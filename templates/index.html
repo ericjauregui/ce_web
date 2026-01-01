@@ -1,0 +1,61 @@
+
+{% extends "base.html" %}
+{% block title %}California Earrings — Catalog{% endblock %}
+{% block content %}
+<header class="hero d-flex align-items-center text-center">
+  <div class="container">
+    <h1 class="display-5 fw-semibold text-gold">Manufacturers • Importers • Wholesalers of 14K Gold Earrings</h1>
+    <p class="lead text-gold-70 mt-2">Los Angeles Jewelry District · Wholesale Only</p>
+    <form class="d-flex justify-content-center mt-4" method="get">
+      <input name="q" value="{{ q or '' }}" placeholder="Search code or style (e.g., 101SB, bezel, 4‑prong)"
+             class="form-control form-control-lg w-75 bg-dark text-light border-gold">
+    </form>
+  </div>
+</header>
+<section class="container py-5">
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">
+    {% for p in products %}
+    <div class="col">
+      <div class="card product h-100 shadow-sm bg-dark border-0"
+           data-bs-toggle="modal" data-bs-target="#viewerModal"
+           data-img="{{ url_for('static', filename='images/' ~ p.image) }}"
+           data-title="{{ p.code }} — {{ p.name }}"
+           data-caption="{{ p.blurb }}">
+        <img class="card-img-top product-img" src="{{ url_for('static', filename='images/' ~ p.image) }}" alt="{{ p.name }}">
+        <div class="card-body text-center">
+          <div class="small code-badge">{{ p.code }}</div>
+          <h5 class="card-title text-gold mt-2">{{ p.name }}</h5>
+          <p class="card-text text-gold-70">{{ p.blurb }}</p>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+<div class="modal fade modal-dark" id="viewerModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="viewerTitle"></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <img id="viewerImg" class="viewer-img" src="" alt="">
+        <div class="mt-2 small" style="color:var(--gold-70)" id="viewerCaption"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+const modal = document.getElementById('viewerModal');
+modal.addEventListener('show.bs.modal', event => {
+  const card = event.relatedTarget;
+  const img = card.getAttribute('data-img');
+  const title = card.getAttribute('data-title');
+  const caption = card.getAttribute('data-caption');
+  document.getElementById('viewerImg').src = img;
+  document.getElementById('viewerTitle').textContent = title;
+  document.getElementById('viewerCaption').textContent = caption;
+});
+</script>
+{% endblock %}

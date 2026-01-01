@@ -1,0 +1,135 @@
+[
+  {
+    "code": "101SB",
+    "name": "Micro 4-Prong CZ Stud",
+    "image": "101SB.jpg",
+    "blurb": "14K yellow gold, round CZ, micro 4-prong.",
+    "tags": [
+      "stud",
+      "prong",
+      "micro",
+      "14k",
+      "cz",
+      "round"
+    ]
+  },
+  {
+    "code": "102SB",
+    "name": "Petite 4-Prong CZ Stud",
+    "image": "102SB.jpg",
+    "blurb": "14K yellow gold, round CZ, petite 4-prong.",
+    "tags": [
+      "stud",
+      "prong",
+      "14k",
+      "cz",
+      "round"
+    ]
+  },
+  {
+    "code": "103BSB",
+    "name": "Micro Bezel CZ Stud",
+    "image": "103BSB.jpg",
+    "blurb": "14K yellow gold, round CZ, micro bezel.",
+    "tags": [
+      "stud",
+      "bezel",
+      "micro",
+      "14k",
+      "cz",
+      "round"
+    ]
+  },
+  {
+    "code": "103SB",
+    "name": "Classic 4-Prong CZ Stud",
+    "image": "103SB.jpg",
+    "blurb": "14K yellow gold, round CZ, classic 4-prong.",
+    "tags": [
+      "stud",
+      "prong",
+      "classic",
+      "14k",
+      "cz",
+      "round"
+    ]
+  },
+  {
+    "code": "104BSB",
+    "name": "Bezel CZ Stud (Small)",
+    "image": "104BSB.jpg",
+    "blurb": "14K yellow gold, round CZ, sleek bezel.",
+    "tags": [
+      "stud",
+      "bezel",
+      "14k",
+      "cz",
+      "round"
+    ]
+  },
+  {
+    "code": "104SB",
+    "name": "4-Prong CZ Stud (Small)",
+    "image": "104SB.jpg",
+    "blurb": "14K yellow gold, round CZ, refined 4-prong.",
+    "tags": [
+      "stud",
+      "prong",
+      "14k",
+      "cz",
+      "round"
+    ]
+  },
+  {
+    "code": "105BSB",
+    "name": "Bezel CZ Stud (Medium)",
+    "image": "105BSB.jpg",
+    "blurb": "14K yellow gold, round CZ, modern bezel.",
+    "tags": [
+      "stud",
+      "bezel",
+      "14k",
+      "cz",
+      "round"
+    ]
+  },
+  {
+    "code": "105SB",
+    "name": "4-Prong CZ Stud (Medium)",
+    "image": "105SB.jpg",
+    "blurb": "14K yellow gold, round CZ, luminous 4-prong.",
+    "tags": [
+      "stud",
+      "prong",
+      "14k",
+      "cz",
+      "round"
+    ]
+  },
+  {
+    "code": "106BSB",
+    "name": "Bezel CZ Stud (Large)",
+    "image": "106BSB.jpg",
+    "blurb": "14K yellow gold, round CZ, bold bezel.",
+    "tags": [
+      "stud",
+      "bezel",
+      "14k",
+      "cz",
+      "round"
+    ]
+  },
+  {
+    "code": "106SB",
+    "name": "4-Prong CZ Stud (Large)",
+    "image": "106SB.jpg",
+    "blurb": "14K yellow gold, round CZ, statement 4-prong.",
+    "tags": [
+      "stud",
+      "prong",
+      "14k",
+      "cz",
+      "round"
+    ]
+  }
+]
