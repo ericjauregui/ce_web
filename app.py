@@ -216,7 +216,6 @@ def send_order_email(subject: str, body: str, csv_bytes: bytes, filename: str) -
 def inject_site_config():
     return {
         "plausible_domain": os.getenv("PLAUSIBLE_DOMAIN", "").strip(),
-        "goatcounter_url": os.getenv("GOATCOUNTER_URL", "").strip(),
         "site_base_url": os.getenv("SITE_BASE_URL", "").strip(),
         "social": load_social(),
         "team": load_team(),
@@ -423,4 +422,4 @@ def not_found(_):
 
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=5000)
+    app.run(debug=True, host="0.0.0.0", port=5001)
