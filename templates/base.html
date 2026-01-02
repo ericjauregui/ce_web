@@ -27,9 +27,7 @@
   {% if plausible_domain %}
     <script defer data-domain="{{ plausible_domain }}" src="https://plausible.io/js/script.js"></script>
   {% endif %}
-  {% if goatcounter_url %}
-    <script data-goatcounter="{{ goatcounter_url }}" async src="//gc.zgo.at/count.js"></script>
-  {% endif %}
+
 </head>
 <body class="bg-black text-light">
 <nav class="navbar navbar-expand-lg navbar-dark bg-black border-bottom border-gold fixed-top">
@@ -52,9 +50,11 @@
 <footer class="text-center py-4 border-top border-gold mt-5 text-gold-70">
   © {{ 2026 }} California Earrings · Wholesale Only · Los Angeles
   <div class="footer-social mt-2">
-    <a class="text-gold-70 text-decoration-none" href="{{ social.instagram.profile_url }}" target="_blank" rel="noopener">instagram</a>
+    <a class="text-gold-70 text-decoration-none" href="{{ social.instagram.profile_url }}" target="_blank"
+      rel="noopener">Instagram</a>
     <span class="text-gold-70">·</span>
-    <a class="text-gold-70 text-decoration-none" href="{{ social.tiktok.profile_url }}" target="_blank" rel="noopener">tiktok</a>
+    <a class="text-gold-70 text-decoration-none" href="{{ social.tiktok.profile_url }}" target="_blank"
+      rel="noopener">TikTok</a>
   </div>
 </footer>
 
