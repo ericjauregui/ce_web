@@ -1,0 +1,26 @@
+<div class="col">
+  <div class="card product h-100 shadow-sm bg-dark border-0"
+       role="button"
+       data-bs-toggle="modal" data-bs-target="#viewerModal"
+       data-img="{{ url_for('static', filename='images/' ~ p.image) }}"
+       data-title="{{ p.code }} — {{ p.name }}"
+       data-caption="{{ p.description }}">
+    <a class="stretched-link" href="{{ url_for('product_detail', slug=p.slug) }}" aria-label="Open {{ p.code }} {{ p.name }}"></a>
+    <img class="card-img-top product-img" src="{{ url_for('static', filename='images/' ~ p.image) }}" alt="{{ p.name }}">
+    <div class="card-body text-center d-flex flex-column">
+      <div class="small code-badge">{{ p.code }}</div>
+      <h5 class="card-title text-gold mt-2">{{ p.name }}</h5>
+      <p class="card-text text-gold-70 mb-2">{{ p.description }}</p>
+
+      <div class="small text-gold-70 mb-3">contact for pricing</div>
+
+      <div class="mt-auto d-grid gap-2">
+        <button type="button"
+                class="btn btn-outline-gold btn-sm add-to-cart-btn"
+                data-code="{{ p.code }}">
+          add to inquiry
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

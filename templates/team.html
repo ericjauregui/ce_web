@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Meet the Team | California Earrings{% endblock %}
+{% block meta_description %}Meet the California Earrings team — Los Angeles–based wholesale manufacturers of 14K gold earrings.{% endblock %}
+
+{% block content %}
+<section class="container py-5" style="max-width: 1100px;">
+  <div class="text-center mb-4">
+    <h1 class="text-gold mb-2">{{ team.headline }}</h1>
+    <p class="text-gold-70 mb-0">{{ team.subheadline }}</p>
+  </div>
+
+  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mt-2">
+    {% for m in team.members %}
+      <div class="col">
+        <div class="card bg-dark border-gold h-100 p-3">
+          <div class="d-flex gap-3 align-items-center">
+            <div class="team-avatar">
+              {% if m.photo %}
+                <img src="{{ url_for('static', filename='team/' ~ m.photo) }}" alt="{{ m.name }}">
+              {% else %}
+                <div class="team-initials">{{ (m.name or 'CE')[:2]|upper }}</div>
+              {% endif %}
+            </div>
+            <div>
+              <div class="text-gold fw-semibold">{{ m.name }}</div>
+              <div class="text-gold-70 small">{{ m.title }}</div>
+            </div>
+          </div>
+          <p class="text-gold-70 mt-3 mb-0">{{ m.bio }}</p>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <div class="text-center mt-5">
+    <a class="btn btn-outline-gold" href="{{ url_for('index') }}">back to catalog</a>
+  </div>
+</section>
+{% endblock %}

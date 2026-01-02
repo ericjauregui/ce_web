@@ -1,0 +1,10 @@
+{
+  "order": [
+    "bezel",
+    "prong"
+  ],
+  "labels": {
+    "bezel": "Bezel Studs",
+    "prong": "Prong Studs"
+  }
+}

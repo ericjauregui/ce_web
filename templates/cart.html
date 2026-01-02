@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block title %}Inquiry Cart | California Earrings{% endblock %}
+{% block content %}
+<section class="container py-5" style="max-width: 1100px;">
+  <div class="d-flex align-items-end justify-content-between gap-3 flex-wrap">
+    <div>
+      <h1 class="text-gold mb-2">Inquiry cart</h1>
+      <p class="text-gold-70 mb-0">No pricing shown. Submit an inquiry and we’ll follow up with wholesale pricing & availability.</p>
+    </div>
+    <div class="d-flex gap-2">
+      <a class="btn btn-outline-gold" href="{{ url_for('index') }}">continue browsing</a>
+      <a class="btn btn-outline-gold" href="{{ url_for('checkout') }}">checkout</a>
+    </div>
+  </div>
+
+  <div class="mt-4 card bg-dark border-gold p-3">
+    {% if items|length == 0 %}
+      <p class="text-gold-70 mb-0">Your inquiry cart is empty.</p>
+    {% else %}
+      <div class="table-responsive">
+        <table class="table table-dark align-middle mb-0">
+          <thead>
+            <tr>
+              <th>item</th>
+              <th>code</th>
+              <th style="width: 220px;">quantity</th>
+              <th style="width: 90px;"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in items %}
+            <tr>
+              <td>
+                <div class="d-flex align-items-center gap-3">
+                  <img src="{{ url_for('static', filename='images/' ~ row.product.image) }}" class="cart-thumb" alt="">
+                  <div>
+                    <div class="text-gold fw-semibold">{{ row.product.name }}</div>
+                    <div class="text-gold-70 small">{{ row.product.description }}</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="code-badge">{{ row.product.code }}</span></td>
+              <td>
+                <div class="qty-control" data-code="{{ row.product.code }}">
+                  <button class="btn btn-outline-gold btn-sm qty-minus" type="button">−</button>
+                  <input class="form-control form-control-sm bg-black text-light border-gold qty-input" value="{{ row.qty }}" inputmode="numeric">
+                  <button class="btn btn-outline-gold btn-sm qty-plus" type="button">+</button>
+                </div>
+              </td>
+              <td>
+                <button class="btn btn-outline-gold btn-sm qty-remove" type="button" data-code="{{ row.product.code }}">remove</button>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2">
+        <div class="text-gold-70 small">items: <span id="cartItemCount">{{ total_items }}</span></div>
+        <a class="btn btn-outline-gold" href="{{ url_for('checkout') }}">checkout</a>
+      </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}
+
+{% block body_end %}
+<script>
+async function postJson(url, payload){
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify(payload || {})
+  });
+  return res.json();
+}
+function clampQty(q){
+  q = parseInt(q || "0", 10);
+  if (isNaN(q) || q < 0) q = 0;
+  if (q > 999) q = 999;
+  return q;
+}
+async function refreshCartCount(){
+  const data = await fetch("/api/cart/count").then(r => r.json());
+  const badge = document.getElementById("cartCountBadge");
+  if (badge){
+    badge.textContent = data.total_items || 0;
+    badge.style.display = (data.total_items || 0) > 0 ? "inline-block" : "none";
+  }
+  const c = document.getElementById("cartItemCount");
+  if (c) c.textContent = data.total_items || 0;
+}
+document.addEventListener("click", async (e) => {
+  const minus = e.target.closest(".qty-minus");
+  const plus = e.target.closest(".qty-plus");
+  const remove = e.target.closest(".qty-remove");
+  if (minus || plus){
+    const wrap = e.target.closest(".qty-control");
+    const code = wrap.getAttribute("data-code");
+    const input = wrap.querySelector(".qty-input");
+    let q = clampQty(input.value);
+    q = minus ? Math.max(0, q - 1) : Math.min(999, q + 1);
+    input.value = q;
+    await postJson("/api/cart/set", {code, qty: q});
+    await refreshCartCount();
+  }
+  if (remove){
+    const code = remove.getAttribute("data-code");
+    await postJson("/api/cart/remove", {code});
+    window.location.reload();
+  }
+});
+document.addEventListener("change", async (e) => {
+  const input = e.target.closest(".qty-input");
+  if (!input) return;
+  const wrap = input.closest(".qty-control");
+  const code = wrap.getAttribute("data-code");
+  const q = clampQty(input.value);
+  input.value = q;
+  await postJson("/api/cart/set", {code, qty: q});
+  await refreshCartCount();
+});
+</script>
+{% endblock %}

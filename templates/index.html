@@ -1,37 +1,84 @@
-
 {% extends "base.html" %}
-{% block title %}California Earrings — Catalog{% endblock %}
+{% block title %}Wholesale 14K Gold Earrings | California Earrings{% endblock %}
 {% block content %}
-<header class="hero d-flex align-items-center text-center">
+<header class="hero d-flex align-items-center text-center" id="top">
   <div class="container">
     <h1 class="display-5 fw-semibold text-gold">Manufacturers • Importers • Wholesalers of 14K Gold Earrings</h1>
     <p class="lead text-gold-70 mt-2">Los Angeles Jewelry District · Wholesale Only</p>
-    <form class="d-flex justify-content-center mt-4" method="get">
-      <input name="q" value="{{ q or '' }}" placeholder="Search code or style (e.g., 101SB, bezel, 4‑prong)"
-             class="form-control form-control-lg w-75 bg-dark text-light border-gold">
+
+    <form class="d-flex justify-content-center mt-4 gap-2 flex-wrap" method="get">
+      <input name="q" value="{{ q or '' }}" placeholder="Search code, style, or tag (e.g., 101SB, bezel, prong)"
+             class="form-control form-control-lg bg-dark text-light border-gold" style="max-width: 520px;">
+
+      <select name="sort" class="form-select form-select-lg bg-dark text-light border-gold" style="max-width: 300px;">
+        {% for val, label in sort_options %}
+          <option value="{{ val }}" {% if sort == val %}selected{% endif %}>sort: {{ label }}</option>
+        {% endfor %}
+      </select>
+
+      <button class="btn btn-outline-gold btn-lg" type="submit">apply</button>
     </form>
   </div>
 </header>
+
+{% if sections|length > 1 %}
+<div class="sticky-collections border-bottom border-gold">
+  <div class="container d-flex flex-wrap gap-2 py-2 justify-content-center">
+    {% for section in sections %}
+      <a class="chip" href="#section-{{ section.key }}">{{ section.title }}</a>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
 <section class="container py-5">
-  <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">
-    {% for p in products %}
-    <div class="col">
-      <div class="card product h-100 shadow-sm bg-dark border-0"
-           data-bs-toggle="modal" data-bs-target="#viewerModal"
-           data-img="{{ url_for('static', filename='images/' ~ p.image) }}"
-           data-title="{{ p.code }} — {{ p.name }}"
-           data-caption="{{ p.blurb }}">
-        <img class="card-img-top product-img" src="{{ url_for('static', filename='images/' ~ p.image) }}" alt="{{ p.name }}">
-        <div class="card-body text-center">
-          <div class="small code-badge">{{ p.code }}</div>
-          <h5 class="card-title text-gold mt-2">{{ p.name }}</h5>
-          <p class="card-text text-gold-70">{{ p.blurb }}</p>
-        </div>
+  {% for section in sections %}
+    <div class="d-flex align-items-end justify-content-between mt-5 mb-3" id="section-{{ section.key }}">
+      <h2 class="text-gold m-0 section-title">{{ section.title }}</h2>
+      <div class="d-flex gap-3 align-items-center">
+        <a class="text-gold-70 small text-decoration-none" href="#top">back to top</a>
       </div>
     </div>
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">
+      {% for p in section.items %}
+        {% include "partials/product_card.html" %}
+      {% endfor %}
+    </div>
+  {% endfor %}
+</section>
+
+<section class="container pb-5" style="max-width: 1200px;">
+  <div class="d-flex align-items-end justify-content-between mb-3">
+    <h2 class="text-gold m-0 section-title">Social reels</h2>
+    <div class="d-flex gap-2">
+      <a class="chip" href="{{ social.instagram.profile_url }}" target="_blank" rel="noopener">instagram</a>
+      <a class="chip" href="{{ social.tiktok.profile_url }}" target="_blank" rel="noopener">tiktok</a>
+    </div>
+  </div>
+
+  <p class="text-gold-70 small mb-3">
+    Note: TikTok/Instagram autoplay is controlled by the platforms and often requires user interaction.
+    These embeds may not autoplay on all browsers/devices.
+  </p>
+
+  <div class="reels-row">
+    {% for url in social.tiktok.videos %}
+      <div class="reel-card bg-dark border-gold">
+        <!-- TikTok embed -->
+        <blockquote class="tiktok-embed" cite="{{ url }}" data-video-id="" style="max-width: 320px;min-width: 260px;">
+          <section>
+            <a target="_blank" rel="noopener" href="{{ url }}">Watch on TikTok</a>
+          </section>
+        </blockquote>
+      </div>
     {% endfor %}
   </div>
 </section>
+
+<script async src="https://www.tiktok.com/embed.js"></script>
+
+
+<!-- Modal Lightbox -->
 <div class="modal fade modal-dark" id="viewerModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-xl">
     <div class="modal-content">
@@ -42,10 +89,16 @@
       <div class="modal-body">
         <img id="viewerImg" class="viewer-img" src="" alt="">
         <div class="mt-2 small" style="color:var(--gold-70)" id="viewerCaption"></div>
+        <div class="mt-3">
+          <a id="viewerLink" class="btn btn-outline-gold btn-sm" href="#" target="_self">open product page</a>
+        </div>
       </div>
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block body_end %}
 <script>
 const modal = document.getElementById('viewerModal');
 modal.addEventListener('show.bs.modal', event => {
@@ -53,9 +106,30 @@ modal.addEventListener('show.bs.modal', event => {
   const img = card.getAttribute('data-img');
   const title = card.getAttribute('data-title');
   const caption = card.getAttribute('data-caption');
+  const link = card.querySelector('a.stretched-link')?.getAttribute('href') || '#';
   document.getElementById('viewerImg').src = img;
   document.getElementById('viewerTitle').textContent = title;
   document.getElementById('viewerCaption').textContent = caption;
+  document.getElementById('viewerLink').setAttribute('href', link);
+});
+async function postJson(url, payload){
+  const res = await fetch(url, {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(payload||{})});
+  return res.json();
+}
+document.addEventListener("click", async (e) => {
+  const btn = e.target.closest(".add-to-cart-btn");
+  if (!btn) return;
+  e.preventDefault();
+  e.stopPropagation();
+  const code = btn.getAttribute("data-code");
+  const r = await postJson("/api/cart/add", {code: code, qty: 1});
+  const badge = document.getElementById("cartCountBadge");
+  if (badge){
+    badge.textContent = r.total_items || 0;
+    badge.style.display = (r.total_items || 0) > 0 ? "inline-block" : "none";
+  }
+  btn.textContent = "added ✓";
+  setTimeout(() => btn.textContent = "add to inquiry", 1200);
 });
 </script>
 {% endblock %}

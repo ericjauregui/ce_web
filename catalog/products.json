@@ -1,35 +1,67 @@
 [
   {
+    "id": "101sb",
     "code": "101SB",
-    "name": "1.5mm · 4-Prong CZ Stud Screwback",
+    "name": "Micro 4-Prong CZ Stud",
+    "slug": "101sb-micro-4-prong-cz-stud",
+    "collection": "prong",
+    "display_order": 1,
+    "size_mm": null,
+    "stone": "CZ",
+    "material": "14K Yellow Gold",
+    "description": "14K yellow gold, round CZ, micro 4-prong.",
     "image": "101SB.jpg",
-    "blurb": "14K yellow gold · CZ · available in all gemstone colors",
     "tags": [
       "stud",
       "prong",
+      "micro",
       "14k",
       "cz",
       "round"
-    ]
+    ],
+    "seo": {
+      "title": "101SB Micro 4-Prong CZ Stud | 14K Gold Wholesale",
+      "description": "Wholesale 14K yellow gold, round CZ, micro 4-prong. Item 101SB."
+    },
+    "qr_image": null
   },
   {
+    "id": "102sb",
     "code": "102SB",
-    "name": "2mm · 4-Prong CZ Stud",
+    "name": "Petite 4-Prong CZ Stud",
+    "slug": "102sb-petite-4-prong-cz-stud",
+    "collection": "prong",
+    "display_order": 2,
+    "size_mm": null,
+    "stone": "CZ",
+    "material": "14K Yellow Gold",
+    "description": "14K yellow gold, round CZ, petite 4-prong.",
     "image": "102SB.jpg",
-    "blurb": "14K yellow gold · round CZ · 4-prong.",
     "tags": [
       "stud",
       "prong",
       "14k",
       "cz",
       "round"
-    ]
+    ],
+    "seo": {
+      "title": "102SB Petite 4-Prong CZ Stud | 14K Gold Wholesale",
+      "description": "Wholesale 14K yellow gold, round CZ, petite 4-prong. Item 102SB."
+    },
+    "qr_image": null
   },
   {
+    "id": "103bsb",
     "code": "103BSB",
     "name": "Micro Bezel CZ Stud",
+    "slug": "103bsb-micro-bezel-cz-stud",
+    "collection": "bezel",
+    "display_order": 3,
+    "size_mm": null,
+    "stone": "CZ",
+    "material": "14K Yellow Gold",
+    "description": "14K yellow gold, round CZ, micro bezel.",
     "image": "103BSB.jpg",
-    "blurb": "14K yellow gold, round CZ, micro bezel.",
     "tags": [
       "stud",
       "bezel",
@@ -37,13 +69,25 @@
       "14k",
       "cz",
       "round"
-    ]
+    ],
+    "seo": {
+      "title": "103BSB Micro Bezel CZ Stud | 14K Gold Wholesale",
+      "description": "Wholesale 14K yellow gold, round CZ, micro bezel. Item 103BSB."
+    },
+    "qr_image": null
   },
   {
+    "id": "103sb",
     "code": "103SB",
     "name": "Classic 4-Prong CZ Stud",
+    "slug": "103sb-classic-4-prong-cz-stud",
+    "collection": "prong",
+    "display_order": 4,
+    "size_mm": null,
+    "stone": "CZ",
+    "material": "14K Yellow Gold",
+    "description": "14K yellow gold, round CZ, classic 4-prong.",
     "image": "103SB.jpg",
-    "blurb": "14K yellow gold, round CZ, classic 4-prong.",
     "tags": [
       "stud",
       "prong",
@@ -51,84 +95,161 @@
       "14k",
       "cz",
       "round"
-    ]
+    ],
+    "seo": {
+      "title": "103SB Classic 4-Prong CZ Stud | 14K Gold Wholesale",
+      "description": "Wholesale 14K yellow gold, round CZ, classic 4-prong. Item 103SB."
+    },
+    "qr_image": null
   },
   {
+    "id": "104bsb",
     "code": "104BSB",
     "name": "Bezel CZ Stud (Small)",
+    "slug": "104bsb-bezel-cz-stud-small",
+    "collection": "bezel",
+    "display_order": 5,
+    "size_mm": null,
+    "stone": "CZ",
+    "material": "14K Yellow Gold",
+    "description": "14K yellow gold, round CZ, sleek bezel.",
     "image": "104BSB.jpg",
-    "blurb": "14K yellow gold, round CZ, sleek bezel.",
     "tags": [
       "stud",
       "bezel",
       "14k",
       "cz",
       "round"
-    ]
+    ],
+    "seo": {
+      "title": "104BSB Bezel CZ Stud (Small) | 14K Gold Wholesale",
+      "description": "Wholesale 14K yellow gold, round CZ, sleek bezel. Item 104BSB."
+    },
+    "qr_image": null
   },
   {
+    "id": "104sb",
     "code": "104SB",
     "name": "4-Prong CZ Stud (Small)",
+    "slug": "104sb-4-prong-cz-stud-small",
+    "collection": "prong",
+    "display_order": 6,
+    "size_mm": null,
+    "stone": "CZ",
+    "material": "14K Yellow Gold",
+    "description": "14K yellow gold, round CZ, refined 4-prong.",
     "image": "104SB.jpg",
-    "blurb": "14K yellow gold, round CZ, refined 4-prong.",
     "tags": [
       "stud",
       "prong",
       "14k",
       "cz",
       "round"
-    ]
+    ],
+    "seo": {
+      "title": "104SB 4-Prong CZ Stud (Small) | 14K Gold Wholesale",
+      "description": "Wholesale 14K yellow gold, round CZ, refined 4-prong. Item 104SB."
+    },
+    "qr_image": null
   },
   {
+    "id": "105bsb",
     "code": "105BSB",
     "name": "Bezel CZ Stud (Medium)",
+    "slug": "105bsb-bezel-cz-stud-medium",
+    "collection": "bezel",
+    "display_order": 7,
+    "size_mm": null,
+    "stone": "CZ",
+    "material": "14K Yellow Gold",
+    "description": "14K yellow gold, round CZ, modern bezel.",
     "image": "105BSB.jpg",
-    "blurb": "14K yellow gold, round CZ, modern bezel.",
     "tags": [
       "stud",
       "bezel",
       "14k",
       "cz",
       "round"
-    ]
+    ],
+    "seo": {
+      "title": "105BSB Bezel CZ Stud (Medium) | 14K Gold Wholesale",
+      "description": "Wholesale 14K yellow gold, round CZ, modern bezel. Item 105BSB."
+    },
+    "qr_image": null
   },
   {
+    "id": "105sb",
     "code": "105SB",
     "name": "4-Prong CZ Stud (Medium)",
+    "slug": "105sb-4-prong-cz-stud-medium",
+    "collection": "prong",
+    "display_order": 8,
+    "size_mm": null,
+    "stone": "CZ",
+    "material": "14K Yellow Gold",
+    "description": "14K yellow gold, round CZ, luminous 4-prong.",
     "image": "105SB.jpg",
-    "blurb": "14K yellow gold, round CZ, luminous 4-prong.",
     "tags": [
       "stud",
       "prong",
       "14k",
       "cz",
       "round"
-    ]
+    ],
+    "seo": {
+      "title": "105SB 4-Prong CZ Stud (Medium) | 14K Gold Wholesale",
+      "description": "Wholesale 14K yellow gold, round CZ, luminous 4-prong. Item 105SB."
+    },
+    "qr_image": null
   },
   {
+    "id": "106bsb",
     "code": "106BSB",
     "name": "Bezel CZ Stud (Large)",
+    "slug": "106bsb-bezel-cz-stud-large",
+    "collection": "bezel",
+    "display_order": 9,
+    "size_mm": null,
+    "stone": "CZ",
+    "material": "14K Yellow Gold",
+    "description": "14K yellow gold, round CZ, bold bezel.",
     "image": "106BSB.jpg",
-    "blurb": "14K yellow gold, round CZ, bold bezel.",
     "tags": [
       "stud",
       "bezel",
       "14k",
       "cz",
       "round"
-    ]
+    ],
+    "seo": {
+      "title": "106BSB Bezel CZ Stud (Large) | 14K Gold Wholesale",
+      "description": "Wholesale 14K yellow gold, round CZ, bold bezel. Item 106BSB."
+    },
+    "qr_image": null
   },
   {
+    "id": "106sb",
     "code": "106SB",
     "name": "4-Prong CZ Stud (Large)",
+    "slug": "106sb-4-prong-cz-stud-large",
+    "collection": "prong",
+    "display_order": 10,
+    "size_mm": null,
+    "stone": "CZ",
+    "material": "14K Yellow Gold",
+    "description": "14K yellow gold, round CZ, statement 4-prong.",
     "image": "106SB.jpg",
-    "blurb": "14K yellow gold, round CZ, statement 4-prong.",
     "tags": [
       "stud",
       "prong",
       "14k",
       "cz",
       "round"
-    ]
+    ],
+    "seo": {
+      "title": "106SB 4-Prong CZ Stud (Large) | 14K Gold Wholesale",
+      "description": "Wholesale 14K yellow gold, round CZ, statement 4-prong. Item 106SB."
+    },
+    "qr_image": null
   }
 ]

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Inquiry Submitted | California Earrings{% endblock %}
+{% block content %}
+<section class="container py-5" style="max-width: 900px;">
+  <h1 class="text-gold mb-2">Inquiry submitted</h1>
+  <p class="text-gold-70">Thanks — we received your inquiry. We’ll contact you shortly with pricing & availability.</p>
+
+  <div class="card bg-dark border-gold p-3 mt-4">
+    <h2 class="h6 text-gold mb-3">download your CSV</h2>
+    <a class="btn btn-outline-gold" href="{{ url_for('download_order_csv', token=token) }}">download csv</a>
+    <div class="text-gold-70 small mt-3">
+      We also sent your inquiry to our team email (if email is configured on the server).
+    </div>
+  </div>
+
+  <div class="mt-4">
+    <a class="btn btn-outline-gold" href="{{ url_for('index') }}">back to catalog</a>
+  </div>
+</section>
+{% endblock %}

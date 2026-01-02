@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Not Found | California Earrings{% endblock %}
+{% block content %}
+<section class="container py-5" style="max-width: 900px;">
+  <h1 class="text-gold mb-3">Page not found</h1>
+  <p class="text-gold-70">That link doesn’t exist. Use the catalog to find your item.</p>
+  <a class="btn btn-outline-gold" href="{{ url_for('index') }}">back to catalog</a>
+</section>
+{% endblock %}

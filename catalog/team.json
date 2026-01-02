@@ -1,0 +1,18 @@
+{
+  "headline": "Meet the team",
+  "subheadline": "Wholesale only \u00b7 Los Angeles Jewelry District",
+  "members": [
+    {
+      "name": "Your Name",
+      "title": "Founder / Sales",
+      "bio": "Short 1\u20132 sentence bio. Replace with real info.",
+      "photo": null
+    },
+    {
+      "name": "Team Member",
+      "title": "Operations",
+      "bio": "Short 1\u20132 sentence bio. Replace with real info.",
+      "photo": null
+    }
+  ]
+}
