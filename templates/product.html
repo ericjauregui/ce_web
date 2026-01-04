@@ -16,17 +16,15 @@
     <div class="col-12 col-lg-6">
       <div class="small code-badge">{{ product.code }}</div>
       <h1 class="mt-3 text-gold">{{ product.name }}</h1>
-      <p class="text-gold-70">{{ product.description }}</p>
+      <p class="text-gold-70">{{ product.description or "Contact us for details." }}</p>
 
       <div class="mt-4">
         <h2 class="h6 text-gold">Details</h2>
         <ul class="text-gold-70 mb-4">
-          <li><span class="text-gold">Material:</span> {{ product.material }}</li>
-          <li><span class="text-gold">Stone:</span> {{ product.stone }}</li>
+          {% if product.material %}<li><span class="text-gold">Material:</span> {{ product.material }}</li>{% endif %}
+          {% if product.stone %}<li><span class="text-gold">Stone:</span> {{ product.stone }}</li>{% endif %}
           <li><span class="text-gold">Collection:</span> {{ product.collection|replace('-', ' ')|title }}</li>
-          {% if product.size_mm %}
-            <li><span class="text-gold">Size:</span> {{ product.size_mm }} mm</li>
-          {% endif %}
+          {% if product.size_mm %}<li><span class="text-gold">Size:</span> {{ product.size_mm }} mm</li>{% endif %}
           <li><span class="text-gold">SKU:</span> {{ product.code }}</li>
         </ul>
 

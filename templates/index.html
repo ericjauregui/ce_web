@@ -12,11 +12,11 @@
 
       <select name="sort" class="form-select form-select-lg bg-dark text-light border-gold" style="max-width: 300px;">
         {% for val, label in sort_options %}
-          <option value="{{ val }}" {% if sort == val %}selected{% endif %}>sort: {{ label }}</option>
+          <option value="{{ val }}" {% if sort==val %}selected{% endif %}>Sort: {{ label }}</option>
         {% endfor %}
       </select>
 
-      <button class="btn btn-outline-gold btn-lg" type="submit">apply</button>
+      <button class="btn btn-outline-gold btn-lg" type="submit">Search</button>
     </form>
   </div>
 </header>

@@ -4,6 +4,7 @@ import csv
 import io
 import json
 import os
+import re
 import secrets
 from dataclasses import dataclass
 from email.message import EmailMessage
@@ -11,7 +12,7 @@ from pathlib import Path
 from typing import Any
 
 import smtplib
-from flask import Flask, abort, jsonify, render_template, request, send_file, session
+from flask import Flask, abort, jsonify, render_template, request, send_file, session, url_for
 
 app = Flask(__name__)
 
@@ -25,14 +26,74 @@ SOCIAL_PATH = BASE_DIR / "catalog" / "social.json"
 TEAM_PATH = BASE_DIR / "catalog" / "team.json"
 
 
+def _slugify(s: str) -> str:
+    s = (s or "").strip().lower()
+    s = re.sub(r"[^a-z0-9]+", "-", s)
+    s = re.sub(r"-{2,}", "-", s).strip("-")
+    return s or "item"
+
+
+def _code_num(code: str) -> int | None:
+    m = re.match(r"^\s*(\d+)", code or "")
+    return int(m.group(1)) if m else None
+
+
+def _compute_slug(code: str, name: str) -> str:
+    c = (code or "").strip()
+    n = (name or "").strip()
+    if not n or n.lower() == c.lower():
+        return _slugify(c)
+    return _slugify(f"{c} {n}")
+
+
+def _compute_seo_title(code: str, name: str) -> str:
+    c = (code or "").strip()
+    n = (name or "").strip()
+    if not n or n.lower() == c.lower():
+        return f"{c} | Wholesale 14K Gold Earrings"
+    return f"{c} {n} | Wholesale 14K Gold Earrings"
+
+
+def normalize_product(p: dict[str, Any]) -> dict[str, Any]:
+    code = (p.get("code") or "").strip()
+    name = (p.get("name") or "").strip() or code
+    description = (p.get("description") or "").strip()
+    collection = (p.get("collection") or "other").strip() or "other"
+    image = (p.get("image") or "").strip()
+    tags = p.get("tags") or []
+    if not isinstance(tags, list):
+        tags = []
+
+    slug = _compute_slug(code, name)
+    seo_title = _compute_seo_title(code, name)
+    seo_desc = description  # default: use description (no code repetition)
+
+    # tolerate extra keys if present, but we now generate derived ones
+    out = dict(p)
+    out.update(
+        {
+            "id": code.lower(),
+            "code": code,
+            "name": name,
+            "description": description,
+            "collection": collection,
+            "image": image,
+            "tags": tags,
+            "slug": slug,
+            "seo": {"title": seo_title, "description": seo_desc},
+        }
+    )
+    return out
+
+
 def load_products() -> list[dict[str, Any]]:
     with open(CATALOG_PATH, "r", encoding="utf-8") as f:
-        return json.load(f)
+        raw = json.load(f)
+    return [normalize_product(p) for p in (raw or [])]
 
 
-def products_by_code(products: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
+def products_by_code(products: list[dict[str, Any]]) -> dict:
     return {p.get("code"): p for p in products if p.get("code")}
-
 
 
 def load_social() -> dict[str, Any]:
@@ -56,7 +117,7 @@ def load_collections_cfg() -> dict[str, Any]:
     return {"order": [], "labels": {}}
 
 
-def sort_products(products: list[dict[str, Any]], sort_key: str) -> list[dict[str, Any]]:
+def sort_products(products: list[dict], sort_key: str) -> list[dict]:
     sort_key = (sort_key or "order").lower()
 
     def safe_lower(x):
@@ -76,7 +137,20 @@ def sort_products(products: list[dict[str, Any]], sort_key: str) -> list[dict[st
             products,
             key=lambda p: (p.get("size_mm") is None, -(p.get("size_mm") or 0), safe_lower(p.get("code"))),
         )
-    return sorted(products, key=lambda p: (p.get("display_order", 999999), safe_lower(p.get("code"))))
+
+    # featured/default order: collection order then code (numeric then lex)
+    cfg = load_collections_cfg()
+    order: list[str] = cfg.get("order") or []
+    order_rank = {k: i for i, k in enumerate(order)}
+
+    def order_key(p: dict[str, Any]):
+        col = (p.get("collection") or "other").strip()
+        col_rank = order_rank.get(col, len(order) + 1)
+        code = p.get("code") or ""
+        num = _code_num(code)
+        return (col_rank, num is None, num or 0, safe_lower(code))
+
+    return sorted(products, key=order_key)
 
 
 def filter_products(products: list[dict[str, Any]], q: str) -> list[dict[str, Any]]:
@@ -219,6 +293,7 @@ def inject_site_config():
         "site_base_url": os.getenv("SITE_BASE_URL", "").strip(),
         "social": load_social(),
         "team": load_team(),
+        "site_name": "California Earrings",
     }
 
 
@@ -235,11 +310,11 @@ def index():
     sections = build_sections(products, cfg)
 
     sort_options = [
-        ("order", "featured"),
-        ("code", "item code (a–z)"),
-        ("name", "name (a–z)"),
-        ("size_mm_asc", "size (mm) small → large"),
-        ("size_mm_desc", "size (mm) large → small"),
+        ("order", "Featured"),
+        ("code", "Item code (a–z)"),
+        ("name", "Name (a–z)"),
+        ("size_mm_asc", "Size (mm) Small →> Large"),
+        ("size_mm_desc", "Size (mm) Large →> Small"),
     ]
 
     return render_template("index.html", sections=sections, q=q, sort=sort, sort_options=sort_options)

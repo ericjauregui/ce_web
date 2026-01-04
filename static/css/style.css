@@ -93,6 +93,38 @@ html::before{
 :root{ --gold:#d7c07a; --gold-70: rgba(215,192,122,0.75); --gold-grad: linear-gradient(90deg, #b8994c, #e6d294, #b8994c); }
 body { font-family:'Lato',sans-serif; color:#e8e8e8; background:#0d0d0d; }
 .brand { font-family:'Playfair Display',serif; letter-spacing:.5px; color: var(--gold) !important; }
+/* --- Brand logo (responsive, restrained) --- */
+.brand-logo {
+  height: clamp(50px, 4.5vw, 80px);
+  /* smaller overall, still responsive */
+  width: auto;
+  max-width: min(200px, 38vw);
+  object-fit: contain;
+  display: block;
+  filter: drop-shadow(0 1px 6px rgba(0, 0, 0, .35));
+}
+
+/* Slightly more compact navbar spacing */
+.navbar {
+  padding-top: .45rem;
+  padding-bottom: .45rem;
+}
+
+/* Extra-small screens */
+@media (max-width: 420px) {
+  .brand-logo {
+    height: 20px;
+    max-width: 60vw;
+  }
+}
+
+/* Large desktops: cap size so it never feels oversized */
+@media (min-width: 1400px) {
+  .brand-logo {
+    height: 30px;
+    max-width: 180px;
+  }
+}
 .text-gold { color: var(--gold) !important; } .text-gold-70{ color: var(--gold-70) !important; }
 .border-gold{ border-color: var(--gold) !important; }
 .bg-black { background:#0d0d0d !important; }

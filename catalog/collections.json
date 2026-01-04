@@ -1,10 +1,14 @@
 {
   "order": [
     "bezel",
-    "prong"
+    "prong",
+    "studs",
+    "uncategorized"
   ],
   "labels": {
     "bezel": "Bezel Studs",
-    "prong": "Prong Studs"
+    "prong": "Prong Studs",
+    "studs": "Studs",
+    "uncategorized": "More Styles"
   }
 }
