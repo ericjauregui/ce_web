@@ -18,7 +18,7 @@ body::before{
   z-index: -3;
 
   background-image: url("/static/assets/ce_logo_shape.png");
-  background-size: cover;
+  background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
 
@@ -338,4 +338,182 @@ footer{ background:#0d0d0d; }
   .cart-link[aria-current="page"] svg {
     animation: none !important;
   }
+}
+/* Navbar expandable search */
+.nav-actions {
+  gap: .25rem;
+}
+
+.nav-search {
+  display: flex;
+  align-items: center;
+  gap: .35rem;
+}
+
+/* Navbar expandable search (centered) */
+.nav-search-center {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  max-width: calc(100% - 190px);
+  /* leaves room for cart+toggler on right */
+  z-index: 2;
+}
+
+.nav-search-trigger {
+  appearance: none;
+  border: 1px solid rgba(215, 192, 122, 0.35);
+  background: rgba(13, 13, 13, 0.55);
+  color: var(--gold);
+  padding: .28rem .6rem;
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  border-radius: 999px;
+}
+
+.nav-search-trigger:hover,
+.nav-search-trigger:focus-visible {
+  color: #fff;
+  background: rgba(215, 192, 122, 0.10);
+  border-color: rgba(215, 192, 122, 0.7);
+  outline: none;
+}
+
+.nav-search-icon {
+  width: 18px;
+  height: 18px;
+  display: block;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  /* thinner silhouette */
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.nav-search-label {
+  font-weight: 600;
+  letter-spacing: .02rem;
+  font-size: .95rem;
+  color: currentColor;
+}
+
+.nav-search-form {
+  width: 0;
+  opacity: 0;
+  pointer-events: none;
+  overflow: hidden;
+  transition: width 190ms ease, opacity 130ms ease;
+}
+
+.nav-search.is-open .nav-search-form {
+  width: min(360px, 62vw);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* When expanded, hide the label text so only icon + input remain */
+.nav-search.is-open .nav-search-label {
+  display: none;
+}
+
+.nav-search-input {
+  height: 34px;
+  padding: .25rem .7rem;
+  background: rgba(13, 13, 13, 0.70);
+  color: var(--gold);
+  /* gold letters */
+  border-radius: 999px;
+}
+
+.nav-search-input::placeholder {
+  color: rgba(215, 192, 122, 0.70);
+}
+
+/* Navbar search: force black input (override Bootstrap + autofill) */
+.nav-search .nav-search-input.form-control {
+  background-color: rgba(13, 13, 13, 0.85) !important;
+  color: var(--gold) !important;
+  caret-color: var(--gold);
+  border-color: rgba(215, 192, 122, 0.55) !important;
+}
+
+.nav-search .nav-search-input.form-control:focus {
+  background-color: rgba(13, 13, 13, 0.92) !important;
+  color: var(--gold) !important;
+  border-color: var(--gold) !important;
+  box-shadow: 0 0 0 .2rem rgba(215, 192, 122, .18) !important;
+}
+
+/* Chrome/Safari autofill can force a light background */
+.nav-search .nav-search-input.form-control:-webkit-autofill,
+.nav-search .nav-search-input.form-control:-webkit-autofill:hover,
+.nav-search .nav-search-input.form-control:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--gold) !important;
+  box-shadow: 0 0 0px 1000px rgba(13, 13, 13, 0.92) inset !important;
+  -webkit-box-shadow: 0 0 0px 1000px rgba(13, 13, 13, 0.92) inset !important;
+  transition: background-color 9999s ease-out 0s;
+}
+
+@media (max-width: 420px) {
+  .nav-search-label {
+    display: none;
+  }
+
+  /* keeps center clean on very small screens */
+  .nav-search-center {
+    max-width: calc(100% - 160px);
+  }
+}
+
+/* Gold scrollbar (site-wide)
+   NOTE: On macOS Safari with "Show scroll bars: Automatically", scrollbars are overlay and may not show custom colors.
+   For consistent styling in Safari: System Settings → Appearance → Show scroll bars → Always.
+*/
+:root {
+  scrollbar-color: var(--gold) #0d0d0d;
+  /* Firefox */
+  scrollbar-width: thin;
+  /* Firefox */
+}
+
+/* WebKit (Chrome/Safari/Edge) - target html/body explicitly for Safari */
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+*::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+html::-webkit-scrollbar-track,
+body::-webkit-scrollbar-track,
+*::-webkit-scrollbar-track {
+  background: rgba(13, 13, 13, 0.95);
+}
+
+html::-webkit-scrollbar-thumb,
+body::-webkit-scrollbar-thumb,
+*::-webkit-scrollbar-thumb {
+  background: rgba(215, 192, 122, 0.92);
+  /* stronger gold */
+  border-radius: 999px;
+  border: 1px solid rgba(13, 13, 13, 0.85);
+  /* lighter than before so gold shows on thin overlay */
+  background-clip: padding-box;
+}
+
+html::-webkit-scrollbar-thumb:hover,
+body::-webkit-scrollbar-thumb:hover,
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(215, 192, 122, 1);
+}
+
+html::-webkit-scrollbar-corner,
+body::-webkit-scrollbar-corner,
+*::-webkit-scrollbar-corner {
+  background: rgba(13, 13, 13, 0.95);
 }
