@@ -18,13 +18,14 @@
 </head>
 <body class="bg-black text-light">
 <div class="page-shell">
-  <nav class="navbar navbar-expand-lg navbar-dark bg-black border-bottom border-gold fixed-top">
+  <nav class="navbar navbar-dark bg-black border-bottom border-gold fixed-top">
     <div class="container">
       <a href="{{ url_for('index') }}" class="navbar-brand brand-lockup" aria-label="{{ site_name }}">
         <img src="{{ url_for('static', filename='assets/ce_logo_full.png') }}" alt="{{ site_name }}" class="brand-logo"
           loading="eager" decoding="async" />
       </a>
-      <a class="nav-link position-relative text-gold-70 ms-auto me-2 order-lg-2" href="/cart" aria-label="Cart">
+      <a id="cartLink" class="nav-link cart-link position-relative text-gold-70 ms-auto me-2 order-lg-2" href="/cart"
+        aria-label="Cart" {% if request.path=='/cart' %}aria-current="page" {% endif %}>
         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
           stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <circle cx="9" cy="21" r="1"></circle>
@@ -37,8 +38,8 @@
       </a>
       <button class="navbar-toggler order-lg-3" data-bs-toggle="collapse" data-bs-target="#nav" aria-controls="nav"
         aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
-      <div id="nav" class="collapse navbar-collapse order-lg-1">
-        <ul class="navbar-nav ms-auto">
+      <div id="nav" class="collapse navbar-collapse w-100 text-end">
+        <ul class="navbar-nav ms-auto align-items-end text-end">
           <li class="nav-item"><a class="nav-link" href="/team">Meet the team</a></li>
           <li class="nav-item"><a class="nav-link" href="/about">About Us</a></li>
           <li class="nav-item"><a class="nav-link" href="/contact">Contact Us</a></li>
@@ -75,7 +76,24 @@
                                   } catch (e) { }
                                 }
                                 document.addEventListener("DOMContentLoaded", refreshCartCount);
-                              </script>
+                                  // Bounce cart when selected/activated (click, Enter, Space)
+                                  (function () {
+                                    const el = document.getElementById("cartLink");
+                                    if (!el) return;
+
+                                    function bounce() {
+                                      el.classList.remove("is-bouncing");
+                                      void el.offsetWidth; // reflow to retrigger animation
+                                      el.classList.add("is-bouncing");
+                                      window.setTimeout(() => el.classList.remove("is-bouncing"), 650);
+                                    }
+
+                                    el.addEventListener("click", bounce);
+                                    el.addEventListener("keydown", (e) => {
+                                      if (e.key === "Enter" || e.key === " ") bounce();
+                                    });
+                                  })();
+</script>
 </div>
 </body>
 </html>
