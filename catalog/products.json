@@ -1,976 +1,1155 @@
 [
   {
     "code": "101SB",
-    "collection": "Studs",
-    "name": "Stud Earring",
-    "description": "14k gold stud earring",
     "image": "101SB.jpg",
+    "collection": "studs",
+    "name": "Petite Double Round CZ Screwback Stud",
+    "description": "Delicate 14K yellow gold stud featuring two round cubic zirconia stones, one larger and one petite, secured with a screwback for everyday sparkle.",
     "tags": [
-      "stud",
+      "cz",
+      "round",
+      "double",
       "screwback"
     ]
   },
   {
     "code": "102SB",
-    "collection": "Studs",
-    "name": "Stud Earring",
-    "description": "14k gold stud earring",
     "image": "102SB.jpg",
+    "collection": "studs",
+    "name": "Small Double Round CZ Screwback Stud",
+    "description": "Small 14K gold stud with a pair of round cubic zirconia stones in ascending size, finished with a secure screwback post.",
     "tags": [
-      "stud",
+      "cz",
+      "round",
+      "double",
       "screwback"
     ]
   },
   {
     "code": "103SB",
-    "collection": "Studs",
-    "name": "Stud Earring",
-    "description": "14k gold stud earring",
     "image": "103SB.jpg",
+    "collection": "studs",
+    "name": "Petite Round CZ Screwback Stud",
+    "description": "Petite 14K yellow gold stud set with a single sparkling round cubic zirconia and a screwback fitting for security.",
     "tags": [
-      "stud",
+      "cz",
+      "round",
+      "petite",
       "screwback"
     ]
   },
   {
     "code": "104SB",
-    "collection": "Studs",
-    "name": "Stud Earring",
-    "description": "14k gold stud earring",
     "image": "104SB.jpg",
+    "collection": "studs",
+    "name": "Small Round CZ Screwback Stud",
+    "description": "Small 14K gold stud showcasing a brilliant round cubic zirconia stone secured by a screwback post.",
     "tags": [
-      "stud",
+      "cz",
+      "round",
+      "small",
       "screwback"
     ]
   },
   {
     "code": "105SB",
-    "collection": "Studs",
-    "name": "Stud Earring",
-    "description": "14k gold stud earring",
     "image": "105SB.jpg",
+    "collection": "studs",
+    "name": "Medium Round CZ Screwback Stud",
+    "description": "Mediumsized 14K yellow gold stud featuring a single round cubic zirconia with classic screwback closure.",
     "tags": [
-      "stud",
+      "cz",
+      "round",
+      "medium",
       "screwback"
     ]
   },
   {
     "code": "106SB",
-    "collection": "Studs",
-    "name": "Stud Earring",
-    "description": "14k gold stud earring",
     "image": "106SB.jpg",
+    "collection": "studs",
+    "name": "Large Round CZ Screwback Stud",
+    "description": "Large 14K gold stud centered on a sparkling round cubic zirconia stone and secured with a screwback.",
     "tags": [
-      "stud",
+      "cz",
+      "round",
+      "large",
       "screwback"
     ]
   },
   {
     "code": "107SB",
-    "collection": "Studs",
-    "name": "Stud Earring",
-    "description": "14k gold stud earring",
     "image": "107SB.jpg",
+    "collection": "studs",
+    "name": "ExtraLarge Round CZ Screwback Stud",
+    "description": "Extralarge round cubic zirconia set in a 14K yellow gold stud with a secure screwback post.",
     "tags": [
-      "stud",
+      "cz",
+      "round",
+      "extra-large",
       "screwback"
     ]
   },
   {
     "code": "108SB",
-    "collection": "Studs",
-    "name": "Stud Earring",
-    "description": "14k gold stud earring",
     "image": "108SB.jpg",
+    "collection": "studs",
+    "name": "UltraLarge Round CZ Screwback Stud",
+    "description": "Ultralarge statement stud crafted in 14K gold featuring a dazzling round cubic zirconia and screwback closure.",
     "tags": [
-      "stud",
+      "cz",
+      "round",
+      "oversized",
       "screwback"
     ]
   },
   {
     "code": "110PB",
-    "collection": "Studs",
-    "name": "Stud Earring",
-    "description": "14k gold stud earring",
     "image": "110PB.jpg",
+    "collection": "studs",
+    "name": "Round CZ Pushback Stud",
+    "description": "Classic 14K yellow gold stud with a brilliant round cubic zirconia secured by a comfortable pushback.",
     "tags": [
+      "cz",
+      "round",
       "stud",
       "pushback"
     ]
   },
   {
     "code": "133SB",
-    "collection": "Studs",
-    "name": "Stud Earring",
-    "description": "14k gold stud earring",
     "image": "133SB.jpg",
+    "collection": "studs",
+    "name": "Small Princesscut CZ Screwback Stud",
+    "description": "Small 14K gold stud showcasing a square princesscut cubic zirconia stone held by four prongs and finished with a screwback post.",
     "tags": [
-      "stud",
+      "cz",
+      "princess cut",
+      "square",
       "screwback"
     ]
   },
   {
     "code": "134SB",
-    "collection": "Studs",
-    "name": "Stud Earring",
-    "description": "14k gold stud earring",
     "image": "134SB.jpg",
+    "collection": "studs",
+    "name": "Medium Princesscut CZ Screwback Stud",
+    "description": "Medium 14K yellow gold stud with a princesscut cubic zirconia set in four prongs and secured with a screwback.",
     "tags": [
-      "stud",
+      "cz",
+      "princess cut",
+      "square",
       "screwback"
     ]
   },
   {
     "code": "135SB",
-    "collection": "Studs",
-    "name": "Stud Earring",
-    "description": "14k gold stud earring",
     "image": "135SB.jpg",
+    "collection": "studs",
+    "name": "Large Princesscut CZ Screwback Stud",
+    "description": "Large square stud in 14K gold featuring a brilliant princesscut cubic zirconia and a secure screwback closure.",
     "tags": [
-      "stud",
+      "cz",
+      "princess cut",
+      "square",
       "screwback"
     ]
   },
   {
     "code": "136SB",
-    "collection": "Studs",
-    "name": "Stud Earring",
-    "description": "14k gold stud earring",
     "image": "136SB.jpg",
+    "collection": "studs",
+    "name": "ExtraLarge Princesscut CZ Screwback Stud",
+    "description": "Extralarge 14K gold stud designed with a striking princesscut cubic zirconia secured by four prongs and a screwback post.",
     "tags": [
-      "stud",
+      "cz",
+      "princess cut",
+      "square",
       "screwback"
     ]
   },
   {
     "code": "137SB",
-    "collection": "Studs",
-    "name": "Stud Earring",
-    "description": "14k gold stud earring",
     "image": "137SB.jpg",
+    "collection": "studs",
+    "name": "UltraLarge Princesscut CZ Screwback Stud",
+    "description": "Statement square stud crafted in 14K yellow gold with an oversized princesscut cubic zirconia and secure screwback.",
     "tags": [
-      "stud",
-      "screwback"
+      "cz",
+      "princess cut",
+      "square",
+      "oversized"
     ]
   },
   {
     "code": "143SB",
-    "collection": "Studs",
-    "name": "Stud Earring",
-    "description": "14k gold stud earring",
     "image": "143SB.jpg",
+    "collection": "studs",
+    "name": "Cushioncut CZ Screwback Stud",
+    "description": "14K gold stud featuring a cushioncut cubic zirconia with rounded corners and a screwback closure for added security.",
     "tags": [
-      "stud",
+      "cz",
+      "cushion cut",
+      "square",
       "screwback"
     ]
   },
   {
     "code": "144SB",
-    "collection": "Studs",
-    "name": "Stud Earring",
-    "description": "14k gold stud earring",
     "image": "144SB.jpg",
+    "collection": "studs",
+    "name": "Square CZ Screwback Stud",
+    "description": "14K yellow gold stud set with a faceted square cubic zirconia stone and finished with a screwback post.",
     "tags": [
+      "cz",
+      "square",
       "stud",
       "screwback"
     ]
   },
   {
     "code": "164SB",
-    "collection": "Studs",
-    "name": "Stud Earring",
-    "description": "14k gold stud earring",
     "image": "164SB.jpg",
+    "collection": "studs",
+    "name": "Trillioncut CZ Screwback Stud",
+    "description": "Modern 14K gold stud featuring a triangular trillioncut cubic zirconia secured by three prongs and a screwback.",
     "tags": [
-      "stud",
+      "cz",
+      "trillion",
+      "triangle",
       "screwback"
     ]
   },
   {
     "code": "165SB",
-    "collection": "Studs",
-    "name": "Stud Earring",
-    "description": "14k gold stud earring",
     "image": "165SB.jpg",
+    "collection": "hearts",
+    "name": "Petite Heart CZ Screwback Stud",
+    "description": "Delicate heartshaped cubic zirconia set in 14K yellow gold with a secure screwback post.",
     "tags": [
-      "stud",
+      "cz",
+      "heart",
+      "petite",
       "screwback"
     ]
   },
   {
     "code": "166SB",
-    "collection": "Studs",
-    "name": "Stud Earring",
-    "description": "14k gold stud earring",
     "image": "166SB.jpg",
+    "collection": "hearts",
+    "name": "Medium Heart CZ Screwback Stud",
+    "description": "Mediumsized heartshaped cubic zirconia stud crafted in 14K gold and finished with a screwback.",
     "tags": [
-      "stud",
-      "screwback"
-    ]
-  },
-  {
-    "code": "167SB",
-    "collection": "Hearts",
-    "name": "Heart Stud",
-    "description": "14k gold heart stud",
-    "image": "167SB.jpg",
-    "tags": [
+      "cz",
       "heart",
-      "stud",
+      "medium",
       "screwback"
     ]
   },
   {
     "code": "203SB",
-    "collection": "Studs",
-    "name": "Stud Earring",
-    "description": "14k gold stud earring",
     "image": "203SB.jpg",
+    "collection": "studs",
+    "name": "Small Floral 6Prong Round CZ Stud",
+    "description": "Small round cubic zirconia secured by a sixprong floralinspired setting in 14K yellow gold with screwback closure.",
     "tags": [
-      "stud",
+      "cz",
+      "round",
+      "6-prong",
+      "floral",
       "screwback"
     ]
   },
   {
     "code": "204SB",
-    "collection": "Studs",
-    "name": "Stud Earring",
-    "description": "14k gold stud earring",
     "image": "204SB.jpg",
+    "collection": "studs",
+    "name": "Medium Floral 6Prong Round CZ Stud",
+    "description": "Medium 14K gold stud featuring a round cubic zirconia held in a sixprong floral setting with a screwback.",
     "tags": [
-      "stud",
+      "cz",
+      "round",
+      "6-prong",
+      "floral",
       "screwback"
     ]
   },
   {
     "code": "205SB",
-    "collection": "Studs",
-    "name": "Stud Earring",
-    "description": "14k gold stud earring",
     "image": "205SB.jpg",
+    "collection": "studs",
+    "name": "Large Floral 6Prong Round CZ Stud",
+    "description": "Large round cubic zirconia embraced by a 14K gold sixprong floral setting and secured with a screwback post.",
     "tags": [
-      "stud",
+      "cz",
+      "round",
+      "6-prong",
+      "floral",
       "screwback"
     ]
   },
   {
     "code": "206SB",
-    "collection": "Studs",
-    "name": "Stud Earring",
-    "description": "14k gold stud earring",
     "image": "206SB.jpg",
+    "collection": "studs",
+    "name": "ExtraLarge Floral 6Prong Round CZ Stud",
+    "description": "Extralarge round cubic zirconia set in a floral sixprong 14K gold mount with screwback closure.",
     "tags": [
-      "stud",
+      "cz",
+      "round",
+      "6-prong",
+      "floral",
       "screwback"
     ]
   },
   {
     "code": "223SB",
-    "collection": "Studs",
-    "name": "Stud Earring",
-    "description": "14k gold stud earring",
     "image": "223SB.jpg",
+    "collection": "studs",
+    "name": "Petite Rainbow Mystic Topaz Stud",
+    "description": "Petite stud featuring a multicolor mystic topaz set in 14K yellow gold with a secure screwback.",
     "tags": [
-      "stud",
+      "mystic topaz",
+      "rainbow",
+      "round",
       "screwback"
     ]
   },
   {
     "code": "224SB",
-    "collection": "Studs",
-    "name": "Stud Earring",
-    "description": "14k gold stud earring",
     "image": "224SB.jpg",
+    "collection": "studs",
+    "name": "Small Rainbow Mystic Topaz Stud",
+    "description": "Small 14K gold stud showcasing a vibrant round mystic topaz in rainbow hues and secured with a screwback.",
     "tags": [
-      "stud",
+      "mystic topaz",
+      "rainbow",
+      "round",
       "screwback"
     ]
   },
   {
     "code": "225SB",
-    "collection": "Studs",
-    "name": "Stud Earring",
-    "description": "14k gold stud earring",
     "image": "225SB.jpg",
+    "collection": "studs",
+    "name": "Medium Rainbow Mystic Topaz Stud",
+    "description": "Mediumsized round mystic topaz stud crafted in 14K yellow gold with a secure screwback.",
     "tags": [
-      "stud",
+      "mystic topaz",
+      "rainbow",
+      "round",
       "screwback"
     ]
   },
   {
     "code": "226SB",
-    "collection": "Studs",
-    "name": "Stud Earring",
-    "description": "14k gold stud earring",
     "image": "226SB.jpg",
+    "collection": "studs",
+    "name": "Large Rainbow Mystic Topaz Stud",
+    "description": "Large 14K gold stud set with a radiant rainbow mystic topaz stone and finished with a screwback post.",
     "tags": [
-      "stud",
+      "mystic topaz",
+      "rainbow",
+      "round",
       "screwback"
     ]
   },
   {
     "code": "228SB",
-    "collection": "Studs",
-    "name": "Stud Earring",
-    "description": "14k gold stud earring",
     "image": "228SB.jpg",
+    "collection": "studs",
+    "name": "ExtraLarge Rainbow Mystic Topaz Stud",
+    "description": "Extralarge statement stud showcasing a colorful mystic topaz in a 14K gold setting with screwback closure.",
     "tags": [
-      "stud",
+      "mystic topaz",
+      "rainbow",
+      "round",
       "screwback"
     ]
   },
   {
     "code": "233SB",
-    "collection": "Studs",
-    "name": "Stud Earring",
-    "description": "14k gold stud earring",
     "image": "233SB.jpg",
+    "collection": "studs",
+    "name": "Tiny Gold Ball Screwback Stud",
+    "description": "Tiny polished 14K yellow gold ball stud with a secure screwback post for a minimalist look.",
     "tags": [
+      "gold ball",
+      "tiny",
       "stud",
       "screwback"
     ]
   },
   {
     "code": "234SB",
-    "collection": "Studs",
-    "name": "Stud Earring",
-    "description": "14k gold stud earring",
     "image": "234SB.jpg",
+    "collection": "studs",
+    "name": "Small Gold Ball Screwback Stud",
+    "description": "Small 14K gold ball stud featuring a smooth polished surface and screwback fastening.",
     "tags": [
+      "gold ball",
+      "small",
       "stud",
       "screwback"
     ]
   },
   {
     "code": "235SB",
-    "collection": "Studs",
-    "name": "Stud Earring",
-    "description": "14k gold stud earring",
     "image": "235SB.jpg",
+    "collection": "studs",
+    "name": "Medium Gold Ball Screwback Stud",
+    "description": "Medium polished gold ball stud crafted in 14K yellow gold with a secure screwback closure.",
     "tags": [
+      "gold ball",
+      "medium",
       "stud",
       "screwback"
     ]
   },
   {
     "code": "236SB",
-    "collection": "Studs",
-    "name": "Stud Earring",
-    "description": "14k gold stud earring",
     "image": "236SB.jpg",
+    "collection": "studs",
+    "name": "Large Gold Ball Screwback Stud",
+    "description": "Large glossy 14K gold ball stud finished with a screwback post for security and comfort.",
     "tags": [
+      "gold ball",
+      "large",
       "stud",
       "screwback"
     ]
   },
   {
     "code": "237SB",
-    "collection": "Studs",
-    "name": "Stud Earring",
-    "description": "14k gold stud earring",
     "image": "237SB.jpg",
+    "collection": "studs",
+    "name": "ExtraLarge Gold Ball Screwback Stud",
+    "description": "Extralarge polished gold ball stud offering bold shine in 14K yellow gold with a screwback fitting.",
     "tags": [
+      "gold ball",
+      "extra-large",
       "stud",
       "screwback"
     ]
   },
   {
     "code": "253SB",
-    "collection": "Studs",
-    "name": "Stud Earring",
-    "description": "14k gold stud earring",
     "image": "253SB.jpg",
+    "collection": "studs",
+    "name": "Huge Round CZ Screwback Stud",
+    "description": "Oversized round cubic zirconia stud set in 14K yellow gold and secured with a screwback post.",
     "tags": [
-      "stud",
+      "cz",
+      "round",
+      "huge",
       "screwback"
     ]
   },
   {
     "code": "254SB",
-    "collection": "Studs",
-    "name": "Stud Earring",
-    "description": "14k gold stud earring",
     "image": "254SB.jpg",
+    "collection": "studs",
+    "name": "Giant Round CZ Screwback Stud",
+    "description": "Giant 14K gold stud featuring an impressive round cubic zirconia with secure screwback closure.",
     "tags": [
-      "stud",
+      "cz",
+      "round",
+      "giant",
       "screwback"
     ]
   },
   {
     "code": "255SB",
-    "collection": "Studs",
-    "name": "Stud Earring",
-    "description": "14k gold stud earring",
     "image": "255SB.jpg",
+    "collection": "studs",
+    "name": "Mega Round CZ Screwback Stud",
+    "description": "Megasized statement stud with a brilliant round cubic zirconia set in 14K gold and finished with a screwback.",
     "tags": [
-      "stud",
+      "cz",
+      "round",
+      "mega",
       "screwback"
     ]
   },
   {
     "code": "256SB",
-    "collection": "Studs",
-    "name": "Stud Earring",
-    "description": "14k gold stud earring",
     "image": "256SB.jpg",
+    "collection": "studs",
+    "name": "Ultra Mega Round CZ Screwback Stud",
+    "description": "Ultra mega round cubic zirconia stud designed for bold shine in 14K yellow gold with screwback post.",
     "tags": [
-      "stud",
-      "screwback"
-    ]
-  },
-  {
-    "code": "103BSB",
-    "collection": "Bezel",
-    "name": "Bezel Stud",
-    "description": "14k gold bezel stud",
-    "image": "103BSB.jpg",
-    "tags": [
-      "bezel",
-      "stud",
-      "screwback"
-    ]
-  },
-  {
-    "code": "104BSB",
-    "collection": "Bezel",
-    "name": "Bezel Stud",
-    "description": "14k gold bezel stud",
-    "image": "104BSB.jpg",
-    "tags": [
-      "bezel",
-      "stud",
-      "screwback"
-    ]
-  },
-  {
-    "code": "105BSB",
-    "collection": "Bezel",
-    "name": "Bezel Stud",
-    "description": "14k gold bezel stud",
-    "image": "105BSB.jpg",
-    "tags": [
-      "bezel",
-      "stud",
-      "screwback"
-    ]
-  },
-  {
-    "code": "106BSB",
-    "collection": "Bezel",
-    "name": "Bezel Stud",
-    "description": "14k gold bezel stud",
-    "image": "106BSB.jpg",
-    "tags": [
-      "bezel",
-      "stud",
-      "screwback"
-    ]
-  },
-  {
-    "code": "1258SB",
-    "collection": "Hearts",
-    "name": "Heart Stud",
-    "description": "14k gold heart stud",
-    "image": "1258SB.jpg",
-    "tags": [
-      "heart",
-      "stud",
-      "screwback"
-    ]
-  },
-  {
-    "code": "133BSB",
-    "collection": "Bezel",
-    "name": "Bezel Stud",
-    "description": "14k gold bezel stud",
-    "image": "133BSB.jpg",
-    "tags": [
-      "bezel",
-      "stud",
-      "screwback"
-    ]
-  },
-  {
-    "code": "134BSB",
-    "collection": "Bezel",
-    "name": "Bezel Stud",
-    "description": "14k gold bezel stud",
-    "image": "134BSB.jpg",
-    "tags": [
-      "bezel",
-      "stud",
-      "screwback"
-    ]
-  },
-  {
-    "code": "135BSB",
-    "collection": "Bezel",
-    "name": "Bezel Stud",
-    "description": "14k gold bezel stud",
-    "image": "135BSB.jpg",
-    "tags": [
-      "bezel",
-      "stud",
+      "cz",
+      "round",
+      "oversized",
       "screwback"
     ]
   },
   {
     "code": "1459SB",
-    "collection": "Studs",
-    "name": "Stud Earring",
-    "description": "14k gold stud earring",
     "image": "1459SB.jpg",
+    "collection": "more-styles",
+    "name": "Floral Cluster CZ Screwback Stud",
+    "description": "Artistic 14K gold stud featuring a floral cluster of cubic zirconia stones secured with a screwback.",
     "tags": [
-      "stud",
+      "cz",
+      "floral",
+      "cluster",
       "screwback"
     ]
   },
   {
     "code": "1555SB",
-    "collection": "Studs",
-    "name": "Stud Earring",
-    "description": "14k gold stud earring",
     "image": "1555SB.jpg",
+    "collection": "more-styles",
+    "name": "Starburst CZ Screwback Stud",
+    "description": "Starburstinspired 14K yellow gold stud accented with sparkling cubic zirconia and finished with a screwback.",
     "tags": [
+      "cz",
+      "starburst",
       "stud",
       "screwback"
     ]
   },
   {
     "code": "1556SB",
-    "collection": "Studs",
-    "name": "Stud Earring",
-    "description": "14k gold stud earring",
     "image": "1556SB.jpg",
+    "collection": "more-styles",
+    "name": "Flower Cluster CZ Screwback Stud",
+    "description": "14K gold stud showcasing a bloom of cubic zirconia stones arranged in a flower cluster with screwback closure.",
     "tags": [
-      "stud",
+      "cz",
+      "flower",
+      "cluster",
       "screwback"
     ]
   },
   {
     "code": "1599SB",
-    "collection": "Studs",
-    "name": "Stud Earring",
-    "description": "14k gold stud earring",
     "image": "1599SB.jpg",
+    "collection": "more-styles",
+    "name": "Triple Stone CZ Screwback Stud",
+    "description": "Elegant 14K yellow gold stud featuring three graduating cubic zirconia stones in a linear arrangement, secured with a screwback.",
     "tags": [
-      "stud",
-      "screwback"
-    ]
-  },
-  {
-    "code": "1601SB",
-    "collection": "Hearts",
-    "name": "Heart Stud",
-    "description": "14k gold heart stud",
-    "image": "1601SB.jpg",
-    "tags": [
-      "heart",
-      "stud",
-      "screwback"
-    ]
-  },
-  {
-    "code": "163BSB",
-    "collection": "Bezel",
-    "name": "Bezel Stud",
-    "description": "14k gold bezel stud",
-    "image": "163BSB.jpg",
-    "tags": [
-      "bezel",
-      "stud",
-      "screwback"
-    ]
-  },
-  {
-    "code": "164BSB",
-    "collection": "Bezel",
-    "name": "Bezel Stud",
-    "description": "14k gold bezel stud",
-    "image": "164BSB.jpg",
-    "tags": [
-      "bezel",
-      "stud",
-      "screwback"
-    ]
-  },
-  {
-    "code": "165BSB",
-    "collection": "Bezel",
-    "name": "Bezel Stud",
-    "description": "14k gold bezel stud",
-    "image": "165BSB.jpg",
-    "tags": [
-      "bezel",
-      "stud",
-      "screwback"
-    ]
-  },
-  {
-    "code": "1665SB",
-    "collection": "Hearts",
-    "name": "Heart Stud",
-    "description": "14k gold heart stud",
-    "image": "1665SB.jpg",
-    "tags": [
-      "heart",
-      "stud",
-      "screwback"
-    ]
-  },
-  {
-    "code": "1666SB",
-    "collection": "Hearts",
-    "name": "Heart Stud",
-    "description": "14k gold heart stud",
-    "image": "1666SB.jpg",
-    "tags": [
-      "heart",
-      "stud",
-      "screwback"
-    ]
-  },
-  {
-    "code": "1667SB",
-    "collection": "Hearts",
-    "name": "Heart Stud",
-    "description": "14k gold heart stud",
-    "image": "1667SB.jpg",
-    "tags": [
-      "heart",
-      "stud",
-      "screwback"
-    ]
-  },
-  {
-    "code": "166BSB",
-    "collection": "Bezel",
-    "name": "Bezel Stud",
-    "description": "14k gold bezel stud",
-    "image": "166BSB.jpg",
-    "tags": [
-      "bezel",
-      "stud",
-      "screwback"
-    ]
-  },
-  {
-    "code": "1675SB",
-    "collection": "Hearts",
-    "name": "Heart Stud",
-    "description": "14k gold heart stud",
-    "image": "1675SB.jpg",
-    "tags": [
-      "heart",
-      "stud",
-      "screwback"
-    ]
-  },
-  {
-    "code": "167BSB",
-    "collection": "Bezel",
-    "name": "Bezel Stud",
-    "description": "14k gold bezel stud",
-    "image": "167BSB.jpg",
-    "tags": [
-      "bezel",
+      "cz",
+      "triple",
       "stud",
       "screwback"
     ]
   },
   {
     "code": "1781SB",
-    "collection": "Studs",
-    "name": "Stud Earring",
-    "description": "14k gold stud earring",
     "image": "1781SB.jpg",
+    "collection": "more-styles",
+    "name": "Asymmetrical CZ Screwback Stud",
+    "description": "Contemporary asymmetrical stud crafted in 14K gold with sparkling cubic zirconia accents and a screwback post.",
     "tags": [
+      "cz",
+      "asymmetrical",
+      "modern",
+      "screwback"
+    ]
+  },
+  {
+    "code": "344LSB",
+    "image": "344LSB.jpg",
+    "collection": "more-styles",
+    "name": "Large Filigree CZ Stud",
+    "description": "Large 14K gold stud with intricate filigree detailing and sparkling cubic zirconia accents, finished with a screwback.",
+    "tags": [
+      "cz",
+      "filigree",
+      "large",
+      "screwback"
+    ]
+  },
+  {
+    "code": "344SSB",
+    "image": "344SSB.jpg",
+    "collection": "more-styles",
+    "name": "Small Filigree CZ Stud",
+    "description": "Small filigreepatterned 14K gold stud featuring delicate cubic zirconia accents and screwback closure.",
+    "tags": [
+      "cz",
+      "filigree",
+      "small",
+      "screwback"
+    ]
+  },
+  {
+    "code": "1041LSB",
+    "image": "1041LSB.jpg",
+    "collection": "more-styles",
+    "name": "Large Starburst CZ Stud",
+    "description": "Large starburstshaped stud crafted in 14K yellow gold with a central cubic zirconia and screwback fastening.",
+    "tags": [
+      "cz",
+      "star",
+      "large",
+      "screwback"
+    ]
+  },
+  {
+    "code": "1041MSB",
+    "image": "1041MSB.jpg",
+    "collection": "more-styles",
+    "name": "Medium Starburst CZ Stud",
+    "description": "Medium 14K gold starburst stud centered with a sparkling cubic zirconia and finished with a screwback post.",
+    "tags": [
+      "cz",
+      "star",
+      "medium",
+      "screwback"
+    ]
+  },
+  {
+    "code": "1041SSB",
+    "image": "1041SSB.jpg",
+    "collection": "more-styles",
+    "name": "Small Starburst CZ Stud",
+    "description": "Small starburstinspired stud in 14K gold featuring a petite cubic zirconia and screwback closure.",
+    "tags": [
+      "cz",
+      "star",
+      "small",
+      "screwback"
+    ]
+  },
+  {
+    "code": "1430LSB",
+    "image": "1430LSB.jpg",
+    "collection": "more-styles",
+    "name": "Large Cluster CZ Stud",
+    "description": "Large cluster stud in 14K yellow gold featuring multiple sparkling cubic zirconia stones with screwback closure.",
+    "tags": [
+      "cz",
+      "cluster",
+      "large",
+      "screwback"
+    ]
+  },
+  {
+    "code": "1430MSB",
+    "image": "1430MSB.jpg",
+    "collection": "more-styles",
+    "name": "Medium Cluster CZ Stud",
+    "description": "Medium cluster stud crafted in 14K gold with grouped cubic zirconia stones and a secure screwback.",
+    "tags": [
+      "cz",
+      "cluster",
+      "medium",
+      "screwback"
+    ]
+  },
+  {
+    "code": "1430SSB",
+    "image": "1430SSB.jpg",
+    "collection": "more-styles",
+    "name": "Small Cluster CZ Stud",
+    "description": "Small 14K gold stud featuring a tight cluster of cubic zirconia stones secured with a screwback.",
+    "tags": [
+      "cz",
+      "cluster",
+      "small",
+      "screwback"
+    ]
+  },
+  {
+    "code": "1462LSB",
+    "image": "1462LSB.jpg",
+    "collection": "more-styles",
+    "name": "Large Floral CZ Stud",
+    "description": "Large flowershaped stud in 14K yellow gold set with sparkling cubic zirconia petals and a screwback post.",
+    "tags": [
+      "cz",
+      "floral",
+      "large",
+      "screwback"
+    ]
+  },
+  {
+    "code": "1462MSB",
+    "image": "1462MSB.jpg",
+    "collection": "more-styles",
+    "name": "Medium Floral CZ Stud",
+    "description": "Medium floral stud crafted in 14K gold with cubic zirconia accents and screwback closure.",
+    "tags": [
+      "cz",
+      "floral",
+      "medium",
+      "screwback"
+    ]
+  },
+  {
+    "code": "1462SSB",
+    "image": "1462SSB.jpg",
+    "collection": "more-styles",
+    "name": "Small Floral CZ Stud",
+    "description": "Small flowerinspired stud in 14K gold featuring cubic zirconia petals and finished with a screwback post.",
+    "tags": [
+      "cz",
+      "floral",
+      "small",
+      "screwback"
+    ]
+  },
+  {
+    "code": "1557MSB",
+    "image": "1557MSB.jpg",
+    "collection": "hearts",
+    "name": "Medium RopeEdge Heart CZ Stud",
+    "description": "Medium heartshaped cubic zirconia surrounded by a ropetextured bezel in 14K gold with screwback fastening.",
+    "tags": [
+      "cz",
+      "heart",
+      "rope-edge",
+      "medium",
+      "screwback"
+    ]
+  },
+  {
+    "code": "1557SSB",
+    "image": "1557SSB.jpg",
+    "collection": "hearts",
+    "name": "Small RopeEdge Heart CZ Stud",
+    "description": "Small heartshaped cubic zirconia set in a ropeedge bezel crafted from 14K gold with screwback closure.",
+    "tags": [
+      "cz",
+      "heart",
+      "rope-edge",
+      "small",
+      "screwback"
+    ]
+  },
+  {
+    "code": "1670SSB",
+    "image": "1670SSB.jpg",
+    "collection": "hearts",
+    "name": "Small Sunburst Textured Gold Heart Stud",
+    "description": "Small solid gold heart stud with a radiant sunburst engraved texture and secure screwback.",
+    "tags": [
+      "gold",
+      "heart",
+      "sunburst",
+      "small",
+      "screwback"
+    ]
+  },
+  {
+    "code": "1981SB3C",
+    "image": "1981SB3C.jpg",
+    "collection": "studs",
+    "name": "TriColor Triple CZ Stud",
+    "description": "Unique stud crafted in three tones of gold and set with three sparkling cubic zirconia stones in an ascending arrangement, secured with a screwback.",
+    "tags": [
+      "cz",
+      "tri-color",
+      "triple",
       "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "167SB",
+    "image": "167SB.jpg",
+    "collection": "hearts",
+    "name": "Classic Heart CZ Screwback Stud",
+    "description": "Timeless heartshaped cubic zirconia stud mounted in 14K yellow gold with a secure screwback.",
+    "tags": [
+      "cz",
+      "heart",
+      "classic",
+      "screwback"
+    ]
+  },
+  {
+    "code": "1258SB",
+    "image": "1258SB.jpg",
+    "collection": "hearts",
+    "name": "Dual Heart Ruby & CZ Stud",
+    "description": "Romantic stud featuring two hearts, one red ruby and one clear cubic zirconia, set side by side in 14K gold with a screwback post.",
+    "tags": [
+      "ruby",
+      "cz",
+      "heart",
+      "dual",
+      "screwback"
+    ]
+  },
+  {
+    "code": "1601SB",
+    "image": "1601SB.jpg",
+    "collection": "hearts",
+    "name": "Textured Heart with CZ Accent Stud",
+    "description": "14K gold heart stud with a textured finish and accented by a tiny round cubic zirconia, secured with a screwback.",
+    "tags": [
+      "gold",
+      "heart",
+      "textured",
+      "accent",
+      "screwback"
+    ]
+  },
+  {
+    "code": "1665SB",
+    "image": "1665SB.jpg",
+    "collection": "hearts",
+    "name": "Open Heart Flower CZ Stud",
+    "description": "Openheart stud crafted in 14K yellow gold adorned with a floral cluster of cubic zirconia stones and secured with a screwback.",
+    "tags": [
+      "cz",
+      "heart",
+      "open-heart",
+      "flower",
+      "screwback"
+    ]
+  },
+  {
+    "code": "1666SB",
+    "image": "1666SB.jpg",
+    "collection": "hearts",
+    "name": "Open Heart Swirl CZ Stud",
+    "description": "Swirling openheart design in 14K gold featuring pave cubic zirconia accents and finished with a screwback post.",
+    "tags": [
+      "cz",
+      "heart",
+      "open-heart",
+      "swirl",
+      "screwback"
+    ]
+  },
+  {
+    "code": "1667SB",
+    "image": "1667SB.jpg",
+    "collection": "hearts",
+    "name": "Open Heart Pave CZ Stud",
+    "description": "Elegant openheart stud fully pav\u00e9set with tiny cubic zirconia stones in 14K gold with a screwback.",
+    "tags": [
+      "cz",
+      "heart",
+      "open-heart",
+      "pave",
+      "screwback"
+    ]
+  },
+  {
+    "code": "1675SB",
+    "image": "1675SB.jpg",
+    "collection": "hearts",
+    "name": "Open Frame Heart CZ Stud",
+    "description": "Open frame heart stud with a large heartshaped cubic zirconia suspended at its center, crafted in 14K gold with screwback fastening.",
+    "tags": [
+      "cz",
+      "heart",
+      "open-frame",
       "screwback"
     ]
   },
   {
     "code": "1782SB",
-    "collection": "Hearts",
-    "name": "Heart Stud",
-    "description": "14k gold heart stud",
     "image": "1782SB.jpg",
+    "collection": "hearts",
+    "name": "Heart Outline with Bar CZ Stud",
+    "description": "Modern heart outline stud accented with a horizontal bar and a single round cubic zirconia, finished in 14K gold with a screwback.",
     "tags": [
+      "cz",
       "heart",
-      "stud",
+      "bar",
+      "outline",
       "screwback"
     ]
   },
   {
     "code": "1813SB",
-    "collection": "Hearts",
-    "name": "Heart Stud",
-    "description": "14k gold heart stud",
     "image": "1813SB.jpg",
+    "collection": "hearts",
+    "name": "Swirl Heart CZ Stud",
+    "description": "Artistic 14K gold heart stud with a swirling motif and a sparkling round cubic zirconia accent secured by a screwback post.",
     "tags": [
+      "cz",
       "heart",
+      "swirl",
       "stud",
       "screwback"
     ]
   },
   {
     "code": "1814SB",
-    "collection": "Hearts",
-    "name": "Heart Stud",
-    "description": "14k gold heart stud",
     "image": "1814SB.jpg",
+    "collection": "hearts",
+    "name": "Milgrain Bezel Heart CZ Stud",
+    "description": "Heartshaped cubic zirconia encased in a milgrain beaded bezel crafted from 14K gold with screwback fastening.",
     "tags": [
+      "cz",
       "heart",
-      "stud",
-      "screwback"
-    ]
-  },
-  {
-    "code": "344LSB",
-    "collection": "Studs",
-    "name": "Stud Earring",
-    "description": "14k gold stud earring",
-    "image": "344LSB.jpg",
-    "tags": [
-      "stud",
-      "screwback"
-    ]
-  },
-  {
-    "code": "344SSB",
-    "collection": "Studs",
-    "name": "Stud Earring",
-    "description": "14k gold stud earring",
-    "image": "344SSB.jpg",
-    "tags": [
-      "stud",
-      "screwback"
-    ]
-  },
-  {
-    "code": "1041LSB",
-    "collection": "Studs",
-    "name": "Stud Earring",
-    "description": "14k gold stud earring",
-    "image": "1041LSB.jpg",
-    "tags": [
-      "stud",
-      "screwback"
-    ]
-  },
-  {
-    "code": "1041MSB",
-    "collection": "Studs",
-    "name": "Stud Earring",
-    "description": "14k gold stud earring",
-    "image": "1041MSB.jpg",
-    "tags": [
-      "stud",
-      "screwback"
-    ]
-  },
-  {
-    "code": "1041SSB",
-    "collection": "Studs",
-    "name": "Stud Earring",
-    "description": "14k gold stud earring",
-    "image": "1041SSB.jpg",
-    "tags": [
-      "stud",
-      "screwback"
-    ]
-  },
-  {
-    "code": "1430LSB",
-    "collection": "Studs",
-    "name": "Stud Earring",
-    "description": "14k gold stud earring",
-    "image": "1430LSB.jpg",
-    "tags": [
-      "stud",
-      "screwback"
-    ]
-  },
-  {
-    "code": "1430MSB",
-    "collection": "Studs",
-    "name": "Stud Earring",
-    "description": "14k gold stud earring",
-    "image": "1430MSB.jpg",
-    "tags": [
-      "stud",
-      "screwback"
-    ]
-  },
-  {
-    "code": "1430SSB",
-    "collection": "Studs",
-    "name": "Stud Earring",
-    "description": "14k gold stud earring",
-    "image": "1430SSB.jpg",
-    "tags": [
-      "stud",
-      "screwback"
-    ]
-  },
-  {
-    "code": "1462LSB",
-    "collection": "Studs",
-    "name": "Stud Earring",
-    "description": "14k gold stud earring",
-    "image": "1462LSB.jpg",
-    "tags": [
-      "stud",
-      "screwback"
-    ]
-  },
-  {
-    "code": "1462MSB",
-    "collection": "Studs",
-    "name": "Stud Earring",
-    "description": "14k gold stud earring",
-    "image": "1462MSB.jpg",
-    "tags": [
-      "stud",
-      "screwback"
-    ]
-  },
-  {
-    "code": "1462SSB",
-    "collection": "Studs",
-    "name": "Stud Earring",
-    "description": "14k gold stud earring",
-    "image": "1462SSB.jpg",
-    "tags": [
-      "stud",
+      "bezel",
+      "milgrain",
       "screwback"
     ]
   },
   {
     "code": "1557LSB",
-    "collection": "Hearts",
-    "name": "Heart Stud",
-    "description": "14k gold heart stud",
     "image": "1557LSB.jpg",
+    "collection": "hearts",
+    "name": "Large RopeEdge Heart CZ Stud",
+    "description": "Large heartshaped cubic zirconia encircled by a ropeedge bezel in 14K yellow gold with a screwback post.",
     "tags": [
+      "cz",
       "heart",
-      "stud",
-      "screwback"
-    ]
-  },
-  {
-    "code": "1557MSB",
-    "collection": "Studs",
-    "name": "Stud Earring",
-    "description": "14k gold stud earring",
-    "image": "1557MSB.jpg",
-    "tags": [
-      "stud",
-      "screwback"
-    ]
-  },
-  {
-    "code": "1557SSB",
-    "collection": "Studs",
-    "name": "Stud Earring",
-    "description": "14k gold stud earring",
-    "image": "1557SSB.jpg",
-    "tags": [
-      "stud",
+      "rope-edge",
+      "large",
       "screwback"
     ]
   },
   {
     "code": "1603LSB",
-    "collection": "Hearts",
-    "name": "Heart Stud",
-    "description": "14k gold heart stud",
     "image": "1603LSB.jpg",
+    "collection": "hearts",
+    "name": "Large Pav\u00e9 Open Heart CZ Stud",
+    "description": "Large open heart stud in 14K yellow gold fully pav\u00e9set with shimmering cubic zirconia stones and secured with a screwback.",
     "tags": [
+      "cz",
       "heart",
-      "stud",
+      "open-heart",
+      "pave",
+      "large",
       "screwback"
     ]
   },
   {
     "code": "1603SSB",
-    "collection": "Hearts",
-    "name": "Heart Stud",
-    "description": "14k gold heart stud",
     "image": "1603SSB.jpg",
+    "collection": "hearts",
+    "name": "Small Pav\u00e9 Open Heart CZ Stud",
+    "description": "Small open heart stud crafted in 14K gold and pav\u00e9set with tiny cubic zirconia stones with a screwback closure.",
     "tags": [
+      "cz",
       "heart",
-      "stud",
+      "open-heart",
+      "pave",
+      "small",
       "screwback"
     ]
   },
   {
     "code": "1670LSB",
-    "collection": "Hearts",
-    "name": "Heart Stud",
-    "description": "14k gold heart stud",
     "image": "1670LSB.jpg",
+    "collection": "hearts",
+    "name": "Large Sunburst Textured Gold Heart Stud",
+    "description": "Large 14K gold heart stud showcasing a bold sunburst engraved texture and finished with a screwback post.",
     "tags": [
+      "gold",
       "heart",
-      "stud",
-      "screwback"
-    ]
-  },
-  {
-    "code": "1670SSB",
-    "collection": "Studs",
-    "name": "Stud Earring",
-    "description": "14k gold stud earring",
-    "image": "1670SSB.jpg",
-    "tags": [
-      "stud",
+      "sunburst",
+      "large",
       "screwback"
     ]
   },
   {
     "code": "1671SSB",
-    "collection": "Hearts",
-    "name": "Heart Stud",
-    "description": "14k gold heart stud",
     "image": "1671SSB.jpg",
+    "collection": "hearts",
+    "name": "Small Ridged Gold Heart Stud",
+    "description": "Small solid gold heart stud featuring vertical ridges for subtle texture with a secure screwback.",
     "tags": [
+      "gold",
       "heart",
-      "stud",
+      "ridged",
+      "small",
       "screwback"
     ]
   },
   {
     "code": "1041L1SB",
-    "collection": "Hearts",
-    "name": "Heart Stud",
-    "description": "14k gold heart stud",
     "image": "1041L1SB.jpg",
+    "collection": "more-styles",
+    "name": "StarShaped CZ Stud",
+    "description": "Unique starshaped cubic zirconia stud crafted in 14K yellow gold with a screwback post.",
     "tags": [
-      "heart",
+      "cz",
+      "star",
       "stud",
       "screwback"
     ]
   },
   {
     "code": "1601SB3C",
-    "collection": "Hearts",
-    "name": "Heart Stud",
-    "description": "14k gold heart stud",
     "image": "1601SB3C.jpg",
+    "collection": "hearts",
+    "name": "TriColor Heart with Flower Accent Stud",
+    "description": "Tricolor heart stud combining yellow, white and rose gold segments, adorned with a dainty flower accent featuring a tiny cubic zirconia and finished with a screwback.",
     "tags": [
+      "tri-color",
       "heart",
-      "stud",
+      "flower",
+      "accent",
       "screwback"
     ]
   },
   {
-    "code": "1981SB3C",
-    "collection": "Studs",
-    "name": "Stud Earring",
-    "description": "14k gold stud earring",
-    "image": "1981SB3C.jpg",
+    "code": "103BSB",
+    "image": "103BSB.jpg",
+    "collection": "bezel",
+    "name": "Small Round BezelSet CZ Stud",
+    "description": "Small round cubic zirconia set in a smooth 14K gold bezel mounting with a secure screwback.",
     "tags": [
-      "stud",
+      "cz",
+      "round",
+      "bezel",
+      "small",
+      "screwback"
+    ]
+  },
+  {
+    "code": "104BSB",
+    "image": "104BSB.jpg",
+    "collection": "bezel",
+    "name": "Medium Round BezelSet CZ Stud",
+    "description": "Medium 14K gold stud with a round cubic zirconia in a polished bezel setting and screwback closure.",
+    "tags": [
+      "cz",
+      "round",
+      "bezel",
+      "medium",
+      "screwback"
+    ]
+  },
+  {
+    "code": "105BSB",
+    "image": "105BSB.jpg",
+    "collection": "bezel",
+    "name": "Large Round BezelSet CZ Stud",
+    "description": "Large round cubic zirconia nestled in a 14K gold bezel setting secured by a screwback.",
+    "tags": [
+      "cz",
+      "round",
+      "bezel",
+      "large",
+      "screwback"
+    ]
+  },
+  {
+    "code": "106BSB",
+    "image": "106BSB.jpg",
+    "collection": "bezel",
+    "name": "ExtraLarge Round BezelSet CZ Stud",
+    "description": "Extralarge bezelset round cubic zirconia in 14K yellow gold finished with a screwback post.",
+    "tags": [
+      "cz",
+      "round",
+      "bezel",
+      "extra-large",
+      "screwback"
+    ]
+  },
+  {
+    "code": "133BSB",
+    "image": "133BSB.jpg",
+    "collection": "bezel",
+    "name": "Small Square BezelSet CZ Stud",
+    "description": "Small square cubic zirconia set in a sleek 14K gold bezel with screwback closure.",
+    "tags": [
+      "cz",
+      "square",
+      "bezel",
+      "small",
+      "screwback"
+    ]
+  },
+  {
+    "code": "134BSB",
+    "image": "134BSB.jpg",
+    "collection": "bezel",
+    "name": "Medium Square BezelSet CZ Stud",
+    "description": "Medium 14K gold stud featuring a square cubic zirconia in a bezel setting and secured by a screwback post.",
+    "tags": [
+      "cz",
+      "square",
+      "bezel",
+      "medium",
+      "screwback"
+    ]
+  },
+  {
+    "code": "135BSB",
+    "image": "135BSB.jpg",
+    "collection": "bezel",
+    "name": "Large Square BezelSet CZ Stud",
+    "description": "Large square cubic zirconia set in a polished 14K gold bezel mount with screwback fastening.",
+    "tags": [
+      "cz",
+      "square",
+      "bezel",
+      "large",
+      "screwback"
+    ]
+  },
+  {
+    "code": "163BSB",
+    "image": "163BSB.jpg",
+    "collection": "bezel",
+    "name": "Petite Heart BezelSet CZ Stud",
+    "description": "Petite heartshaped cubic zirconia encased in a smooth bezel mounting crafted from 14K gold with screwback.",
+    "tags": [
+      "cz",
+      "heart",
+      "bezel",
+      "petite",
+      "screwback"
+    ]
+  },
+  {
+    "code": "164BSB",
+    "image": "164BSB.jpg",
+    "collection": "bezel",
+    "name": "Small Heart BezelSet CZ Stud",
+    "description": "Small heartshaped cubic zirconia set in a polished bezel frame made from 14K yellow gold with screwback closure.",
+    "tags": [
+      "cz",
+      "heart",
+      "bezel",
+      "small",
+      "screwback"
+    ]
+  },
+  {
+    "code": "165BSB",
+    "image": "165BSB.jpg",
+    "collection": "bezel",
+    "name": "Medium Heart BezelSet CZ Stud",
+    "description": "Medium heartshaped cubic zirconia in a sleek 14K gold bezel setting with screwback fastening.",
+    "tags": [
+      "cz",
+      "heart",
+      "bezel",
+      "medium",
+      "screwback"
+    ]
+  },
+  {
+    "code": "166BSB",
+    "image": "166BSB.jpg",
+    "collection": "bezel",
+    "name": "Large Heart BezelSet CZ Stud",
+    "description": "Large heartshaped cubic zirconia embraced by a polished 14K gold bezel mount secured with a screwback.",
+    "tags": [
+      "cz",
+      "heart",
+      "bezel",
+      "large",
+      "screwback"
+    ]
+  },
+  {
+    "code": "167BSB",
+    "image": "167BSB.jpg",
+    "collection": "bezel",
+    "name": "ExtraLarge Heart BezelSet CZ Stud",
+    "description": "Extralarge heartshaped cubic zirconia set in a smooth 14K gold bezel frame with a screwback post.",
+    "tags": [
+      "cz",
+      "heart",
+      "bezel",
+      "extra-large",
       "screwback"
     ]
   }
