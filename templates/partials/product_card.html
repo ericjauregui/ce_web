@@ -2,11 +2,12 @@
   <div class="card product h-100 shadow-sm bg-dark border-0"
        role="button"
        data-bs-toggle="modal" data-bs-target="#viewerModal"
-       data-img="{{ url_for('static', filename='images/' ~ p.image) }}"
-       data-title="{{ p.code }} — {{ p.name }}"
+       data-img="{{ url_for('static', filename='product_images/' ~ p.image) }}"
+       data-title="{{ p.code }} - {{ p.name }}"
        data-caption="{{ p.description }}">
     <a class="stretched-link" href="{{ url_for('product_detail', slug=p.slug) }}" aria-label="Open {{ p.code }} {{ p.name }}"></a>
-    <img class="card-img-top product-img" src="{{ url_for('static', filename='images/' ~ p.image) }}" alt="{{ p.name }}">
+    <img class="card-img-top product-img" src="{{ url_for('static', filename='product_images/' ~ p.image) }}"
+      alt="{{ p.name }}">
     <div class="card-body text-center d-flex flex-column">
       <div class="small code-badge">{{ p.code }}</div>
       <p class="card-text text-gold-70 mb-2">{{ p.description }}</p>

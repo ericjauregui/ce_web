@@ -10,7 +10,8 @@
   <div class="row g-4 align-items-start">
     <div class="col-12 col-lg-6">
       <div class="detail-img-wrap">
-        <img class="detail-img" src="{{ url_for('static', filename='images/' ~ product.image) }}" alt="{{ product.name }}">
+        <img class="detail-img" src="{{ url_for('static', filename='product_images/' ~ product.image) }}"
+          alt="{{ product.name }}">
       </div>
     </div>
     <div class="col-12 col-lg-6">
@@ -30,7 +31,12 @@
         <div class="d-flex gap-2 flex-wrap">
           <a class="btn btn-outline-gold" href="{{ url_for('index') }}">Back to catalog</a>
           <button type="button" class="btn btn-outline-gold add-to-cart-btn" data-code="{{ product.code }}">Add to cart</button>
+<<<<<<< Updated upstream
           <a class="btn btn-outline-gold" href="{{ (site_base_url ~ request.path) if site_base_url else request.base_url }}" target="_self">Share item link</a>
+=======
+          <a class="btn btn-outline-gold" href="{{ (site_base_url ~ request.path) if site_base_url else request.base_url }}"
+            target="_self">Share item link</a>
+>>>>>>> Stashed changes
         </div>
       </div>
     </div>
@@ -44,7 +50,7 @@
   "@context": "https://schema.org/",
   "@type": "Product",
   "name": {{ product.name|tojson }},
-  "image": [{{ url_for('static', filename='images/' ~ product.image, _external=True)|tojson }}],
+  "image": [{{ url_for('static', filename='product_images/' ~ product.image, _external=True)|tojson }}],
   "description": {{ product.description|tojson }},
   "sku": {{ product.code|tojson }},
   "brand": { "@type": "Brand", "name": "California Earrings" },

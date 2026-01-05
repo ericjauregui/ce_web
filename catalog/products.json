@@ -1,757 +1,132 @@
 [
   {
     "code": "101SB",
-    "collection": "prong",
+    "collection": "Studs",
     "name": "Micro 4-Prong CZ Stud",
-    "description": "14K yellow gold, round CZ, micro 4-prong.",
-    "image": "101SB.jpg",
+    "description": "14K yellow gold micro 4-prong stud set with round CZ.",
     "tags": [
-      "stud",
-      "prong",
-      "micro",
-      "14k",
       "cz",
-      "round"
-    ]
+      "round",
+      "stud",
+      "prong"
+    ],
+    "image": "101SB.jpg"
   },
   {
     "code": "102SB",
-    "collection": "prong",
+    "collection": "Studs",
     "name": "Petite 4-Prong CZ Stud",
-    "description": "14K yellow gold, round CZ, petite 4-prong.",
-    "image": "102SB.jpg",
+    "description": "14K yellow gold petite prong-set stud with round CZ.",
     "tags": [
-      "stud",
-      "prong",
-      "14k",
       "cz",
-      "round"
-    ]
+      "round",
+      "stud",
+      "prong"
+    ],
+    "image": "102SB.jpg"
   },
   {
     "code": "103BSB",
-    "collection": "bezel",
-    "name": "Micro Bezel CZ Stud",
-    "description": "14K yellow gold, round CZ, micro bezel.",
-    "image": "103BSB.jpg",
+    "collection": "Bezel",
+    "name": "Micro Bezel CZ Screwback Stud",
+    "description": "14K yellow gold micro bezel-set screwback stud with round CZ.",
     "tags": [
-      "stud",
+      "cz",
+      "round",
       "bezel",
-      "micro",
-      "14k",
-      "cz",
-      "round"
-    ]
-  },
-  {
-    "code": "103SB",
-    "collection": "prong",
-    "name": "Classic 4-Prong CZ Stud",
-    "description": "14K yellow gold, round CZ, classic 4-prong.",
-    "image": "103SB.jpg",
-    "tags": [
-      "stud",
-      "prong",
-      "classic",
-      "14k",
-      "cz",
-      "round"
-    ]
+      "screwback"
+    ],
+    "image": "103BSB.jpg"
   },
   {
     "code": "104BSB",
-    "collection": "bezel",
-    "name": "Bezel CZ Stud (Small)",
-    "description": "14K yellow gold, round CZ, sleek bezel.",
-    "image": "104BSB.jpg",
+    "collection": "Bezel",
+    "name": "Small Bezel CZ Screwback Stud",
+    "description": "14K yellow gold small bezel-set screwback stud with round CZ.",
     "tags": [
-      "stud",
+      "cz",
+      "round",
       "bezel",
-      "14k",
-      "cz",
-      "round"
-    ]
-  },
-  {
-    "code": "104SB",
-    "collection": "prong",
-    "name": "4-Prong CZ Stud (Small)",
-    "description": "14K yellow gold, round CZ, refined 4-prong.",
-    "image": "104SB.jpg",
-    "tags": [
-      "stud",
-      "prong",
-      "14k",
-      "cz",
-      "round"
-    ]
+      "screwback"
+    ],
+    "image": "104BSB.jpg"
   },
   {
     "code": "105BSB",
-    "collection": "bezel",
-    "name": "Bezel CZ Stud (Medium)",
-    "description": "14K yellow gold, round CZ, modern bezel.",
-    "image": "105BSB.jpg",
+    "collection": "Bezel",
+    "name": "Medium Bezel CZ Screwback Stud",
+    "description": "14K yellow gold medium bezel-set screwback stud with round CZ.",
     "tags": [
-      "stud",
+      "cz",
+      "round",
       "bezel",
-      "14k",
-      "cz",
-      "round"
-    ]
-  },
-  {
-    "code": "105SB",
-    "collection": "prong",
-    "name": "4-Prong CZ Stud (Medium)",
-    "description": "14K yellow gold, round CZ, luminous 4-prong.",
-    "image": "105SB.jpg",
-    "tags": [
-      "stud",
-      "prong",
-      "14k",
-      "cz",
-      "round"
-    ]
-  },
-  {
-    "code": "106BSB",
-    "collection": "bezel",
-    "name": "Bezel CZ Stud (Large)",
-    "description": "14K yellow gold, round CZ, bold bezel.",
-    "image": "106BSB.jpg",
-    "tags": [
-      "stud",
-      "bezel",
-      "14k",
-      "cz",
-      "round"
-    ]
-  },
-  {
-    "code": "106SB",
-    "collection": "prong",
-    "name": "4-Prong CZ Stud (Large)",
-    "description": "14K yellow gold, round CZ, statement 4-prong.",
-    "image": "106SB.jpg",
-    "tags": [
-      "stud",
-      "prong",
-      "14k",
-      "cz",
-      "round"
-    ]
+      "screwback"
+    ],
+    "image": "105BSB.jpg"
   },
   {
     "code": "107SB",
-    "collection": "studs",
-    "name": "107SB",
-    "description": "14K gold earrings. Contact for pricing.",
-    "image": "107SB.jpg",
+    "collection": "Studs",
+    "name": "Classic Round CZ Stud",
+    "description": "14K yellow gold classic round CZ stud with screwback.",
     "tags": [
-      "14k",
-      "gold"
-    ]
+      "cz",
+      "round",
+      "stud",
+      "screwback"
+    ],
+    "image": "107SB.jpg"
   },
   {
     "code": "108SB",
-    "collection": "studs",
-    "name": "108SB",
-    "description": "14K gold earrings. Contact for pricing.",
-    "image": "108SB.jpg",
+    "collection": "Studs",
+    "name": "Petite Round CZ Stud",
+    "description": "14K yellow gold petite round CZ screwback stud.",
     "tags": [
-      "14k",
-      "gold"
-    ]
+      "cz",
+      "round",
+      "stud",
+      "screwback"
+    ],
+    "image": "108SB.jpg"
   },
   {
     "code": "110PB",
-    "collection": "studs",
-    "name": "110PB",
-    "description": "14K gold earrings. Contact for pricing.",
-    "image": "110PB.jpg",
+    "collection": "Studs",
+    "name": "Round CZ Pushback Stud",
+    "description": "14K yellow gold pushback stud with round CZ.",
     "tags": [
-      "14k",
-      "gold"
-    ]
-  },
-  {
-    "code": "1258SB",
-    "collection": "studs",
-    "name": "1258SB",
-    "description": "14K gold earrings. Contact for pricing.",
-    "image": "1258SB.jpg",
-    "tags": [
-      "14k",
-      "gold"
-    ]
-  },
-  {
-    "code": "133BSB",
-    "collection": "studs",
-    "name": "133BSB",
-    "description": "14K gold earrings. Contact for pricing.",
-    "image": "133BSB.jpg",
-    "tags": [
-      "14k",
-      "gold"
-    ]
-  },
-  {
-    "code": "133SB",
-    "collection": "studs",
-    "name": "133SB",
-    "description": "14K gold earrings. Contact for pricing.",
-    "image": "133SB.jpg",
-    "tags": [
-      "14k",
-      "gold"
-    ]
-  },
-  {
-    "code": "134BSB",
-    "collection": "studs",
-    "name": "134BSB",
-    "description": "14K gold earrings. Contact for pricing.",
-    "image": "134BSB.jpg",
-    "tags": [
-      "14k",
-      "gold"
-    ]
-  },
-  {
-    "code": "134SB",
-    "collection": "studs",
-    "name": "134SB",
-    "description": "14K gold earrings. Contact for pricing.",
-    "image": "134SB.jpg",
-    "tags": [
-      "14k",
-      "gold"
-    ]
-  },
-  {
-    "code": "135BSB",
-    "collection": "studs",
-    "name": "135BSB",
-    "description": "14K gold earrings. Contact for pricing.",
-    "image": "135BSB.jpg",
-    "tags": [
-      "14k",
-      "gold"
-    ]
-  },
-  {
-    "code": "135SB",
-    "collection": "studs",
-    "name": "135SB",
-    "description": "14K gold earrings. Contact for pricing.",
-    "image": "135SB.jpg",
-    "tags": [
-      "14k",
-      "gold"
-    ]
-  },
-  {
-    "code": "136SB",
-    "collection": "studs",
-    "name": "136SB",
-    "description": "14K gold earrings. Contact for pricing.",
-    "image": "136SB.jpg",
-    "tags": [
-      "14k",
-      "gold"
-    ]
-  },
-  {
-    "code": "137SB",
-    "collection": "studs",
-    "name": "137SB",
-    "description": "14K gold earrings. Contact for pricing.",
-    "image": "137SB.jpg",
-    "tags": [
-      "14k",
-      "gold"
-    ]
-  },
-  {
-    "code": "1430LSB",
-    "collection": "uncategorized",
-    "name": "1430LSB",
-    "description": "",
-    "image": "1430LSB.jpg",
-    "tags": []
-  },
-  {
-    "code": "1430MSB",
-    "collection": "uncategorized",
-    "name": "1430MSB",
-    "description": "",
-    "image": "1430MSB.jpg",
-    "tags": []
-  },
-  {
-    "code": "1430SSB",
-    "collection": "uncategorized",
-    "name": "1430SSB",
-    "description": "",
-    "image": "1430SSB.jpg",
-    "tags": []
-  },
-  {
-    "code": "143SB",
-    "collection": "uncategorized",
-    "name": "143SB",
-    "description": "",
-    "image": "143SB.jpg",
-    "tags": []
-  },
-  {
-    "code": "144SB",
-    "collection": "uncategorized",
-    "name": "144SB",
-    "description": "",
-    "image": "144SB.jpg",
-    "tags": []
-  },
-  {
-    "code": "1459SB",
-    "collection": "uncategorized",
-    "name": "1459SB",
-    "description": "",
-    "image": "1459SB.jpg",
-    "tags": []
-  },
-  {
-    "code": "1462LSB",
-    "collection": "uncategorized",
-    "name": "1462LSB",
-    "description": "",
-    "image": "1462LSB.jpg",
-    "tags": []
-  },
-  {
-    "code": "1462MSB",
-    "collection": "uncategorized",
-    "name": "1462MSB",
-    "description": "",
-    "image": "1462MSB.jpg",
-    "tags": []
-  },
-  {
-    "code": "1462SSB",
-    "collection": "uncategorized",
-    "name": "1462SSB",
-    "description": "",
-    "image": "1462SSB.jpg",
-    "tags": []
-  },
-  {
-    "code": "1555SB",
-    "collection": "uncategorized",
-    "name": "1555SB",
-    "description": "",
-    "image": "1555SB.jpg",
-    "tags": []
+      "cz",
+      "round",
+      "stud",
+      "pushback"
+    ],
+    "image": "110PB.jpg"
   },
   {
     "code": "1556SB",
-    "collection": "uncategorized",
-    "name": "1556SB",
-    "description": "",
-    "image": "1556SB.jpg",
-    "tags": []
-  },
-  {
-    "code": "1557LSB",
-    "collection": "uncategorized",
-    "name": "1557LSB",
-    "description": "",
-    "image": "1557LSB.jpg",
-    "tags": []
+    "collection": "Hearts",
+    "name": "Multi-Color Heart CZ Stud",
+    "description": "14K yellow gold heart-shaped stud with multi-color CZ stones.",
+    "tags": [
+      "cz",
+      "heart",
+      "stud",
+      "screwback"
+    ],
+    "image": "1556SB.jpg"
   },
   {
     "code": "1557MSB",
-    "collection": "uncategorized",
-    "name": "1557MSB",
-    "description": "",
-    "image": "1557MSB.jpg",
-    "tags": []
-  },
-  {
-    "code": "1557SSB",
-    "collection": "uncategorized",
-    "name": "1557SSB",
-    "description": "",
-    "image": "1557SSB.jpg",
-    "tags": []
-  },
-  {
-    "code": "1599SB",
-    "collection": "uncategorized",
-    "name": "1599SB",
-    "description": "",
-    "image": "1599SB.jpg",
-    "tags": []
-  },
-  {
-    "code": "1601SB",
-    "collection": "uncategorized",
-    "name": "1601SB",
-    "description": "",
-    "image": "1601SB.jpg",
-    "tags": []
-  },
-  {
-    "code": "1601SB3C",
-    "collection": "uncategorized",
-    "name": "1601SB3C",
-    "description": "",
-    "image": "1601SB3C.jpg",
-    "tags": []
-  },
-  {
-    "code": "1603LSB",
-    "collection": "uncategorized",
-    "name": "1603LSB",
-    "description": "",
-    "image": "1603LSB.jpg",
-    "tags": []
-  },
-  {
-    "code": "1603SSB",
-    "collection": "uncategorized",
-    "name": "1603SSB",
-    "description": "",
-    "image": "1603SSB.jpg",
-    "tags": []
-  },
-  {
-    "code": "163BSB",
-    "collection": "uncategorized",
-    "name": "163BSB",
-    "description": "",
-    "image": "163BSB.jpg",
-    "tags": []
-  },
-  {
-    "code": "164BSB",
-    "collection": "uncategorized",
-    "name": "164BSB",
-    "description": "",
-    "image": "164BSB.jpg",
-    "tags": []
-  },
-  {
-    "code": "164SB",
-    "collection": "uncategorized",
-    "name": "164SB",
-    "description": "",
-    "image": "164SB.jpg",
-    "tags": []
-  },
-  {
-    "code": "165BSB",
-    "collection": "uncategorized",
-    "name": "165BSB",
-    "description": "",
-    "image": "165BSB.jpg",
-    "tags": []
-  },
-  {
-    "code": "165SB",
-    "collection": "uncategorized",
-    "name": "165SB",
-    "description": "",
-    "image": "165SB.jpg",
-    "tags": []
-  },
-  {
-    "code": "1665SB",
-    "collection": "uncategorized",
-    "name": "1665SB",
-    "description": "",
-    "image": "1665SB.jpg",
-    "tags": []
-  },
-  {
-    "code": "1666SB",
-    "collection": "uncategorized",
-    "name": "1666SB",
-    "description": "",
-    "image": "1666SB.jpg",
-    "tags": []
-  },
-  {
-    "code": "1667SB",
-    "collection": "uncategorized",
-    "name": "1667SB",
-    "description": "",
-    "image": "1667SB.jpg",
-    "tags": []
-  },
-  {
-    "code": "166BSB",
-    "collection": "uncategorized",
-    "name": "166BSB",
-    "description": "",
-    "image": "166BSB.jpg",
-    "tags": []
-  },
-  {
-    "code": "166SB",
-    "collection": "uncategorized",
-    "name": "166SB",
-    "description": "",
-    "image": "166SB.jpg",
-    "tags": []
-  },
-  {
-    "code": "1670LSB",
-    "collection": "uncategorized",
-    "name": "1670LSB",
-    "description": "",
-    "image": "1670LSB.jpg",
-    "tags": []
-  },
-  {
-    "code": "1670SSB",
-    "collection": "uncategorized",
-    "name": "1670SSB",
-    "description": "",
-    "image": "1670SSB.jpg",
-    "tags": []
-  },
-  {
-    "code": "1671SSB",
-    "collection": "uncategorized",
-    "name": "1671SSB",
-    "description": "",
-    "image": "1671SSB.jpg",
-    "tags": []
-  },
-  {
-    "code": "1675SB",
-    "collection": "uncategorized",
-    "name": "1675SB",
-    "description": "",
-    "image": "1675SB.jpg",
-    "tags": []
-  },
-  {
-    "code": "167BSB",
-    "collection": "uncategorized",
-    "name": "167BSB",
-    "description": "",
-    "image": "167BSB.jpg",
-    "tags": []
-  },
-  {
-    "code": "167SB",
-    "collection": "uncategorized",
-    "name": "167SB",
-    "description": "",
-    "image": "167SB.jpg",
-    "tags": []
-  },
-  {
-    "code": "1781SB",
-    "collection": "uncategorized",
-    "name": "1781SB",
-    "description": "",
-    "image": "1781SB.jpg",
-    "tags": []
-  },
-  {
-    "code": "1782SB",
-    "collection": "uncategorized",
-    "name": "1782SB",
-    "description": "",
-    "image": "1782SB.jpg",
-    "tags": []
-  },
-  {
-    "code": "1813SB",
-    "collection": "uncategorized",
-    "name": "1813SB",
-    "description": "",
-    "image": "1813SB.jpg",
-    "tags": []
-  },
-  {
-    "code": "1814SB",
-    "collection": "uncategorized",
-    "name": "1814SB",
-    "description": "",
-    "image": "1814SB.jpg",
-    "tags": []
-  },
-  {
-    "code": "1981SB3C",
-    "collection": "uncategorized",
-    "name": "1981SB3C",
-    "description": "",
-    "image": "1981SB3C.jpg",
-    "tags": []
-  },
-  {
-    "code": "203SB",
-    "collection": "uncategorized",
-    "name": "203SB",
-    "description": "",
-    "image": "203SB.jpg",
-    "tags": []
-  },
-  {
-    "code": "204SB",
-    "collection": "uncategorized",
-    "name": "204SB",
-    "description": "",
-    "image": "204SB.jpg",
-    "tags": []
-  },
-  {
-    "code": "205SB",
-    "collection": "uncategorized",
-    "name": "205SB",
-    "description": "",
-    "image": "205SB.jpg",
-    "tags": []
-  },
-  {
-    "code": "206SB",
-    "collection": "uncategorized",
-    "name": "206SB",
-    "description": "",
-    "image": "206SB.jpg",
-    "tags": []
-  },
-  {
-    "code": "223SB",
-    "collection": "uncategorized",
-    "name": "223SB",
-    "description": "",
-    "image": "223SB.jpg",
-    "tags": []
-  },
-  {
-    "code": "224SB",
-    "collection": "uncategorized",
-    "name": "224SB",
-    "description": "",
-    "image": "224SB.jpg",
-    "tags": []
-  },
-  {
-    "code": "225SB",
-    "collection": "uncategorized",
-    "name": "225SB",
-    "description": "",
-    "image": "225SB.jpg",
-    "tags": []
-  },
-  {
-    "code": "226SB",
-    "collection": "uncategorized",
-    "name": "226SB",
-    "description": "",
-    "image": "226SB.jpg",
-    "tags": []
-  },
-  {
-    "code": "228SB",
-    "collection": "uncategorized",
-    "name": "228SB",
-    "description": "",
-    "image": "228SB.jpg",
-    "tags": []
-  },
-  {
-    "code": "233SB",
-    "collection": "uncategorized",
-    "name": "233SB",
-    "description": "",
-    "image": "233SB.jpg",
-    "tags": []
-  },
-  {
-    "code": "234SB",
-    "collection": "uncategorized",
-    "name": "234SB",
-    "description": "",
-    "image": "234SB.jpg",
-    "tags": []
-  },
-  {
-    "code": "235SB",
-    "collection": "uncategorized",
-    "name": "235SB",
-    "description": "",
-    "image": "235SB.jpg",
-    "tags": []
-  },
-  {
-    "code": "236SB",
-    "collection": "uncategorized",
-    "name": "236SB",
-    "description": "",
-    "image": "236SB.jpg",
-    "tags": []
-  },
-  {
-    "code": "237SB",
-    "collection": "uncategorized",
-    "name": "237SB",
-    "description": "",
-    "image": "237SB.jpg",
-    "tags": []
-  },
-  {
-    "code": "253SB",
-    "collection": "uncategorized",
-    "name": "253SB",
-    "description": "",
-    "image": "253SB.jpg",
-    "tags": []
-  },
-  {
-    "code": "254SB",
-    "collection": "uncategorized",
-    "name": "254SB",
-    "description": "",
-    "image": "254SB.jpg",
-    "tags": []
-  },
-  {
-    "code": "255SB",
-    "collection": "uncategorized",
-    "name": "255SB",
-    "description": "",
-    "image": "255SB.jpg",
-    "tags": []
-  },
-  {
-    "code": "256SB",
-    "collection": "uncategorized",
-    "name": "256SB",
-    "description": "",
-    "image": "256SB.jpg",
-    "tags": []
-  },
-  {
-    "code": "344LSB",
-    "collection": "uncategorized",
-    "name": "344LSB",
-    "description": "",
-    "image": "344LSB.jpg",
-    "tags": []
-  },
-  {
-    "code": "344SSB",
-    "collection": "uncategorized",
-    "name": "344SSB",
-    "description": "",
-    "image": "344SSB.jpg",
-    "tags": []
+    "collection": "Hearts",
+    "name": "Ribbed Heart CZ Stud",
+    "description": "14K yellow gold ribbed heart stud with CZ accents.",
+    "tags": [
+      "cz",
+      "heart",
+      "stud",
+      "screwback"
+    ],
+    "image": "1557MSB.jpg"
   }
 ]

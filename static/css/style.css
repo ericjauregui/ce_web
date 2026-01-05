@@ -17,7 +17,7 @@ body::before{
   inset: 0;
   z-index: -3;
 
-  background-image: url("/static/images/site-bg.jpg");
+  background-image: url("/static/assets/ce_logo_shape.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -32,8 +32,8 @@ body::after{
   inset: 0;
   z-index: -2;
 
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
 
   background: rgba(0, 0, 0, 0.55);
   pointer-events: none;
@@ -93,12 +93,12 @@ html::before{
 :root{ --gold:#d7c07a; --gold-70: rgba(215,192,122,0.75); --gold-grad: linear-gradient(90deg, #b8994c, #e6d294, #b8994c); }
 body { font-family:'Lato',sans-serif; color:#e8e8e8; background:#0d0d0d; }
 .brand { font-family:'Playfair Display',serif; letter-spacing:.5px; color: var(--gold) !important; }
-/* --- Brand logo (responsive, restrained) --- */
+
 .brand-logo {
   height: clamp(50px, 4.5vw, 80px);
   /* smaller overall, still responsive */
   width: auto;
-  max-width: min(200px, 38vw);
+  /* max-width: min(200px, 38vw); */
   object-fit: contain;
   display: block;
   filter: drop-shadow(0 1px 6px rgba(0, 0, 0, .35));
@@ -111,31 +111,33 @@ body { font-family:'Lato',sans-serif; color:#e8e8e8; background:#0d0d0d; }
 }
 
 /* Extra-small screens */
-@media (max-width: 420px) {
+/* @media (max-width: 420px) {
   .brand-logo {
     height: 20px;
     max-width: 60vw;
   }
 }
 
+*/
 /* Large desktops: cap size so it never feels oversized */
-@media (min-width: 1400px) {
+/* @media (min-width: 1400px) {
   .brand-logo {
     height: 30px;
     max-width: 180px;
   }
 }
+*/
 .text-gold { color: var(--gold) !important; } .text-gold-70{ color: var(--gold-70) !important; }
 .border-gold{ border-color: var(--gold) !important; }
 .bg-black { background:#0d0d0d !important; }
 .bg-dark  { background:#151515 !important; }
 .hero{
-  min-height: 62vh;
-  background: linear-gradient(rgba(0,0,0,.55), rgba(0,0,0,.55)),
-              url('../images/hero_bg.jpg') center/cover no-repeat;
+  min-height: 33vh;
+    background: linear-gradient(rgba(0, 0, 0, .55), rgba(0, 0, 0, .55));
   border-bottom: 1px solid var(--gold);
   display:flex; align-items:center;
 }
+
 .product{ transition: transform .25s ease, box-shadow .25s ease; }
 .product:hover{ transform: translateY(-6px); box-shadow: 0 12px 30px rgba(0,0,0,.5) }
 .product-img{ object-fit: cover; height: 300px; background: #111; }
