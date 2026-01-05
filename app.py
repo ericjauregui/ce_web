@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import Any
 
 import smtplib
-from flask import Flask, abort, jsonify, render_template, request, send_file, session, url_for
+from flask import Flask, abort, jsonify, render_template, request, send_file, session
 
 app = Flask(__name__)
 
@@ -117,42 +117,6 @@ def load_collections_cfg() -> dict[str, Any]:
     return {"order": [], "labels": {}}
 
 
-def sort_products(products: list[dict], sort_key: str) -> list[dict]:
-    sort_key = (sort_key or "order").lower()
-
-    def safe_lower(x):
-        return (x or "").lower() if isinstance(x, str) else x
-
-    if sort_key == "code":
-        return sorted(products, key=lambda p: safe_lower(p.get("code")))
-    if sort_key == "name":
-        return sorted(products, key=lambda p: safe_lower(p.get("name")))
-    if sort_key == "size_mm_asc":
-        return sorted(
-            products,
-            key=lambda p: (p.get("size_mm") is None, p.get("size_mm") or 0, safe_lower(p.get("code"))),
-        )
-    if sort_key == "size_mm_desc":
-        return sorted(
-            products,
-            key=lambda p: (p.get("size_mm") is None, -(p.get("size_mm") or 0), safe_lower(p.get("code"))),
-        )
-
-    # featured/default order: collection order then code (numeric then lex)
-    cfg = load_collections_cfg()
-    order: list[str] = cfg.get("order") or []
-    order_rank = {k: i for i, k in enumerate(order)}
-
-    def order_key(p: dict[str, Any]):
-        col = (p.get("collection") or "other").strip()
-        col_rank = order_rank.get(col, len(order) + 1)
-        code = p.get("code") or ""
-        num = _code_num(code)
-        return (col_rank, num is None, num or 0, safe_lower(code))
-
-    return sorted(products, key=order_key)
-
-
 def filter_products(products: list[dict[str, Any]], q: str) -> list[dict[str, Any]]:
     q = (q or "").strip().lower()
     if not q:
@@ -165,8 +129,6 @@ def filter_products(products: list[dict[str, Any]], q: str) -> list[dict[str, An
                 str(p.get("code", "")),
                 str(p.get("name", "")),
                 str(p.get("collection", "")),
-                str(p.get("material", "")),
-                str(p.get("stone", "")),
                 str(p.get("description", "")),
                 " ".join(p.get("tags", []) or []),
             ]
@@ -301,28 +263,17 @@ def inject_site_config():
 def index():
     products = load_products()
     q = request.args.get("q", "")
-    sort = request.args.get("sort", "order")
-
     products = filter_products(products, q)
-    products = sort_products(products, sort)
 
     cfg = load_collections_cfg()
     sections = build_sections(products, cfg)
 
-    sort_options = [
-        ("order", "Featured"),
-        ("code", "Item code (a–z)"),
-        ("name", "Name (a–z)"),
-        ("size_mm_asc", "Size (mm) Small →> Large"),
-        ("size_mm_desc", "Size (mm) Large →> Small"),
-    ]
-
-    return render_template("index.html", sections=sections, q=q, sort=sort, sort_options=sort_options)
+    return render_template("index.html", sections=sections, q=q)
 
 
 @app.route("/product/<slug>")
 def product_detail(slug: str):
-    products = sort_products(load_products(), "order")
+    products = load_products()
     product = next((p for p in products if p.get("slug") == slug), None)
     if not product:
         abort(404)
@@ -372,7 +323,7 @@ Notes: {notes}
 Distinct items: {len(items)}
 Total qty: {cart_total_items(cart)}
 """
-    filename = f"inquiry_{company.lower().replace(' ','_')}_{token[:8]}.csv"
+    filename = f"order_{company.lower().replace(' ', '_')}_{token[:8]}.csv"
 
     sent = False
     try:
@@ -482,7 +433,7 @@ Sitemap: {base}/sitemap.xml
 
 @app.route("/sitemap.xml")
 def sitemap():
-    products = sort_products(load_products(), "order")
+    products = load_products()
     base_url = request.url_root.rstrip("/")
     return (
         render_template("sitemap.xml", products=products, base_url=base_url),

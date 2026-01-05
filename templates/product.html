@@ -31,12 +31,8 @@
         <div class="d-flex gap-2 flex-wrap">
           <a class="btn btn-outline-gold" href="{{ url_for('index') }}">Back to catalog</a>
           <button type="button" class="btn btn-outline-gold add-to-cart-btn" data-code="{{ product.code }}">Add to cart</button>
-<<<<<<< Updated upstream
-          <a class="btn btn-outline-gold" href="{{ (site_base_url ~ request.path) if site_base_url else request.base_url }}" target="_self">Share item link</a>
-=======
           <a class="btn btn-outline-gold" href="{{ (site_base_url ~ request.path) if site_base_url else request.base_url }}"
             target="_self">Share item link</a>
->>>>>>> Stashed changes
         </div>
       </div>
     </div>

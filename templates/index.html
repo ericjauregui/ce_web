@@ -1,20 +1,14 @@
 {% extends "base.html" %}
-{% block title %}Wholesale 14K Gold Earrings | California Earrings{% endblock %}
+{% block title %}Wholesalers of 10k/14K Gold Earrings | California Earrings{% endblock %}
 {% block content %}
 <header class="hero d-flex align-items-center text-center" id="top">
   <div class="container">
-    <h1 class="display-5 fw-semibold text-gold">Manufacturers • Importers • Wholesalers of 14K Gold Earrings</h1>
-    <p class="lead text-gold-70 mt-2">Los Angeles Jewelry District · Wholesale Only</p>
+    <h1 class="display-6 fw-semibold text-gold">Wholesalers • Manufacturers • Importers</h1>
+    <p class="lead text-gold-70 mt-2"><b>Contact us to place an order • Wholesale Only • Shipping available globally</b></p>
 
     <form class="d-flex justify-content-center mt-4 gap-2 flex-wrap" method="get">
-      <input name="q" value="{{ q or '' }}" placeholder="Search code, style, or tag (e.g., 101SB, bezel, prong)"
+      <input name="q" value="{{ q or '' }}" placeholder="Search code, style, or tag (e.g., 101SB, studs, hearts)"
              class="form-control form-control-lg bg-dark text-light border-gold" style="max-width: 520px;">
-
-      <select name="sort" class="form-select form-select-lg bg-dark text-light border-gold" style="max-width: 300px;">
-        {% for val, label in sort_options %}
-          <option value="{{ val }}" {% if sort==val %}selected{% endif %}>Sort: {{ label }}</option>
-        {% endfor %}
-      </select>
 
       <button class="btn btn-outline-gold btn-lg" type="submit">Search</button>
     </form>
@@ -51,8 +45,10 @@
   <div class="d-flex align-items-end justify-content-between mb-3">
     <h2 class="text-gold m-0 section-title">Social reels</h2>
     <div class="d-flex gap-2">
-      <a class="chip" href="{{ social.instagram.profile_url }}" target="_blank" rel="noopener">Instagram</a>
-      <a class="chip" href="{{ social.tiktok.profile_url }}" target="_blank" rel="noopener">TikTok</a>
+      <a class="chip" href="{{ social.instagram.profile_url }}" target="_blank" rel="noopener">Click to see our
+        Instagram</a>
+      <a class="chip" href="{{ social.tiktok.profile_url }}" target="_blank" rel="noopener">Click to see our
+        TikTok</a>
     </div>
   </div>
 

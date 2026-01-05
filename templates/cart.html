@@ -5,11 +5,12 @@
   <div class="d-flex align-items-end justify-content-between gap-3 flex-wrap">
     <div>
       <h1 class="text-gold mb-2">Shopping cart</h1>
-      <p class="text-gold-70 mb-0">Checkout your cart and we'll follow up with wholesale pricing & availability.</p>
+      <p class="text-gold-70 mb-0">Checkout your cart and we'll follow up with wholesale pricing & availability. No payment
+        required.</p>
     </div>
     <div class="d-flex gap-2">
       <a class="btn btn-outline-gold" href="{{ url_for('index') }}">Continue browsing</a>
-      <a class="btn btn-outline-gold" href="{{ url_for('checkout') }}">Checkout</a>
+      <a class="btn btn-outline-gold" href="{{ url_for('checkout') }}">Checkout (no payment)</a>
     </div>
   </div>
 
@@ -48,7 +49,7 @@
                 </div>
               </td>
               <td>
-                <button class="btn btn-outline-gold btn-sm qty-remove" type="button" data-code="{{ row.product.code }}">remove</button>
+                <button class="btn btn-outline-gold btn-sm qty-remove" type="button" data-code="{{ row.product.code }}">Remove</button>
               </td>
             </tr>
             {% endfor %}
@@ -58,7 +59,7 @@
 
       <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2">
         <div class="text-gold-70 small">items: <span id="cartItemCount">{{ total_items }}</span></div>
-        <a class="btn btn-outline-gold" href="{{ url_for('checkout') }}">checkout</a>
+        <a class="btn btn-outline-gold" href="{{ url_for('checkout') }}">Checkout (no payment)</a>
       </div>
     {% endif %}
   </div>

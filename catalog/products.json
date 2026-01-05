@@ -2,131 +2,976 @@
   {
     "code": "101SB",
     "collection": "Studs",
-    "name": "Micro 4-Prong CZ Stud",
-    "description": "14K yellow gold micro 4-prong stud set with round CZ.",
+    "name": "Stud Earring",
+    "description": "14k gold stud earring",
+    "image": "101SB.jpg",
     "tags": [
-      "cz",
-      "round",
       "stud",
-      "prong"
-    ],
-    "image": "101SB.jpg"
+      "screwback"
+    ]
   },
   {
     "code": "102SB",
     "collection": "Studs",
-    "name": "Petite 4-Prong CZ Stud",
-    "description": "14K yellow gold petite prong-set stud with round CZ.",
+    "name": "Stud Earring",
+    "description": "14k gold stud earring",
+    "image": "102SB.jpg",
     "tags": [
-      "cz",
-      "round",
       "stud",
-      "prong"
-    ],
-    "image": "102SB.jpg"
+      "screwback"
+    ]
   },
   {
-    "code": "103BSB",
-    "collection": "Bezel",
-    "name": "Micro Bezel CZ Screwback Stud",
-    "description": "14K yellow gold micro bezel-set screwback stud with round CZ.",
+    "code": "103SB",
+    "collection": "Studs",
+    "name": "Stud Earring",
+    "description": "14k gold stud earring",
+    "image": "103SB.jpg",
     "tags": [
-      "cz",
-      "round",
-      "bezel",
+      "stud",
       "screwback"
-    ],
-    "image": "103BSB.jpg"
+    ]
   },
   {
-    "code": "104BSB",
-    "collection": "Bezel",
-    "name": "Small Bezel CZ Screwback Stud",
-    "description": "14K yellow gold small bezel-set screwback stud with round CZ.",
+    "code": "104SB",
+    "collection": "Studs",
+    "name": "Stud Earring",
+    "description": "14k gold stud earring",
+    "image": "104SB.jpg",
     "tags": [
-      "cz",
-      "round",
-      "bezel",
+      "stud",
       "screwback"
-    ],
-    "image": "104BSB.jpg"
+    ]
   },
   {
-    "code": "105BSB",
-    "collection": "Bezel",
-    "name": "Medium Bezel CZ Screwback Stud",
-    "description": "14K yellow gold medium bezel-set screwback stud with round CZ.",
+    "code": "105SB",
+    "collection": "Studs",
+    "name": "Stud Earring",
+    "description": "14k gold stud earring",
+    "image": "105SB.jpg",
     "tags": [
-      "cz",
-      "round",
-      "bezel",
+      "stud",
       "screwback"
-    ],
-    "image": "105BSB.jpg"
+    ]
+  },
+  {
+    "code": "106SB",
+    "collection": "Studs",
+    "name": "Stud Earring",
+    "description": "14k gold stud earring",
+    "image": "106SB.jpg",
+    "tags": [
+      "stud",
+      "screwback"
+    ]
   },
   {
     "code": "107SB",
     "collection": "Studs",
-    "name": "Classic Round CZ Stud",
-    "description": "14K yellow gold classic round CZ stud with screwback.",
+    "name": "Stud Earring",
+    "description": "14k gold stud earring",
+    "image": "107SB.jpg",
     "tags": [
-      "cz",
-      "round",
       "stud",
       "screwback"
-    ],
-    "image": "107SB.jpg"
+    ]
   },
   {
     "code": "108SB",
     "collection": "Studs",
-    "name": "Petite Round CZ Stud",
-    "description": "14K yellow gold petite round CZ screwback stud.",
+    "name": "Stud Earring",
+    "description": "14k gold stud earring",
+    "image": "108SB.jpg",
     "tags": [
-      "cz",
-      "round",
       "stud",
       "screwback"
-    ],
-    "image": "108SB.jpg"
+    ]
   },
   {
     "code": "110PB",
     "collection": "Studs",
-    "name": "Round CZ Pushback Stud",
-    "description": "14K yellow gold pushback stud with round CZ.",
+    "name": "Stud Earring",
+    "description": "14k gold stud earring",
+    "image": "110PB.jpg",
     "tags": [
-      "cz",
-      "round",
       "stud",
       "pushback"
-    ],
-    "image": "110PB.jpg"
+    ]
+  },
+  {
+    "code": "133SB",
+    "collection": "Studs",
+    "name": "Stud Earring",
+    "description": "14k gold stud earring",
+    "image": "133SB.jpg",
+    "tags": [
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "134SB",
+    "collection": "Studs",
+    "name": "Stud Earring",
+    "description": "14k gold stud earring",
+    "image": "134SB.jpg",
+    "tags": [
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "135SB",
+    "collection": "Studs",
+    "name": "Stud Earring",
+    "description": "14k gold stud earring",
+    "image": "135SB.jpg",
+    "tags": [
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "136SB",
+    "collection": "Studs",
+    "name": "Stud Earring",
+    "description": "14k gold stud earring",
+    "image": "136SB.jpg",
+    "tags": [
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "137SB",
+    "collection": "Studs",
+    "name": "Stud Earring",
+    "description": "14k gold stud earring",
+    "image": "137SB.jpg",
+    "tags": [
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "143SB",
+    "collection": "Studs",
+    "name": "Stud Earring",
+    "description": "14k gold stud earring",
+    "image": "143SB.jpg",
+    "tags": [
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "144SB",
+    "collection": "Studs",
+    "name": "Stud Earring",
+    "description": "14k gold stud earring",
+    "image": "144SB.jpg",
+    "tags": [
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "164SB",
+    "collection": "Studs",
+    "name": "Stud Earring",
+    "description": "14k gold stud earring",
+    "image": "164SB.jpg",
+    "tags": [
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "165SB",
+    "collection": "Studs",
+    "name": "Stud Earring",
+    "description": "14k gold stud earring",
+    "image": "165SB.jpg",
+    "tags": [
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "166SB",
+    "collection": "Studs",
+    "name": "Stud Earring",
+    "description": "14k gold stud earring",
+    "image": "166SB.jpg",
+    "tags": [
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "167SB",
+    "collection": "Hearts",
+    "name": "Heart Stud",
+    "description": "14k gold heart stud",
+    "image": "167SB.jpg",
+    "tags": [
+      "heart",
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "203SB",
+    "collection": "Studs",
+    "name": "Stud Earring",
+    "description": "14k gold stud earring",
+    "image": "203SB.jpg",
+    "tags": [
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "204SB",
+    "collection": "Studs",
+    "name": "Stud Earring",
+    "description": "14k gold stud earring",
+    "image": "204SB.jpg",
+    "tags": [
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "205SB",
+    "collection": "Studs",
+    "name": "Stud Earring",
+    "description": "14k gold stud earring",
+    "image": "205SB.jpg",
+    "tags": [
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "206SB",
+    "collection": "Studs",
+    "name": "Stud Earring",
+    "description": "14k gold stud earring",
+    "image": "206SB.jpg",
+    "tags": [
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "223SB",
+    "collection": "Studs",
+    "name": "Stud Earring",
+    "description": "14k gold stud earring",
+    "image": "223SB.jpg",
+    "tags": [
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "224SB",
+    "collection": "Studs",
+    "name": "Stud Earring",
+    "description": "14k gold stud earring",
+    "image": "224SB.jpg",
+    "tags": [
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "225SB",
+    "collection": "Studs",
+    "name": "Stud Earring",
+    "description": "14k gold stud earring",
+    "image": "225SB.jpg",
+    "tags": [
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "226SB",
+    "collection": "Studs",
+    "name": "Stud Earring",
+    "description": "14k gold stud earring",
+    "image": "226SB.jpg",
+    "tags": [
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "228SB",
+    "collection": "Studs",
+    "name": "Stud Earring",
+    "description": "14k gold stud earring",
+    "image": "228SB.jpg",
+    "tags": [
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "233SB",
+    "collection": "Studs",
+    "name": "Stud Earring",
+    "description": "14k gold stud earring",
+    "image": "233SB.jpg",
+    "tags": [
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "234SB",
+    "collection": "Studs",
+    "name": "Stud Earring",
+    "description": "14k gold stud earring",
+    "image": "234SB.jpg",
+    "tags": [
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "235SB",
+    "collection": "Studs",
+    "name": "Stud Earring",
+    "description": "14k gold stud earring",
+    "image": "235SB.jpg",
+    "tags": [
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "236SB",
+    "collection": "Studs",
+    "name": "Stud Earring",
+    "description": "14k gold stud earring",
+    "image": "236SB.jpg",
+    "tags": [
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "237SB",
+    "collection": "Studs",
+    "name": "Stud Earring",
+    "description": "14k gold stud earring",
+    "image": "237SB.jpg",
+    "tags": [
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "253SB",
+    "collection": "Studs",
+    "name": "Stud Earring",
+    "description": "14k gold stud earring",
+    "image": "253SB.jpg",
+    "tags": [
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "254SB",
+    "collection": "Studs",
+    "name": "Stud Earring",
+    "description": "14k gold stud earring",
+    "image": "254SB.jpg",
+    "tags": [
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "255SB",
+    "collection": "Studs",
+    "name": "Stud Earring",
+    "description": "14k gold stud earring",
+    "image": "255SB.jpg",
+    "tags": [
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "256SB",
+    "collection": "Studs",
+    "name": "Stud Earring",
+    "description": "14k gold stud earring",
+    "image": "256SB.jpg",
+    "tags": [
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "103BSB",
+    "collection": "Bezel",
+    "name": "Bezel Stud",
+    "description": "14k gold bezel stud",
+    "image": "103BSB.jpg",
+    "tags": [
+      "bezel",
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "104BSB",
+    "collection": "Bezel",
+    "name": "Bezel Stud",
+    "description": "14k gold bezel stud",
+    "image": "104BSB.jpg",
+    "tags": [
+      "bezel",
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "105BSB",
+    "collection": "Bezel",
+    "name": "Bezel Stud",
+    "description": "14k gold bezel stud",
+    "image": "105BSB.jpg",
+    "tags": [
+      "bezel",
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "106BSB",
+    "collection": "Bezel",
+    "name": "Bezel Stud",
+    "description": "14k gold bezel stud",
+    "image": "106BSB.jpg",
+    "tags": [
+      "bezel",
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "1258SB",
+    "collection": "Hearts",
+    "name": "Heart Stud",
+    "description": "14k gold heart stud",
+    "image": "1258SB.jpg",
+    "tags": [
+      "heart",
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "133BSB",
+    "collection": "Bezel",
+    "name": "Bezel Stud",
+    "description": "14k gold bezel stud",
+    "image": "133BSB.jpg",
+    "tags": [
+      "bezel",
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "134BSB",
+    "collection": "Bezel",
+    "name": "Bezel Stud",
+    "description": "14k gold bezel stud",
+    "image": "134BSB.jpg",
+    "tags": [
+      "bezel",
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "135BSB",
+    "collection": "Bezel",
+    "name": "Bezel Stud",
+    "description": "14k gold bezel stud",
+    "image": "135BSB.jpg",
+    "tags": [
+      "bezel",
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "1459SB",
+    "collection": "Studs",
+    "name": "Stud Earring",
+    "description": "14k gold stud earring",
+    "image": "1459SB.jpg",
+    "tags": [
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "1555SB",
+    "collection": "Studs",
+    "name": "Stud Earring",
+    "description": "14k gold stud earring",
+    "image": "1555SB.jpg",
+    "tags": [
+      "stud",
+      "screwback"
+    ]
   },
   {
     "code": "1556SB",
-    "collection": "Hearts",
-    "name": "Multi-Color Heart CZ Stud",
-    "description": "14K yellow gold heart-shaped stud with multi-color CZ stones.",
+    "collection": "Studs",
+    "name": "Stud Earring",
+    "description": "14k gold stud earring",
+    "image": "1556SB.jpg",
     "tags": [
-      "cz",
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "1599SB",
+    "collection": "Studs",
+    "name": "Stud Earring",
+    "description": "14k gold stud earring",
+    "image": "1599SB.jpg",
+    "tags": [
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "1601SB",
+    "collection": "Hearts",
+    "name": "Heart Stud",
+    "description": "14k gold heart stud",
+    "image": "1601SB.jpg",
+    "tags": [
       "heart",
       "stud",
       "screwback"
-    ],
-    "image": "1556SB.jpg"
+    ]
+  },
+  {
+    "code": "163BSB",
+    "collection": "Bezel",
+    "name": "Bezel Stud",
+    "description": "14k gold bezel stud",
+    "image": "163BSB.jpg",
+    "tags": [
+      "bezel",
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "164BSB",
+    "collection": "Bezel",
+    "name": "Bezel Stud",
+    "description": "14k gold bezel stud",
+    "image": "164BSB.jpg",
+    "tags": [
+      "bezel",
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "165BSB",
+    "collection": "Bezel",
+    "name": "Bezel Stud",
+    "description": "14k gold bezel stud",
+    "image": "165BSB.jpg",
+    "tags": [
+      "bezel",
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "1665SB",
+    "collection": "Hearts",
+    "name": "Heart Stud",
+    "description": "14k gold heart stud",
+    "image": "1665SB.jpg",
+    "tags": [
+      "heart",
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "1666SB",
+    "collection": "Hearts",
+    "name": "Heart Stud",
+    "description": "14k gold heart stud",
+    "image": "1666SB.jpg",
+    "tags": [
+      "heart",
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "1667SB",
+    "collection": "Hearts",
+    "name": "Heart Stud",
+    "description": "14k gold heart stud",
+    "image": "1667SB.jpg",
+    "tags": [
+      "heart",
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "166BSB",
+    "collection": "Bezel",
+    "name": "Bezel Stud",
+    "description": "14k gold bezel stud",
+    "image": "166BSB.jpg",
+    "tags": [
+      "bezel",
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "1675SB",
+    "collection": "Hearts",
+    "name": "Heart Stud",
+    "description": "14k gold heart stud",
+    "image": "1675SB.jpg",
+    "tags": [
+      "heart",
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "167BSB",
+    "collection": "Bezel",
+    "name": "Bezel Stud",
+    "description": "14k gold bezel stud",
+    "image": "167BSB.jpg",
+    "tags": [
+      "bezel",
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "1781SB",
+    "collection": "Studs",
+    "name": "Stud Earring",
+    "description": "14k gold stud earring",
+    "image": "1781SB.jpg",
+    "tags": [
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "1782SB",
+    "collection": "Hearts",
+    "name": "Heart Stud",
+    "description": "14k gold heart stud",
+    "image": "1782SB.jpg",
+    "tags": [
+      "heart",
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "1813SB",
+    "collection": "Hearts",
+    "name": "Heart Stud",
+    "description": "14k gold heart stud",
+    "image": "1813SB.jpg",
+    "tags": [
+      "heart",
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "1814SB",
+    "collection": "Hearts",
+    "name": "Heart Stud",
+    "description": "14k gold heart stud",
+    "image": "1814SB.jpg",
+    "tags": [
+      "heart",
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "344LSB",
+    "collection": "Studs",
+    "name": "Stud Earring",
+    "description": "14k gold stud earring",
+    "image": "344LSB.jpg",
+    "tags": [
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "344SSB",
+    "collection": "Studs",
+    "name": "Stud Earring",
+    "description": "14k gold stud earring",
+    "image": "344SSB.jpg",
+    "tags": [
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "1041LSB",
+    "collection": "Studs",
+    "name": "Stud Earring",
+    "description": "14k gold stud earring",
+    "image": "1041LSB.jpg",
+    "tags": [
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "1041MSB",
+    "collection": "Studs",
+    "name": "Stud Earring",
+    "description": "14k gold stud earring",
+    "image": "1041MSB.jpg",
+    "tags": [
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "1041SSB",
+    "collection": "Studs",
+    "name": "Stud Earring",
+    "description": "14k gold stud earring",
+    "image": "1041SSB.jpg",
+    "tags": [
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "1430LSB",
+    "collection": "Studs",
+    "name": "Stud Earring",
+    "description": "14k gold stud earring",
+    "image": "1430LSB.jpg",
+    "tags": [
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "1430MSB",
+    "collection": "Studs",
+    "name": "Stud Earring",
+    "description": "14k gold stud earring",
+    "image": "1430MSB.jpg",
+    "tags": [
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "1430SSB",
+    "collection": "Studs",
+    "name": "Stud Earring",
+    "description": "14k gold stud earring",
+    "image": "1430SSB.jpg",
+    "tags": [
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "1462LSB",
+    "collection": "Studs",
+    "name": "Stud Earring",
+    "description": "14k gold stud earring",
+    "image": "1462LSB.jpg",
+    "tags": [
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "1462MSB",
+    "collection": "Studs",
+    "name": "Stud Earring",
+    "description": "14k gold stud earring",
+    "image": "1462MSB.jpg",
+    "tags": [
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "1462SSB",
+    "collection": "Studs",
+    "name": "Stud Earring",
+    "description": "14k gold stud earring",
+    "image": "1462SSB.jpg",
+    "tags": [
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "1557LSB",
+    "collection": "Hearts",
+    "name": "Heart Stud",
+    "description": "14k gold heart stud",
+    "image": "1557LSB.jpg",
+    "tags": [
+      "heart",
+      "stud",
+      "screwback"
+    ]
   },
   {
     "code": "1557MSB",
-    "collection": "Hearts",
-    "name": "Ribbed Heart CZ Stud",
-    "description": "14K yellow gold ribbed heart stud with CZ accents.",
+    "collection": "Studs",
+    "name": "Stud Earring",
+    "description": "14k gold stud earring",
+    "image": "1557MSB.jpg",
     "tags": [
-      "cz",
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "1557SSB",
+    "collection": "Studs",
+    "name": "Stud Earring",
+    "description": "14k gold stud earring",
+    "image": "1557SSB.jpg",
+    "tags": [
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "1603LSB",
+    "collection": "Hearts",
+    "name": "Heart Stud",
+    "description": "14k gold heart stud",
+    "image": "1603LSB.jpg",
+    "tags": [
       "heart",
       "stud",
       "screwback"
-    ],
-    "image": "1557MSB.jpg"
+    ]
+  },
+  {
+    "code": "1603SSB",
+    "collection": "Hearts",
+    "name": "Heart Stud",
+    "description": "14k gold heart stud",
+    "image": "1603SSB.jpg",
+    "tags": [
+      "heart",
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "1670LSB",
+    "collection": "Hearts",
+    "name": "Heart Stud",
+    "description": "14k gold heart stud",
+    "image": "1670LSB.jpg",
+    "tags": [
+      "heart",
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "1670SSB",
+    "collection": "Studs",
+    "name": "Stud Earring",
+    "description": "14k gold stud earring",
+    "image": "1670SSB.jpg",
+    "tags": [
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "1671SSB",
+    "collection": "Hearts",
+    "name": "Heart Stud",
+    "description": "14k gold heart stud",
+    "image": "1671SSB.jpg",
+    "tags": [
+      "heart",
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "1041L1SB",
+    "collection": "Hearts",
+    "name": "Heart Stud",
+    "description": "14k gold heart stud",
+    "image": "1041L1SB.jpg",
+    "tags": [
+      "heart",
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "1601SB3C",
+    "collection": "Hearts",
+    "name": "Heart Stud",
+    "description": "14k gold heart stud",
+    "image": "1601SB3C.jpg",
+    "tags": [
+      "heart",
+      "stud",
+      "screwback"
+    ]
+  },
+  {
+    "code": "1981SB3C",
+    "collection": "Studs",
+    "name": "Stud Earring",
+    "description": "14k gold stud earring",
+    "image": "1981SB3C.jpg",
+    "tags": [
+      "stud",
+      "screwback"
+    ]
   }
 ]
