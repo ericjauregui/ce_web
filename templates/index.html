@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block title %}Wholesalers of 10k/14K Gold Earrings | California Earrings{% endblock %}
 {% block content %}
-<header class="hero d-flex align-items-center text-center" id="top">
+<header class="hero d-flex align-items-center text-center">
   <div class="container">
     <h1 class="display-4 fw-semibold text-gold">Wholesalers • Manufacturers</h1>
     <h2 class="display-6 fw-semibold text-gold">14k/10k Gold Earrings • Piercings</h2>
@@ -26,8 +26,8 @@
       <h2 class="text-gold m-0 section-title">{{ section.title }}</h2>
       <div class="d-flex gap-3 align-items-center">
         <a class="text-gold-70 small text-decoration-none" href="#top">Jump to Top</a>
-        </div>
-        </div>
+      </div>
+      </div>
   </div>
   <div class="container">
     <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">
@@ -129,5 +129,12 @@ document.addEventListener("click", async (e) => {
   btn.textContent = "added ✓";
   setTimeout(() => btn.textContent = "add to inquiry", 1200);
 });
+
+  document.addEventListener("click", (e) => {
+    const link = e.target.closest('a[href="#top"]');
+    if (!link) return;
+    e.preventDefault();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
 </script>
 {% endblock %}
