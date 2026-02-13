@@ -268,6 +268,38 @@ footer{ background:#0d0d0d; }
 }
 .footer-social a:hover{ color:#fff; }
 
+/* WhatsApp floating button */
+.whatsapp-float{
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  width: 56px;
+  height: 56px;
+  border-radius: 999px;
+  background: #25d366;
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
+  transition: transform 160ms ease, box-shadow 160ms ease;
+  z-index: 1040;
+}
+
+.whatsapp-float svg{
+  width: 26px;
+  height: 26px;
+  fill: currentColor;
+}
+
+.whatsapp-float:hover,
+.whatsapp-float:focus-visible{
+  transform: translateY(-3px);
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.55);
+  color: #fff;
+}
+
 /* Cart icon micro-interactions */
 @keyframes cart-shake {
 
