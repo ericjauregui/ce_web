@@ -177,12 +177,17 @@ footer{ background:#0d0d0d; }
 }
 
 
-/* Sticky collections nav */
+/* Collections nav (scrolls with page) */
 .sticky-collections{
+  background: rgba(13,13,13,0.92);
+  backdrop-filter: blur(8px);
+}
+
+/* Sticky section header */
+.sticky-section-header{
   position: sticky;
   top: var(--nav-height);
-    /* below navbar */
-  z-index: 1020;
+  z-index: 1015;
   background: rgba(13,13,13,0.92);
   backdrop-filter: blur(8px);
 }

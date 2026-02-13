@@ -19,18 +19,22 @@
 </div>
 {% endif %}
 
-<section class="container py-5">
+<section class="py-5">
   {% for section in sections %}
-  <div class="d-flex align-items-end justify-content-between mt-5 mb-3" id="section-{{ section.key }}">
-    <h2 class="text-gold m-0 section-title">{{ section.title }}</h2>
-    <div class="d-flex gap-3 align-items-center">
-      <a class="text-gold-70 small text-decoration-none" href="#top">Back to top</a>
-    </div>
+  <div class="sticky-section-header border-top border-bottom border-gold mt-5 mb-3" id="section-{{ section.key }}">
+    <div class="container d-flex align-items-end justify-content-between py-3">
+      <h2 class="text-gold m-0 section-title">{{ section.title }}</h2>
+      <div class="d-flex gap-3 align-items-center">
+        <a class="text-gold-70 small text-decoration-none" href="#top">Jump to Top</a>
+        </div>
+        </div>
   </div>
-  <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">
-    {% for p in section.items %}
-    {% include "partials/product_card.html" %}
-    {% endfor %}
+  <div class="container">
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">
+      {% for p in section.items %}
+      {% include "partials/product_card.html" %}
+      {% endfor %}
+    </div>
   </div>
   {% endfor %}
 </section>
