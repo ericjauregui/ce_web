@@ -9,23 +9,22 @@
   </div>
 </header>
 
-{% if sections|length > 1 %}
-<div class="sticky-collections border-bottom border-gold">
-  <div class="container d-flex flex-wrap gap-2 py-2 justify-content-center">
-    {% for section in sections %}
-    <a class="chip" href="#section-{{ section.key }}">{{ section.title }}</a>
-    {% endfor %}
-  </div>
-</div>
-{% endif %}
-
 <section class="py-5">
   {% for section in sections %}
   <div class="sticky-section-header border-top border-bottom border-gold mt-5 mb-3" id="section-{{ section.key }}">
-    <div class="container d-flex align-items-end justify-content-between py-3">
+    <div class="container section-header-row py-3">
       <h2 class="text-gold m-0 section-title">{{ section.title }}</h2>
-      <div class="d-flex gap-3 align-items-center">
-        <a class="text-gold-70 small text-decoration-none" href="#top">Jump to Top</a>
+      {% if sections|length > 1 %}
+      <div class="section-header-cats" aria-label="Other categories">
+        {% for other in sections %}
+        {% if other.key != section.key %}
+        <a class="chip" href="#section-{{ other.key }}">{{ other.title }}</a>
+        {% endif %}
+        {% endfor %}
+      </div>
+      {% endif %}
+      <div class="section-header-jump d-flex gap-3 align-items-center">
+        <a class="chip" href="#top">Jump to Top</a>
       </div>
       </div>
   </div>
@@ -76,7 +75,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <img id="viewerImg" class="viewer-img" src="" alt="">
+        <img id="viewerImg" class="viewer-img" data-zoomable="true" src="" alt="">
         <div class="mt-2 small" style="color:var(--gold-70)" id="viewerCaption"></div>
         <div class="mt-3">
           <a id="viewerLink" class="btn btn-outline-gold btn-sm" href="#" target="_self">open product page</a>
@@ -129,6 +128,26 @@ document.addEventListener("click", async (e) => {
   btn.textContent = "added ✓";
   setTimeout(() => btn.textContent = "add to inquiry", 1200);
 });
+
+    document.addEventListener("click", (e) => {
+      const link = e.target.closest('a[href^="#section-"]');
+      if (!link) return;
+
+      const hash = link.getAttribute("href");
+      const target = hash ? document.querySelector(hash) : null;
+      if (!target) return;
+
+      e.preventDefault();
+
+      const styles = getComputedStyle(document.documentElement);
+      const navActual = parseFloat(styles.getPropertyValue("--nav-actual-height")) || 0;
+      const navFallback = parseFloat(styles.getPropertyValue("--nav-height")) || 50;
+      const topOffset = navActual || navFallback;
+      const targetTop = target.offsetTop - topOffset;
+
+      window.scrollTo({ top: Math.max(0, targetTop), behavior: "smooth" });
+      window.history.replaceState(null, "", hash);
+    });
 
   document.addEventListener("click", (e) => {
     const link = e.target.closest('a[href="#top"]');

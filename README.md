@@ -43,6 +43,13 @@ Set ONE of these environment variables on Render:
 - `PLAUSIBLE_DOMAIN=californiaearrings.com`
 - OR `GOATCOUNTER_URL=https://YOURACCOUNT.goatcounter.com/count`
 
+## Link preview thumbnail (Open Graph)
+To show an image thumbnail when sharing links in iMessage, WhatsApp, Instagram DMs, etc., set:
+
+- `SITE_BASE_URL=https://californiaearrings.com`
+
+This ensures Open Graph/Twitter image URLs are absolute and crawlable.
+
 ## QR codes (optional)
 Generate QR codes that deep-link to each product page:
 

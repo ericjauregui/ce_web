@@ -4,13 +4,16 @@
 {% block og_title %}{{ product.seo.title }}{% endblock %}
 {% block og_description %}{{ product.seo.description }}{% endblock %}
 {% block og_type %}product{% endblock %}
+{% block og_image %}{{ (site_base_url.rstrip('/') ~ url_for('static', filename='product_images/' ~ product.image)) if
+site_base_url else url_for('static', filename='product_images/' ~ product.image, _external=True) }}{% endblock %}
+{% block og_image_alt %}{{ product.name }}{% endblock %}
 
 {% block content %}
 <section class="container py-5" style="max-width: 1100px;">
   <div class="row g-4 align-items-start">
     <div class="col-12 col-lg-6">
       <div class="detail-img-wrap">
-        <img class="detail-img" src="{{ url_for('static', filename='product_images/' ~ product.image) }}"
+        <img class="detail-img" data-zoomable="true" src="{{ url_for('static', filename='product_images/' ~ product.image) }}"
           alt="{{ product.name }}">
       </div>
     </div>
