@@ -191,22 +191,22 @@ body {
   display: flex;
     align-items: center;
   }
-  
+
   .product {
     transition: transform .25s ease, box-shadow .25s ease;
   }
-  
+
   .product:hover {
     transform: translateY(-6px);
     box-shadow: 0 12px 30px rgba(0, 0, 0, .5)
   }
-  
+
   .product-img {
     object-fit: cover;
     height: 300px;
     background: #111;
   }
-  
+
   .code-badge {
     display: inline-block;
     padding: .15rem .5rem;
@@ -216,30 +216,30 @@ body {
     background: var(--gold-grad);
     border-radius: 999px;
   }
-  
+
   .form-control.border-gold {
     border: 1px solid var(--gold);
   }
-  
+
   .form-control:focus {
     box-shadow: 0 0 0 .2rem rgba(215, 192, 122, .25);
     border-color: var(--gold);
   }
-  
+
   .modal-dark .modal-content {
     background: #0f0f0f;
     color: #eee;
     border: 1px solid var(--gold);
   }
-  
+
   .modal-dark .modal-header {
     border-bottom-color: var(--gold-70);
   }
-  
+
   .modal-dark .btn-close {
     filter: invert(1) grayscale(100%);
   }
-  
+
   .viewer-img {
     max-height: 80vh;
     width: 100%;
@@ -509,7 +509,7 @@ footer {
   gap: .4rem;
   max-width: calc(100% - 190px);
   /* leaves room for cart+toggler on right */
-  z-index: 2;
+  z-index: 1040;
 }
 
 .nav-search-trigger {
@@ -552,17 +552,24 @@ footer {
 }
 
 .nav-search-form {
-  width: 0;
+  position: absolute;
+    top: calc(100% + .5rem);
+    left: 50%;
+    transform: translateX(-50%) translateY(-4px);
+    width: min(560px, 92vw);
+    z-index: 1060;
   opacity: 0;
+  visibility: hidden;
   pointer-events: none;
-  overflow: hidden;
-  transition: width 190ms ease, opacity 130ms ease;
+  transition: opacity 130ms ease, transform 160ms ease, visibility 0s linear 160ms;
 }
 
 .nav-search.is-open .nav-search-form {
-  width: min(360px, 62vw);
   opacity: 1;
+  visibility: visible;
   pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+    transition: opacity 130ms ease, transform 160ms ease;
 }
 
 /* When expanded, hide the label text so only icon + input remain */
@@ -571,8 +578,8 @@ footer {
 }
 
 .nav-search-input {
-  height: 34px;
-  padding: .25rem .7rem;
+  height: 40px;
+    padding: .35rem .85rem;
   background: rgba(13, 13, 13, 0.70);
   color: var(--gold);
   /* gold letters */

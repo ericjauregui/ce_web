@@ -25,9 +25,9 @@
           loading="eager" decoding="async" />
       </a>
 {% set current_q = request.args.get('q', '') %}
-<div class="nav-search nav-search-center {% if current_q %}is-open{% endif %}">
+<div class="nav-search nav-search-center">
   <button type="button" class="nav-search-trigger" aria-controls="navSearchForm"
-    aria-expanded="{% if current_q %}true{% else %}false{% endif %}">
+    aria-expanded="false">
     <svg class="nav-search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
       <circle cx="11" cy="11" r="7"></circle>
       <path d="M20 20l-3.5-3.5"></path>
@@ -121,29 +121,53 @@
 
     const btn = wrap.querySelector(".nav-search-trigger");
     const input = wrap.querySelector(".nav-search-input");
+    const initialValue = input ? input.value : "";
 
-    function setOpen(open) {
+    function resetInputValue() {
+      if (!input) return;
+      input.value = initialValue;
+    }
+
+    function setOpen(open, options = {}) {
+      const { restoreValue = false } = options;
       wrap.classList.toggle("is-open", open);
       btn.setAttribute("aria-expanded", open ? "true" : "false");
-      if (open) window.setTimeout(() => input && input.focus(), 0);
+      if (open) {
+        window.setTimeout(() => {
+          if (!input) return;
+          input.focus();
+          if (input.value) input.select();
+        }, 0);
+        return;
+      }
+
+      if (restoreValue) resetInputValue();
     }
 
     btn.addEventListener("click", () => {
       const open = !wrap.classList.contains("is-open");
-      setOpen(open);
-      if (open && input && input.value) input.select();
+      setOpen(open, { restoreValue: !open });
     });
+
+    if (input) {
+      input.addEventListener("keydown", (e) => {
+        const isSelectAll = (e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "a";
+        if (!isSelectAll) return;
+        e.preventDefault();
+        input.select();
+      });
+    }
 
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape" && wrap.classList.contains("is-open")) {
-        setOpen(false);
+        setOpen(false, { restoreValue: true });
         btn.focus();
       }
     });
 
     document.addEventListener("click", (e) => {
-      if (!wrap.contains(e.target) && wrap.classList.contains("is-open") && !(input && input.value)) {
-        setOpen(false);
+      if (!wrap.contains(e.target) && wrap.classList.contains("is-open")) {
+        setOpen(false, { restoreValue: true });
       }
     });
   })();
