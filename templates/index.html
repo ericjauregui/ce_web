@@ -11,14 +11,15 @@
 
 <section class="py-5">
   {% for section in sections %}
-  <div class="sticky-section-header border-top border-bottom border-gold mt-5 mb-3" id="section-{{ section.key }}">
+  <div id="section-{{ section.key }}" class="section-anchor" aria-hidden="true"></div>
+  <div class="sticky-section-header border-top border-bottom border-gold mb-3">
     <div class="container section-header-row py-3">
       <h2 class="text-gold m-0 section-title">{{ section.title }}</h2>
       {% if sections|length > 1 %}
       <div class="section-header-cats" aria-label="Other categories">
         {% for other in sections %}
         {% if other.key != section.key %}
-        <a class="chip" href="#section-{{ other.key }}">{{ other.title }}</a>
+        <button type="button" class="chip section-chip-btn" data-target="section-{{ other.key }}">{{ other.title }}</button>
         {% endif %}
         {% endfor %}
       </div>
@@ -130,11 +131,11 @@ document.addEventListener("click", async (e) => {
 });
 
     document.addEventListener("click", (e) => {
-      const link = e.target.closest('a[href^="#section-"]');
-      if (!link) return;
+      const btn = e.target.closest('.section-chip-btn[data-target]');
+      if (!btn) return;
 
-      const hash = link.getAttribute("href");
-      const target = hash ? document.querySelector(hash) : null;
+      const targetId = btn.getAttribute("data-target");
+      const target = targetId ? document.getElementById(targetId) : null;
       if (!target) return;
 
       e.preventDefault();
@@ -143,10 +144,19 @@ document.addEventListener("click", async (e) => {
       const navActual = parseFloat(styles.getPropertyValue("--nav-actual-height")) || 0;
       const navFallback = parseFloat(styles.getPropertyValue("--nav-height")) || 50;
       const topOffset = navActual || navFallback;
-      const targetTop = target.offsetTop - topOffset;
+      const targetTop = Math.max(0, (target.getBoundingClientRect().top + window.scrollY) - topOffset);
+      const hash = `#${targetId}`;
 
       window.scrollTo({ top: Math.max(0, targetTop), behavior: "smooth" });
       window.history.replaceState(null, "", hash);
+      btn.blur();
+
+      window.setTimeout(() => {
+        const remaining = Math.abs(window.scrollY - targetTop);
+        if (remaining > 24) {
+          window.scrollTo({ top: targetTop, behavior: "auto" });
+        }
+      }, 420);
     });
 
   document.addEventListener("click", (e) => {
@@ -154,6 +164,7 @@ document.addEventListener("click", async (e) => {
     if (!link) return;
     e.preventDefault();
     window.scrollTo({ top: 0, behavior: "smooth" });
+    window.history.replaceState(null, "", window.location.pathname + window.location.search);
   });
 </script>
 {% endblock %}

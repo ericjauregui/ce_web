@@ -307,15 +307,31 @@ footer {
   backdrop-filter: blur(8px);
 }
 
+.section-anchor {
+  scroll-margin-top: calc(var(--nav-actual-height, var(--nav-height)) + 2px);
+}
 .section-header-row {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, .85fr) minmax(0, 1.7fr) minmax(0, .85fr);
   align-items: center;
-  gap: .75rem;
+  gap: clamp(.35rem, 1vw, .75rem);
+  }
+  
+  .section-header-row .section-title {
+    grid-column: 1;
+    justify-self: start;
+    min-width: 0;
+    font-size: clamp(.95rem, 2.4vw, 1.25rem);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .section-header-cats {
+  grid-column: 2;
+    justify-self: center;
   min-width: 0;
+  max-width: 100%;
   display: flex;
   flex-wrap: nowrap;
   justify-content: center;
@@ -332,30 +348,32 @@ footer {
   white-space: nowrap;
 }
 
+.section-header-jump {
+  grid-column: 3;
+  justify-self: end;
+}
 @media (max-width: 767.98px) {
   .section-header-row {
-    grid-template-columns: auto minmax(0, 1fr) auto;
-    gap: .45rem;
-  }
-
-  .section-header-row .section-title {
-    margin-right: 0;
-    font-size: clamp(.95rem, 3.7vw, 1.15rem);
-  }
-
-  .section-header-jump {
-    justify-self: auto;
-  }
+    grid-template-columns: minmax(0, .65fr) minmax(0, 2.1fr) minmax(0, .65fr);
+      gap: .35rem;
+  
 }
+
 /* Section chips */
 .chip {
   display: inline-block;
   padding: .35rem .7rem;
   border: 1px solid rgba(215, 192, 122, 0.45);
   border-radius: 999px;
+  background: transparent;
   color: var(--gold);
   text-decoration: none;
   font-size: .95rem;
+}
+.section-chip-btn {
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
 }
 .chip:hover {
   background: rgba(215, 192, 122, 0.10);
@@ -673,16 +691,16 @@ footer {
                                                                                                                                   gap: 0;
                                                                                                                                   border-radius: 999px;
                                                                                                                                 }
-                                                                
+
                                                                                                                                 .nav-search-center {
                                                                                                                                   max-width: 44px;
                                                                                                                                 }
-                                                                
+
                                                                                                                                 .nav-search-form {
                                                                                                                                   width: min(420px, 92vw);
                                                                                                                                 }
                                                                                                                                 }
-                                                                
+
                                                                                                                                 @media (max-width: 420px) {
   /* keeps center clean on very small screens */
   .nav-search-center {
