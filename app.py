@@ -16,8 +16,7 @@ from flask import Flask, abort, jsonify, render_template, request, send_file, se
 
 app = Flask(__name__)
 
-# On Render: set SECRET_KEY to a long random string
-app.secret_key = os.getenv("SECRET_KEY", "dev-secret-key-change-me")
+app.secret_key = os.environ["SECRET_KEY"]
 
 BASE_DIR = Path(__file__).parent
 CATALOG_PATH = BASE_DIR / "catalog" / "products.json"
@@ -449,4 +448,5 @@ def not_found(_):
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5001))
-    app.run(debug=True, host="0.0.0.0", port=port)
+    debug = os.environ.get("FLASK_DEBUG", "0") == "1"
+    app.run(debug=debug, host="0.0.0.0", port=port)
