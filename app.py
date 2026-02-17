@@ -18,6 +18,9 @@ app = Flask(__name__)
 
 app.secret_key = os.environ["SECRET_KEY"]
 
+if not app.secret_key:
+    raise RuntimeError("SECRET_KEY env var not set")
+
 BASE_DIR = Path(__file__).parent
 CATALOG_PATH = BASE_DIR / "catalog" / "products.json"
 COLLECTIONS_PATH = BASE_DIR / "catalog" / "collections.json"
