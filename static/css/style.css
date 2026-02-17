@@ -316,7 +316,7 @@ footer {
   align-items: center;
   gap: clamp(.35rem, 1vw, .75rem);
   }
-  
+
   .section-header-row .section-title {
     grid-column: 1;
     justify-self: start;
@@ -355,8 +355,8 @@ footer {
 @media (max-width: 767.98px) {
   .section-header-row {
     grid-template-columns: minmax(0, .65fr) minmax(0, 2.1fr) minmax(0, .65fr);
-      gap: .35rem;
-  
+    gap: .35rem;
+  }
 }
 
 /* Section chips */
@@ -701,7 +701,7 @@ footer {
                                                                                                                                 }
                                                                                                                                 }
 
-                                                                                                                                @media (max-width: 420px) {
+@media (max-width: 420px) {
   /* keeps center clean on very small screens */
   .nav-search-center {
     max-width: 40px;
