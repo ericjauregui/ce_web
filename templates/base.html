@@ -6,13 +6,15 @@
 
   {% set base_url = (site_base_url or request.url_root).rstrip('/') %}
   {% set canonical_url = base_url ~ request.path %}
-  {% set default_og_image = base_url ~ url_for('static', filename='assets/ce_logo_full.png') %}
+  {% set default_og_image = base_url ~ url_for('static', filename='assets/social_preview.png') %}
 
-  <title>{% block title %}California Earrings | 14K Gold Wholesaler of Earrings{% endblock %}</title>
+  <title>{% block title %}California Earrings | Manufacturers/Wholesalers of 10K/14K Gold Earrings & Piercings{% endblock
+    %}
+  </title>
   <meta name="description"
-    content="{% block meta_description %}Los Angeles based manufacturer & wholesaler of 14K gold earrings.{% endblock %}">
+    content="{% block meta_description %}Los Angeles based manufacturer/wholesaler of 10k/14K gold earrings and piercings.{% endblock %}">
   <link rel="canonical" href="{{ canonical_url }}">
-  
+
   <meta property="og:site_name" content="{{ site_name }}">
   <meta property="og:type" content="{% block og_type %}website{% endblock %}">
   <meta property="og:title" content="{% block og_title %}{{ self.title()|striptags|trim }}{% endblock %}">
@@ -21,7 +23,7 @@
   <meta property="og:url" content="{% block og_url %}{{ canonical_url }}{% endblock %}">
   <meta property="og:image" content="{% block og_image %}{{ default_og_image }}{% endblock %}">
   <meta property="og:image:alt" content="{% block og_image_alt %}{{ site_name }}{% endblock %}">
-  
+
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="{% block twitter_title %}{{ self.title()|striptags|trim }}{% endblock %}">
   <meta name="twitter:description"
