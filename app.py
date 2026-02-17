@@ -10,12 +10,14 @@ from dataclasses import dataclass
 from email.message import EmailMessage
 from pathlib import Path
 from typing import Any
+from dotenv import load_dotenv
 
 import smtplib
 from flask import Flask, abort, jsonify, render_template, request, send_file, session
 
 app = Flask(__name__)
 
+load_dotenv()
 app.secret_key = os.environ["SECRET_KEY"]
 
 if not app.secret_key:
