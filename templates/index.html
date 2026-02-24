@@ -44,7 +44,7 @@
 
 <section class="pb-5">
   <div class="social-section-header border-top border-bottom border-gold mb-3">
-    <div class="container section-header-row py-3" style="max-width: 1200px;">
+    <div class="container section-header-row py-3">
       <h2 class="m-0 section-title catalog-section-title">
         <span class="catalog-section-title-text">Social reels</span>
         <span class="catalog-section-title-rule" aria-hidden="true"></span>
@@ -73,7 +73,7 @@
     </div>
   </div>
 
-  <div class="container" style="max-width: 1200px;">
+  <div class="container">
     <div class="reels-row">
     {% for url in social.tiktok.videos %}
     {% set video_id = url.split('/video/')[-1].split('?')[0] %}

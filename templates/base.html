@@ -212,7 +212,6 @@
                 const rect = nav.getBoundingClientRect();
                 const topRowNodes = [
                   nav.querySelector(".brand-lockup"),
-                  nav.querySelector(".nav-search-center"),
                   nav.querySelector(".nav-actions"),
                 ].filter(Boolean);
 
@@ -222,7 +221,7 @@
                 }
 
                 const topRowHeight = Math.max(1, topRowBottom - rect.top);
-                const centerY = rect.top + (topRowHeight / 2);
+                const centerY = rect.top + (rect.height / 2);
                 document.documentElement.style.setProperty("--nav-search-fixed-center", `${centerY}px`);
                 document.documentElement.style.setProperty("--nav-actual-height", `${topRowHeight}px`);
               }
