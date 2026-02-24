@@ -1,18 +1,28 @@
 {
-  "headline": "Meet the team",
-  "subheadline": "Wholesale only \u00b7 Los Angeles Jewelry District",
+  "company": "California Earrings",
+  "headline": "Meet Our Team",
+  "whatsapp_intro": "Hi {name}, I'm interested in learning more about your earrings.",
   "members": [
     {
-      "name": "Your Name",
-      "title": "Founder / Sales",
-      "bio": "Short 1\u20132 sentence bio. Replace with real info.",
-      "photo": null
+      "name": "Miguel Jauregui",
+      "title": "CEO",
+      "photo": null,
+      "phone": "+1 (818) 331-9595",
+      "email": "californiaearrings@gmail.com"
     },
     {
-      "name": "Team Member",
-      "title": "Operations",
-      "bio": "Short 1\u20132 sentence bio. Replace with real info.",
-      "photo": null
+      "name": "Giancarlo Jauregui",
+      "title": "SVP, Operations",
+      "photo": null,
+      "phone": "+1 (818) 331-9292",
+      "email": "giancarloj7@gmail.com"
+    },
+    {
+      "name": "Ari G",
+      "title": "Sales",
+      "photo": null,
+      "phone": "+1 (213) 440-5005",
+      "email": null
     }
   ]
 }

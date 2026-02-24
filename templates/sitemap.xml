@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>{{ base_url }}/</loc></url>
-  <url><loc>{{ base_url }}/about</loc></url>
-  <url><loc>{{ base_url }}/contact</loc></url>
-  {% for p in products %}
-  <url><loc>{{ base_url }}{{ url_for('product_detail', slug=p.slug) }}</loc></url>
+  {% for url in urls %}
+  <url>
+    <loc>{{ url.loc }}</loc>
+    {% if url.lastmod %}<lastmod>{{ url.lastmod }}</lastmod>{% endif %}
+    <changefreq>{{ url.changefreq }}</changefreq>
+    <priority>{{ "%.1f"|format(url.priority) }}</priority>
+  </url>
   {% endfor %}
 </urlset>

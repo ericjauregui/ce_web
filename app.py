@@ -6,6 +6,8 @@ import json
 import os
 import re
 import secrets
+from datetime import UTC, datetime
+from urllib.parse import quote_plus
 from dataclasses import dataclass
 from email.message import EmailMessage
 from pathlib import Path
@@ -13,7 +15,7 @@ from typing import Any
 from dotenv import load_dotenv
 
 import smtplib
-from flask import Flask, abort, jsonify, render_template, request, send_file, session
+from flask import Flask, abort, jsonify, redirect, render_template, request, send_file, session, url_for
 
 app = Flask(__name__)
 
@@ -30,32 +32,173 @@ SOCIAL_PATH = BASE_DIR / "catalog" / "social.json"
 TEAM_PATH = BASE_DIR / "catalog" / "team.json"
 
 
-def _slugify(s: str) -> str:
-    s = (s or "").strip().lower()
-    s = re.sub(r"[^a-z0-9]+", "-", s)
-    s = re.sub(r"-{2,}", "-", s).strip("-")
-    return s or "item"
+def _canonical_base_url() -> str:
+    configured = (os.getenv("SITE_BASE_URL") or "").strip()
+    if configured:
+        return configured.rstrip("/")
+    return request.url_root.rstrip("/")
 
 
-def _code_num(code: str) -> int | None:
-    m = re.match(r"^\s*(\d+)", code or "")
-    return int(m.group(1)) if m else None
+def _iso_lastmod(*paths: Path) -> str | None:
+    valid = [path for path in paths if path.exists()]
+    if not valid:
+        return None
+
+    latest = max(path.stat().st_mtime for path in valid)
+    return datetime.fromtimestamp(latest, tz=UTC).date().isoformat()
 
 
-def _compute_slug(code: str, name: str) -> str:
-    c = (code or "").strip()
-    n = (name or "").strip()
-    if not n or n.lower() == c.lower():
-        return _slugify(c)
-    return _slugify(f"{c} {n}")
+def build_sitemap_urls(base_url: str) -> list[dict[str, str | float | None]]:
+    pages = [
+        {
+            "path": "/",
+            "changefreq": "daily",
+            "priority": 1.0,
+            "lastmod": _iso_lastmod(CATALOG_PATH, COLLECTIONS_PATH, BASE_DIR / "templates" / "index.html"),
+        },
+        {
+            "path": "/about",
+            "changefreq": "monthly",
+            "priority": 0.7,
+            "lastmod": _iso_lastmod(BASE_DIR / "templates" / "about.html"),
+        },
+        {
+            "path": "/contact",
+            "changefreq": "monthly",
+            "priority": 0.7,
+            "lastmod": _iso_lastmod(BASE_DIR / "templates" / "contact.html"),
+        },
+        {
+            "path": "/team",
+            "changefreq": "monthly",
+            "priority": 0.8,
+            "lastmod": _iso_lastmod(TEAM_PATH, BASE_DIR / "templates" / "team.html"),
+        },
+    ]
+
+    team_lastmod = _iso_lastmod(
+        TEAM_PATH, BASE_DIR / "templates" / "team_member.html")
+    for member in build_team_members(load_team()):
+        pages.append(
+            {
+                "path": f"/team/{member.get('slug', '')}",
+                "changefreq": "monthly",
+                "priority": 0.6,
+                "lastmod": team_lastmod,
+            }
+        )
+
+    return [
+        {
+            "loc": f"{base_url}{page['path']}",
+            "lastmod": page["lastmod"],
+            "changefreq": page["changefreq"],
+            "priority": page["priority"],
+        }
+        for page in pages
+    ]
 
 
-def _compute_seo_title(code: str, name: str) -> str:
-    c = (code or "").strip()
-    n = (name or "").strip()
-    if not n or n.lower() == c.lower():
-        return f"{c} | Wholesale 14K Gold Earrings"
-    return f"{c} {n} | Wholesale 14K Gold Earrings"
+def _slugify(value: str) -> str:
+    slug = re.sub(r"[^a-z0-9]+", "-", (value or "").strip().lower()).strip("-")
+    return slug or "member"
+
+
+def build_team_members(team: dict[str, Any]) -> list[dict[str, Any]]:
+    raw_members = team.get("members") or []
+    if not isinstance(raw_members, list):
+        raw_members = []
+
+    members: list[dict[str, Any]] = []
+    seen_slugs: dict[str, int] = {}
+    company = (team.get("company") or "California Earrings").strip(
+    ) or "California Earrings"
+    whatsapp_intro_template = (
+        team.get("whatsapp_intro")
+        or "Hi {name}, I found your contact on {company}."
+    )
+
+    for raw in raw_members:
+        source = raw if isinstance(raw, dict) else {}
+        name = (source.get("name") or "Team Member").strip() or "Team Member"
+        title = (source.get("title") or "").strip()
+        bio = (source.get("bio") or "").strip()
+        photo = (source.get("photo") or "").strip() or None
+        phone = (source.get("phone") or "").strip()
+        email = (source.get("email") or "").strip()
+
+        base_slug = _slugify(name)
+        seen_slugs[base_slug] = seen_slugs.get(base_slug, 0) + 1
+        slug = base_slug if seen_slugs[base_slug] == 1 else f"{base_slug}-{seen_slugs[base_slug]}"
+
+        phone_digits = re.sub(r"\D+", "", phone)
+        if phone_digits.startswith("00"):
+            phone_digits = phone_digits[2:]
+
+        whatsapp_url = ""
+        if phone_digits:
+            member_intro = source.get(
+                "whatsapp_intro") or whatsapp_intro_template
+            try:
+                intro = str(member_intro).format(name=name, company=company)
+            except Exception:
+                intro = f"Hi {name}, I found your contact on {company}."
+            text = quote_plus(intro)
+            whatsapp_url = f"https://wa.me/{phone_digits}?text={text}"
+
+        members.append(
+            {
+                "name": name,
+                "title": title,
+                "bio": bio,
+                "photo": photo,
+                "phone": phone,
+                "email": email,
+                "slug": slug,
+                "phone_digits": phone_digits,
+                "whatsapp_url": whatsapp_url,
+                "call_url": f"tel:{phone_digits}" if phone_digits else "",
+            }
+        )
+
+    return members
+
+
+def get_team_member_by_slug(member_slug: str) -> tuple[dict[str, Any], list[dict[str, Any]], dict[str, Any] | None]:
+    team = load_team()
+    members = build_team_members(team)
+    member = next((m for m in members if m.get("slug") == member_slug), None)
+    return team, members, member
+
+
+def _vcard_escape(value: str) -> str:
+    return (value or "").replace("\\", "\\\\").replace("\n", "\\n").replace(";", "\\;").replace(",", "\\,")
+
+
+def build_member_vcard(member: dict[str, Any], team: dict[str, Any]) -> str:
+    company = (team.get("company") or "California Earrings").strip(
+    ) or "California Earrings"
+    lines = [
+        "BEGIN:VCARD",
+        "VERSION:3.0",
+        f"FN:{_vcard_escape(member.get('name', ''))}",
+        f"ORG:{_vcard_escape(company)}",
+    ]
+
+    title = member.get("title") or ""
+    if title:
+        lines.append(f"TITLE:{_vcard_escape(title)}")
+
+    phone_digits = member.get("phone_digits") or ""
+    if phone_digits:
+        lines.append(f"TEL;TYPE=CELL:{_vcard_escape(phone_digits)}")
+
+    email = member.get("email") or ""
+    if email:
+        lines.append(f"EMAIL;TYPE=INTERNET:{_vcard_escape(email)}")
+
+    lines.extend(["END:VCARD", ""])
+    return "\n".join(lines)
 
 
 def normalize_product(p: dict[str, Any]) -> dict[str, Any]:
@@ -68,11 +211,6 @@ def normalize_product(p: dict[str, Any]) -> dict[str, Any]:
     if not isinstance(tags, list):
         tags = []
 
-    slug = _compute_slug(code, name)
-    seo_title = _compute_seo_title(code, name)
-    seo_desc = description  # default: use description (no code repetition)
-
-    # tolerate extra keys if present, but we now generate derived ones
     out = dict(p)
     out.update(
         {
@@ -83,8 +221,6 @@ def normalize_product(p: dict[str, Any]) -> dict[str, Any]:
             "collection": collection,
             "image": image,
             "tags": tags,
-            "slug": slug,
-            "seo": {"title": seo_title, "description": seo_desc},
         }
     )
     return out
@@ -111,7 +247,12 @@ def load_team() -> dict[str, Any]:
     if TEAM_PATH.exists():
         with open(TEAM_PATH, "r", encoding="utf-8") as f:
             return json.load(f)
-    return {"headline": "Meet the team", "subheadline": "", "members": []}
+    return {
+        "headline": "Meet Our Team",
+        "company": "California Earrings",
+        "whatsapp_intro": "Hi {name}, I found your contact on {company}.",
+        "members": [],
+    }
 
 
 def load_collections_cfg() -> dict[str, Any]:
@@ -275,13 +416,14 @@ def index():
     return render_template("index.html", sections=sections, q=q)
 
 
-@app.route("/product/<slug>")
-def product_detail(slug: str):
+@app.route("/catalog/")
+def catalog_start():
     products = load_products()
-    product = next((p for p in products if p.get("slug") == slug), None)
-    if not product:
-        abort(404)
-    return render_template("product.html", product=product)
+    cfg = load_collections_cfg()
+    sections = build_sections(products, cfg)
+    if not sections:
+        return redirect(url_for("index"))
+    return redirect(f"{url_for('index')}#section-{sections[0].key}")
 
 
 @app.route("/cart")
@@ -412,7 +554,33 @@ def api_cart_remove():
 
 @app.route("/team")
 def team_page():
-    return render_template("team.html", team=load_team())
+    team = load_team()
+    members = build_team_members(team)
+    return render_template("team.html", team=team, members=members)
+
+
+@app.route("/team/<member_slug>")
+def team_member_page(member_slug: str):
+    team, _, member = get_team_member_by_slug(member_slug)
+    if not member:
+        abort(404)
+    return render_template("team_member.html", team=team, member=member)
+
+
+@app.route("/team/<member_slug>/contact.vcf")
+def team_member_vcard(member_slug: str):
+    team, _, member = get_team_member_by_slug(member_slug)
+    if not member:
+        abort(404)
+
+    vcard_text = build_member_vcard(member, team)
+    filename = f"{_slugify(member.get('name', 'contact'))}.vcf"
+    return send_file(
+        io.BytesIO(vcard_text.encode("utf-8")),
+        mimetype="text/vcard; charset=utf-8",
+        as_attachment=True,
+        download_name=filename,
+    )
 
 
 @app.route("/about")
@@ -427,20 +595,25 @@ def contact():
 
 @app.route("/robots.txt")
 def robots():
-    base = request.url_root.rstrip("/")
+    base = _canonical_base_url()
     body = f"""User-agent: *
 Allow: /
+Disallow: /api/
+Disallow: /cart
+Disallow: /checkout
+Disallow: /download/
 Sitemap: {base}/sitemap.xml
 """
     return body, 200, {"Content-Type": "text/plain; charset=utf-8"}
 
 
+@app.route("/sitemaps.xml")
 @app.route("/sitemap.xml")
 def sitemap():
-    products = load_products()
-    base_url = request.url_root.rstrip("/")
+    base_url = _canonical_base_url()
+    urls = build_sitemap_urls(base_url)
     return (
-        render_template("sitemap.xml", products=products, base_url=base_url),
+        render_template("sitemap.xml", urls=urls),
         200,
         {"Content-Type": "application/xml"},
     )

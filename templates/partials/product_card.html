@@ -1,24 +1,39 @@
 <div class="col">
-  <div class="card product h-100 shadow-sm bg-dark border-0"
+  {% set drawer_id = 'drawer-' ~ p.code|lower|replace(' ', '-')|replace('/', '-') %}
+  <article class="card product product-card shadow-sm bg-dark border-0"
        role="button"
-       data-bs-toggle="modal" data-bs-target="#viewerModal"
-       data-img="{{ url_for('static', filename='product_images/' ~ p.image) }}"
-       data-title="{{ p.code }} - {{ p.name }}"
-       data-caption="{{ p.description }}">
-    <a class="stretched-link" href="{{ url_for('product_detail', slug=p.slug) }}" aria-label="Open {{ p.code }} {{ p.name }}"></a>
-    <img class="card-img-top product-img" src="{{ url_for('static', filename='product_images/' ~ p.image) }}"
-      alt="{{ p.name }}">
+       tabindex="0"
+       aria-expanded="false"
+       aria-controls="{{ drawer_id }}">
+    <div class="product-img-wrap">
+      <img class="card-img-top product-img" src="{{ url_for('static', filename='product_images/' ~ p.image) }}"
+        alt="{{ p.name }}">
+    </div>
     <div class="card-body text-center d-flex flex-column">
       <div class="small code-badge">{{ p.code }}</div>
-      <p class="card-text text-gold-70 mb-2">{{ p.description }}</p>
+<div id="{{ drawer_id }}" class="product-drawer" aria-hidden="true">
+  <p class="card-text text-gold-70 mb-0">{{ p.description }}</p>
+</div>
 
-      <div class="mt-auto d-grid gap-2">
+      <div class="product-actions mt-auto pt-2 d-grid gap-2">
         <button type="button"
                 class="btn btn-outline-gold btn-sm rounded-pill add-to-cart-btn"
                 data-code="{{ p.code }}">
-          Add to cart - contact us for pricing
+          Add to cart
         </button>
-      </div>
+        <div class="product-qty-control d-none" data-code="{{ p.code }}" aria-label="Inline quantity controls">
+          <button type="button" class="btn btn-outline-gold btn-sm rounded-pill qty-clear-btn"
+            aria-label="Clear item from cart">×</button>
+          <div class="qty-center-group" aria-hidden="false">
+            <button type="button" class="btn btn-outline-gold btn-sm rounded-pill qty-adjust-btn" data-delta="-1"
+              aria-label="Decrease quantity">−</button>
+            <input type="number" min="0" max="999" step="1" inputmode="numeric" class="product-qty-pill product-qty-input"
+              value="1" aria-label="Quantity" />
+            <button type="button" class="btn btn-outline-gold btn-sm rounded-pill qty-adjust-btn" data-delta="1"
+              aria-label="Increase quantity">+</button>
+          </div>
+          </div>
+          </div>
     </div>
-  </div>
+    </article>
 </div>

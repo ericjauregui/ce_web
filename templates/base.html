@@ -8,11 +8,12 @@
   {% set canonical_url = base_url ~ request.path %}
   {% set default_og_image = base_url ~ url_for('static', filename='assets/social_preview.png') %}
 
-  <title>{% block title %}California Earrings | Manufacturers/Wholesalers of 10K/14K Gold Earrings & Piercings{% endblock
+  <title>{% block title %}California Earrings | Manufacturers/Wholesalers of 10K/14K Gold Earrings & Body Jewelry{%
+    endblock
     %}
   </title>
   <meta name="description"
-    content="{% block meta_description %}Los Angeles based manufacturer/wholesaler of 10k/14K gold earrings and piercings.{% endblock %}">
+    content="{% block meta_description %}Los Angeles based manufacturer/wholesaler of 10k/14K gold earrings and Body Jewelry.{% endblock %}">
   <link rel="canonical" href="{{ canonical_url }}">
 
   <meta property="og:site_name" content="{{ site_name }}">
@@ -30,7 +31,7 @@
     content="{% block twitter_description %}{{ self.meta_description()|striptags|trim }}{% endblock %}">
   <meta name="twitter:image" content="{% block twitter_image %}{{ self.og_image()|striptags|trim }}{% endblock %}">
 
-  <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='assets/ce_logo_shape.png') }}">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
   <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
@@ -82,7 +83,8 @@
 
       <div id="nav" class="collapse navbar-collapse w-100 text-end">
         <ul class="navbar-nav ms-auto align-items-end text-end">
-          <li class="nav-item"><a class="nav-link" href="/team">Meet the team</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('catalog_start') }}">Our Catalog</a></li>
+          <li class="nav-item"><a class="nav-link" href="/team">Meet the Team</a></li>
           <li class="nav-item"><a class="nav-link" href="/about">About Us</a></li>
           <li class="nav-item"><a class="nav-link" href="/contact">Contact Us</a></li>
           </ul>
@@ -93,13 +95,13 @@
   <main class="mt-5 pt-4">{% block content %}{% endblock %}</main>
 
   <footer class="text-center py-4 border-top border-gold mt-5 text-gold-70">
-    © {{ 2026 }} California Earrings · Wholesalers · Los Angeles, CA, USA
+    © {{ 2026 }} California Earrings · Los Angeles, CA, USA
     <div class="footer-social mt-2">
       <span class="text-gold-70">Follow us on our socials: </span>
-      <a class="text-gold-70 text-decoration-none" href="{{ social.instagram.profile_url }}" target="_blank"
+      <a class="team-phone-link text-gold-70" href="{{ social.instagram.profile_url }}" target="_blank"
         rel="noopener">Instagram</a>
       <span class="text-gold-70"> · </span>
-      <a class="text-gold-70 text-decoration-none" href="{{ social.tiktok.profile_url }}" target="_blank"
+      <a class="team-phone-link text-gold-70" href="{{ social.tiktok.profile_url }}" target="_blank"
         rel="noopener">TikTok</a>
     </div>
   </footer>
@@ -142,6 +144,7 @@
                 if (!wrap) return;
 
               const btn = wrap.querySelector(".nav-search-trigger");
+                const form = wrap.querySelector("#navSearchForm");
               const input = wrap.querySelector(".nav-search-input");
               const initialValue = input ? input.value : "";
 
@@ -178,6 +181,13 @@
                   e.preventDefault();
                   input.select();
                 });
+
+                input.addEventListener("search", () => {
+                  if (input.value.trim() !== "") return;
+                  if (!form) return;
+                  const baseUrl = form.action || window.location.pathname;
+                  window.location.assign(baseUrl);
+                });
               }
 
               document.addEventListener("keydown", (e) => {
@@ -200,9 +210,21 @@
 
               function syncSearchCenter() {
                 const rect = nav.getBoundingClientRect();
-                const centerY = rect.top + (rect.height / 2);
+                const topRowNodes = [
+                  nav.querySelector(".brand-lockup"),
+                  nav.querySelector(".nav-search-center"),
+                  nav.querySelector(".nav-actions"),
+                ].filter(Boolean);
+
+                let topRowBottom = rect.bottom;
+                if (topRowNodes.length) {
+                  topRowBottom = Math.max(...topRowNodes.map((node) => node.getBoundingClientRect().bottom));
+                }
+
+                const topRowHeight = Math.max(1, topRowBottom - rect.top);
+                const centerY = rect.top + (topRowHeight / 2);
                 document.documentElement.style.setProperty("--nav-search-fixed-center", `${centerY}px`);
-                document.documentElement.style.setProperty("--nav-actual-height", `${rect.height}px`);
+                document.documentElement.style.setProperty("--nav-actual-height", `${topRowHeight}px`);
               }
 
               syncSearchCenter();
@@ -210,157 +232,6 @@
               window.addEventListener("orientationchange", syncSearchCenter);
             })();
 
-            (function () {
-              const zoomTargets = document.querySelectorAll('[data-zoomable="true"]');
-              if (!zoomTargets.length) return;
-
-              const MIN_SCALE = 1;
-              const MAX_SCALE = 12;
-
-              function clamp(value, min, max) {
-                return Math.min(max, Math.max(min, value));
-              }
-
-              function distance(t1, t2) {
-                const dx = t2.clientX - t1.clientX;
-                const dy = t2.clientY - t1.clientY;
-                return Math.hypot(dx, dy);
-              }
-
-              zoomTargets.forEach((img) => {
-                let scale = 1;
-                let offsetX = 0;
-                let offsetY = 0;
-                let dragging = false;
-                let pinching = false;
-                let startX = 0;
-                let startY = 0;
-                let startOffsetX = 0;
-                let startOffsetY = 0;
-                let pinchStartDistance = 0;
-                let pinchStartScale = 1;
-
-                function render() {
-                  img.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
-                  img.style.cursor = scale > 1 ? (dragging ? "grabbing" : "grab") : "zoom-in";
-                }
-
-                function resetZoom() {
-                  scale = 1;
-                  offsetX = 0;
-                  offsetY = 0;
-                  dragging = false;
-                  pinching = false;
-                  render();
-                }
-
-                img.addEventListener("load", resetZoom);
-
-                img.addEventListener("wheel", (e) => {
-                  e.preventDefault();
-                  const delta = e.deltaY < 0 ? 0.15 : -0.15;
-                  scale = clamp(scale + delta, MIN_SCALE, MAX_SCALE);
-                  if (scale === 1) {
-                    offsetX = 0;
-                    offsetY = 0;
-                  }
-                  render();
-                }, { passive: false });
-
-                img.addEventListener("dblclick", (e) => {
-                  e.preventDefault();
-                  if (scale > 1) {
-                    resetZoom();
-                    return;
-                  }
-                  scale = 2;
-                  render();
-                });
-
-                img.addEventListener("mousedown", (e) => {
-                  if (scale <= 1) return;
-                  e.preventDefault();
-                  dragging = true;
-                  startX = e.clientX;
-                  startY = e.clientY;
-                  startOffsetX = offsetX;
-                  startOffsetY = offsetY;
-                  render();
-                });
-
-                window.addEventListener("mousemove", (e) => {
-                  if (!dragging) return;
-                  offsetX = startOffsetX + (e.clientX - startX);
-                  offsetY = startOffsetY + (e.clientY - startY);
-                  render();
-                });
-
-                window.addEventListener("mouseup", () => {
-                  if (!dragging) return;
-                  dragging = false;
-                  render();
-                });
-
-                img.addEventListener("touchstart", (e) => {
-                  if (e.touches.length === 2) {
-                    pinching = true;
-                    dragging = false;
-                    pinchStartDistance = distance(e.touches[0], e.touches[1]);
-                    pinchStartScale = scale;
-                    return;
-                  }
-
-                  if (e.touches.length === 1 && scale > 1) {
-                    dragging = true;
-                    pinching = false;
-                    startX = e.touches[0].clientX;
-                    startY = e.touches[0].clientY;
-                    startOffsetX = offsetX;
-                    startOffsetY = offsetY;
-                    render();
-                  }
-                }, { passive: true });
-
-                img.addEventListener("touchmove", (e) => {
-                  if (pinching && e.touches.length === 2) {
-                    e.preventDefault();
-                    const nextDistance = distance(e.touches[0], e.touches[1]);
-                    const ratio = nextDistance / pinchStartDistance;
-                    scale = clamp(pinchStartScale * ratio, MIN_SCALE, MAX_SCALE);
-                    if (scale === 1) {
-                      offsetX = 0;
-                      offsetY = 0;
-                    }
-                    render();
-                    return;
-                  }
-
-                  if (dragging && e.touches.length === 1 && scale > 1) {
-                    e.preventDefault();
-                    offsetX = startOffsetX + (e.touches[0].clientX - startX);
-                    offsetY = startOffsetY + (e.touches[0].clientY - startY);
-                    render();
-                  }
-                }, { passive: false });
-
-                img.addEventListener("touchend", (e) => {
-                  if (e.touches.length < 2) pinching = false;
-                  if (e.touches.length === 0) dragging = false;
-                  if (scale === 1) {
-                    offsetX = 0;
-                    offsetY = 0;
-                  }
-                  render();
-                });
-
-                const modalEl = img.closest(".modal");
-                if (modalEl) {
-                  modalEl.addEventListener("hidden.bs.modal", resetZoom);
-                }
-
-                render();
-    });
-  })();
 </script>
 </div>
 </body>

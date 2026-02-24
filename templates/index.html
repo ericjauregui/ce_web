@@ -3,9 +3,9 @@
 {% block content %}
 <header class="hero d-flex align-items-center text-center">
   <div class="container">
-    <h1 class="display-4 fw-semibold text-gold">Wholesalers • Manufacturers</h1>
-    <h2 class="display-6 fw-semibold text-gold">14k/10k Gold Earrings • Piercings</h2>
-    <p class="lead text-gold-70 mt-2"><b>Contact us to place an order • Wholesale Only • Shipping available globally</b></p>
+    <h1 class="display-4 fw-semibold text-gold">Wholesalers • Manufacturers </h1>
+    <h2 class="display-6 fw-semibold text-gold">10k/14k Gold Earrings • Body Jewelry</h2>
+    <p class="lead text-gold-70 mt-2"><b>Contact us to place an order • Shipping available globally</b></p>
   </div>
 </header>
 
@@ -14,7 +14,10 @@
   <div id="section-{{ section.key }}" class="section-anchor" aria-hidden="true"></div>
   <div class="sticky-section-header border-top border-bottom border-gold mb-3">
     <div class="container section-header-row py-3">
-      <h2 class="text-gold m-0 section-title">{{ section.title }}</h2>
+      <h2 class="m-0 section-title catalog-section-title">
+        <span class="catalog-section-title-text">{{ section.title }}</span>
+        <span class="catalog-section-title-rule" aria-hidden="true"></span>
+      </h2>
       {% if sections|length > 1 %}
       <div class="section-header-cats" aria-label="Other categories">
         {% for other in sections %}
@@ -29,8 +32,8 @@
       </div>
       </div>
   </div>
-  <div class="container">
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">
+  <div class="container{% if not loop.last %} mb-3{% endif %}">
+    <div class="row row-cols-2 row-cols-md-3 row-cols-xl-4 g-4 product-grid-row">
       {% for p in section.items %}
       {% include "partials/product_card.html" %}
       {% endfor %}
@@ -39,18 +42,39 @@
   {% endfor %}
 </section>
 
-<section class="container pb-5" style="max-width: 1200px;">
-  <div class="d-flex align-items-end justify-content-between mb-3">
-    <h2 class="text-gold m-0 section-title">Social reels</h2>
-    <div class="d-flex gap-2">
-      <a class="chip" href="{{ social.instagram.profile_url }}" target="_blank" rel="noopener">Click to see our
-        Instagram</a>
-      <a class="chip" href="{{ social.tiktok.profile_url }}" target="_blank" rel="noopener">Click to see our
-        TikTok</a>
+<section class="pb-5">
+  <div class="social-section-header border-top border-bottom border-gold mb-3">
+    <div class="container section-header-row py-3" style="max-width: 1200px;">
+      <h2 class="m-0 section-title catalog-section-title">
+        <span class="catalog-section-title-text">Social reels</span>
+        <span class="catalog-section-title-rule" aria-hidden="true"></span>
+      </h2>
+      <div class="section-header-cats" aria-hidden="true"></div>
+      <div class="section-header-jump d-flex gap-3 align-items-center social-brand-links" aria-label="Social links">
+        <a class="social-brand-link" href="{{ social.instagram.profile_url }}" target="_blank" rel="noopener"
+          aria-label="Open Instagram" title="Instagram">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="3.5" y="3.5" width="17" height="17" rx="5" ry="5" fill="none" stroke="currentColor"
+              stroke-width="1.8" />
+            <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8" />
+            <circle cx="17.3" cy="6.8" r="1.1" fill="currentColor" />
+          </svg>
+        </a>
+        <a class="social-brand-link" href="{{ social.tiktok.profile_url }}" target="_blank" rel="noopener"
+          aria-label="Open TikTok" title="TikTok">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M14.5 4v9.2a3.7 3.7 0 1 1-3.7-3.7" fill="none" stroke="currentColor" stroke-width="1.9"
+              stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M14.5 4c.6 1.7 2 3 3.7 3.7" fill="none" stroke="currentColor" stroke-width="1.9"
+              stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </a>
+      </div>
     </div>
   </div>
 
-  <div class="reels-row">
+  <div class="container" style="max-width: 1200px;">
+    <div class="reels-row">
     {% for url in social.tiktok.videos %}
     {% set video_id = url.split('/video/')[-1].split('?')[0] %}
     <div class="reel-card bg-dark border-gold">
@@ -62,29 +86,11 @@
       </blockquote>
       </div>
     {% endfor %}
+    </div>
   </div>
 </section>
 
 <script async src="https://www.tiktok.com/embed.js"></script>
-
-<!-- Modal Lightbox -->
-  <div class="modal fade modal-dark" id="viewerModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-xl">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="viewerTitle"></h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <img id="viewerImg" class="viewer-img" data-zoomable="true" src="" alt="">
-        <div class="mt-2 small" style="color:var(--gold-70)" id="viewerCaption"></div>
-        <div class="mt-3">
-          <a id="viewerLink" class="btn btn-outline-gold btn-sm" href="#" target="_self">open product page</a>
-        </div>
-      </div>
-    </div>
-    </div>
-  </div>
 
   <a class="whatsapp-float"
     href="https://wa.me/18183319292?text=Hello%20I%27d%20like%20more%20information"
@@ -97,74 +103,5 @@
 {% endblock %}
 
 {% block body_end %}
-<script>
-const modal = document.getElementById('viewerModal');
-modal.addEventListener('show.bs.modal', event => {
-  const card = event.relatedTarget;
-  const img = card.getAttribute('data-img');
-  const title = card.getAttribute('data-title');
-  const caption = card.getAttribute('data-caption');
-  const link = card.querySelector('a.stretched-link')?.getAttribute('href') || '#';
-  document.getElementById('viewerImg').src = img;
-  document.getElementById('viewerTitle').textContent = title;
-  document.getElementById('viewerCaption').textContent = caption;
-  document.getElementById('viewerLink').setAttribute('href', link);
-});
-async function postJson(url, payload){
-  const res = await fetch(url, {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(payload||{})});
-  return res.json();
-}
-document.addEventListener("click", async (e) => {
-  const btn = e.target.closest(".add-to-cart-btn");
-  if (!btn) return;
-  e.preventDefault();
-  e.stopPropagation();
-  const code = btn.getAttribute("data-code");
-  const r = await postJson("/api/cart/add", {code: code, qty: 1});
-  const badge = document.getElementById("cartCountBadge");
-  if (badge){
-    badge.textContent = r.total_items || 0;
-    badge.style.display = (r.total_items || 0) > 0 ? "inline-block" : "none";
-  }
-  btn.textContent = "added ✓";
-  setTimeout(() => btn.textContent = "add to inquiry", 1200);
-});
-
-    document.addEventListener("click", (e) => {
-      const btn = e.target.closest('.section-chip-btn[data-target]');
-      if (!btn) return;
-
-      const targetId = btn.getAttribute("data-target");
-      const target = targetId ? document.getElementById(targetId) : null;
-      if (!target) return;
-
-      e.preventDefault();
-
-      const styles = getComputedStyle(document.documentElement);
-      const navActual = parseFloat(styles.getPropertyValue("--nav-actual-height")) || 0;
-      const navFallback = parseFloat(styles.getPropertyValue("--nav-height")) || 50;
-      const topOffset = navActual || navFallback;
-      const targetTop = Math.max(0, (target.getBoundingClientRect().top + window.scrollY) - topOffset);
-      const hash = `#${targetId}`;
-
-      window.scrollTo({ top: Math.max(0, targetTop), behavior: "smooth" });
-      window.history.replaceState(null, "", hash);
-      btn.blur();
-
-      window.setTimeout(() => {
-        const remaining = Math.abs(window.scrollY - targetTop);
-        if (remaining > 24) {
-          window.scrollTo({ top: targetTop, behavior: "auto" });
-        }
-      }, 420);
-    });
-
-  document.addEventListener("click", (e) => {
-    const link = e.target.closest('a[href="#top"]');
-    if (!link) return;
-    e.preventDefault();
-    window.scrollTo({ top: 0, behavior: "smooth" });
-    window.history.replaceState(null, "", window.location.pathname + window.location.search);
-  });
-</script>
+<script src="{{ url_for('static', filename='js/catalog.js') }}"></script>
 {% endblock %}
