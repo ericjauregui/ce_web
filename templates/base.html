@@ -95,15 +95,60 @@
   <main class="mt-5 pt-4">{% block content %}{% endblock %}</main>
 
   <footer class="text-center py-4 border-top border-gold mt-5 text-gold-70">
-    © {{ 2026 }} California Earrings · Los Angeles, CA, USA
-    <div class="footer-social mt-2">
-      <span class="text-gold-70">Follow us on our socials: </span>
-      <a class="team-phone-link text-gold-70" href="{{ social.instagram.profile_url }}" target="_blank"
-        rel="noopener">Instagram</a>
-      <span class="text-gold-70"> · </span>
-      <a class="team-phone-link text-gold-70" href="{{ social.tiktok.profile_url }}" target="_blank"
-        rel="noopener">TikTok</a>
+    <div class="footer-social mb-2" aria-label="Follow us on our socials">
+      <div class="d-inline-flex flex-wrap align-items-center justify-content-center gap-2">
+        <a class="team-inline-icon" href="tel:2139357272" aria-label="Call (213) 935-7272" title="Call">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M6.7 3.5l3 1.3c.6.2.9.9.8 1.5l-.5 2.4c1 .2 2 .7 2.8 1.6.9.9 1.5 1.8 1.7 2.9l2.3-.5c.7-.1 1.3.2 1.6.8l1.3 3c.3.7.1 1.5-.5 2-1 .8-2.5 1.3-4.2.8-2.1-.5-4.4-2-6.3-3.9-1.9-1.9-3.3-4.2-3.9-6.3-.5-1.8 0-3.2.8-4.2.5-.6 1.4-.8 2.1-.4z"
+              fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </a>
+        <a class="team-inline-icon"
+          href="https://wa.me/18183319292?text=Hello%20I%27d%20like%20more%20information"
+          target="_blank" rel="noopener noreferrer" aria-label="Chat on WhatsApp" title="WhatsApp">
+          <svg viewBox="0 0 448 512" aria-hidden="true" stroke="none">
+            <path fill="currentColor"
+              d="M380.9 97.1C339 55.2 283.2 32 223.9 32 100.5 32 0 132.5 0 256c0 45.4 11.9 89.5 34.5 128.4L0 480l98.8-32.5C136.9 469 179.7 480 223.9 480c123.4 0 224-100.5 224-224 0-59.2-23.2-115-65-156.9zM223.9 438.7c-38.8 0-76.8-10.4-110.1-30.1l-7.9-4.7-58.6 19.3 19.1-57.1-5.1-8.2C41.6 323.6 30.3 290.1 30.3 256 30.3 149.3 117.1 62.5 223.9 62.5c51.8 0 100.5 20.2 137.1 56.8 36.6 36.6 56.8 85.3 56.8 137.1 0 106.8-86.8 193.6-193.9 193.6zm101.7-145.5c-5.6-2.8-33.1-16.3-38.2-18.1-5.1-1.9-8.9-2.8-12.6 2.8-3.7 5.6-14.5 18.1-17.7 21.8-3.3 3.7-6.5 4.2-12.1 1.4-32.9-16.5-54.4-29.5-76.2-66.9-5.8-9.9 5.8-9.2 16.5-30.7 1.8-3.7.9-6.8-.5-9.6-1.4-2.8-12.6-30.3-17.3-41.5-4.6-11.1-9.3-9.6-12.6-9.8-3.3-.2-7.1-.2-10.8-.2-3.7 0-9.6 1.4-14.6 6.8-5.1 5.6-19.1 18.7-19.1 45.6 0 26.8 19.6 52.8 22.3 56.5 2.8 3.7 38.4 58.6 93.1 82.1 34.5 14.9 48 16.1 65.1 13.5 10.4-1.6 33.1-13.5 37.7-26.6 4.7-13.1 4.7-24.3 3.3-26.6-1.3-2.4-5.1-3.8-10.7-6.6z" />
+          </svg>
+        </a>
+        <a class="team-inline-icon" href="https://linktr.ee/californiaearrings" target="_blank"
+          rel="noopener noreferrer" aria-label="Open Linktree" title="Linktree">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.7" />
+            <path d="M4 12h16M12 4c2.6 2.2 2.6 13.8 0 16M12 4c-2.6 2.2-2.6 13.8 0 16" fill="none"
+              stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </a>
+        <a class="team-inline-icon" href="mailto:californiaearrings@gmail.com"
+          aria-label="Email californiaearrings@gmail.com" title="Email">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M3 6.5h18v11H3z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" />
+            <path d="M4.5 8l7.5 6 7.5-6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"
+              stroke-linejoin="round" />
+          </svg>
+        </a>
+        <a class="team-inline-icon" href="{{ social.tiktok.profile_url }}" target="_blank" rel="noopener"
+          aria-label="Open TikTok" title="TikTok">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M14.5 4v9.2a3.7 3.7 0 1 1-3.7-3.7" fill="none" stroke="currentColor" stroke-width="1.9"
+              stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M14.5 4c.6 1.7 2 3 3.7 3.7" fill="none" stroke="currentColor" stroke-width="1.9"
+              stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </a>
+        <a class="team-inline-icon" href="{{ social.instagram.profile_url }}" target="_blank" rel="noopener"
+          aria-label="Open Instagram" title="Instagram">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="3.5" y="3.5" width="17" height="17" rx="5" ry="5" fill="none" stroke="currentColor"
+              stroke-width="1.8" />
+            <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8" />
+            <circle cx="17.3" cy="6.8" r="1.1" fill="currentColor" />
+          </svg>
+        </a>
+      </div>
     </div>
+    © {{ 2026 }} California Earrings · Los Angeles, CA, USA
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -158,21 +203,65 @@
                 wrap.classList.toggle("is-open", open);
                 btn.setAttribute("aria-expanded", open ? "true" : "false");
                 if (open) {
-                  window.setTimeout(() => {
-                    if (!input) return;
-                    input.focus();
-                    if (input.value) input.select();
-                  }, 0);
+                  if (input) {
+                    const focusInput = () => {
+                      try {
+                        input.focus({ preventScroll: true });
+                      } catch (_err) {
+                        input.focus();
+                      }
+                      if (input.value) input.select();
+                    };
+
+                    focusInput();
+                    window.requestAnimationFrame(focusInput);
+                  }
                   return;
                 }
 
               if (restoreValue) resetInputValue();
             }
 
-              btn.addEventListener("click", () => {
+                btn.addEventListener("click", (e) => {
+                  e.preventDefault();
                 const open = !wrap.classList.contains("is-open");
                 setOpen(open, { restoreValue: !open });
               });
+
+                let clearInFlight = false;
+
+                async function restoreHomeContentWithoutReload() {
+                  const response = await fetch("/", {
+                    method: "GET",
+                    headers: { Accept: "text/html" },
+                    credentials: "same-origin",
+                  });
+
+                  if (!response.ok) {
+                    throw new Error(`Failed to fetch home content: ${response.status}`);
+                  }
+
+                  const html = await response.text();
+                  const parser = new DOMParser();
+                  const nextDoc = parser.parseFromString(html, "text/html");
+                  const nextMain = nextDoc.querySelector("main");
+                  const currentMain = document.querySelector("main");
+
+                  if (!nextMain || !currentMain) {
+                    throw new Error("Unable to locate page main content");
+                  }
+
+                  currentMain.replaceWith(nextMain);
+                  if (nextDoc.title) document.title = nextDoc.title;
+                  window.history.replaceState(null, "", "/");
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+
+                  document.dispatchEvent(
+                    new CustomEvent("ce:content-replaced", {
+                      detail: { source: "search-clear" },
+                    })
+                  );
+                }
 
               if (input) {
                 input.addEventListener("keydown", (e) => {
@@ -182,12 +271,48 @@
                   input.select();
                 });
 
-                input.addEventListener("search", () => {
+                async function handleClearedSearch() {
+                  if (clearInFlight) return;
+                  clearInFlight = true;
+
+                  try {
+                    setOpen(false, { restoreValue: false });
+                    input.value = "";
+
+                    const baseUrl = form.action || "/";
+                    const target = new URL(baseUrl, window.location.origin);
+                    const onSamePath = window.location.pathname === target.pathname;
+
+                    if (onSamePath) {
+                      const hasSearchState = window.location.search.includes("q=") || window.location.hash.startsWith("#section-");
+                      if (hasSearchState) {
+                        try {
+                          await restoreHomeContentWithoutReload();
+                        } catch (_err) {
+                          window.location.assign(target.pathname);
+                        }
+                        return;
+                      }
+
+                      window.history.replaceState(null, "", target.pathname);
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                      return;
+                    }
+
+                    window.location.assign(target.pathname);
+                  } finally {
+                    clearInFlight = false;
+                  }
+                }
+
+                function maybeClearSearch() {
                   if (input.value.trim() !== "") return;
                   if (!form) return;
-                  const baseUrl = form.action || window.location.pathname;
-                  window.location.assign(baseUrl);
-                });
+                  handleClearedSearch();
+                }
+
+                input.addEventListener("search", maybeClearSearch);
+                input.addEventListener("input", maybeClearSearch);
               }
 
               document.addEventListener("keydown", (e) => {

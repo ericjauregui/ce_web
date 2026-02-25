@@ -5,12 +5,18 @@
 
 {% block content %}
 <section class="container py-5" style="max-width: 1020px;">
-  <div class="d-flex flex-wrap gap-2 mb-3">
-    <a class="btn btn-outline-gold" href="{{ url_for('team_page') }}">← Back to Team</a>
-    <a class="btn btn-outline-gold" href="{{ url_for('index') }}#section-studs">Back to Catalog</a>
+  <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+    <div class="d-flex flex-wrap gap-2">
+      <a class="btn btn-outline-gold" href="{{ url_for('team_page') }}">← Back to Team</a>
+      <a class="btn btn-outline-gold" href="{{ url_for('index') }}#section-studs">Go to Catalog</a>
+      </div>
+      <a class="btn btn-outline-gold ms-auto" href="{{ url_for('team_member_vcard', member_slug=member.slug) }}">Save to
+        Contacts</a>
   </div>
 
-  <article class="card bg-dark border-gold p-4 p-lg-5 team-member-card team-member-luxe-card">
+  <article class="card bg-dark border-gold p-4 p-lg-5 team-member-card team-member-luxe-card team-member-card-vcard"
+    data-vcard-url="{{ url_for('team_member_vcard', member_slug=member.slug) }}" tabindex="0" role="link"
+    aria-label="Save {{ member.name }} to contacts">
     <div class="d-flex flex-column flex-md-row gap-4 align-items-center align-items-md-start">
       <div class="team-avatar team-avatar-luxe">
         {% if member.photo %}
@@ -99,8 +105,33 @@
 
       </div>
 
-      <a class="btn btn-outline-gold btn-sm team-save-btn" href="{{ url_for('team_member_vcard', member_slug=member.slug) }}">Save to Contacts</a>
     </div>
   </article>
 </section>
+{% endblock %}
+
+{% block body_end %}
+<script>
+  (function () {
+    function shouldIgnoreClick(target) {
+      return !!target.closest("a, button, input, textarea, select, label");
+    }
+
+    document.addEventListener("click", function (event) {
+      const card = event.target.closest(".team-member-card-vcard[data-vcard-url]");
+      if (!card || shouldIgnoreClick(event.target)) return;
+      const href = card.getAttribute("data-vcard-url");
+      if (href) window.location.assign(href);
+    });
+
+    document.addEventListener("keydown", function (event) {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      const card = event.target.closest(".team-member-card-vcard[data-vcard-url]");
+      if (!card || event.target !== card) return;
+      event.preventDefault();
+      const href = card.getAttribute("data-vcard-url");
+      if (href) window.location.assign(href);
+    });
+  })();
+</script>
 {% endblock %}

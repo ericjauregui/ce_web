@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import re
 import unittest
 from unittest.mock import patch
 
@@ -77,6 +78,29 @@ class CartApiTests(unittest.TestCase):
         body = response.get_data(as_text=True)
         self.assertIn(f"/team/{self.first_member['slug']}", body)
 
+    def test_team_member_slug_uses_first_name(self) -> None:
+        members = webapp.build_team_members(
+            {
+                "company": "California Earrings",
+                "members": [{"name": "Miguel Jauregui"}],
+            }
+        )
+        self.assertEqual(members[0]["slug"], "miguel")
+
+    def test_duplicate_first_names_append_last_initial(self) -> None:
+        members = webapp.build_team_members(
+            {
+                "company": "California Earrings",
+                "members": [
+                    {"name": "Alex Stone"},
+                    {"name": "Alex Johnson"},
+                    {"name": "Alex"},
+                ],
+            }
+        )
+        slugs = [member["slug"] for member in members]
+        self.assertEqual(slugs, ["alex-s", "alex-j", "alex-x"])
+
     def test_team_member_page_and_vcard_download(self) -> None:
         member_slug = self.first_member["slug"]
         member_name = self.first_member["name"]
@@ -113,6 +137,36 @@ class CartApiTests(unittest.TestCase):
         self.assertIn("Disallow: /api/", robots_body)
         self.assertIn("Disallow: /checkout", robots_body)
         self.assertIn("Sitemap: https://californiaearrings.com/sitemap.xml", robots_body)
+
+    def test_nav_search_clear_logic_uses_input_and_search_events(self) -> None:
+        response = self.client.get("/")
+        self.assertEqual(response.status_code, 200)
+        body = response.get_data(as_text=True)
+
+        self.assertIn("async function handleClearedSearch()", body)
+        self.assertIn(
+            "input.addEventListener(\"search\", maybeClearSearch)", body)
+        self.assertIn(
+            "input.addEventListener(\"input\", maybeClearSearch)", body)
+        self.assertIn("setOpen(false, { restoreValue: false });", body)
+        self.assertIn(
+            "window.history.replaceState(null, \"\", target.pathname);", body)
+
+    def test_default_catalog_state_has_more_cards_than_filtered_query(self) -> None:
+        full_response = self.client.get("/")
+        self.assertEqual(full_response.status_code, 200)
+        full_body = full_response.get_data(as_text=True)
+        full_count = len(re.findall(r'class=\"[^\"]*product-card', full_body))
+        self.assertGreater(full_count, 0)
+
+        filtered_response = self.client.get(f"/?q={self.valid_code}")
+        self.assertEqual(filtered_response.status_code, 200)
+        filtered_body = filtered_response.get_data(as_text=True)
+        filtered_count = len(re.findall(
+            r'class=\"[^\"]*product-card', filtered_body))
+
+        self.assertGreater(filtered_count, 0)
+        self.assertLess(filtered_count, full_count)
 
 
 if __name__ == "__main__":

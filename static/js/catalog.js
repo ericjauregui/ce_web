@@ -147,13 +147,17 @@ window.addEventListener("resize", () => {
   document.querySelectorAll(".product-card.is-open").forEach(syncDrawerHeight);
 });
 
-document.addEventListener("DOMContentLoaded", () => {
-  document.querySelectorAll(".product-card").forEach((card) => {
+function initializeCatalogCards(root = document) {
+  root.querySelectorAll(".product-card").forEach((card) => {
     syncDrawerHeight(card);
     setCardExpanded(card, false);
     setCardQty(card, 0);
     setAddButtonLabel(card, 0);
   });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  initializeCatalogCards();
 
   const currentPath = window.location.pathname;
   const hash = (window.location.hash || "").trim();
@@ -184,6 +188,10 @@ document.addEventListener("DOMContentLoaded", () => {
       scrollSectionToTop(target, "auto", false);
     });
   }
+});
+
+document.addEventListener("ce:content-replaced", () => {
+  initializeCatalogCards();
 });
 
 document.addEventListener("click", async (event) => {

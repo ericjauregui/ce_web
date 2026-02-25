@@ -104,6 +104,19 @@ def _slugify(value: str) -> str:
     return slug or "member"
 
 
+def _name_parts_for_slug(name: str) -> list[str]:
+    return re.findall(r"[a-z0-9]+", (name or "").strip().lower())
+
+
+def _member_slug_base(name: str) -> tuple[str, str]:
+    parts = _name_parts_for_slug(name)
+    if not parts:
+        return "member", ""
+    first = _slugify(parts[0])
+    last_initial = parts[-1][0] if len(parts) > 1 and parts[-1] else ""
+    return first, last_initial
+
+
 def build_team_members(team: dict[str, Any]) -> list[dict[str, Any]]:
     raw_members = team.get("members") or []
     if not isinstance(raw_members, list):
@@ -111,6 +124,8 @@ def build_team_members(team: dict[str, Any]) -> list[dict[str, Any]]:
 
     members: list[dict[str, Any]] = []
     seen_slugs: dict[str, int] = {}
+    member_names: list[str] = []
+    first_name_counts: dict[str, int] = {}
     company = (team.get("company") or "California Earrings").strip(
     ) or "California Earrings"
     whatsapp_intro_template = (
@@ -121,15 +136,29 @@ def build_team_members(team: dict[str, Any]) -> list[dict[str, Any]]:
     for raw in raw_members:
         source = raw if isinstance(raw, dict) else {}
         name = (source.get("name") or "Team Member").strip() or "Team Member"
+        member_names.append(name)
+        first_slug, _ = _member_slug_base(name)
+        first_name_counts[first_slug] = first_name_counts.get(
+            first_slug, 0) + 1
+
+    for raw, name in zip(raw_members, member_names, strict=False):
+        source = raw if isinstance(raw, dict) else {}
         title = (source.get("title") or "").strip()
         bio = (source.get("bio") or "").strip()
         photo = (source.get("photo") or "").strip() or None
         phone = (source.get("phone") or "").strip()
         email = (source.get("email") or "").strip()
 
-        base_slug = _slugify(name)
-        seen_slugs[base_slug] = seen_slugs.get(base_slug, 0) + 1
-        slug = base_slug if seen_slugs[base_slug] == 1 else f"{base_slug}-{seen_slugs[base_slug]}"
+        first_slug, last_initial = _member_slug_base(name)
+        if first_name_counts.get(first_slug, 0) > 1:
+            suffix = last_initial or "x"
+            candidate_slug = f"{first_slug}-{suffix}"
+        else:
+            candidate_slug = first_slug
+
+        seen_slugs[candidate_slug] = seen_slugs.get(candidate_slug, 0) + 1
+        slug = candidate_slug if seen_slugs[
+            candidate_slug] == 1 else f"{candidate_slug}-{seen_slugs[candidate_slug]}"
 
         phone_digits = re.sub(r"\D+", "", phone)
         if phone_digits.startswith("00"):
