@@ -5,8 +5,8 @@
   z-index: 1015;
   background: rgba(13, 13, 13, 0.92);
   backdrop-filter: blur(8px);
-  border-top-color: rgb(var(--gold-rgb) / 0.58) !important;
-    border-bottom-color: rgb(var(--gold-rgb) / 0.58) !important;
+  border-top-color: var(--gold-outline) !important;
+    border-bottom-color: var(--gold-outline) !important;
     box-shadow:
       inset 0 1px 0 rgb(var(--gold-rgb) / 0.22),
         inset 0 -1px 0 rgb(var(--gold-rgb) / 0.22),
@@ -16,8 +16,8 @@
 .social-section-header {
   background: rgba(13, 13, 13, 0.92);
   backdrop-filter: blur(8px);
-  border-top-color: rgb(var(--gold-rgb) / 0.58) !important;
-    border-bottom-color: rgb(var(--gold-rgb) / 0.58) !important;
+  border-top-color: var(--gold-outline) !important;
+    border-bottom-color: var(--gold-outline) !important;
     box-shadow:
       inset 0 1px 0 rgb(var(--gold-rgb) / 0.22),
         inset 0 -1px 0 rgb(var(--gold-rgb) / 0.22),
@@ -65,7 +65,7 @@
     min-width: 2.8rem;
     height: 2px;
     border-radius: 999px;
-    background: rgba(215, 192, 122, 0.78);
+    background: var(--gold-outline);
 }
 .section-header-cats {
   grid-column: 2;
@@ -106,7 +106,7 @@
   align-items: center;
   justify-content: center;
   opacity: 1;
-  border: 1px solid rgb(var(--gold-rgb) / 0.5);
+  border: 1px solid var(--gold-outline);
     border-radius: 999px;
     background: rgba(13, 13, 13, 0.55);
 }
@@ -119,7 +119,7 @@
 .social-brand-link:focus-visible {
   color: #fff;
   background: rgba(215, 192, 122, 0.12);
-  border-color: rgb(var(--gold-rgb) / 0.72);
+  border-color: var(--gold-outline-strong);
     outline: none;
 }
 @media (max-width: 767.98px) {
@@ -175,7 +175,7 @@
 .chip {
   display: inline-block;
   padding: .35rem .7rem;
-  border: 1px solid rgb(var(--gold-rgb) / 0.45);
+  border: 1px solid var(--gold-outline);
   border-radius: 999px;
   background: transparent;
   color: var(--gold);
@@ -198,7 +198,7 @@
   height: 56px;
   object-fit: cover;
   border-radius: 10px;
-  border: 1px solid rgb(var(--gold-rgb) / 0.35);
+  border: 1px solid var(--gold-outline);
 }
 .qty-control {
   display: flex;
@@ -231,7 +231,7 @@
   width: 56px;
   height: 56px;
   border-radius: 14px;
-  border: 1px solid rgb(var(--gold-rgb) / 0.35);
+  border: 1px solid var(--gold-outline);
   background: #111;
   display: flex;
   align-items: center;
@@ -389,7 +389,7 @@
   height: 34px;
   min-width: 34px;
   border-radius: 999px;
-  border: 1px solid rgb(var(--gold-rgb) / 0.45);
+  border: 1px solid var(--gold-outline);
   color: var(--gold);
   background: transparent;
   display: inline-flex;

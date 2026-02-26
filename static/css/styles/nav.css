@@ -95,7 +95,7 @@
 
 .nav-search-trigger {
   appearance: none;
-  border: 1px solid rgb(var(--gold-rgb) / 0.35);
+  border: 1px solid var(--gold-outline);
   background: rgba(13, 13, 13, 0.55);
   color: var(--gold);
   padding: .28rem .6rem;
@@ -108,7 +108,7 @@
 .nav-search-trigger:focus-visible {
   color: #fff;
   background: rgba(215, 192, 122, 0.10);
-  border-color: rgb(var(--gold-rgb) / 0.7);
+  border-color: var(--gold-outline-strong);
   outline: none;
 }
 
@@ -116,7 +116,7 @@
   .social-brand-link:hover {
     color: #fff;
     background: rgba(215, 192, 122, 0.12);
-    border-color: rgb(var(--gold-rgb) / 0.72);
+    border-color: var(--gold-outline-strong);
   }
 
   .chip:hover {
@@ -141,7 +141,7 @@
   .nav-search-trigger:hover {
     color: #fff;
     background: rgba(215, 192, 122, 0.10);
-    border-color: rgb(var(--gold-rgb) / 0.7);
+    border-color: var(--gold-outline-strong);
   }
 }
 
@@ -149,14 +149,14 @@
 (pointer: coarse) {
   .btn-outline-gold {
     --bs-btn-hover-bg: transparent;
-    --bs-btn-hover-border-color: var(--gold);
+    --bs-btn-hover-border-color: var(--gold-outline-strong);
     --bs-btn-hover-color: var(--gold);
   }
 
   .btn-outline-gold:hover {
     color: var(--gold);
     background-color: transparent;
-    border-color: var(--gold);
+    border-color: var(--gold-outline-strong);
   }
 }
 .nav-search-icon {
@@ -238,13 +238,13 @@
   background-color: rgba(13, 13, 13, 0.85) !important;
   color: var(--gold) !important;
   caret-color: var(--gold);
-  border-color: rgb(var(--gold-rgb) / 0.55) !important;
+  border-color: var(--gold-outline) !important;
 }
 
 .nav-search .nav-search-input.form-control:focus {
   background-color: rgba(13, 13, 13, 0.92) !important;
   color: var(--gold) !important;
-  border-color: var(--gold) !important;
+  border-color: var(--gold-outline-strong) !important;
   box-shadow: 0 0 0 .2rem rgba(215, 192, 122, .18) !important;
 }
 
