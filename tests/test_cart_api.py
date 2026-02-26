@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import re
 import unittest
+from pathlib import Path
 from unittest.mock import patch
 
 os.environ.setdefault("SECRET_KEY", "test-secret-key")
@@ -167,6 +168,30 @@ class CartApiTests(unittest.TestCase):
 
         self.assertGreater(filtered_count, 0)
         self.assertLess(filtered_count, full_count)
+
+    def test_hover_rules_are_scoped_to_hover_capable_devices(self) -> None:
+        css = (Path(webapp.BASE_DIR) / "static" / "css" /
+               "style.css").read_text(encoding="utf-8")
+
+        self.assertIn("@media (hover: hover) and (pointer: fine)", css)
+        self.assertIn(".social-brand-link:hover", css)
+        self.assertIn(".team-inline-icon:hover", css)
+        self.assertIn(".team-phone-link:hover", css)
+        self.assertIn(".chip:hover", css)
+        self.assertIn(".nav-search-trigger:hover", css)
+        self.assertIn(".cart-link:hover svg", css)
+
+    def test_touch_devices_neutralize_outline_button_hover_state(self) -> None:
+        css = (Path(webapp.BASE_DIR) / "static" / "css" /
+               "style.css").read_text(encoding="utf-8")
+        condensed = re.sub(r"\s+", " ", css)
+
+        self.assertIn("@media (hover: none), (pointer: coarse)", condensed)
+        self.assertIn(
+            ".btn-outline-gold { --bs-btn-hover-bg: transparent;", condensed)
+        self.assertIn("--bs-btn-hover-color: var(--gold);", condensed)
+        self.assertIn(
+            ".btn-outline-gold:hover { color: var(--gold);", condensed)
 
 
 if __name__ == "__main__":
