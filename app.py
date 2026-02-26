@@ -277,7 +277,7 @@ def load_team() -> dict[str, Any]:
         with open(TEAM_PATH, "r", encoding="utf-8") as f:
             return json.load(f)
     return {
-        "headline": "Meet Our Team",
+        "headline": "Meet the Team",
         "company": "California Earrings",
         "whatsapp_intro": "Hi {name}, I found your contact on {company}.",
         "members": [],

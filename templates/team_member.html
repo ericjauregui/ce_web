@@ -5,12 +5,13 @@
 
 {% block content %}
 <section class="container py-5" style="max-width: 1020px;">
-  <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
-    <div class="d-flex flex-wrap gap-2">
-      <a class="btn btn-outline-gold" href="{{ url_for('team_page') }}">← Back to Team</a>
-      <a class="btn btn-outline-gold" href="{{ url_for('index') }}#section-studs">Go to Catalog</a>
+  <div class="team-member-top-actions d-flex align-items-start gap-2 mb-3">
+    <div class="team-member-top-left d-flex align-items-start gap-2">
+      <a class="btn btn-outline-gold team-member-top-btn" href="{{ url_for('team_page') }}">← Back to Team</a>
+      <a class="btn btn-outline-gold team-member-top-btn" href="{{ url_for('index') }}#section-studs">Go to Catalog</a>
       </div>
-      <a class="btn btn-outline-gold ms-auto" href="{{ url_for('team_member_vcard', member_slug=member.slug) }}">Save to
+      <a class="btn btn-outline-gold team-member-top-btn team-member-top-save ms-auto"
+        href="{{ url_for('team_member_vcard', member_slug=member.slug) }}">Save to
         Contacts</a>
   </div>
 
