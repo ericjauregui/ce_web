@@ -146,3 +146,23 @@ class FrontendContractTests(BaseWebTest):
         body = response.get_data(as_text=True)
 
         self.assertIn("assets/ce_logo_shape.png", body)
+
+    def test_visual_polish_contracts_for_hero_header_and_cards(self) -> None:
+        css = self.load_site_css()
+        condensed = re.sub(r"\s+", " ", css)
+
+        self.assertIn("width: clamp(172px, 41vw, 352px);", css)
+        self.assertIn("width: clamp(148px, 51vw, 262px);", css)
+        self.assertIn("min-height: clamp(196px, 27vh, 318px);", css)
+        self.assertIn("min-height: clamp(176px, 24vh, 258px);", css)
+        self.assertIn("padding-top: clamp(.84rem, 2.3vw, 1.32rem);", css)
+        self.assertIn("padding-bottom: clamp(.66rem, 1.84vw, 1.06rem);", css)
+        self.assertIn("opacity: 0.70;", css)
+        self.assertIn("opacity: 0.77;", css)
+        self.assertIn(
+            ".catalog-section-title-rule { display: none; }", condensed)
+        self.assertIn(".section-header-row::after", css)
+        self.assertIn("box-shadow: 0 15px 40px rgba(0, 0, 0, 0.45);", css)
+        self.assertIn(".code-badge", css)
+        self.assertIn("padding: .11rem .46rem;", css)
+        self.assertIn("rgb(var(--gold-rgb) / 0.84)", css)

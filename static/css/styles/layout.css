@@ -31,6 +31,17 @@
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: clamp(.35rem, 1vw, .75rem);
+  position: relative;
+  }
+  
+  .section-header-row::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 1px;
+    background: rgb(var(--gold-rgb) / 0.32);
 }
 
 .section-header-row .section-title {
@@ -60,12 +71,7 @@
 }
 
 .catalog-section-title-rule {
-  display: block;
-  width: min(88%, 7.5rem);
-    min-width: 2.8rem;
-    height: 2px;
-    border-radius: 999px;
-    background: var(--gold-outline);
+  display: none;
 }
 .section-header-cats {
   grid-column: 2;
