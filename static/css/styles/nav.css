@@ -1,0 +1,334 @@
+/* Cart icon micro-interactions */
+@keyframes cart-shake {
+
+  0%,
+  100% {
+    transform: translateX(0) rotate(0);
+  }
+
+  20% {
+    transform: translateX(-2px) rotate(-4deg);
+  }
+
+  40% {
+    transform: translateX(2px) rotate(4deg);
+  }
+
+  60% {
+    transform: translateX(-2px) rotate(-3deg);
+  }
+
+  80% {
+    transform: translateX(2px) rotate(3deg);
+  }
+}
+
+@keyframes cart-bounce {
+  0% {
+    transform: scale(1);
+  }
+
+  30% {
+    transform: scale(1.12);
+  }
+
+  55% {
+    transform: scale(0.96);
+  }
+
+  75% {
+    transform: scale(1.04);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+.cart-link svg {
+  transform-origin: center;
+  will-change: transform;
+}
+
+.cart-link:focus-visible svg {
+  animation: cart-shake 420ms ease-in-out;
+}
+
+.cart-link.is-bouncing svg,
+.cart-link[aria-current="page"] svg {
+  animation: cart-bounce 520ms cubic-bezier(.22, 1.2, .36, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cart-link:hover svg,
+  .cart-link:focus-visible svg,
+  .cart-link.is-bouncing svg,
+  .cart-link[aria-current="page"] svg {
+    animation: none !important;
+  }
+}
+
+/* Navbar expandable search */
+.nav-actions {
+  gap: .25rem;
+}
+
+.nav-search {
+  display: flex;
+  align-items: center;
+  gap: .35rem;
+}
+
+/* Navbar expandable search (centered) */
+.nav-search-center {
+  position: fixed;
+  top: var(--nav-search-fixed-center, 2.1rem);
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  max-width: calc(100% - 190px);
+  /* leaves room for cart+toggler on right */
+  z-index: 1080;
+}
+
+.nav-search-trigger {
+  appearance: none;
+  border: 1px solid rgb(var(--gold-rgb) / 0.35);
+  background: rgba(13, 13, 13, 0.55);
+  color: var(--gold);
+  padding: .28rem .6rem;
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  border-radius: 999px;
+}
+
+.nav-search-trigger:focus-visible {
+  color: #fff;
+  background: rgba(215, 192, 122, 0.10);
+  border-color: rgb(var(--gold-rgb) / 0.7);
+  outline: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .social-brand-link:hover {
+    color: #fff;
+    background: rgba(215, 192, 122, 0.12);
+    border-color: rgb(var(--gold-rgb) / 0.72);
+  }
+
+  .chip:hover {
+    background: rgba(215, 192, 122, 0.10);
+    color: #fff;
+  }
+
+  .team-phone-link:hover {
+    color: #fff !important;
+    text-decoration: underline;
+  }
+
+  .team-inline-icon:hover {
+    color: #fff;
+    background: rgba(215, 192, 122, 0.12);
+  }
+
+  .cart-link:hover svg {
+    animation: cart-shake 420ms ease-in-out;
+  }
+
+  .nav-search-trigger:hover {
+    color: #fff;
+    background: rgba(215, 192, 122, 0.10);
+    border-color: rgb(var(--gold-rgb) / 0.7);
+  }
+}
+
+@media (hover: none),
+(pointer: coarse) {
+  .btn-outline-gold {
+    --bs-btn-hover-bg: transparent;
+    --bs-btn-hover-border-color: var(--gold);
+    --bs-btn-hover-color: var(--gold);
+  }
+
+  .btn-outline-gold:hover {
+    color: var(--gold);
+    background-color: transparent;
+    border-color: var(--gold);
+  }
+}
+.nav-search-icon {
+  width: 18px;
+  height: 18px;
+  display: block;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  /* thinner silhouette */
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.nav-search-label {
+  font-weight: 600;
+  letter-spacing: .02rem;
+  font-size: .95rem;
+  color: currentColor;
+}
+
+.nav-search-form {
+  position: absolute;
+  top: calc(100% + .5rem);
+    left: 50%;
+    transform: translateX(-50%) translateY(-4px);
+    width: min(560px, 92vw);
+    z-index: 1060;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 130ms ease, transform 160ms ease, visibility 0s linear 160ms;
+}
+
+.nav-search.is-open .nav-search-form {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+  transition: opacity 130ms ease, transform 160ms ease;
+}
+
+/* When expanded, hide the label text so only icon + input remain */
+.nav-search.is-open .nav-search-label {
+  display: none;
+}
+
+.nav-search-input {
+  height: 40px;
+  padding: .35rem .85rem;
+  background: rgba(13, 13, 13, 0.70);
+  color: var(--gold);
+  /* gold letters */
+  border-radius: 999px;
+}
+
+.nav-search-input::placeholder {
+  color: rgba(215, 192, 122, 0.70);
+}
+
+.nav-search-input::-webkit-search-decoration,
+.nav-search-input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+}
+
+.nav-search-input::-webkit-search-cancel-button {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background-color: rgba(215, 192, 122, 0.22);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M6 6l8 8M14 6l-8 8' stroke='%23d7c07a' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 12px 12px;
+  cursor: pointer;
+}
+/* Navbar search: force black input (override Bootstrap + autofill) */
+.nav-search .nav-search-input.form-control {
+  background-color: rgba(13, 13, 13, 0.85) !important;
+  color: var(--gold) !important;
+  caret-color: var(--gold);
+  border-color: rgb(var(--gold-rgb) / 0.55) !important;
+}
+
+.nav-search .nav-search-input.form-control:focus {
+  background-color: rgba(13, 13, 13, 0.92) !important;
+  color: var(--gold) !important;
+  border-color: var(--gold) !important;
+  box-shadow: 0 0 0 .2rem rgba(215, 192, 122, .18) !important;
+}
+
+/* Chrome/Safari autofill can force a light background */
+.nav-search .nav-search-input.form-control:-webkit-autofill,
+.nav-search .nav-search-input.form-control:-webkit-autofill:hover,
+.nav-search .nav-search-input.form-control:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--gold) !important;
+  box-shadow: 0 0 0px 1000px rgba(13, 13, 13, 0.92) inset !important;
+  -webkit-box-shadow: 0 0 0px 1000px rgba(13, 13, 13, 0.92) inset !important;
+  transition: background-color 9999s ease-out 0s;
+}
+
+@media (max-width: 640px) {
+  .nav-search-label {
+    display: none;
+  }
+
+                                                                                                                                .nav-search-trigger {
+                                                                                                                                  padding: .35rem;
+                                                                                                                                  gap: 0;
+                                                                                                                                  border-radius: 999px;
+                                                                                                                                }
+
+                                                                                                                                .nav-search-center {
+                                                                                                                                  max-width: 44px;
+                                                                                                                                }
+
+                                                                                                                                .nav-search-form {
+                                                                                                                                  width: min(420px, 92vw);
+                                                                                                                                }
+                                                                                                                                }
+
+@media (max-width: 420px) {
+  /* keeps center clean on very small screens */
+  .nav-search-center {
+    max-width: 40px;
+  }
+}
+
+/* Gold scrollbar (site-wide)
+   NOTE: On macOS Safari with "Show scroll bars: Automatically", scrollbars are overlay and may not show custom colors.
+   For consistent styling in Safari: System Settings → Appearance → Show scroll bars → Always.
+*/
+:root {
+  scrollbar-color: var(--gold) #0d0d0d;
+  /* Firefox */
+  scrollbar-width: thin;
+  /* Firefox */
+}
+
+/* WebKit (Chrome/Safari/Edge) - target html/body explicitly for Safari */
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+*::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+html::-webkit-scrollbar-track,
+body::-webkit-scrollbar-track,
+*::-webkit-scrollbar-track {
+  background: rgba(13, 13, 13, 0.95);
+}
+
+html::-webkit-scrollbar-thumb,
+body::-webkit-scrollbar-thumb,
+*::-webkit-scrollbar-thumb {
+  background: rgba(215, 192, 122, 0.92);
+  /* stronger gold */
+  border-radius: 999px;
+  border: 1px solid rgba(13, 13, 13, 0.85);
+  /* lighter than before so gold shows on thin overlay */
+  background-clip: padding-box;
+}
+
+html::-webkit-scrollbar-thumb:hover,
+body::-webkit-scrollbar-thumb:hover,
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(215, 192, 122, 1);
+}
+
+html::-webkit-scrollbar-corner,
+body::-webkit-scrollbar-corner,
+*::-webkit-scrollbar-corner {
+  background: rgba(13, 13, 13, 0.95);
+}
