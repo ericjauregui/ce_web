@@ -547,7 +547,6 @@ footer {
   height: 1.2rem;
 }
 
-.social-brand-link:hover,
 .social-brand-link:focus-visible {
   color: #fff;
   background: rgba(215, 192, 122, 0.12);
@@ -563,17 +562,17 @@ footer {
       align-items: start;
       gap: .45rem;
     }
-    
+
     .section-header-row .section-title {
       grid-area: title;
     }
-    
+
     .section-header-jump {
       grid-area: jump;
       justify-self: end;
       align-self: start;
     }
-    
+
     .section-header-cats {
       grid-area: cats;
       justify-self: stretch;
@@ -612,7 +611,7 @@ footer {
   -webkit-appearance: none;
   cursor: pointer;
 }
-.chip:hover {
+.chip:focus-visible {
   background: rgba(215, 192, 122, 0.10);
   color: #fff;
 }
@@ -804,7 +803,6 @@ footer {
   text-decoration: none;
 }
 
-.team-phone-link:hover,
 .team-phone-link:focus-visible {
   color: #fff !important;
   text-decoration: underline;
@@ -830,7 +828,6 @@ footer {
   stroke: currentColor;
 }
 
-.team-inline-icon:hover,
 .team-inline-icon:focus-visible {
   color: #fff;
   background: rgba(215, 192, 122, 0.12);
@@ -1086,7 +1083,6 @@ footer {
   will-change: transform;
 }
 
-.cart-link:hover svg,
 .cart-link:focus-visible svg {
   animation: cart-shake 420ms ease-in-out;
 }
@@ -1142,7 +1138,6 @@ footer {
   border-radius: 999px;
 }
 
-.nav-search-trigger:hover,
 .nav-search-trigger:focus-visible {
   color: #fff;
   background: rgba(215, 192, 122, 0.10);
@@ -1150,6 +1145,53 @@ footer {
   outline: none;
 }
 
+@media (hover: hover) and (pointer: fine) {
+  .social-brand-link:hover {
+    color: #fff;
+    background: rgba(215, 192, 122, 0.12);
+    border-color: rgba(215, 192, 122, 0.72);
+  }
+
+  .chip:hover {
+    background: rgba(215, 192, 122, 0.10);
+    color: #fff;
+  }
+
+  .team-phone-link:hover {
+    color: #fff !important;
+    text-decoration: underline;
+  }
+
+  .team-inline-icon:hover {
+    color: #fff;
+    background: rgba(215, 192, 122, 0.12);
+  }
+
+  .cart-link:hover svg {
+    animation: cart-shake 420ms ease-in-out;
+  }
+
+  .nav-search-trigger:hover {
+    color: #fff;
+    background: rgba(215, 192, 122, 0.10);
+    border-color: rgba(215, 192, 122, 0.7);
+  }
+}
+
+@media (hover: none),
+(pointer: coarse) {
+  .btn-outline-gold {
+    --bs-btn-hover-bg: transparent;
+    --bs-btn-hover-border-color: var(--gold);
+    --bs-btn-hover-color: var(--gold);
+  }
+
+  .btn-outline-gold:hover {
+    color: var(--gold);
+    background-color: transparent;
+    border-color: var(--gold);
+  }
+}
 .nav-search-icon {
   width: 18px;
   height: 18px;
