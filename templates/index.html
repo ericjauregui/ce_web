@@ -1,11 +1,17 @@
 {% extends "base.html" %}
-{% block title %}Wholesalers of 10k/14K Gold Earrings | California Earrings{% endblock %}
+{% block title %}California Earrings | Wholesalers/Manufacturers of 10K/14K Gold Earrings & Body Jewelry{% endblock %}
 {% block content %}
 <header class="hero d-flex align-items-center text-center">
   <div class="container">
-    <h1 class="display-4 fw-semibold text-gold">Wholesalers • Manufacturers </h1>
+    <h1 class="visually-hidden">California Earrings</h1>
+    <img class="hero-logo" src="{{ url_for('static', filename='assets/ce_logo_full.png') }}" alt="California Earrings" loading="eager" decoding="async">
     <h2 class="display-6 fw-semibold text-gold">10k/14k Gold Earrings • Body Jewelry</h2>
-    <p class="lead text-gold-70 mt-2"><b>Contact us to place an order • Shipping available globally</b></p>
+    <h4 class="display-8 fw-medium text-gold">Wholesalers • Manufacturers • Est. 1992</h4>
+    <p class="display-10 fw-normal text-gold">Contact us to place an order • Shipping available globally</p>
+    <div class="hero-actions d-flex justify-content-center" aria-label="Hero actions">
+      <a class="btn btn-outline-gold hero-action-btn" href="#section-studs">View Catalog</a>
+      <a class="btn btn-outline-gold hero-action-btn" href="{{ url_for('contact') }}">Contact Us for Pricing</a>
+    </div>
   </div>
 </header>
 

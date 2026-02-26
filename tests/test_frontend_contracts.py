@@ -37,6 +37,19 @@ class FrontendContractTests(BaseWebTest):
         self.assertIn("--bs-btn-hover-color: var(--gold);", condensed)
         self.assertIn(".btn-outline-gold:hover { color: var(--gold);", condensed)
 
+    def test_mobile_hero_and_catalog_transition_stays_flush(self) -> None:
+        css = self.load_site_css()
+        condensed = re.sub(r"\s+", " ", css)
+
+        self.assertIn("@media (max-width: 767.98px)", css)
+        self.assertIn("background-size: min(520px, 108vw);", css)
+        self.assertIn("background-position: center 30%;", css)
+        self.assertIn(
+            "header.hero+section.py-5 { padding-top: 0 !important; }", condensed)
+        self.assertIn("min-height: inherit;", css)
+        self.assertIn("margin-top: auto !important;", css)
+        self.assertIn("margin-bottom: auto !important;", css)
+
     def test_stylesheet_has_balanced_braces(self) -> None:
         css = self.load_site_css()
 
@@ -82,3 +95,54 @@ class FrontendContractTests(BaseWebTest):
             re.MULTILINE,
         )
         self.assertRegex(css, pattern)
+
+    def test_gold_theme_borders_follow_outline_tokens(self) -> None:
+        css = self.load_site_css()
+        condensed = re.sub(r"\s+", " ", css)
+
+        self.assertIn("--gold-outline:", css)
+        self.assertIn("--gold-outline-strong:", css)
+        self.assertIn(
+            ".border-gold { border-color: var(--gold-outline) !important; }", condensed)
+
+        forbidden_full_gold_borders = re.compile(
+            r"border(?:-color)?\s*:\s*[^;]*var\(--gold\)\b",
+            re.IGNORECASE,
+        )
+        self.assertIsNone(
+            forbidden_full_gold_borders.search(css),
+            "Theme regression: border rules must use --gold-outline or --gold-outline-strong, not --gold.",
+        )
+
+    def test_footer_uses_shared_gold_border_class(self) -> None:
+        response = self.client.get("/")
+        self.assertEqual(response.status_code, 200)
+        body = response.get_data(as_text=True)
+
+        self.assertIn(
+            "<footer class=\"text-center py-4 border-top border-gold", body)
+
+    def test_navbar_and_footer_share_border_gold_utility(self) -> None:
+        response = self.client.get("/")
+        self.assertEqual(response.status_code, 200)
+        body = response.get_data(as_text=True)
+
+        self.assertIn(
+            "<nav class=\"navbar navbar-dark bg-black border-bottom border-gold fixed-top\"", body)
+        self.assertIn(
+            "<footer class=\"text-center py-4 border-top border-gold", body)
+
+    def test_homepage_hero_uses_full_logo_asset(self) -> None:
+        response = self.client.get("/")
+        self.assertEqual(response.status_code, 200)
+        body = response.get_data(as_text=True)
+
+        self.assertIn("assets/ce_logo_full.png", body)
+        self.assertIn("class=\"hero-logo\"", body)
+
+    def test_navbar_uses_shape_logo_asset(self) -> None:
+        response = self.client.get("/")
+        self.assertEqual(response.status_code, 200)
+        body = response.get_data(as_text=True)
+
+        self.assertIn("assets/ce_logo_shape.png", body)

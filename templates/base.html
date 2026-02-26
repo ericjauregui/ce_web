@@ -8,12 +8,12 @@
   {% set canonical_url = base_url ~ request.path %}
   {% set default_og_image = base_url ~ url_for('static', filename='assets/social_preview.png') %}
 
-  <title>{% block title %}California Earrings | Manufacturers/Wholesalers of 10K/14K Gold Earrings & Body Jewelry{%
+  <title>{% block title %}California Earrings | Wholesalers/Manufacturers of 10K/14K Gold Earrings & Body Jewelry{%
     endblock
     %}
   </title>
   <meta name="description"
-    content="{% block meta_description %}Los Angeles based manufacturer/wholesaler of 10k/14K gold earrings and Body Jewelry.{% endblock %}">
+    content="{% block meta_description %}Los Angeles based wholesaler/manufacturer of 10k/14K gold earrings and body jewelry.{% endblock %}">
   <link rel="canonical" href="{{ canonical_url }}">
 
   <meta property="og:site_name" content="{{ site_name }}">
@@ -44,7 +44,7 @@
   <nav class="navbar navbar-dark bg-black border-bottom border-gold fixed-top">
     <div class="container-fluid position-relative px-2 px-md-3">
       <a href="{{ url_for('index') }}" class="navbar-brand brand-lockup" aria-label="{{ site_name }}">
-        <img src="{{ url_for('static', filename='assets/ce_logo_full.png') }}" alt="{{ site_name }}" class="brand-logo"
+        <img src="{{ url_for('static', filename='assets/ce_logo_shape.png') }}" alt="{{ site_name }}" class="brand-logo"
           loading="eager" decoding="async" />
       </a>
 {% set current_q = request.args.get('q', '') %}

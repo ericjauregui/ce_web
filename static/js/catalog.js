@@ -18,11 +18,11 @@ function setAddButtonLabel(card, cardQty) {
   const button = card.querySelector(".add-to-cart-btn");
   if (!button) return;
   if ((cardQty || 0) <= 0) {
-    button.textContent = "Add to cart";
+    button.textContent = "Add to Order";
     return;
   }
   const noun = cardQty === 1 ? "item" : "items";
-  button.textContent = `${cardQty} ${noun} in cart`;
+  button.textContent = `${cardQty} ${noun} in order`;
 }
 
 function setCardQty(card, qty) {
