@@ -268,43 +268,45 @@ body {
   }
 
   .product-actions {
-    gap: .45rem;
-    min-width: 0;
+    display: flex;
+      align-items: flex-start;
+      flex-wrap: nowrap;
+      gap: .5rem;
   }
 
   .add-to-cart-btn {
     width: 100%;
-    max-width: 100%;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
+    display: inline-flex;
+      align-items: center;
+      justify-content: center;
 
+    min-width: 0;
+      font-size: clamp(.62rem, 1.85vw, .95rem);
+      line-height: 1.12;
+      padding: clamp(.24rem, .65vw, .42rem) clamp(.38rem, 1.15vw, .92rem);
   .product-qty-control {
     position: relative;
     display: flex;
+    display: flex;
+      align-items: flex-start;
+      flex-wrap: nowrap;
+      gap: .5rem;
+      min-width: 0;
+      flex: 1 1 auto;
     align-items: center;
     justify-content: center;
     width: 100%;
+    flex: 1 1 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
     min-height: 2rem;
     padding-left: 2.15rem;
     padding-right: 2.15rem;
+    margin-left: auto;
+      flex: 0 0 auto;
     box-sizing: border-box;
     overflow: hidden;
-  }
-
-  .qty-center-group {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: clamp(.18rem, 2.2cqw, .45rem);
-    max-width: 100%;
-    min-width: 0;
-    flex-wrap: nowrap;
-  }
-
-  .qty-adjust-btn {
-    min-width: clamp(1.45rem, 11cqw, 2rem);
+  
     line-height: 1;
     padding-left: clamp(.2rem, 1.4cqw, .6rem);
     padding-right: clamp(.2rem, 1.4cqw, .6rem);
@@ -555,43 +557,50 @@ footer {
 }
 @media (max-width: 767.98px) {
   .section-header-row {
-    grid-template-columns: minmax(0, 1fr) auto;
-      grid-template-areas:
-        "title jump"
-        "cats cats";
-      align-items: start;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+      grid-template-areas: "title cats jump";
+      align-items: center;
       gap: .45rem;
     }
 
     .section-header-row .section-title {
       grid-area: title;
+      white-space: nowrap;
+        font-size: clamp(.98rem, 4.2vw, 1.2rem);
     }
 
     .section-header-jump {
       grid-area: jump;
       justify-self: end;
-      align-self: start;
+      align-self: center;
     }
 
     .section-header-cats {
       grid-area: cats;
       justify-self: stretch;
-      justify-content: flex-start;
+      justify-content: center;
       flex-wrap: nowrap;
-      overflow-x: hidden;
-    gap: .35rem;
+      overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        gap: .35rem;
+      min-width: 0;
+      }
+      
+      .section-header-cats::-webkit-scrollbar {
+        display: none;
+        width: 0;
+        height: 0;
   }
 .section-header-cats .chip,
 .section-header-jump .chip {
-  flex: 1 1 0;
-  min-width: 0;
-  max-width: 100%;
+  flex: 0 0 auto;
   text-align: center;
   font-size: clamp(.64rem, 2.7vw, .85rem);
   padding: clamp(.2rem, .9vw, .3rem) clamp(.42rem, 1.6vw, .62rem);
   line-height: 1.2;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 }
 
@@ -856,6 +865,44 @@ footer {
   min-height: 36px;
 }
 
+.team-member-top-actions {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: nowrap;
+  gap: .5rem;
+  min-width: 0;
+}
+
+.team-member-top-left {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: nowrap;
+  gap: .5rem;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.team-member-top-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  min-width: 0;
+  font-size: clamp(.62rem, 1.85vw, .95rem);
+  line-height: 1.12;
+  padding: clamp(.24rem, .65vw, .42rem) clamp(.38rem, 1.15vw, .92rem);
+}
+
+.team-member-top-left .team-member-top-btn {
+  flex: 1 1 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.team-member-top-save {
+  margin-left: auto;
+  flex: 0 0 auto;
+}
 @media (max-width: 767.98px) {
   .team-member-card-linkable .team-inline-icon {
     width: 34px;
