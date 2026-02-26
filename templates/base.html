@@ -346,7 +346,7 @@
                 }
 
                 const topRowHeight = Math.max(1, topRowBottom - rect.top);
-                const centerY = rect.top + (rect.height / 2);
+                const centerY = rect.top + (topRowHeight / 2);
                 document.documentElement.style.setProperty("--nav-search-fixed-center", `${centerY}px`);
                 document.documentElement.style.setProperty("--nav-actual-height", `${topRowHeight}px`);
               }
@@ -354,6 +354,17 @@
               syncSearchCenter();
               window.addEventListener("resize", syncSearchCenter);
               window.addEventListener("orientationchange", syncSearchCenter);
+              window.addEventListener("scroll", syncSearchCenter, { passive: true });
+
+              const navCollapse = nav.querySelector("#nav");
+              if (navCollapse) {
+                ["show.bs.collapse", "shown.bs.collapse", "hide.bs.collapse", "hidden.bs.collapse"].forEach((eventName) => {
+                  navCollapse.addEventListener(eventName, () => {
+                    syncSearchCenter();
+                    window.requestAnimationFrame(syncSearchCenter);
+                  });
+                });
+              }
             })();
 
 </script>
