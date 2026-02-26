@@ -82,7 +82,7 @@
 /* Navbar expandable search (centered) */
 .nav-search-center {
   position: fixed;
-  top: var(--nav-search-fixed-center, 2.1rem);
+  top: calc(var(--nav-search-fixed-center, 2.1rem) + 2px);
   left: 50%;
   transform: translate(-50%, -50%);
   display: inline-flex;
@@ -172,7 +172,7 @@
 }
 
 .nav-search-label {
-  font-weight: 600;
+  font-weight: 400;
   letter-spacing: .02rem;
   font-size: .95rem;
   color: currentColor;
@@ -258,25 +258,25 @@
   transition: background-color 9999s ease-out 0s;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 560px) {
   .nav-search-label {
     display: none;
   }
 
-                                                                                                                                .nav-search-trigger {
-                                                                                                                                  padding: .35rem;
-                                                                                                                                  gap: 0;
-                                                                                                                                  border-radius: 999px;
-                                                                                                                                }
+    .nav-search-trigger {
+      padding: .35rem;
+      gap: 0;
+      border-radius: 999px;
+    }
 
-                                                                                                                                .nav-search-center {
-                                                                                                                                  max-width: 44px;
-                                                                                                                                }
+    .nav-search-center {
+      max-width: 44px;
+    }
 
-                                                                                                                                .nav-search-form {
-                                                                                                                                  width: min(420px, 92vw);
-                                                                                                                                }
-                                                                                                                                }
+    .nav-search-form {
+      width: min(420px, 92vw);
+    }
+    }
 
 @media (max-width: 420px) {
   /* keeps center clean on very small screens */
