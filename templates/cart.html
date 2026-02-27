@@ -1,17 +1,15 @@
 {% extends "base.html" %}
 {% block title %}Shopping Cart | California Earrings{% endblock %}
 {% block content %}
-<section class="container py-5" style="max-width: 1100px;">
-  <div class="d-flex align-items-end justify-content-between gap-3 flex-wrap">
-    <div>
-      <h1 class="text-gold mb-2">Shopping cart</h1>
+<section class="container py-5 cart-page" style="max-width: 1100px;">
+  <h1 class="text-gold mb-3">Shopping cart</h1>
+  <div class="card bg-dark border-gold p-3 cart-intro-card">
       <p class="text-gold-70 mb-0">Checkout your order and we'll follow up with wholesale pricing & availability. No payment
         required.</p>
-    </div>
-    <div class="d-flex gap-2">
+  </div>
+<div class="d-flex gap-2 cart-top-actions mt-3">
       <a class="btn btn-outline-gold" href="{{ url_for('index') }}#section-studs">Back to Catalog</a>
       <a class="btn btn-outline-gold" href="{{ url_for('checkout') }}">Checkout (no payment)</a>
-    </div>
   </div>
 
   <div class="mt-4 card bg-dark border-gold p-3">
@@ -25,6 +23,7 @@
               <th>Item</th>
               <th>Code</th>
               <th style="width: 220px;">Quantity</th>
+              <th style="min-width: 250px;">Item notes</th>
               <th style="width: 90px;"></th>
             </tr>
           </thead>
@@ -48,6 +47,11 @@
                 </div>
               </td>
               <td>
+                <textarea class="form-control form-control-sm bg-black text-light border-gold item-note-input"
+                  data-code="{{ row.product.code }}" rows="2" maxlength="500"
+                  placeholder="Add note for this item (optional)">{{ row.note }}</textarea>
+                </td>
+                <td>
                 <button class="btn btn-outline-gold btn-sm qty-remove" type="button" data-code="{{ row.product.code }}">Remove</button>
               </td>
             </tr>
@@ -81,6 +85,16 @@ function clampQty(q){
   if (q > 999) q = 999;
   return q;
 }
+
+  let noteSaveTimers = {};
+
+  async function persistItemNote(noteInput) {
+    const code = noteInput.getAttribute("data-code");
+    if (!code) return;
+    const note = (noteInput.value || "").trim().slice(0, 500);
+    noteInput.value = note;
+    await postJson("/api/cart/note", { code, note });
+  }
   function removeRowAndUpdateEmptyState(row) {
     if (row) row.remove();
 
@@ -151,5 +165,35 @@ document.addEventListener("change", async (e) => {
     removeRowAndUpdateEmptyState(row);
   }
 });
+
+  document.addEventListener("input", (e) => {
+    const input = e.target.closest(".item-note-input");
+    if (!input) return;
+
+    const code = input.getAttribute("data-code") || "";
+    if (!code) return;
+
+    if (noteSaveTimers[code]) {
+      window.clearTimeout(noteSaveTimers[code]);
+    }
+
+    noteSaveTimers[code] = window.setTimeout(async () => {
+      await persistItemNote(input);
+      delete noteSaveTimers[code];
+    }, 350);
+  });
+
+  document.addEventListener("blur", async (e) => {
+    const input = e.target.closest(".item-note-input");
+    if (!input) return;
+
+    const code = input.getAttribute("data-code") || "";
+    if (code && noteSaveTimers[code]) {
+      window.clearTimeout(noteSaveTimers[code]);
+      delete noteSaveTimers[code];
+    }
+
+    await persistItemNote(input);
+  }, true);
 </script>
 {% endblock %}

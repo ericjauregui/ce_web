@@ -143,9 +143,15 @@ document.addEventListener("keydown", (event) => {
   setCardExpanded(card, !card.classList.contains("is-open"));
 });
 
+let resizeRafId = 0;
+
 window.addEventListener("resize", () => {
-  document.querySelectorAll(".product-card.is-open").forEach(syncDrawerHeight);
-});
+  if (resizeRafId) return;
+  resizeRafId = window.requestAnimationFrame(() => {
+    resizeRafId = 0;
+    document.querySelectorAll(".product-card.is-open").forEach(syncDrawerHeight);
+  });
+}, { passive: true });
 
 function initializeCatalogCards(root = document) {
   root.querySelectorAll(".product-card").forEach((card) => {

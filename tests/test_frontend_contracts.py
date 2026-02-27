@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import re
+from pathlib import Path
 
+import app as webapp
 from tests.common import BaseWebTest
 
 
@@ -49,6 +51,77 @@ class FrontendContractTests(BaseWebTest):
         self.assertIn("min-height: inherit;", css)
         self.assertIn("margin-top: auto !important;", css)
         self.assertIn("margin-bottom: auto !important;", css)
+
+    def test_nav_search_centering_and_form_expansion_contracts(self) -> None:
+        css = self.load_site_css()
+        body = self.client.get("/").get_data(as_text=True)
+
+        self.assertIn(".nav-search-center {", css)
+        self.assertIn("position: absolute;", css)
+        self.assertIn("top: 50%;", css)
+        self.assertIn("transform: translate(-50%, -50%);", css)
+        self.assertIn("width: min(52rem, calc(100vw - .9rem));", css)
+        self.assertIn("function syncNavMetrics()", body)
+        self.assertIn(
+            "window.addEventListener(\"resize\", queueSyncNavMetrics, { passive: true });", body)
+        self.assertNotIn(
+            "window.addEventListener(\"scroll\", syncSearchCenter", body)
+
+    def test_section_chip_row_and_cta_button_stay_vertically_centered(self) -> None:
+        css = self.load_site_css()
+        condensed = re.sub(r"\s+", " ", css)
+
+        self.assertIn(".section-header-cats {", css)
+        self.assertIn("align-items: center;", css)
+        self.assertIn("min-height: 2.15rem;", css)
+        self.assertIn(".section-header-jump {", css)
+        self.assertIn("align-self: center;", css)
+        self.assertIn(".hero-action-btn {", css)
+        self.assertIn("display: inline-flex;", css)
+        self.assertIn("justify-content: center;", css)
+        self.assertIn("text-align: center;", css)
+        self.assertIn(".hero-action-btn { flex: 0 1", condensed)
+
+    def test_sticky_category_row_stays_flush_under_navbar(self) -> None:
+        css = self.load_site_css()
+        condensed = re.sub(r"\s+", " ", css)
+
+        self.assertIn(
+            ".sticky-section-header { position: sticky; top: var(--nav-actual-height, var(--nav-height));",
+            condensed,
+        )
+        self.assertIn(
+            ".section-anchor { scroll-margin-top: var(--nav-actual-height, var(--nav-height)); }",
+            condensed,
+        )
+        self.assertNotIn(
+            "top: calc(var(--nav-actual-height, var(--nav-height)) + 5px);",
+            css,
+        )
+        self.assertNotIn(
+            "scroll-margin-top: calc(var(--nav-actual-height, var(--nav-height)) + 5px);",
+            css,
+        )
+
+    def test_catalog_card_images_are_lazy_loaded(self) -> None:
+        response = self.client.get("/")
+        self.assertEqual(response.status_code, 200)
+        body = response.get_data(as_text=True)
+
+        self.assertIn("class=\"card-img-top product-img\"", body)
+        self.assertIn("loading=\"lazy\"", body)
+        self.assertIn("decoding=\"async\"", body)
+        self.assertIn("fetchpriority=\"low\"", body)
+
+    def test_catalog_resize_logic_is_raf_throttled(self) -> None:
+        script = (Path(webapp.BASE_DIR) / "static" / "js" /
+                  "catalog.js").read_text(encoding="utf-8")
+
+        self.assertIn("let resizeRafId = 0;", script)
+        self.assertIn(
+            "resizeRafId = window.requestAnimationFrame(() => {", script)
+        self.assertIn("window.addEventListener(\"resize\", () => {", script)
+        self.assertIn("}, { passive: true });", script)
 
     def test_stylesheet_has_balanced_braces(self) -> None:
         css = self.load_site_css()
@@ -153,12 +226,12 @@ class FrontendContractTests(BaseWebTest):
 
         self.assertIn("width: clamp(172px, 41vw, 352px);", css)
         self.assertIn("width: clamp(148px, 51vw, 262px);", css)
-        self.assertIn("min-height: clamp(196px, 27vh, 318px);", css)
-        self.assertIn("min-height: clamp(176px, 24vh, 258px);", css)
-        self.assertIn("padding-top: clamp(.84rem, 2.3vw, 1.32rem);", css)
-        self.assertIn("padding-bottom: clamp(.66rem, 1.84vw, 1.06rem);", css)
+        self.assertIn("min-height: clamp(220px, 31vh, 360px);", css)
+        self.assertIn("min-height: clamp(196px, 27vh, 286px);", css)
+        self.assertIn("padding-top: clamp(1.05rem, 2.8vw, 1.7rem);", css)
+        self.assertIn("padding-bottom: clamp(.9rem, 2.4vw, 1.45rem);", css)
+        self.assertIn("opacity: 0.62;", css)
         self.assertIn("opacity: 0.70;", css)
-        self.assertIn("opacity: 0.77;", css)
         self.assertIn(
             ".catalog-section-title-rule { display: none; }", condensed)
         self.assertIn(".section-header-row::after", css)

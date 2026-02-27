@@ -81,16 +81,18 @@
 
 /* Navbar expandable search (centered) */
 .nav-search-center {
-  position: fixed;
-  top: calc(var(--nav-search-fixed-center, 2.1rem) + 2px);
+  position: absolute;
+    top: 50%;
+    top: var(--nav-search-top, 50%);
   left: 50%;
   transform: translate(-50%, -50%);
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: .4rem;
-  max-width: calc(100% - 190px);
-  /* leaves room for cart+toggler on right */
-  z-index: 1080;
+  max-width: min(96vw, 52rem);
+    width: auto;
+    z-index: 1081;
 }
 
 .nav-search-trigger {
@@ -103,6 +105,8 @@
   align-items: center;
   gap: .45rem;
   border-radius: 999px;
+  min-height: 40px;
+    justify-content: center;
 }
 
 .nav-search-trigger:focus-visible {
@@ -181,10 +185,10 @@
 .nav-search-form {
   position: absolute;
   top: calc(100% + .5rem);
-    left: 50%;
+  left: 50%;
     transform: translateX(-50%) translateY(-4px);
-    width: min(560px, 92vw);
-    z-index: 1060;
+  width: min(52rem, calc(100vw - .9rem));
+    z-index: 1082;
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
@@ -205,7 +209,7 @@
 }
 
 .nav-search-input {
-  height: 40px;
+  min-height: 42px;
   padding: .35rem .85rem;
   background: rgba(13, 13, 13, 0.70);
   color: var(--gold);
@@ -259,6 +263,17 @@
 }
 
 @media (max-width: 560px) {
+    .nav-search-center {
+        max-width: min(calc(100vw - 175px), 20rem);
+      }
+    
+      .nav-search-form {
+        width: calc(100vw - .8rem);
+        max-width: 32rem;
+      }
+    }
+    
+    @media (max-width: 380px) {
   .nav-search-label {
     display: none;
   }
@@ -269,16 +284,6 @@
       border-radius: 999px;
     }
 
-    .nav-search-center {
-      max-width: 44px;
-    }
-
-    .nav-search-form {
-      width: min(420px, 92vw);
-    }
-    }
-
-@media (max-width: 420px) {
   /* keeps center clean on very small screens */
   .nav-search-center {
     max-width: 40px;

@@ -4,6 +4,6 @@ services:
     name: californiaearrings
     env: python
     plan: free
-    buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn app:app
+    buildCommand: curl -Ls https://astral.sh/uv/install.sh | sh && ~/.local/bin/uv sync --frozen
+    startCommand: .venv/bin/gunicorn --bind 0.0.0.0:$PORT app:app
     autoDeploy: true

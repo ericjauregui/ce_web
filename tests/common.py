@@ -22,6 +22,7 @@ class BaseWebTest(unittest.TestCase):
     def setUp(self) -> None:
         with self.client.session_transaction() as sess:
             sess["cart"] = {}
+            sess["cart_notes"] = {}
 
     @staticmethod
     def load_site_css() -> str:

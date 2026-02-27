@@ -44,6 +44,7 @@
                 <th>Code</th>
                 <th>Name</th>
                 <th>Quantity</th>
+                <th>Item notes</th>
               </tr>
             </thead>
             <tbody>
@@ -52,6 +53,7 @@
                 <td><span class="code-badge">{{ row.product.code }}</span></td>
                 <td>{{ row.product.name }}</td>
                 <td>{{ row.qty }}</td>
+                <td>{{ row.note or "" }}</td>
               </tr>
               {% endfor %}
             </tbody>

@@ -55,6 +55,70 @@ class CartEndpointTests(BaseWebTest):
         self.assertFalse(data["ok"])
         self.assertEqual(data["error"], "unknown_code")
 
+    def test_item_note_round_trip_in_cart_view(self) -> None:
+        self.client.post(
+            "/api/cart/add", json={"code": self.valid_code, "qty": 1})
+
+        note_response = self.client.post(
+            "/api/cart/note",
+            json={"code": self.valid_code,
+                  "note": "Please match screwback style"},
+        )
+        self.assertEqual(note_response.status_code, 200)
+        note_data = note_response.get_json()
+        self.assertTrue(note_data["ok"])
+        self.assertEqual(note_data["note"], "Please match screwback style")
+
+        cart_response = self.client.get("/cart")
+        self.assertEqual(cart_response.status_code, 200)
+        cart_body = cart_response.get_data(as_text=True)
+        self.assertIn("item-note-input", cart_body)
+        self.assertIn("Please match screwback style", cart_body)
+
+    def test_item_note_requires_item_in_cart(self) -> None:
+        self.client.post(
+            "/api/cart/add", json={"code": self.valid_code, "qty": 1})
+        self.client.post("/api/cart/remove", json={"code": self.valid_code})
+
+        response = self.client.post(
+            "/api/cart/note",
+            json={"code": self.valid_code, "note": "should fail"},
+        )
+        self.assertEqual(response.status_code, 400)
+        data = response.get_json()
+        self.assertFalse(data["ok"])
+        self.assertEqual(data["error"], "item_not_in_cart")
+
+    def test_checkout_csv_includes_per_item_note_column(self) -> None:
+        self.client.post(
+            "/api/cart/add", json={"code": self.valid_code, "qty": 2})
+        self.client.post(
+            "/api/cart/note",
+            json={"code": self.valid_code, "note": "Need matching pair"},
+        )
+
+        checkout_response = self.client.post(
+            "/checkout",
+            data={
+                "name": "Test Buyer",
+                "company": "Sample Co",
+                "phone": "555-0101",
+                "notes": "general order note",
+            },
+        )
+        self.assertEqual(checkout_response.status_code, 200)
+
+        with self.client.session_transaction() as sess:
+            token = sess.get("last_order_token")
+
+        self.assertTrue(token)
+        csv_response = self.client.get(f"/download/order/{token}.csv")
+        self.assertEqual(csv_response.status_code, 200)
+        csv_text = csv_response.get_data(as_text=True)
+
+        self.assertIn("notes", csv_text)
+        self.assertIn("Need matching pair", csv_text)
+
     def test_default_catalog_state_has_more_cards_than_filtered_query(self) -> None:
         full_response = self.client.get("/")
         self.assertEqual(full_response.status_code, 200)

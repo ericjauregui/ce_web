@@ -1,5 +1,45 @@
 # California Earrings (Flask Catalog)
 
+## Project structure
+
+```text
+ce_web/
+├── app.py
+├── catalog/
+├── domains/
+│   ├── cart.py
+│   ├── catalog.py
+│   ├── emailing.py
+│   ├── seo.py
+│   └── team.py
+├── static/
+├── templates/
+└── tests/
+	├── e2e/
+	└── ...
+```
+
+- `app.py`: Flask app entrypoint and route orchestration.
+- `domains/`: domain logic modules (catalog, cart, team, seo, email).
+- `catalog/`: JSON content source (products, collections, social, team).
+- `static/` and `templates/`: frontend assets and Jinja templates.
+- `tests/`: unit/contract tests plus Playwright E2E tests.
+
+## Setup (uv)
+
+Install dependencies:
+
+```bash
+uv sync
+```
+
+Install dev tooling (Playwright + pre-commit):
+
+```bash
+uv sync --extra dev
+uv run python -m playwright install chromium webkit
+```
+
 ## Key features
 - SEO basics (titles, meta descriptions, Open Graph)
 - Collections/sections (configured in `catalog/collections.json`)
@@ -39,8 +79,7 @@ This ensures Open Graph/Twitter image URLs are absolute and crawlable.
 Generate QR codes for catalog discovery:
 
 ```bash
-pip install -r requirements.txt
-python scripts/generate_qr_codes.py --base-url https://californiaearrings.com
+uv run python scripts/generate_qr_codes.py --base-url https://californiaearrings.com
 ```
 
 This writes QR images to `static/qr/`.
@@ -62,5 +101,55 @@ Optionally add headshots to `static/team/` and set `photo` to the filename.
 Run API smoke tests with:
 
 ```bash
-python -m unittest discover -s tests
+uv run python -m unittest discover -s tests
+```
+
+## Browser E2E UX tests (Playwright)
+Install optional dev dependencies and browser engines:
+
+```bash
+uv sync --extra dev
+uv run python -m playwright install chromium webkit
+```
+
+Run browser UX tests:
+
+```bash
+uv run python -m unittest discover -s tests/e2e -p "e2e_*.py" -t .
+```
+
+These tests cover navbar/search centering stability, category chip/CTA alignment contracts, resize/scroll resilience, and lazy-loading hints for catalog images.
+
+## Pre-commit hook (comprehensive suite)
+
+Install and enable:
+
+```bash
+uv run pre-commit install
+```
+
+Manual run (optional):
+
+```bash
+uv run pre-commit run --all-files
+```
+
+Current hooks behavior:
+
+- Runs unit/contract tests on every commit.
+- Runs Playwright E2E only on branch `dev`.
+- Skips Playwright E2E on non-`dev` branches.
+
+Commands used by hooks:
+
+```bash
+uv run python -m unittest discover -s tests
+CE_REQUIRE_E2E=1 uv run python -m unittest discover -s tests/e2e -p "e2e_*.py" -t .
+```
+
+If Playwright/browsers are missing, commit will fail until you run:
+
+```bash
+uv sync --extra dev
+uv run python -m playwright install chromium webkit
 ```

@@ -1,0 +1,15 @@
+repos:
+  - repo: local
+    hooks:
+      - id: full-test-suite
+        name: Run unittest suite
+        entry: python -m unittest discover -s tests
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]
+      - id: playwright-e2e-suite
+        name: Run Playwright E2E suite
+        entry: bash -c 'branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo unknown)"; if [ "$branch" != "dev" ]; then echo "Skipping Playwright E2E on branch $branch (runs only on dev)"; exit 0; fi; CE_REQUIRE_E2E=1 uv run python -m unittest discover -s tests/e2e -p "e2e_*.py" -t .'
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]

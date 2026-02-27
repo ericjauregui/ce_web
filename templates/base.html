@@ -55,11 +55,11 @@
       <circle cx="11" cy="11" r="7"></circle>
       <path d="M20 20l-3.5-3.5"></path>
     </svg>
-    <span class="nav-search-label">Search our products</span>
+    <span class="nav-search-label">Search our items</span>
   </button>
 
   <form id="navSearchForm" class="nav-search-form" action="{{ url_for('index') }}" method="get" role="search">
-    <input class="form-control nav-search-input border-gold" type="search" name="q" placeholder="Search our products"
+    <input class="form-control nav-search-input border-gold" type="search" name="q" placeholder="Search our items"
       value="{{ current_q }}" autocomplete="off" />
   </form>
 </div>
@@ -332,36 +332,46 @@
             (function () {
               const nav = document.querySelector(".navbar.fixed-top");
               if (!nav) return;
+              const navContainer = nav.querySelector(".container-fluid.position-relative") || nav.querySelector(".container-fluid") || nav;
 
-              function syncSearchCenter() {
-                const rect = nav.getBoundingClientRect();
+              let rafId = 0;
+
+              function syncNavMetrics() {
+                document.documentElement.style.setProperty("--nav-actual-height", `${Math.max(1, nav.offsetHeight)}px`);
+
                 const topRowNodes = [
                   nav.querySelector(".brand-lockup"),
                   nav.querySelector(".nav-actions"),
                 ].filter(Boolean);
 
-                let topRowBottom = rect.bottom;
-                if (topRowNodes.length) {
-                  topRowBottom = Math.max(...topRowNodes.map((node) => node.getBoundingClientRect().bottom));
-                }
+                if (!topRowNodes.length) return;
 
-                const topRowHeight = Math.max(1, topRowBottom - rect.top);
-                const centerY = rect.top + (topRowHeight / 2);
-                document.documentElement.style.setProperty("--nav-search-fixed-center", `${centerY}px`);
-                document.documentElement.style.setProperty("--nav-actual-height", `${topRowHeight}px`);
+                const rowTop = Math.min(...topRowNodes.map((node) => node.getBoundingClientRect().top));
+                const rowBottom = Math.max(...topRowNodes.map((node) => node.getBoundingClientRect().bottom));
+                const containerTop = navContainer.getBoundingClientRect().top;
+                const centerOffset = Math.max(1, ((rowTop + rowBottom) / 2) - containerTop);
+
+                document.documentElement.style.setProperty("--nav-search-top", `${centerOffset}px`);
               }
 
-              syncSearchCenter();
-              window.addEventListener("resize", syncSearchCenter);
-              window.addEventListener("orientationchange", syncSearchCenter);
-              window.addEventListener("scroll", syncSearchCenter, { passive: true });
+              function queueSyncNavMetrics() {
+                if (rafId) return;
+                rafId = window.requestAnimationFrame(() => {
+                  rafId = 0;
+                  syncNavMetrics();
+                });
+              }
+
+              syncNavMetrics();
+              window.addEventListener("resize", queueSyncNavMetrics, { passive: true });
+              window.addEventListener("orientationchange", queueSyncNavMetrics, { passive: true });
 
               const navCollapse = nav.querySelector("#nav");
               if (navCollapse) {
                 ["show.bs.collapse", "shown.bs.collapse", "hide.bs.collapse", "hidden.bs.collapse"].forEach((eventName) => {
                   navCollapse.addEventListener(eventName, () => {
-                    syncSearchCenter();
-                    window.requestAnimationFrame(syncSearchCenter);
+                    queueSyncNavMetrics();
+                    window.requestAnimationFrame(queueSyncNavMetrics);
                   });
                 });
               }

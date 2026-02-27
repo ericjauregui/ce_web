@@ -1,21 +1,40 @@
 from __future__ import annotations
 
-import csv
 import io
-import json
 import os
-import re
 import secrets
-from datetime import UTC, datetime
-from urllib.parse import quote_plus
-from dataclasses import dataclass
-from email.message import EmailMessage
 from pathlib import Path
 from typing import Any
-from dotenv import load_dotenv
 
-import smtplib
+from dotenv import load_dotenv
 from flask import Flask, abort, jsonify, redirect, render_template, request, send_file, session, url_for
+
+from domains.cart import (
+    cart_items,
+    cart_to_csv_bytes,
+    cart_total_items,
+    get_cart as get_cart_from_session,
+    get_cart_notes,
+    normalize_item_note,
+)
+from domains.catalog import (
+    build_sections,
+    filter_products,
+    load_collections_cfg as load_collections_cfg_from_path,
+    load_products as load_products_from_path,
+    load_social as load_social_from_path,
+    products_by_code,
+)
+from domains.emailing import send_order_email
+from domains.seo import build_sitemap_urls as build_sitemap_urls_from_context
+from domains.seo import canonical_base_url, iso_lastmod
+from domains.team import (
+    build_member_vcard,
+    build_team_members,
+    get_team_member_by_slug as get_team_member_by_slug_in_team,
+    load_team as load_team_from_path,
+    slugify,
+)
 
 app = Flask(__name__)
 
@@ -33,393 +52,53 @@ TEAM_PATH = BASE_DIR / "catalog" / "team.json"
 
 
 def _canonical_base_url() -> str:
-    configured = (os.getenv("SITE_BASE_URL") or "").strip()
-    if configured:
-        return configured.rstrip("/")
-    return request.url_root.rstrip("/")
+    return canonical_base_url(request.url_root)
 
 
 def _iso_lastmod(*paths: Path) -> str | None:
-    valid = [path for path in paths if path.exists()]
-    if not valid:
-        return None
-
-    latest = max(path.stat().st_mtime for path in valid)
-    return datetime.fromtimestamp(latest, tz=UTC).date().isoformat()
-
-
-def build_sitemap_urls(base_url: str) -> list[dict[str, str | float | None]]:
-    pages = [
-        {
-            "path": "/",
-            "changefreq": "daily",
-            "priority": 1.0,
-            "lastmod": _iso_lastmod(CATALOG_PATH, COLLECTIONS_PATH, BASE_DIR / "templates" / "index.html"),
-        },
-        {
-            "path": "/about",
-            "changefreq": "monthly",
-            "priority": 0.7,
-            "lastmod": _iso_lastmod(BASE_DIR / "templates" / "about.html"),
-        },
-        {
-            "path": "/contact",
-            "changefreq": "monthly",
-            "priority": 0.7,
-            "lastmod": _iso_lastmod(BASE_DIR / "templates" / "contact.html"),
-        },
-        {
-            "path": "/team",
-            "changefreq": "monthly",
-            "priority": 0.8,
-            "lastmod": _iso_lastmod(TEAM_PATH, BASE_DIR / "templates" / "team.html"),
-        },
-    ]
-
-    team_lastmod = _iso_lastmod(
-        TEAM_PATH, BASE_DIR / "templates" / "team_member.html")
-    for member in build_team_members(load_team()):
-        pages.append(
-            {
-                "path": f"/team/{member.get('slug', '')}",
-                "changefreq": "monthly",
-                "priority": 0.6,
-                "lastmod": team_lastmod,
-            }
-        )
-
-    return [
-        {
-            "loc": f"{base_url}{page['path']}",
-            "lastmod": page["lastmod"],
-            "changefreq": page["changefreq"],
-            "priority": page["priority"],
-        }
-        for page in pages
-    ]
+    return iso_lastmod(*paths)
 
 
 def _slugify(value: str) -> str:
-    slug = re.sub(r"[^a-z0-9]+", "-", (value or "").strip().lower()).strip("-")
-    return slug or "member"
+    return slugify(value)
 
 
-def _name_parts_for_slug(name: str) -> list[str]:
-    return re.findall(r"[a-z0-9]+", (name or "").strip().lower())
+def load_products() -> list[dict[str, Any]]:
+    return load_products_from_path(CATALOG_PATH)
 
 
-def _member_slug_base(name: str) -> tuple[str, str]:
-    parts = _name_parts_for_slug(name)
-    if not parts:
-        return "member", ""
-    first = _slugify(parts[0])
-    last_initial = parts[-1][0] if len(parts) > 1 and parts[-1] else ""
-    return first, last_initial
+def load_social() -> dict[str, Any]:
+    return load_social_from_path(SOCIAL_PATH)
 
 
-def build_team_members(team: dict[str, Any]) -> list[dict[str, Any]]:
-    raw_members = team.get("members") or []
-    if not isinstance(raw_members, list):
-        raw_members = []
+def load_team() -> dict[str, Any]:
+    return load_team_from_path(TEAM_PATH)
 
-    members: list[dict[str, Any]] = []
-    seen_slugs: dict[str, int] = {}
-    member_names: list[str] = []
-    first_name_counts: dict[str, int] = {}
-    company = (team.get("company") or "California Earrings").strip(
-    ) or "California Earrings"
-    whatsapp_intro_template = (
-        team.get("whatsapp_intro")
-        or "Hi {name}, I found your contact on {company}."
-    )
 
-    for raw in raw_members:
-        source = raw if isinstance(raw, dict) else {}
-        name = (source.get("name") or "Team Member").strip() or "Team Member"
-        member_names.append(name)
-        first_slug, _ = _member_slug_base(name)
-        first_name_counts[first_slug] = first_name_counts.get(
-            first_slug, 0) + 1
+def load_collections_cfg() -> dict[str, Any]:
+    return load_collections_cfg_from_path(COLLECTIONS_PATH)
 
-    for raw, name in zip(raw_members, member_names, strict=False):
-        source = raw if isinstance(raw, dict) else {}
-        title = (source.get("title") or "").strip()
-        bio = (source.get("bio") or "").strip()
-        photo = (source.get("photo") or "").strip() or None
-        phone = (source.get("phone") or "").strip()
-        email = (source.get("email") or "").strip()
 
-        first_slug, last_initial = _member_slug_base(name)
-        if first_name_counts.get(first_slug, 0) > 1:
-            suffix = last_initial or "x"
-            candidate_slug = f"{first_slug}-{suffix}"
-        else:
-            candidate_slug = first_slug
-
-        seen_slugs[candidate_slug] = seen_slugs.get(candidate_slug, 0) + 1
-        slug = candidate_slug if seen_slugs[
-            candidate_slug] == 1 else f"{candidate_slug}-{seen_slugs[candidate_slug]}"
-
-        phone_digits = re.sub(r"\D+", "", phone)
-        if phone_digits.startswith("00"):
-            phone_digits = phone_digits[2:]
-
-        whatsapp_url = ""
-        if phone_digits:
-            member_intro = source.get(
-                "whatsapp_intro") or whatsapp_intro_template
-            try:
-                intro = str(member_intro).format(name=name, company=company)
-            except Exception:
-                intro = f"Hi {name}, I found your contact on {company}."
-            text = quote_plus(intro)
-            whatsapp_url = f"https://wa.me/{phone_digits}?text={text}"
-
-        members.append(
-            {
-                "name": name,
-                "title": title,
-                "bio": bio,
-                "photo": photo,
-                "phone": phone,
-                "email": email,
-                "slug": slug,
-                "phone_digits": phone_digits,
-                "whatsapp_url": whatsapp_url,
-                "call_url": f"tel:{phone_digits}" if phone_digits else "",
-            }
-        )
-
-    return members
+def get_cart() -> dict[str, int]:
+    return get_cart_from_session(session)
 
 
 def get_team_member_by_slug(member_slug: str) -> tuple[dict[str, Any], list[dict[str, Any]], dict[str, Any] | None]:
     team = load_team()
-    members = build_team_members(team)
-    member = next((m for m in members if m.get("slug") == member_slug), None)
+    members, member = get_team_member_by_slug_in_team(member_slug, team)
     return team, members, member
 
 
-def _vcard_escape(value: str) -> str:
-    return (value or "").replace("\\", "\\\\").replace("\n", "\\n").replace(";", "\\;").replace(",", "\\,")
-
-
-def build_member_vcard(member: dict[str, Any], team: dict[str, Any]) -> str:
-    company = (team.get("company") or "California Earrings").strip(
-    ) or "California Earrings"
-    lines = [
-        "BEGIN:VCARD",
-        "VERSION:3.0",
-        f"FN:{_vcard_escape(member.get('name', ''))}",
-        f"ORG:{_vcard_escape(company)}",
-    ]
-
-    title = member.get("title") or ""
-    if title:
-        lines.append(f"TITLE:{_vcard_escape(title)}")
-
-    phone_digits = member.get("phone_digits") or ""
-    if phone_digits:
-        lines.append(f"TEL;TYPE=CELL:{_vcard_escape(phone_digits)}")
-
-    email = member.get("email") or ""
-    if email:
-        lines.append(f"EMAIL;TYPE=INTERNET:{_vcard_escape(email)}")
-
-    lines.extend(["END:VCARD", ""])
-    return "\n".join(lines)
-
-
-def normalize_product(p: dict[str, Any]) -> dict[str, Any]:
-    code = (p.get("code") or "").strip()
-    name = (p.get("name") or "").strip() or code
-    description = (p.get("description") or "").strip()
-    collection = (p.get("collection") or "other").strip() or "other"
-    image = (p.get("image") or "").strip()
-    tags = p.get("tags") or []
-    if not isinstance(tags, list):
-        tags = []
-
-    out = dict(p)
-    out.update(
-        {
-            "id": code.lower(),
-            "code": code,
-            "name": name,
-            "description": description,
-            "collection": collection,
-            "image": image,
-            "tags": tags,
-        }
+def build_sitemap_urls(base_url: str) -> list[dict[str, str | float | None]]:
+    members = build_team_members(load_team())
+    return build_sitemap_urls_from_context(
+        base_url,
+        base_dir=BASE_DIR,
+        catalog_path=CATALOG_PATH,
+        collections_path=COLLECTIONS_PATH,
+        team_path=TEAM_PATH,
+        team_members=members,
     )
-    return out
-
-
-def load_products() -> list[dict[str, Any]]:
-    with open(CATALOG_PATH, "r", encoding="utf-8") as f:
-        raw = json.load(f)
-    return [normalize_product(p) for p in (raw or [])]
-
-
-def products_by_code(products: list[dict[str, Any]]) -> dict:
-    return {p.get("code"): p for p in products if p.get("code")}
-
-
-def load_social() -> dict[str, Any]:
-    if SOCIAL_PATH.exists():
-        with open(SOCIAL_PATH, "r", encoding="utf-8") as f:
-            return json.load(f)
-    return {"tiktok": {"profile_url": "", "videos": []}, "instagram": {"profile_url": "", "reels_url": ""}}
-
-
-def load_team() -> dict[str, Any]:
-    if TEAM_PATH.exists():
-        with open(TEAM_PATH, "r", encoding="utf-8") as f:
-            return json.load(f)
-    return {
-        "headline": "Meet the Team",
-        "company": "California Earrings",
-        "whatsapp_intro": "Hi {name}, I found your contact on {company}.",
-        "members": [],
-    }
-
-
-def load_collections_cfg() -> dict[str, Any]:
-    if COLLECTIONS_PATH.exists():
-        with open(COLLECTIONS_PATH, "r", encoding="utf-8") as f:
-            return json.load(f)
-    return {"order": [], "labels": {}}
-
-
-def filter_products(products: list[dict[str, Any]], q: str) -> list[dict[str, Any]]:
-    q = (q or "").strip().lower()
-    if not q:
-        return products
-
-    out: list[dict[str, Any]] = []
-    for p in products:
-        hay = " ".join(
-            [
-                str(p.get("code", "")),
-                str(p.get("name", "")),
-                str(p.get("collection", "")),
-                str(p.get("description", "")),
-                " ".join(p.get("tags", []) or []),
-            ]
-        ).lower()
-        if q in hay:
-            out.append(p)
-    return out
-
-
-@dataclass
-class Section:
-    key: str
-    title: str
-    items: list[dict[str, Any]]
-
-
-def build_sections(products: list[dict[str, Any]], cfg: dict[str, Any]) -> list[Section]:
-    order: list[str] = cfg.get("order") or []
-    labels: dict[str, str] = cfg.get("labels") or {}
-
-    by_collection: dict[str, list[dict[str, Any]]] = {}
-    for p in products:
-        by_collection.setdefault(p.get("collection", "other"), []).append(p)
-
-    sections: list[Section] = []
-    for key in order:
-        items = by_collection.get(key, [])
-        if items:
-            sections.append(Section(key=key, title=labels.get(key, key.replace("-", " ").title()), items=items))
-
-    for key, items in by_collection.items():
-        if key in set(order):
-            continue
-        sections.append(Section(key=key, title=labels.get(key, key.replace("-", " ").title()), items=items))
-
-    return sections
-
-
-def get_cart() -> dict[str, int]:
-    cart = session.get("cart", {})
-    if not isinstance(cart, dict):
-        cart = {}
-    clean: dict[str, int] = {}
-    for code, qty in cart.items():
-        try:
-            q = int(qty)
-        except Exception:
-            q = 0
-        if q > 0:
-            clean[code] = max(1, min(999, q))
-    session["cart"] = clean
-    return clean
-
-
-def cart_total_items(cart: dict[str, int]) -> int:
-    return int(sum(cart.values()))
-
-
-def cart_items(pmap: dict[str, dict[str, Any]], cart: dict[str, int]) -> list[dict[str, Any]]:
-    items: list[dict[str, Any]] = []
-    for code, qty in cart.items():
-        p = pmap.get(code)
-        if p:
-            items.append({"product": p, "qty": qty})
-    return items
-
-
-def cart_to_csv_bytes(meta: dict[str, str], items: list[dict[str, Any]]) -> bytes:
-    buf = io.StringIO()
-    w = csv.writer(buf)
-    w.writerow(["name", meta.get("name", "")])
-    w.writerow(["company", meta.get("company", "")])
-    w.writerow(["phone", meta.get("phone", "")])
-    w.writerow(["notes", meta.get("notes", "")])
-    w.writerow([])
-    w.writerow(["code", "name", "qty", "collection", "material", "stone", "size_mm"])
-    for row in items:
-        p = row["product"]
-        w.writerow(
-            [
-                p.get("code", ""),
-                p.get("name", ""),
-                row["qty"],
-                p.get("collection", ""),
-                p.get("material", ""),
-                p.get("stone", ""),
-                p.get("size_mm", ""),
-            ]
-        )
-    return buf.getvalue().encode("utf-8")
-
-
-def send_order_email(subject: str, body: str, csv_bytes: bytes, filename: str) -> bool:
-    """Email the CSV to your team if SMTP_* + EMAIL_TO are configured."""
-    smtp_host = os.getenv("SMTP_HOST", "").strip()
-    smtp_port = int(os.getenv("SMTP_PORT", "587") or "587")
-    smtp_user = os.getenv("SMTP_USER", "").strip()
-    smtp_pass = os.getenv("SMTP_PASS", "").strip()
-    email_to = os.getenv("EMAIL_TO", "").strip()
-    email_from = os.getenv("EMAIL_FROM", smtp_user).strip()
-
-    if not (smtp_host and smtp_user and smtp_pass and email_to and email_from):
-        return False
-
-    msg = EmailMessage()
-    msg["Subject"] = subject
-    msg["From"] = email_from
-    msg["To"] = email_to
-    msg.set_content(body)
-    msg.add_attachment(csv_bytes, maintype="text", subtype="csv", filename=filename)
-
-    with smtplib.SMTP(smtp_host, smtp_port) as s:
-        s.starttls()
-        s.login(smtp_user, smtp_pass)
-        s.send_message(msg)
-
-    return True
 
 
 @app.context_processor
@@ -458,16 +137,18 @@ def catalog_start():
 @app.route("/cart")
 def cart():
     pmap = products_by_code(load_products())
-    cart = get_cart()
-    items = cart_items(pmap, cart)
-    return render_template("cart.html", items=items, total_items=cart_total_items(cart))
+    cart_data = get_cart()
+    notes_by_code = get_cart_notes(session, cart_data)
+    items = cart_items(pmap, cart_data, notes_by_code)
+    return render_template("cart.html", items=items, total_items=cart_total_items(cart_data))
 
 
 @app.route("/checkout", methods=["GET", "POST"])
 def checkout():
     pmap = products_by_code(load_products())
-    cart = get_cart()
-    items = cart_items(pmap, cart)
+    cart_data = get_cart()
+    notes_by_code = get_cart_notes(session, cart_data)
+    items = cart_items(pmap, cart_data, notes_by_code)
 
     if request.method == "GET":
         return render_template("checkout.html", items=items)
@@ -496,7 +177,7 @@ Phone: {phone}
 Notes: {notes}
 
 Distinct items: {len(items)}
-Total qty: {cart_total_items(cart)}
+Total qty: {cart_total_items(cart_data)}
 """
     filename = f"order_{company.lower().replace(' ', '_')}_{token[:8]}.csv"
 
@@ -506,8 +187,8 @@ Total qty: {cart_total_items(cart)}
     except Exception:
         sent = False
 
-    # clear cart after submit
     session["cart"] = {}
+    session["cart_notes"] = {}
     return render_template("order_submitted.html", token=token, email_sent=sent)
 
 
@@ -518,6 +199,7 @@ def download_order_csv(token: str):
     csv_text = session.get("last_order_csv")
     if not csv_text:
         abort(404)
+
     data = csv_text.encode("utf-8")
     return send_file(
         io.BytesIO(data),
@@ -527,11 +209,10 @@ def download_order_csv(token: str):
     )
 
 
-# --- cart api ---
 @app.route("/api/cart/count")
 def api_cart_count():
-    cart = get_cart()
-    return jsonify({"total_items": cart_total_items(cart), "distinct_items": len(cart)})
+    cart_data = get_cart()
+    return jsonify({"total_items": cart_total_items(cart_data), "distinct_items": len(cart_data)})
 
 
 @app.route("/api/cart/add", methods=["POST"])
@@ -545,10 +226,10 @@ def api_cart_add():
     if code not in pmap:
         return jsonify({"ok": False, "error": "unknown_code"}), 400
 
-    cart = get_cart()
-    cart[code] = max(1, min(999, cart.get(code, 0) + qty))
-    session["cart"] = cart
-    return jsonify({"ok": True, "total_items": cart_total_items(cart), "distinct_items": len(cart)})
+    cart_data = get_cart()
+    cart_data[code] = max(1, min(999, cart_data.get(code, 0) + qty))
+    session["cart"] = cart_data
+    return jsonify({"ok": True, "total_items": cart_total_items(cart_data), "distinct_items": len(cart_data)})
 
 
 @app.route("/api/cart/set", methods=["POST"])
@@ -562,23 +243,55 @@ def api_cart_set():
     if code not in pmap:
         return jsonify({"ok": False, "error": "unknown_code"}), 400
 
-    cart = get_cart()
+    cart_data = get_cart()
+    notes_by_code = get_cart_notes(session, cart_data)
     if qty == 0:
-        cart.pop(code, None)
+        cart_data.pop(code, None)
+        notes_by_code.pop(code, None)
     else:
-        cart[code] = qty
-    session["cart"] = cart
-    return jsonify({"ok": True, "total_items": cart_total_items(cart), "distinct_items": len(cart)})
+        cart_data[code] = qty
+    session["cart"] = cart_data
+    session["cart_notes"] = notes_by_code
+    return jsonify({"ok": True, "total_items": cart_total_items(cart_data), "distinct_items": len(cart_data)})
 
 
 @app.route("/api/cart/remove", methods=["POST"])
 def api_cart_remove():
     payload = request.get_json(force=True, silent=True) or {}
     code = payload.get("code")
-    cart = get_cart()
-    cart.pop(code, None)
-    session["cart"] = cart
-    return jsonify({"ok": True, "total_items": cart_total_items(cart), "distinct_items": len(cart)})
+    code_str = code if isinstance(code, str) else ""
+    cart_data = get_cart()
+    notes_by_code = get_cart_notes(session, cart_data)
+    cart_data.pop(code_str, None)
+    notes_by_code.pop(code_str, None)
+    session["cart"] = cart_data
+    session["cart_notes"] = notes_by_code
+    return jsonify({"ok": True, "total_items": cart_total_items(cart_data), "distinct_items": len(cart_data)})
+
+
+@app.route("/api/cart/note", methods=["POST"])
+def api_cart_note():
+    payload = request.get_json(force=True, silent=True) or {}
+    code = payload.get("code")
+    code_str = code if isinstance(code, str) else ""
+
+    pmap = products_by_code(load_products())
+    if code_str not in pmap:
+        return jsonify({"ok": False, "error": "unknown_code"}), 400
+
+    cart_data = get_cart()
+    if code_str not in cart_data:
+        return jsonify({"ok": False, "error": "item_not_in_cart"}), 400
+
+    note = normalize_item_note(payload.get("note"))
+    notes_by_code = get_cart_notes(session, cart_data)
+    if note:
+        notes_by_code[code_str] = note
+    else:
+        notes_by_code.pop(code_str, None)
+
+    session["cart_notes"] = notes_by_code
+    return jsonify({"ok": True, "code": code_str, "note": notes_by_code.get(code_str, "")})
 
 
 @app.route("/team")
