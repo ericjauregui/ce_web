@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 {% set company_name = team.company or site_name %}
 {% block title %}{{ member.name }} | {{ company_name }} Team{% endblock %}
-{% block meta_description %}Digital contact card for {{ member.name }} at {{ company_name }}.{% endblock %}
+{% block meta_description %}Contact {{ member.name }} at {{ company_name }} for wholesale jewelry support, ordering, and
+account assistance.{% endblock %}
 
 {% block content %}
 <section class="container py-5" style="max-width: 1020px;">
@@ -109,6 +110,25 @@
     </div>
   </article>
 </section>
+{% endblock %}
+
+{% block schema_json_ld %}
+{{ super() }}
+<script type="application/ld+json">
+{{ {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": member.name,
+    "jobTitle": member.title,
+    "worksFor": {
+      "@type": "Organization",
+      "name": company_name
+    },
+    "url": canonical_url,
+    "telephone": member.phone,
+    "email": member.email
+  }|tojson }}
+</script>
 {% endblock %}
 
 {% block body_end %}

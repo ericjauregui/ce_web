@@ -7,6 +7,12 @@ async function postJson(url, payload) {
   return response.json();
 }
 
+const CARD_INTERACTIVE_SELECTOR = ".add-to-cart-btn, .product-qty-control, .product-qty-input, .product-detail-link";
+
+function isCardInteractiveTarget(target) {
+  return !!target.closest(CARD_INTERACTIVE_SELECTOR);
+}
+
 function updateCartBadge(totalItems) {
   const badge = document.getElementById("cartCountBadge");
   if (!badge) return;
@@ -130,7 +136,12 @@ async function setCardQtyOnServer(card, nextQty) {
 document.addEventListener("click", (event) => {
   const card = event.target.closest(".product-card");
   if (!card) return;
-  if (event.target.closest(".add-to-cart-btn, .product-qty-control, .product-qty-input")) return;
+  if (card.dataset.longPressFired === "true") {
+    card.dataset.longPressFired = "false";
+    event.preventDefault();
+    return;
+  }
+  if (isCardInteractiveTarget(event.target)) return;
   setCardExpanded(card, !card.classList.contains("is-open"));
 });
 
@@ -138,10 +149,63 @@ document.addEventListener("keydown", (event) => {
   const card = event.target.closest(".product-card");
   if (!card) return;
   if (event.key !== "Enter" && event.key !== " ") return;
-  if (event.target.closest(".add-to-cart-btn, .product-qty-control, .product-qty-input")) return;
+  if (isCardInteractiveTarget(event.target)) return;
   event.preventDefault();
   setCardExpanded(card, !card.classList.contains("is-open"));
 });
+
+const LONG_PRESS_MS = 520;
+const LONG_PRESS_MOVE_TOLERANCE = 12;
+let longPressTimerId = 0;
+let longPressCard = null;
+let longPressPointerId = null;
+let longPressStartX = 0;
+let longPressStartY = 0;
+
+function clearLongPressState() {
+  if (longPressTimerId) {
+    window.clearTimeout(longPressTimerId);
+    longPressTimerId = 0;
+  }
+  longPressCard = null;
+  longPressPointerId = null;
+}
+
+document.addEventListener("pointerdown", (event) => {
+  const card = event.target.closest(".product-card");
+  if (!card) return;
+  if (event.pointerType === "mouse") return;
+  if (!card.classList.contains("is-open")) return;
+  if (isCardInteractiveTarget(event.target)) return;
+
+  const detailUrl = card.getAttribute("data-detail-url");
+  if (!detailUrl) return;
+
+  clearLongPressState();
+  longPressCard = card;
+  longPressPointerId = event.pointerId;
+  longPressStartX = event.clientX;
+  longPressStartY = event.clientY;
+
+  longPressTimerId = window.setTimeout(() => {
+    if (!longPressCard) return;
+    longPressCard.dataset.longPressFired = "true";
+    window.location.assign(detailUrl);
+  }, LONG_PRESS_MS);
+});
+
+document.addEventListener("pointermove", (event) => {
+  if (!longPressCard || longPressPointerId !== event.pointerId) return;
+  const deltaX = Math.abs(event.clientX - longPressStartX);
+  const deltaY = Math.abs(event.clientY - longPressStartY);
+  if (deltaX > LONG_PRESS_MOVE_TOLERANCE || deltaY > LONG_PRESS_MOVE_TOLERANCE) {
+    clearLongPressState();
+  }
+});
+
+document.addEventListener("pointerup", clearLongPressState);
+document.addEventListener("pointercancel", clearLongPressState);
+window.addEventListener("scroll", clearLongPressState, { passive: true });
 
 let resizeRafId = 0;
 

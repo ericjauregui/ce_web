@@ -118,6 +118,34 @@ class CartEndpointTests(BaseWebTest):
 
         self.assertIn("notes", csv_text)
         self.assertIn("Need matching pair", csv_text)
+        self.assertIn("code,name,quantity,notes", csv_text)
+        self.assertNotIn("collection", csv_text)
+        self.assertNotIn("material", csv_text)
+        self.assertNotIn("size_mm", csv_text)
+
+    def test_checkout_pdf_download_endpoint_returns_pdf(self) -> None:
+        self.client.post(
+            "/api/cart/add", json={"code": self.valid_code, "qty": 1})
+
+        checkout_response = self.client.post(
+            "/checkout",
+            data={
+                "name": "Test Buyer",
+                "company": "Sample Co",
+                "phone": "555-0101",
+                "notes": "general order note",
+            },
+        )
+        self.assertEqual(checkout_response.status_code, 200)
+
+        with self.client.session_transaction() as sess:
+            token = sess.get("last_order_token")
+
+        self.assertTrue(token)
+        pdf_response = self.client.get(f"/download/order/{token}.pdf")
+        self.assertEqual(pdf_response.status_code, 200)
+        self.assertEqual(pdf_response.mimetype, "application/pdf")
+        self.assertTrue(pdf_response.get_data().startswith(b"%PDF"))
 
     def test_default_catalog_state_has_more_cards_than_filtered_query(self) -> None:
         full_response = self.client.get("/")

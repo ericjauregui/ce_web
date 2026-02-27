@@ -11,14 +11,17 @@ from flask import Flask, abort, jsonify, redirect, render_template, request, sen
 
 from domains.cart import (
     cart_items,
+    cart_to_pdf_bytes,
     cart_to_csv_bytes,
     cart_total_items,
     get_cart as get_cart_from_session,
     get_cart_notes,
     normalize_item_note,
+    order_rows_from_items,
 )
 from domains.catalog import (
     build_sections,
+    find_product_by_code,
     filter_products,
     load_collections_cfg as load_collections_cfg_from_path,
     load_products as load_products_from_path,
@@ -91,6 +94,11 @@ def get_team_member_by_slug(member_slug: str) -> tuple[dict[str, Any], list[dict
 
 def build_sitemap_urls(base_url: str) -> list[dict[str, str | float | None]]:
     members = build_team_members(load_team())
+    product_codes = [
+        str(product.get("code") or "").strip()
+        for product in load_products()
+        if str(product.get("code") or "").strip()
+    ]
     return build_sitemap_urls_from_context(
         base_url,
         base_dir=BASE_DIR,
@@ -98,6 +106,7 @@ def build_sitemap_urls(base_url: str) -> list[dict[str, str | float | None]]:
         collections_path=COLLECTIONS_PATH,
         team_path=TEAM_PATH,
         team_members=members,
+        product_codes=product_codes,
     )
 
 
@@ -134,6 +143,34 @@ def catalog_start():
     return redirect(f"{url_for('index')}#section-{sections[0].key}")
 
 
+@app.route("/product/<product_code>")
+def product_detail(product_code: str):
+    products = load_products()
+    product = find_product_by_code(products, product_code)
+    if not product:
+        abort(404)
+
+    canonical_code = str(product.get("code") or "").strip()
+    if canonical_code and canonical_code != product_code:
+        return redirect(url_for("product_detail", product_code=canonical_code), code=301)
+
+    cart_data = get_cart()
+    initial_qty = max(0, min(999, int(cart_data.get(canonical_code, 0))))
+
+    cfg = load_collections_cfg()
+    labels: dict[str, str] = cfg.get("labels") or {}
+    collection_key = str(product.get("collection") or "other")
+    collection_label = labels.get(
+        collection_key, collection_key.replace("-", " ").title())
+
+    return render_template(
+        "product_detail.html",
+        product=product,
+        initial_qty=initial_qty,
+        collection_label=collection_label,
+    )
+
+
 @app.route("/cart")
 def cart():
     pmap = products_by_code(load_products())
@@ -161,11 +198,12 @@ def checkout():
     if not (name and company and phone) or len(items) == 0:
         return render_template("checkout.html", items=items), 400
 
-    meta = {"name": name, "company": company, "phone": phone, "notes": notes}
-    csv_bytes = cart_to_csv_bytes(meta, items)
+    order_rows = order_rows_from_items(items)
+    csv_bytes = cart_to_csv_bytes(order_rows)
 
     token = secrets.token_urlsafe(24)
     session["last_order_csv"] = csv_bytes.decode("utf-8")
+    session["last_order_rows"] = order_rows
     session["last_order_token"] = token
 
     subject = f"California Earrings inquiry — {company} ({name})"
@@ -206,6 +244,24 @@ def download_order_csv(token: str):
         mimetype="text/csv",
         as_attachment=True,
         download_name=f"inquiry_{token[:8]}.csv",
+    )
+
+
+@app.route("/download/order/<token>.pdf")
+def download_order_pdf(token: str):
+    if session.get("last_order_token") != token:
+        abort(404)
+
+    rows = session.get("last_order_rows")
+    if not isinstance(rows, list) or not rows:
+        abort(404)
+
+    pdf_bytes = cart_to_pdf_bytes(rows, BASE_DIR / "static" / "product_images")
+    return send_file(
+        io.BytesIO(pdf_bytes),
+        mimetype="application/pdf",
+        as_attachment=True,
+        download_name=f"inquiry_{token[:8]}.pdf",
     )
 
 

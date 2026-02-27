@@ -34,15 +34,15 @@ body::after {
   top: var(--nav-height);
   left: 0;
   right: 0;
-    bottom: 0;
+  bottom: 0;
   z-index: -2;
 
   backdrop-filter: blur(2.4px) saturate(106%);
-    -webkit-backdrop-filter: blur(2.4px) saturate(106%);
+  -webkit-backdrop-filter: blur(2.4px) saturate(106%);
 
   background:
       radial-gradient(120% 84% at 50% 12%, rgb(var(--gold-rgb) / 0.06), transparent 58%),
-        linear-gradient(180deg, rgba(8, 8, 8, 0.52) 0%, rgba(10, 10, 10, 0.66) 58%, rgba(13, 13, 13, 0.76) 100%);
+      linear-gradient(180deg, rgba(8, 8, 8, 0.52) 0%, rgba(10, 10, 10, 0.66) 58%, rgba(13, 13, 13, 0.76) 100%);
   pointer-events: none;
 }
 
@@ -53,7 +53,7 @@ html::before {
   top: var(--nav-height);
   left: 0;
   right: 0;
-    bottom: 0;
+  bottom: 0;
   z-index: -1;
   pointer-events: none;
 
@@ -64,7 +64,7 @@ html::before {
 
   opacity: 0.045;
   /* intensity */
-    mix-blend-mode: soft-light;
+  mix-blend-mode: soft-light;
     /* luxe film grain */
   filter: contrast(112%) brightness(98%);
 
@@ -323,7 +323,7 @@ body {
                                                                       rgb(var(--gold-rgb) / 0.66)) !important;
                                                                   box-shadow: 0 10px 24px rgba(215, 192, 122, 0.24);
                                                                 }
-                                
+
                                                                 .hero-action-btn--highlight:hover,
                                                                 .hero-action-btn--highlight:focus-visible {
                                                                   color: #0d0d0d !important;
@@ -367,13 +367,13 @@ body {
       padding-top: clamp(.72rem, 2.5vw, 1.02rem);
         padding-bottom: clamp(.64rem, 2vw, .9rem);
       }
-      
+
       .hero-actions {
         margin-top: clamp(.78rem, 2.8vw, 1.2rem) !important;
         margin-bottom: 0 !important;
         padding-bottom: clamp(.2rem, 1.4vw, .42rem);
       }
-      
+
       .hero-action-btn {
         min-height: 38px;
         font-size: clamp(.9rem, 3.2cqw, 1.06rem);
@@ -502,6 +502,15 @@ body {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    min-height: 38px;
+    }
+    
+    .product-card .product-detail-link.code-badge {
+      width: 100%;
+      min-height: 38px;
+      padding: .42rem .85rem;
+      border-radius: 999px;
+      text-decoration: none;
   }
 
   .product-qty-control {
@@ -589,11 +598,22 @@ body {
     margin: 0;
   }
 
+                .product-qty-input:focus,
+                .product-qty-input:focus-visible {
+                  border-color: var(--gold-outline-strong);
+                  box-shadow: 0 0 0 .2rem rgba(215, 192, 122, .25);
+                  outline: none;
+                }
 .code-badge {
-  display: inline-block;
-  padding: .11rem .46rem;
+  display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: .18rem .62rem;
   font-weight: 700;
-  letter-spacing: .08rem;
+  letter-spacing: .06rem;
+    font-size: .96rem;
+    text-align: center;
+    line-height: 1;
   color: #0d0d0d;
   background: linear-gradient(90deg,
         rgb(var(--gold-rgb) / 0.66),
@@ -602,6 +622,71 @@ body {
   border-radius: 999px;
 }
 
+.product-detail-page .product-detail-top-actions,
+.product-detail-page .product-detail-top-left {
+  align-items: center;
+}
+
+.product-detail-content-row {
+  --bs-gutter-x: .9rem;
+}
+
+.product-detail-image-card,
+.product-detail-meta-card {
+  background: rgba(18, 18, 18, 0.88) !important;
+}
+
+.product-detail-image-wrap {
+  width: 100%;
+  max-width: min(100%, 560px);
+  margin: 0 auto;
+  border-radius: 14px;
+  padding: clamp(.45rem, 1vw, .75rem);
+  background: rgba(10, 10, 10, 0.58);
+  border: 1px solid rgb(var(--gold-rgb) / 0.24);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.product-detail-image {
+  width: 100%;
+  max-height: min(62vh, 520px);
+  object-fit: contain;
+  object-position: center;
+  border-radius: 10px;
+  display: block;
+}
+
+.product-detail-meta-card {
+  min-height: 100%;
+}
+
+.product-detail-code-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 38px;
+  margin-left: 0;
+  margin-right: 0;
+  padding: .42rem .85rem;
+  font-size: 1.04rem;
+}
+
+.product-detail-meta p {
+  line-height: 1.35;
+}
+
+@media (max-width: 991.98px) {
+  .product-detail-image-wrap {
+    max-width: min(100%, 500px);
+  }
+
+  .product-detail-image {
+    max-height: min(54vh, 440px);
+  }
+}
 .form-control.border-gold {
   border: 1px solid var(--gold-outline);
 }

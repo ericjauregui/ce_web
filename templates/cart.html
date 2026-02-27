@@ -2,7 +2,7 @@
 {% block title %}Shopping Cart | California Earrings{% endblock %}
 {% block content %}
 <section class="container py-5 cart-page" style="max-width: 1100px;">
-  <h1 class="text-gold mb-3">Shopping cart</h1>
+  <h1 class="text-gold mb-3">Shopping Cart</h1>
   <div class="card bg-dark border-gold p-3 cart-intro-card">
       <p class="text-gold-70 mb-0">Checkout your order and we'll follow up with wholesale pricing & availability. No payment
         required.</p>
@@ -12,12 +12,12 @@
       <a class="btn btn-outline-gold" href="{{ url_for('checkout') }}">Checkout (no payment)</a>
   </div>
 
-  <div class="mt-4 card bg-dark border-gold p-3">
+  <div class="mt-4 card bg-dark border-gold p-3" id="cartContentCard">
     {% if items|length == 0 %}
       <p class="text-gold-70 mb-0">Your shopping cart is empty.</p>
     {% else %}
       <div class="table-responsive" id="cartTableWrap">
-        <table class="table table-dark align-middle mb-0">
+        <table class="table table-dark align-middle mb-0 minimal-items-table cart-items-table">
           <thead>
             <tr>
               <th>Item</th>
@@ -30,7 +30,7 @@
           <tbody id="cartTableBody">
             {% for row in items %}
             <tr>
-              <td>
+              <td class="cell-item" data-label="Item">
                 <div class="d-flex align-items-center gap-3">
                   <img src="{{ url_for('static', filename='product_images/' ~ row.product.image) }}" class="cart-thumb" alt="">
                   <div>
@@ -38,20 +38,20 @@
                   </div>
                 </div>
               </td>
-              <td><span class="code-badge">{{ row.product.code }}</span></td>
-              <td>
+              <td class="cell-code" data-label="Code"><span class="code-badge">{{ row.product.code }}</span></td>
+              <td class="cell-qty" data-label="Quantity">
                 <div class="qty-control" data-code="{{ row.product.code }}">
                   <button class="btn btn-outline-gold btn-sm qty-minus" type="button">−</button>
                   <input class="form-control form-control-sm bg-black text-light border-gold qty-input" value="{{ row.qty }}" inputmode="numeric">
                   <button class="btn btn-outline-gold btn-sm qty-plus" type="button">+</button>
                 </div>
               </td>
-              <td>
+              <td class="cell-notes" data-label="Item notes">
                 <textarea class="form-control form-control-sm bg-black text-light border-gold item-note-input"
                   data-code="{{ row.product.code }}" rows="2" maxlength="500"
                   placeholder="Add note for this item (optional)">{{ row.note }}</textarea>
                 </td>
-                <td>
+                <td class="cell-remove" data-label="">
                 <button class="btn btn-outline-gold btn-sm qty-remove" type="button" data-code="{{ row.product.code }}">Remove</button>
               </td>
             </tr>
@@ -107,7 +107,7 @@ function clampQty(q){
     const summaryBar = document.getElementById("cartSummaryBar");
     if (summaryBar) summaryBar.remove();
 
-    const card = document.querySelector("section .card.bg-dark.border-gold.p-3");
+    const card = document.getElementById("cartContentCard");
     if (!card || card.querySelector(".cart-empty-message")) return;
 
     const empty = document.createElement("p");

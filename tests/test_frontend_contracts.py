@@ -123,6 +123,19 @@ class FrontendContractTests(BaseWebTest):
         self.assertIn("window.addEventListener(\"resize\", () => {", script)
         self.assertIn("}, { passive: true });", script)
 
+    def test_catalog_supports_expanded_long_press_and_detail_link(self) -> None:
+        script = (Path(webapp.BASE_DIR) / "static" / "js" /
+                  "catalog.js").read_text(encoding="utf-8")
+        body = self.client.get("/").get_data(as_text=True)
+
+        self.assertIn("const LONG_PRESS_MS = 520;", script)
+        self.assertIn(
+            "if (!card.classList.contains(\"is-open\")) return;", script)
+        self.assertIn("window.location.assign(detailUrl);", script)
+        self.assertIn(".product-detail-link", script)
+        self.assertIn("data-detail-url=", body)
+        self.assertIn("class=\"small code-badge product-detail-link", body)
+
     def test_stylesheet_has_balanced_braces(self) -> None:
         css = self.load_site_css()
 
@@ -237,5 +250,5 @@ class FrontendContractTests(BaseWebTest):
         self.assertIn(".section-header-row::after", css)
         self.assertIn("box-shadow: 0 15px 40px rgba(0, 0, 0, 0.45);", css)
         self.assertIn(".code-badge", css)
-        self.assertIn("padding: .11rem .46rem;", css)
+        self.assertIn("padding: .18rem .62rem;", css)
         self.assertIn("rgb(var(--gold-rgb) / 0.84)", css)

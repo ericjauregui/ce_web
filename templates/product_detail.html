@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% set product_image_url = (site_base_url or request.url_root).rstrip('/') ~ url_for('static', filename='product_images/' ~ product.image) %}
+{% block title %}{{ product.name }} ({{ product.code }}) | California Earrings{% endblock %}
+{% block meta_description %}{{ (product.description or (product.name ~ ' wholesale item by California Earrings.'))|trim }}{% endblock %}
+{% block og_type %}product{% endblock %}
+{% block og_image %}{{ product_image_url }}{% endblock %}
+{% block og_image_alt %}{{ product.name }}{% endblock %}
+
+{% block content %}
+<section class="container py-5 product-detail-page" style="max-width: 1060px;">
+  <div class="product-detail-top-actions d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+    <div class="d-flex flex-wrap gap-2 product-detail-top-left">
+      <a class="btn btn-outline-gold" href="{{ url_for('index') }}#section-{{ product.collection }}">← Back to Catalog</a>
+      <a class="btn btn-outline-gold" href="{{ url_for('contact') }}">Contact Us</a>
+    </div>
+    <button type="button" class="btn btn-outline-gold product-share-btn" data-share-url="{{ canonical_url }}"
+      data-share-title="{{ product.name }} | {{ site_name }}">Share</button>
+  </div>
+
+  <div class="row g-3 align-items-start product-detail-content-row">
+    <div class="col-12 col-lg-7">
+      <article class="card bg-dark border-gold p-3 p-md-3 product-detail-image-card">
+        <div class="product-detail-image-wrap">
+          <img
+            src="{{ url_for('static', filename='product_images/' ~ product.image) }}"
+            alt="{{ product.name }}"
+            class="product-detail-image"
+            loading="eager"
+            decoding="async"
+          >
+        </div>
+      </article>
+    </div>
+
+    <div class="col-12 col-lg-5">
+      <article class="card bg-dark border-gold p-3 p-md-4 product-detail-meta-card" data-code="{{ product.code }}"
+        data-initial-qty="{{ initial_qty }}">
+        <h1 class="text-gold mb-2">{{ product.name }}</h1>
+        <div class="small code-badge mb-3 product-detail-code-badge">{{ product.code }}</div>
+
+        <div class="product-detail-meta text-gold-70 mb-4">
+          <p class="mb-2"><span class="text-gold fw-semibold">Collection:</span> {{ collection_label }}</p>
+          <p class="mb-2"><span class="text-gold fw-semibold">Description:</span> {{ product.description or 'No description provided.' }}</p>
+          <p class="mb-0">
+            <span class="text-gold fw-semibold">Tags:</span>
+            {% if product.tags and product.tags|length > 0 %}
+              {{ product.tags|join(', ') }}
+            {% else %}
+              none
+            {% endif %}
+          </p>
+        </div>
+
+        <div class="product-actions mt-auto d-grid gap-2">
+          <button type="button" class="btn btn-outline-gold btn-sm rounded-pill add-to-cart-btn" data-code="{{ product.code }}">
+            Add to Order
+          </button>
+          <div class="product-qty-control {% if initial_qty <= 0 %}d-none{% endif %}" data-code="{{ product.code }}" aria-label="Inline quantity controls">
+            <button type="button" class="btn btn-outline-gold btn-sm rounded-pill qty-clear-btn" aria-label="Clear item from cart">×</button>
+            <div class="qty-center-group" aria-hidden="false">
+              <button type="button" class="btn btn-outline-gold btn-sm rounded-pill qty-adjust-btn" data-delta="-1" aria-label="Decrease quantity">−</button>
+              <input type="number" min="0" max="999" step="1" inputmode="numeric" class="product-qty-pill product-qty-input" value="{{ initial_qty if initial_qty > 0 else 1 }}" aria-label="Quantity" />
+              <button type="button" class="btn btn-outline-gold btn-sm rounded-pill qty-adjust-btn" data-delta="1" aria-label="Increase quantity">+</button>
+            </div>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block schema_json_ld %}
+{{ super() }}
+<script type="application/ld+json">
+  {{ {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": product.name,
+    "sku": product.code,
+    "category": collection_label,
+    "description": product.description,
+    "image": [product_image_url],
+    "brand": {
+      "@type": "Brand",
+      "name": site_name
+    },
+    "url": canonical_url
+  }|tojson }}
+</script>
+{% endblock %}
+
+{% block body_end %}
+<script src="{{ url_for('static', filename='js/product_detail.js') }}"></script>
+{% endblock %}

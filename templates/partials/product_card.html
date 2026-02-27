@@ -3,6 +3,7 @@
   <article class="card product product-card shadow-sm bg-dark border-0"
        role="button"
        tabindex="0"
+      data-detail-url="{{ url_for('product_detail', product_code=p.code) }}"
        aria-expanded="false"
        aria-controls="{{ drawer_id }}">
     <div class="product-img-wrap">
@@ -10,7 +11,10 @@
         alt="{{ p.name }}" loading="lazy" decoding="async" fetchpriority="low">
     </div>
     <div class="card-body text-center d-flex flex-column">
-      <div class="small code-badge">{{ p.code }}</div>
+      <a class="small code-badge product-detail-link" href="{{ url_for('product_detail', product_code=p.code) }}"
+        aria-label="View details for {{ p.name }} {{ p.code }}">
+        {{ p.code }}
+      </a>
 <div id="{{ drawer_id }}" class="product-drawer" aria-hidden="true">
   <p class="card-text text-gold-70 mb-0">{{ p.name }}</p>
 </div>
@@ -19,7 +23,7 @@
         <button type="button"
                 class="btn btn-outline-gold btn-sm rounded-pill add-to-cart-btn"
                 data-code="{{ p.code }}">
-          Add to order
+          Add to Order
         </button>
         <div class="product-qty-control d-none" data-code="{{ p.code }}" aria-label="Inline quantity controls">
           <button type="button" class="btn btn-outline-gold btn-sm rounded-pill qty-clear-btn"

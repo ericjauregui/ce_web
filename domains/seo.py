@@ -29,6 +29,7 @@ def build_sitemap_urls(
     collections_path: Path,
     team_path: Path,
     team_members: list[dict],
+    product_codes: list[str] | None = None,
 ) -> list[dict[str, str | float | None]]:
     pages = [
         {
@@ -65,6 +66,21 @@ def build_sitemap_urls(
                 "changefreq": "monthly",
                 "priority": 0.6,
                 "lastmod": team_lastmod,
+            }
+        )
+
+    product_lastmod = iso_lastmod(
+        catalog_path, base_dir / "templates" / "product_detail.html")
+    for code in product_codes or []:
+        code_value = str(code or "").strip()
+        if not code_value:
+            continue
+        pages.append(
+            {
+                "path": f"/product/{code_value}",
+                "changefreq": "weekly",
+                "priority": 0.8,
+                "lastmod": product_lastmod,
             }
         )
 

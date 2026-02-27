@@ -53,6 +53,19 @@ def products_by_code(products: list[dict[str, Any]]) -> dict[str, dict[str, Any]
     return by_code
 
 
+def find_product_by_code(products: list[dict[str, Any]], code: str) -> dict[str, Any] | None:
+    target = (code or "").strip().lower()
+    if not target:
+        return None
+
+    for product in products:
+        product_code = str(product.get("code") or "").strip().lower()
+        if product_code == target:
+            return product
+
+    return None
+
+
 def load_social(social_path: Path) -> dict[str, Any]:
     if social_path.exists():
         with open(social_path, "r", encoding="utf-8") as file:

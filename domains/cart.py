@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import csv
 import io
+from pathlib import Path
 from typing import Any
 
 
@@ -60,29 +61,105 @@ def cart_items(product_map: dict[str, dict[str, Any]], cart: dict[str, int], not
     return items
 
 
-def cart_to_csv_bytes(meta: dict[str, str], items: list[dict[str, Any]]) -> bytes:
+def order_rows_from_items(items: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for row in items:
+        product = row.get("product") or {}
+        rows.append(
+            {
+                "code": str(product.get("code") or ""),
+                "name": str(product.get("name") or ""),
+                "quantity": int(row.get("qty") or 0),
+                "notes": str(row.get("note") or ""),
+                "image": str(product.get("image") or ""),
+            }
+        )
+    return rows
+
+
+def cart_to_csv_bytes(order_rows: list[dict[str, Any]]) -> bytes:
     buffer = io.StringIO()
     writer = csv.writer(buffer)
-    writer.writerow(["name", meta.get("name", "")])
-    writer.writerow(["company", meta.get("company", "")])
-    writer.writerow(["phone", meta.get("phone", "")])
-    writer.writerow(["notes", meta.get("notes", "")])
-    writer.writerow([])
-    writer.writerow(["code", "name", "qty", "notes", "collection", "material", "stone", "size_mm"])
+    writer.writerow(["code", "name", "quantity", "notes"])
 
-    for row in items:
-        product = row["product"]
+    for row in order_rows:
         writer.writerow(
             [
-                product.get("code", ""),
-                product.get("name", ""),
-                row["qty"],
-                row.get("note", ""),
-                product.get("collection", ""),
-                product.get("material", ""),
-                product.get("stone", ""),
-                product.get("size_mm", ""),
+                row.get("code", ""),
+                row.get("name", ""),
+                row.get("quantity", 0),
+                row.get("notes", ""),
             ]
         )
 
     return buffer.getvalue().encode("utf-8")
+
+
+def cart_to_pdf_bytes(order_rows: list[dict[str, Any]], product_images_dir: Path) -> bytes:
+    from reportlab.lib import colors
+    from reportlab.lib.pagesizes import letter
+    from reportlab.lib.styles import getSampleStyleSheet
+    from reportlab.platypus import Image, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
+
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(
+        buffer,
+        pagesize=letter,
+        leftMargin=30,
+        rightMargin=30,
+        topMargin=30,
+        bottomMargin=30,
+    )
+
+    styles = getSampleStyleSheet()
+    elements: list[Any] = [
+        Paragraph("California Earrings Order", styles["Title"]),
+        Spacer(1, 10),
+    ]
+
+    table_data: list[list[Any]] = [
+        ["Image", "Code", "Name", "Quantity", "Notes"]]
+
+    for row in order_rows:
+        image_cell: Any = ""
+        image_name = str(row.get("image") or "").strip()
+        image_path = product_images_dir / image_name if image_name else None
+        if image_path and image_path.exists():
+            try:
+                image_cell = Image(str(image_path), width=34, height=34)
+                image_cell.hAlign = "CENTER"
+            except Exception:
+                image_cell = ""
+
+        table_data.append(
+            [
+                image_cell,
+                row.get("code", ""),
+                row.get("name", ""),
+                str(row.get("quantity", 0)),
+                row.get("notes", "") or "—",
+            ]
+        )
+
+    table = Table(table_data, colWidths=[52, 76, 210, 70, 132], repeatRows=1)
+    table.setStyle(
+        TableStyle(
+            [
+                ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#f1e2a3")),
+                ("TEXTCOLOR", (0, 0), (-1, 0), colors.HexColor("#101010")),
+                ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+                ("ALIGN", (0, 0), (-1, -1), "LEFT"),
+                ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+                ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#8d7a3e")),
+                ("ROWBACKGROUNDS", (0, 1), (-1, -1),
+                 [colors.white, colors.HexColor("#f8f8f8")]),
+                ("FONTSIZE", (0, 0), (-1, -1), 9),
+                ("TOPPADDING", (0, 0), (-1, -1), 6),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
+            ]
+        )
+    )
+
+    elements.append(table)
+    doc.build(elements)
+    return buffer.getvalue()

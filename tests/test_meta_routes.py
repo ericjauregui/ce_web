@@ -14,6 +14,8 @@ class MetaRouteTests(BaseWebTest):
         body = response.get_data(as_text=True)
         self.assertIn("https://californiaearrings.com/", body)
         self.assertIn(f"https://californiaearrings.com/team/{self.first_member['slug']}", body)
+        self.assertIn(
+            f"https://californiaearrings.com/product/{self.valid_code}", body)
         self.assertIn("<changefreq>daily</changefreq>", body)
 
     def test_sitemaps_alias_and_robots_include_expected_directives(self) -> None:
@@ -29,3 +31,25 @@ class MetaRouteTests(BaseWebTest):
         self.assertIn("Disallow: /api/", robots_body)
         self.assertIn("Disallow: /checkout", robots_body)
         self.assertIn("Sitemap: https://californiaearrings.com/sitemap.xml", robots_body)
+
+    def test_base_layout_exposes_global_schema_and_noindex_for_transaction_pages(self) -> None:
+        home = self.client.get("/")
+        self.assertEqual(home.status_code, 200)
+        home_body = home.get_data(as_text=True)
+        self.assertIn('"@type": "Organization"', home_body)
+        self.assertIn('"@type": "WebSite"', home_body)
+
+        cart = self.client.get("/cart")
+        self.assertEqual(cart.status_code, 200)
+        self.assertIn('meta name="robots" content="noindex,nofollow"',
+                      cart.get_data(as_text=True))
+
+        checkout = self.client.get("/checkout")
+        self.assertEqual(checkout.status_code, 200)
+        self.assertIn('meta name="robots" content="noindex,nofollow"',
+                      checkout.get_data(as_text=True))
+
+        not_found = self.client.get("/this-page-does-not-exist")
+        self.assertEqual(not_found.status_code, 404)
+        self.assertIn('meta name="robots" content="noindex,nofollow"',
+                      not_found.get_data(as_text=True))

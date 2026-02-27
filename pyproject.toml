@@ -8,6 +8,7 @@ dependencies = [
     "flask==3.1.2",
     "gunicorn==23.0.0",
     "python-dotenv==1.2.1",
+    "reportlab>=4.2.0,<5",
 ]
 
 [project.optional-dependencies]
