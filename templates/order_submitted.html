@@ -16,13 +16,12 @@ copy and contact us with any follow-up details.{% endblock %}
       </div>
     <div class="text-gold-70 small mt-3">
       {% if client_email %}
-      Inquiry email recipients: our team and {{ client_email }}.
+      Email recipients: {{ client_email }}.
       {% else %}
-      Inquiry email recipient: our team only.
       {% endif %}
     </div>
     <div class="text-gold-70 small mt-3">
-      We sent your order to our team. If you have any questions, feel free to <a href="{{ url_for('contact') }}"
+      We received your order. If you have any questions, feel free to <a href="{{ url_for('contact') }}"
         class="text-gold-70 text-decoration-none"><u>contact us</u></a>.
     </div>
   </div>

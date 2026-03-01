@@ -4,7 +4,8 @@
 <section class="container py-5 checkout-page" style="max-width: 900px;">
   <h1 class="text-gold mb-2">Submit Inquiry</h1>
   <div class="card bg-dark border-gold p-3 checkout-intro-card">
-    <p class="text-gold-70 mb-0">We'll contact you with availability & wholesale pricing.</p>
+    <p class="text-gold-70 mb-0">We'll contact you with availability & wholesale pricing. After submitting, your order will
+      be shared with our team and you'll be able to download a CSV/PDF.</p>
   </div>
 
   {% if items|length == 0 %}
@@ -24,15 +25,15 @@
 
         <div class="row g-3">
           <div class="col-12 col-md-6">
-            <label class="form-label text-gold-70">Name *</label>
+            <label class="form-label text-gold-70">Name*</label>
             <input name="name" class="form-control bg-black text-light border-gold" required>
           </div>
           <div class="col-12 col-md-6">
-            <label class="form-label text-gold-70">Company Name *</label>
+            <label class="form-label text-gold-70">Company Name*</label>
             <input name="company" class="form-control bg-black text-light border-gold" required>
           </div>
           <div class="col-12 col-md-6">
-            <label class="form-label text-gold-70">Phone Number *</label>
+            <label class="form-label text-gold-70">Phone Number*</label>
             <input name="phone" class="form-control bg-black text-light border-gold" required placeholder="(###) ###-####">
           </div>
           <div class="col-12 col-md-6">
@@ -47,7 +48,7 @@
           </div>
         </div>
 
-        <p class="text-gold-70 small mt-2 mb-0">*Required fields</p>
+        <p class="text-gold-70 small mt-2 mb-0"><i>*Required fields</i></p>
 
         <hr class="border-gold my-4">
 
@@ -83,10 +84,6 @@
           <div class="text-gold-70 small">Total items: <span class="text-gold">{{ items|length }}</span></div>
           <div class="text-gold-70 small">Total quantity: <span class="text-gold">{{ items|sum(attribute='qty') }}</span></div>
         </div>
-
-        <p class="text-gold-70 small mt-3 mb-0">
-          After submitting, your order will be shared with our team. You'll also be able to download a CSV or PDF.
-        </p>
       </form>
     </div>
   {% endif %}

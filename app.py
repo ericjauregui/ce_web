@@ -259,6 +259,7 @@ Total quantity: {total_quantity}</p>
 
 @app.route("/download/order/<token>.csv")
 def download_order_csv(token: str):
+    from datetime import date
     if session.get("last_order_token") != token:
         abort(404)
     csv_text = session.get("last_order_csv")
@@ -270,12 +271,13 @@ def download_order_csv(token: str):
         io.BytesIO(data),
         mimetype="text/csv",
         as_attachment=True,
-        download_name=f"inquiry_{token[:8]}.csv",
+        download_name=f"ce_order_{str(date.today().strftime("%m%d%y"))}.csv",
     )
 
 
 @app.route("/download/order/<token>.pdf")
 def download_order_pdf(token: str):
+    from datetime import date
     if session.get("last_order_token") != token:
         abort(404)
 
@@ -288,7 +290,7 @@ def download_order_pdf(token: str):
         io.BytesIO(pdf_bytes),
         mimetype="application/pdf",
         as_attachment=True,
-        download_name=f"inquiry_{token[:8]}.pdf",
+        download_name=f"ce_order_{str(date.today().strftime("%m%d%y"))}.pdf",
     )
 
 
