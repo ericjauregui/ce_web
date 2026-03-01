@@ -193,6 +193,7 @@ def checkout():
     name = (request.form.get("name") or "").strip()
     company = (request.form.get("company") or "").strip()
     phone = (request.form.get("phone") or "").strip()
+    client_email = (request.form.get("email") or "").strip()
     notes = (request.form.get("notes") or "").strip()
 
     if not (name and company and phone) or len(items) == 0:
@@ -206,28 +207,54 @@ def checkout():
     session["last_order_rows"] = order_rows
     session["last_order_token"] = token
 
-    subject = f"California Earrings inquiry — {company} ({name})"
-    body = f"""Inquiry submitted.
+    total_items = len(items)
+    total_quantity = cart_total_items(cart_data)
 
-Name: {name}
-Company: {company}
-Phone: {phone}
-Notes: {notes}
+    subject = "Thank you for your Order | California Earrings"
+    body = f"""Hi {company},
 
-Distinct items: {len(items)}
-Total qty: {cart_total_items(cart_data)}
+Thank you for submtiting your inquiry. We'll get back to you shortly with the full invoice.
+
+Total items: {total_items}
+Total quantity: {total_quantity}
+
+Best,
+
+California Earrings
+ce_logo_full.png
+"""
+    logo_url = f"{_canonical_base_url()}{url_for('static', filename='assets/ce_logo_full.png')}"
+    html_body = f"""<p>Hi {company},</p>
+<p>Thank you for submtiting your inquiry. We'll get back to you shortly with the full invoice.</p>
+<p>Total items: {total_items}<br>
+Total quantity: {total_quantity}</p>
+<p>Best,</p>
+<p>California Earrings<br><br>
+<img src=\"{logo_url}\" alt=\"California Earrings\" style=\"max-width: 220px; height: auto;\"></p>
 """
     filename = f"order_{company.lower().replace(' ', '_')}_{token[:8]}.csv"
 
     sent = False
     try:
-        sent = send_order_email(subject, body, csv_bytes, filename)
+        sent = send_order_email(
+            subject,
+            body,
+            csv_bytes,
+            filename,
+            client_email=client_email,
+            html_body=html_body,
+        )
     except Exception:
         sent = False
 
     session["cart"] = {}
     session["cart_notes"] = {}
-    return render_template("order_submitted.html", token=token, email_sent=sent)
+    return render_template(
+        "order_submitted.html",
+        token=token,
+        email_sent=sent,
+        client_email=client_email,
+    )
 
 
 @app.route("/download/order/<token>.csv")

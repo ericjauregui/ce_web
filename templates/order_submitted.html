@@ -15,6 +15,13 @@ copy and contact us with any follow-up details.{% endblock %}
       <a class="btn btn-outline-gold" href="{{ url_for('download_order_pdf', token=token) }}">Download PDF</a>
       </div>
     <div class="text-gold-70 small mt-3">
+      {% if client_email %}
+      Inquiry email recipients: our team and {{ client_email }}.
+      {% else %}
+      Inquiry email recipient: our team only.
+      {% endif %}
+    </div>
+    <div class="text-gold-70 small mt-3">
       We sent your order to our team. If you have any questions, feel free to <a href="{{ url_for('contact') }}"
         class="text-gold-70 text-decoration-none"><u>contact us</u></a>.
     </div>

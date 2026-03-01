@@ -82,6 +82,9 @@ def cart_to_csv_bytes(order_rows: list[dict[str, Any]]) -> bytes:
     writer = csv.writer(buffer)
     writer.writerow(["code", "name", "quantity", "notes"])
 
+    total_items = len(order_rows)
+    total_quantity = sum(int(row.get("quantity") or 0) for row in order_rows)
+
     for row in order_rows:
         writer.writerow(
             [
@@ -91,6 +94,10 @@ def cart_to_csv_bytes(order_rows: list[dict[str, Any]]) -> bytes:
                 row.get("notes", ""),
             ]
         )
+
+    writer.writerow([])
+    writer.writerow(["", "Total items:", total_items, ""])
+    writer.writerow(["", "Total quantity:", total_quantity, ""])
 
     return buffer.getvalue().encode("utf-8")
 
@@ -120,6 +127,9 @@ def cart_to_pdf_bytes(order_rows: list[dict[str, Any]], product_images_dir: Path
     table_data: list[list[Any]] = [
         ["Image", "Code", "Name", "Quantity", "Notes"]]
 
+    total_items = len(order_rows)
+    total_quantity = sum(int(row.get("quantity") or 0) for row in order_rows)
+
     for row in order_rows:
         image_cell: Any = ""
         image_name = str(row.get("image") or "").strip()
@@ -141,6 +151,9 @@ def cart_to_pdf_bytes(order_rows: list[dict[str, Any]], product_images_dir: Path
             ]
         )
 
+    table_data.append(["", "", "Total items:", str(total_items), ""])
+    table_data.append(["", "", "Total quantity:", str(total_quantity), ""])
+
     table = Table(table_data, colWidths=[52, 76, 210, 70, 132], repeatRows=1)
     table.setStyle(
         TableStyle(
@@ -156,6 +169,8 @@ def cart_to_pdf_bytes(order_rows: list[dict[str, Any]], product_images_dir: Path
                 ("FONTSIZE", (0, 0), (-1, -1), 9),
                 ("TOPPADDING", (0, 0), (-1, -1), 6),
                 ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
+                ("FONTNAME", (2, -2), (3, -1), "Helvetica-Bold"),
+                ("BACKGROUND", (0, -2), (-1, -1), colors.HexColor("#fff8df")),
             ]
         )
     )

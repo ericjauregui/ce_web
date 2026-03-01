@@ -24,23 +24,30 @@
 
         <div class="row g-3">
           <div class="col-12 col-md-6">
-            <label class="form-label text-gold-70">Name</label>
+            <label class="form-label text-gold-70">Name *</label>
             <input name="name" class="form-control bg-black text-light border-gold" required>
           </div>
           <div class="col-12 col-md-6">
-            <label class="form-label text-gold-70">Company Name</label>
+            <label class="form-label text-gold-70">Company Name *</label>
             <input name="company" class="form-control bg-black text-light border-gold" required>
           </div>
           <div class="col-12 col-md-6">
-            <label class="form-label text-gold-70">Phone Number</label>
+            <label class="form-label text-gold-70">Phone Number *</label>
             <input name="phone" class="form-control bg-black text-light border-gold" required placeholder="(###) ###-####">
           </div>
           <div class="col-12 col-md-6">
-            <label class="form-label text-gold-70">Notes (optional)</label>
+            <label class="form-label text-gold-70">Email</label>
+            <input name="email" type="email" inputmode="email" class="form-control bg-black text-light border-gold"
+              placeholder="you@company.com">
+          </div>
+          <div class="col-12">
+            <label class="form-label text-gold-70">Notes</label>
             <input name="notes" class="form-control bg-black text-light border-gold"
               placeholder="Shipping state/country, preferred stones, etc.">
           </div>
         </div>
+
+        <p class="text-gold-70 small mt-2 mb-0">*Required fields</p>
 
         <hr class="border-gold my-4">
 
@@ -49,6 +56,7 @@
           <table class="table table-dark align-middle mb-0 minimal-items-table checkout-items-table">
             <thead>
               <tr>
+                <th>Item</th>
                 <th>Code</th>
                 <th>Name</th>
                 <th>Quantity</th>
@@ -58,6 +66,9 @@
             <tbody>
               {% for row in items %}
               <tr>
+                <td class="cell-item" data-label="Item">
+                  <img src="{{ url_for('static', filename='product_images/' ~ row.product.image) }}" class="cart-thumb" alt="{{ row.product.name }}">
+                </td>
                 <td class="cell-code" data-label="Code"><span class="code-badge">{{ row.product.code }}</span></td>
                 <td class="cell-item" data-label="Item">{{ row.product.name }}</td>
                 <td class="cell-qty" data-label="Quantity">{{ row.qty }}</td>
@@ -69,7 +80,7 @@
         </div>
 
         <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mt-3">
-          <div class="text-gold-70 small">Unique items: <span class="text-gold">{{ items|length }}</span></div>
+          <div class="text-gold-70 small">Total items: <span class="text-gold">{{ items|length }}</span></div>
           <div class="text-gold-70 small">Total quantity: <span class="text-gold">{{ items|sum(attribute='qty') }}</span></div>
         </div>
 
