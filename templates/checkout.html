@@ -1,8 +1,8 @@
 {% extends "base.html" %}
-{% block title %}Checkout Order | California Earrings{% endblock %}
+{% block title %}Submit Inquiry | California Earrings{% endblock %}
 {% block content %}
 <section class="container py-5 checkout-page" style="max-width: 900px;">
-  <h1 class="text-gold mb-2">Checkout Order</h1>
+  <h1 class="text-gold mb-2">Submit Inquiry</h1>
   <div class="card bg-dark border-gold p-3 checkout-intro-card">
     <p class="text-gold-70 mb-0">We'll contact you with availability & wholesale pricing.</p>
   </div>
@@ -19,7 +19,7 @@
       <form method="post" action="{{ url_for('checkout') }}">
         <div class="d-flex gap-2 checkout-top-actions mb-4">
           <a class="btn btn-outline-gold" href="{{ url_for('cart') }}">Back to Order</a>
-          <button class="btn btn-outline-gold" type="submit">Submit Order</button>
+          <button class="btn btn-outline-gold" type="submit">Submit Inquiry</button>
         </div>
 
         <div class="row g-3">
@@ -74,7 +74,7 @@
         </div>
 
         <p class="text-gold-70 small mt-3 mb-0">
-          After submitting, your order will be shared with our team. You'll also be able to download the CSV.
+          After submitting, your order will be shared with our team. You'll also be able to download a CSV or PDF.
         </p>
       </form>
     </div>

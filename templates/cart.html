@@ -5,10 +5,12 @@
   <h1 class="text-gold mb-3">Shopping Cart</h1>
 <div class="d-flex gap-2 cart-top-actions mb-3">
   <a class="btn btn-outline-gold cart-back-btn" href="{{ url_for('index') }}#section-studs">Back to Catalog</a>
-  <a class="btn btn-outline-gold" href="{{ url_for('checkout') }}">Checkout (no payment)</a>
+  {% if items|length > 0 %}
+  <a class="btn btn-outline-gold cart-checkout-btn" href="{{ url_for('checkout') }}">Submit Inquiry (no payment)</a>
+  {% endif %}
 </div>
 
-  <div class="card bg-dark border-gold p-3 cart-intro-card">
+  <div class="card bg-dark border-gold p-3 cart-intro-card" id="cartIntroCard">
       <p class="text-gold-70 mb-0">Checkout your order and we'll follow up with wholesale pricing & availability. No payment
         required.</p>
   </div>
@@ -68,7 +70,7 @@
             <div class="text-gold-70 small">Total Items:<span id="cartLineItemCount">{{ items|length }}</span></div>
             <div class="text-gold-70 small">Total Quantity:<span id="cartTotalQty">{{ total_items }}</span></div>
           </div>
-          <a class="btn btn-outline-gold" href="{{ url_for('checkout') }}">Checkout (no payment)</a>
+          <a class="btn btn-outline-gold cart-checkout-btn" href="{{ url_for('checkout') }}">Submit Inquiry (no payment)</a>
         </div>
       </div>
     {% endif %}
@@ -91,6 +93,18 @@ function clampQty(q){
   if (isNaN(q) || q < 0) q = 0;
   if (q > 999) q = 999;
   return q;
+}
+
+function setCheckoutVisibility(hasItems) {
+  document.querySelectorAll(".cart-checkout-btn").forEach((button) => {
+    button.style.display = hasItems ? "" : "none";
+  });
+}
+
+function setCartIntroVisibility(hasItems) {
+  const introCard = document.getElementById("cartIntroCard");
+  if (!introCard) return;
+  introCard.style.display = hasItems ? "" : "none";
 }
 
       function getLineItemCount() {
@@ -121,6 +135,9 @@ function clampQty(q){
     const totalQtyEl = document.getElementById("cartTotalQty");
     if (totalQtyEl) totalQtyEl.textContent = "0";
 
+    setCheckoutVisibility(false);
+    setCartIntroVisibility(false);
+
     const card = document.getElementById("cartContentCard");
     if (!card || card.querySelector(".cart-empty-message")) return;
 
@@ -144,16 +161,30 @@ function clampQty(q){
   }
 async function refreshCartCount(){
   const data = await fetch("/api/cart/count").then(r => r.json());
+  const totalItems = Number(data.total_items) || 0;
   const badge = document.getElementById("cartCountBadge");
   if (badge){
-    badge.textContent = data.total_items || 0;
-    badge.style.display = (data.total_items || 0) > 0 ? "inline-block" : "none";
+    badge.textContent = totalItems;
+    badge.style.display = totalItems > 0 ? "inline-block" : "none";
   }
   const totalQty = document.getElementById("cartTotalQty");
-  if (totalQty) totalQty.textContent = data.total_items || 0;
+  if (totalQty) totalQty.textContent = totalItems;
   const lineCountEl = document.getElementById("cartLineItemCount");
-  if (lineCountEl) lineCountEl.textContent = getLineItemCount();
+  const lineItemCount = getLineItemCount();
+  if (lineCountEl) lineCountEl.textContent = lineItemCount;
+
+  const hasItems = totalItems > 0 && lineItemCount > 0;
+  setCheckoutVisibility(hasItems);
+  setCartIntroVisibility(hasItems);
 }
+document.addEventListener("DOMContentLoaded", () => {
+  const totalQtyEl = document.getElementById("cartTotalQty");
+  const totalQty = totalQtyEl ? clampQty(totalQtyEl.textContent) : 0;
+  const lineItemCount = getLineItemCount();
+  const hasItems = totalQty > 0 && lineItemCount > 0;
+  setCheckoutVisibility(hasItems);
+  setCartIntroVisibility(hasItems);
+});
 document.addEventListener("click", async (e) => {
   const minus = e.target.closest(".qty-minus");
   const plus = e.target.closest(".qty-plus");

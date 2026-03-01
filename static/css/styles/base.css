@@ -512,7 +512,41 @@ body {
       min-height: var(--cta-btn-min-height);
         padding: var(--cta-btn-pad-y) var(--cta-btn-pad-x);
       border-radius: 999px;
-      text-decoration: none;
+      text-decoration-line: underline;
+      text-underline-offset: .12em;
+      text-decoration-thickness: .08em;
+      cursor: pointer;
+      transition: transform .18s ease, filter .18s ease, box-shadow .18s ease;
+      -webkit-tap-highlight-color: transparent;
+  }
+
+  .product-card .product-detail-link.code-badge:hover,
+  .product-card .product-detail-link.code-badge:focus-visible {
+    transform: scale(1.04);
+    filter: brightness(1.08);
+    box-shadow: 0 0 0 1px rgb(var(--gold-rgb) / .5), 0 10px 22px rgba(0, 0, 0, .3);
+  }
+
+  .product-card .product-detail-link.code-badge:active {
+    transform: scale(0.95);
+    filter: brightness(1.04);
+    box-shadow: 0 0 0 1px rgb(var(--gold-rgb) / .38), 0 4px 10px rgba(0, 0, 0, .24);
+  }
+
+  .product-card .product-detail-link.code-badge:focus-visible {
+    outline: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .product-card .product-detail-link.code-badge {
+      transition: filter .12s ease, box-shadow .12s ease;
+    }
+
+    .product-card .product-detail-link.code-badge:hover,
+    .product-card .product-detail-link.code-badge:focus-visible,
+    .product-card .product-detail-link.code-badge:active {
+      transform: none;
+    }
   }
 
   .product-qty-control {
