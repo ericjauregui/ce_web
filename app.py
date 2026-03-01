@@ -325,6 +325,13 @@ def api_cart_remove():
     return jsonify({"ok": True, "total_items": cart_total_items(cart_data), "distinct_items": len(cart_data)})
 
 
+@app.route("/api/cart/clear", methods=["POST"])
+def api_cart_clear():
+    session["cart"] = {}
+    session["cart_notes"] = {}
+    return jsonify({"ok": True, "total_items": 0, "distinct_items": 0})
+
+
 @app.route("/api/cart/note", methods=["POST"])
 def api_cart_note():
     payload = request.get_json(force=True, silent=True) or {}

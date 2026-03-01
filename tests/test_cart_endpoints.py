@@ -48,6 +48,22 @@ class CartEndpointTests(BaseWebTest):
         self.assertEqual(count_data["total_items"], 0)
         self.assertEqual(count_data["distinct_items"], 0)
 
+    def test_clear_endpoint_empties_cart(self) -> None:
+        self.client.post("/api/cart/add", json={"code": self.valid_code, "qty": 3})
+
+        clear_response = self.client.post("/api/cart/clear", json={})
+        self.assertEqual(clear_response.status_code, 200)
+        clear_data = clear_response.get_json()
+        self.assertTrue(clear_data["ok"])
+        self.assertEqual(clear_data["total_items"], 0)
+        self.assertEqual(clear_data["distinct_items"], 0)
+
+        count_response = self.client.get("/api/cart/count")
+        self.assertEqual(count_response.status_code, 200)
+        count_data = count_response.get_json()
+        self.assertEqual(count_data["total_items"], 0)
+        self.assertEqual(count_data["distinct_items"], 0)
+
     def test_unknown_code_is_rejected(self) -> None:
         response = self.client.post("/api/cart/add", json={"code": "NOT_A_CODE", "qty": 1})
         self.assertEqual(response.status_code, 400)

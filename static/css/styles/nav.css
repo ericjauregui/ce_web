@@ -46,10 +46,15 @@
 }
 
 .cart-link svg {
+  width: 24px;
+    height: 24px;
   transform-origin: center;
   will-change: transform;
 }
 
+#cartCountBadge {
+  transform: translate(-70%, -56%);
+}
 .cart-link:focus-visible svg {
   animation: cart-shake 420ms ease-in-out;
 }
@@ -70,9 +75,40 @@
 
 /* Navbar expandable search */
 .nav-actions {
-  gap: .25rem;
+  gap: .4rem;
+  }
+  
+  .nav-actions .cart-link {
+    margin-left: .35rem !important;
+    margin-right: .55rem !important;
+  }
+  
+  .navbar .navbar-toggler {
+    border: 0;
+    border-left: 1px solid var(--gold-outline);
+    border-radius: 0;
+    margin-left: .3rem;
+    padding: .3rem 0 .3rem .75rem;
+    box-shadow: none;
+  }
+  
+  .navbar .navbar-toggler:focus,
+  .navbar .navbar-toggler:focus-visible {
+    box-shadow: none;
+    border-left-color: var(--gold-outline-strong);
+  }
+  
+  .navbar .navbar-toggler-icon {
+    width: 1.35rem;
+    height: 1.35rem;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(215, 192, 122, 0.95)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
 }
 
+.navbar .navbar-collapse .navbar-nav .nav-link {
+  font-family: 'Lato', sans-serif;
+  font-weight: 400;
+  letter-spacing: .01rem;
+}
 .nav-search {
   display: flex;
   align-items: center;
@@ -266,13 +302,13 @@
     .nav-search-center {
         max-width: min(calc(100vw - 175px), 20rem);
       }
-    
+
       .nav-search-form {
         width: calc(100vw - .8rem);
         max-width: 32rem;
       }
     }
-    
+
     @media (max-width: 380px) {
   .nav-search-label {
     display: none;

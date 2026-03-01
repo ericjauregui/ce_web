@@ -131,6 +131,10 @@ html::before {
     --gold-outline: rgb(var(--gold-rgb) / 0.74);
     --gold-outline-strong: rgb(var(--gold-rgb) / 0.86);
   --gold-70: rgb(var(--gold-rgb) / 0.75);
+    --cta-btn-min-height: 36px;
+      --cta-btn-pad-y: .4rem;
+      --cta-btn-pad-x: .9rem;
+      --hero-pad-y: clamp(1.65rem, 3.2vw, 2.3rem);
     --gold-grad: linear-gradient(90deg,
         rgb(var(--gold-rgb) / 0.78),
         rgb(var(--gold-rgb) / 1),
@@ -237,8 +241,8 @@ body {
     min-height: inherit;
     display: flex;
     flex-direction: column;
-    padding-top: clamp(1.05rem, 2.8vw, 1.7rem);
-      padding-bottom: clamp(.9rem, 2.4vw, 1.45rem);
+    padding-top: var(--hero-pad-y);
+      padding-bottom: var(--hero-pad-y);
   }
 
   .hero-logo {
@@ -291,8 +295,8 @@ body {
     white-space: nowrap;
     font-size: clamp(.76rem, 2.7cqw, .98rem);
     line-height: 1.2;
-    padding: clamp(.28rem, 1.35cqw, .48rem) clamp(.48rem, 2.1cqw, .9rem);
-    min-height: 36px;
+    padding: var(--cta-btn-pad-y) var(--cta-btn-pad-x);
+      min-height: var(--cta-btn-min-height);
     display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -339,6 +343,9 @@ body {
   }
 
   @media (max-width: 767.98px) {
+    :root {
+        --hero-pad-y: clamp(1.1rem, 3.8vw, 1.55rem);
+      }
     body::before {
       opacity: 0.70;
         filter: blur(.45px) saturate(114%) brightness(86%);
@@ -363,11 +370,6 @@ body {
       max-width: 90%;
     }
 
-    .hero .container {
-      padding-top: clamp(.72rem, 2.5vw, 1.02rem);
-        padding-bottom: clamp(.64rem, 2vw, .9rem);
-      }
-
       .hero-actions {
         margin-top: clamp(.78rem, 2.8vw, 1.2rem) !important;
         margin-bottom: 0 !important;
@@ -375,7 +377,7 @@ body {
       }
 
       .hero-action-btn {
-        min-height: 38px;
+        min-height: var(--cta-btn-min-height);
         font-size: clamp(.9rem, 3.2cqw, 1.06rem);
         line-height: 1.22;
         padding-top: clamp(.34rem, 1.5cqw, .56rem);
@@ -502,13 +504,13 @@ body {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    min-height: 38px;
+    min-height: var(--cta-btn-min-height);
     }
-    
+
     .product-card .product-detail-link.code-badge {
       width: 100%;
-      min-height: 38px;
-      padding: .42rem .85rem;
+      min-height: var(--cta-btn-min-height);
+        padding: var(--cta-btn-pad-y) var(--cta-btn-pad-x);
       border-radius: 999px;
       text-decoration: none;
   }
@@ -609,8 +611,8 @@ body {
     align-items: center;
     justify-content: center;
     padding: .18rem .62rem;
-  font-weight: 700;
-  letter-spacing: .06rem;
+  font-weight: 600;
+    letter-spacing: .04rem;
     font-size: .96rem;
     text-align: center;
     line-height: 1;
@@ -667,10 +669,10 @@ body {
   align-items: center;
   justify-content: center;
   width: 100%;
-  min-height: 38px;
+  min-height: var(--cta-btn-min-height);
   margin-left: 0;
   margin-right: 0;
-  padding: .42rem .85rem;
+  padding: var(--cta-btn-pad-y) var(--cta-btn-pad-x);
   font-size: 1.04rem;
 }
 
@@ -739,4 +741,10 @@ footer {
 .section-title {
   font-family: 'Playfair Display', serif;
   letter-spacing: .02rem;
+}
+
+@media (max-width: 767.98px) {
+  :root {
+    --cta-btn-min-height: 38px;
+  }
 }
