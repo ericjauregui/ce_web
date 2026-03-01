@@ -268,6 +268,12 @@
   align-items: center;
 }
 
+.cart-page .cart-summary-metrics {
+  justify-content: center;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
+
 .cart-page .cart-summary-metrics .text-gold-70 span {
   margin-left: .28rem;
 }
@@ -281,11 +287,7 @@
 }
 
 .cart-page .cart-summary-metrics::after {
-  content: "";
-  width: 1px;
-  height: 1.05rem;
-  margin: 0 .5rem 0 .15rem;
-  background: rgb(var(--gold-rgb) / 0.36);
+  display: none;
 }
 
 @media (max-width: 575.98px) {
@@ -330,6 +332,19 @@
   opacity: 1 !important;
 }
 
+.checkout-page .checkout-field-error {
+  min-height: 1.1rem;
+  margin-top: .35rem;
+  font-size: .84rem;
+  color: var(--gold-70);
+}
+
+.checkout-page .form-control.checkout-input-invalid,
+.checkout-page .form-control.checkout-input-invalid:focus {
+  border-color: var(--gold-outline-strong) !important;
+  box-shadow: 0 0 0 .2rem rgba(215, 192, 122, .16) !important;
+}
+
 .order-submitted-page .btn-outline-gold {
   background: rgba(13, 13, 13, 0.88) !important;
   color: var(--gold) !important;
@@ -357,6 +372,7 @@
   font-weight: 600;
   padding-top: .7rem;
   padding-bottom: .7rem;
+  text-align: center;
 }
 
 .minimal-items-table tbody td {
@@ -370,6 +386,35 @@
   text-align: right;
 }
 
+.cart-page .minimal-items-table .cell-code,
+.cart-page .minimal-items-table .cell-qty,
+.cart-page .minimal-items-table .cell-notes {
+  text-align: center;
+}
+
+.cart-page .minimal-items-table .cell-qty .qty-control {
+  justify-content: center;
+  gap: .42rem;
+}
+
+.cart-page .minimal-items-table .cell-qty .qty-adjust-btn {
+  min-width: clamp(1.45rem, 11cqw, 2rem);
+  line-height: 1;
+  padding-left: clamp(.2rem, 1.4cqw, .6rem);
+  padding-right: clamp(.2rem, 1.4cqw, .6rem);
+}
+
+.cart-page .minimal-items-table .cell-qty .qty-input {
+  width: clamp(2.8rem, 22cqw, 4.9rem);
+}
+
+.cart-page .minimal-items-table .cell-code .code-badge {
+  min-width: 4.15rem;
+  padding: .24rem .66rem;
+  font-size: .96rem;
+  letter-spacing: .04rem;
+}
+
 .cart-page .minimal-items-table .cell-notes textarea.form-control.item-note-input,
 .checkout-page textarea.form-control.item-note-input,
 .minimal-items-table .cell-notes .item-note-input {
@@ -379,6 +424,13 @@
   background-color: rgba(13, 13, 13, 0.85) !important;
   border-color: var(--gold-outline) !important;
   caret-color: var(--gold) !important;
+  min-height: 36px;
+  height: 36px;
+  resize: none;
+  overflow: hidden;
+  line-height: 1.28;
+  padding-top: .42rem;
+  padding-bottom: .42rem;
 }
 
 .minimal-items-table .cell-notes .item-note-input:focus,
@@ -460,7 +512,8 @@
   }
 
   .minimal-items-table .cell-notes .item-note-input {
-    min-height: 74px;
+    min-height: 36px;
+    height: 36px;
   }
 
   .minimal-items-table .cell-notes .item-note-input::placeholder {

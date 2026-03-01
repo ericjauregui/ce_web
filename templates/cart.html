@@ -44,14 +44,14 @@
               <td class="cell-code" data-label="Code"><span class="code-badge">{{ row.product.code }}</span></td>
               <td class="cell-qty" data-label="Quantity">
                 <div class="qty-control" data-code="{{ row.product.code }}">
-                  <button class="btn btn-outline-gold btn-sm qty-minus" type="button">−</button>
-                  <input class="form-control form-control-sm bg-black text-light border-gold qty-input" value="{{ row.qty }}" inputmode="numeric">
-                  <button class="btn btn-outline-gold btn-sm qty-plus" type="button">+</button>
+                  <button class="btn btn-outline-gold qty-adjust-btn qty-minus" type="button">−</button>
+                  <input class="form-control bg-black text-light border-gold qty-input product-qty-input" value="{{ row.qty }}" inputmode="numeric">
+                  <button class="btn btn-outline-gold qty-adjust-btn qty-plus" type="button">+</button>
                 </div>
               </td>
               <td class="cell-notes" data-label="Item notes">
                 <textarea class="form-control form-control-sm bg-black text-light border-gold item-note-input"
-                  data-code="{{ row.product.code }}" rows="2" maxlength="500"
+                  data-code="{{ row.product.code }}" rows="1" maxlength="500"
                   placeholder="Add note for this item (optional)">{{ row.note }}</textarea>
                 </td>
                 <td class="cell-remove" data-label="">
@@ -93,6 +93,13 @@ function clampQty(q){
   if (isNaN(q) || q < 0) q = 0;
   if (q > 999) q = 999;
   return q;
+}
+
+function autoResizeNoteInput(input) {
+  if (!input) return;
+  input.style.height = "auto";
+  const minHeight = 36;
+  input.style.height = `${Math.max(minHeight, input.scrollHeight)}px`;
 }
 
 function setCheckoutVisibility(hasItems) {
@@ -184,6 +191,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const hasItems = totalQty > 0 && lineItemCount > 0;
   setCheckoutVisibility(hasItems);
   setCartIntroVisibility(hasItems);
+
+  document.querySelectorAll(".item-note-input").forEach((input) => {
+    autoResizeNoteInput(input);
+  });
 });
 document.addEventListener("click", async (e) => {
   const minus = e.target.closest(".qty-minus");
@@ -238,6 +249,8 @@ document.addEventListener("change", async (e) => {
   document.addEventListener("input", (e) => {
     const input = e.target.closest(".item-note-input");
     if (!input) return;
+
+    autoResizeNoteInput(input);
 
     const code = input.getAttribute("data-code") || "";
     if (!code) return;

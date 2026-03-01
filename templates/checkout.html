@@ -4,7 +4,7 @@
 <section class="container py-5 checkout-page" style="max-width: 900px;">
   <h1 class="text-gold mb-2">Submit Inquiry</h1>
   <div class="card bg-dark border-gold p-3 checkout-intro-card">
-    <p class="text-gold-70 mb-0">We'll contact you with availability & wholesale pricing. After submitting, your order will
+    <p class="text-gold-70 mb-0">We'll contact you with availability & wholesale pricing.<br><br>After submitting, your order will
       be shared with our team and you'll be able to download a CSV/PDF.</p>
   </div>
 
@@ -17,7 +17,7 @@
     </div>
   {% else %}
     <div class="card bg-dark border-gold p-3 mt-4">
-      <form method="post" action="{{ url_for('checkout') }}">
+      <form method="post" action="{{ url_for('checkout') }}" id="checkoutForm" novalidate>
         <div class="d-flex gap-2 checkout-top-actions mb-4">
           <a class="btn btn-outline-gold" href="{{ url_for('cart') }}">Back to Order</a>
           <button class="btn btn-outline-gold" type="submit">Submit Inquiry</button>
@@ -34,12 +34,29 @@
           </div>
           <div class="col-12 col-md-6">
             <label class="form-label text-gold-70">Phone Number*</label>
-            <input name="phone" class="form-control bg-black text-light border-gold" required placeholder="(###) ###-####">
+            <input
+              name="phone"
+              class="form-control bg-black text-light border-gold"
+              required
+              placeholder="(###) ###-####"
+              id="checkoutPhone"
+              aria-describedby="checkoutPhoneError"
+            >
+            <div id="checkoutPhoneError" class="checkout-field-error" aria-live="polite"></div>
           </div>
           <div class="col-12 col-md-6">
             <label class="form-label text-gold-70">Email</label>
-            <input name="email" type="email" inputmode="email" class="form-control bg-black text-light border-gold"
-              placeholder="you@company.com">
+            <input
+              name="email"
+              type="text"
+              inputmode="email"
+              autocomplete="email"
+              class="form-control bg-black text-light border-gold"
+              placeholder="you@company.com"
+              id="checkoutEmail"
+              aria-describedby="checkoutEmailError"
+            >
+            <div id="checkoutEmailError" class="checkout-field-error" aria-live="polite"></div>
           </div>
           <div class="col-12">
             <label class="form-label text-gold-70">Notes</label>
@@ -88,4 +105,94 @@
     </div>
   {% endif %}
 </section>
+{% endblock %}
+
+{% block body_end %}
+<script>
+  (function () {
+    const form = document.getElementById("checkoutForm");
+    const phoneInput = document.getElementById("checkoutPhone");
+    const phoneError = document.getElementById("checkoutPhoneError");
+    const emailInput = document.getElementById("checkoutEmail");
+    const emailError = document.getElementById("checkoutEmailError");
+    if (!form || !phoneInput || !phoneError || !emailInput || !emailError) return;
+
+    const phoneAllowedPattern = /^[0-9()+\-\.\s]+$/;
+    const phoneInvalidMessage = "Please enter a valid phone number";
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const invalidMessage = "Please enter a valid email address";
+
+    function setPhoneError(message) {
+      phoneError.textContent = message;
+      phoneInput.classList.toggle("checkout-input-invalid", Boolean(message));
+      phoneInput.setAttribute("aria-invalid", message ? "true" : "false");
+    }
+
+    function setEmailError(message) {
+      emailError.textContent = message;
+      emailInput.classList.toggle("checkout-input-invalid", Boolean(message));
+      emailInput.setAttribute("aria-invalid", message ? "true" : "false");
+    }
+
+    function validatePhoneField() {
+      const value = phoneInput.value.trim();
+      if (!value) {
+        setPhoneError("Please enter a phone number");
+        return false;
+      }
+
+      const digitCount = (value.match(/\d/g) || []).length;
+      const hasValidChars = phoneAllowedPattern.test(value);
+      if (!hasValidChars || digitCount < 7) {
+        setPhoneError(phoneInvalidMessage);
+        return false;
+      }
+
+      setPhoneError("");
+      return true;
+    }
+
+    function validateEmailField() {
+      const value = emailInput.value.trim();
+      if (!value) {
+        setEmailError("");
+        return true;
+      }
+      if (!emailPattern.test(value)) {
+        setEmailError(invalidMessage);
+        return false;
+      }
+      setEmailError("");
+      return true;
+    }
+
+    phoneInput.addEventListener("input", validatePhoneField);
+    phoneInput.addEventListener("blur", validatePhoneField);
+    emailInput.addEventListener("input", validateEmailField);
+    emailInput.addEventListener("blur", validateEmailField);
+
+    form.addEventListener("submit", function (event) {
+      const requiredFields = form.querySelectorAll("input[required]");
+      let missingRequired = false;
+      requiredFields.forEach(function (field) {
+        if (!field.value.trim()) {
+          missingRequired = true;
+        }
+      });
+
+      const phoneValid = validatePhoneField();
+      const emailValid = validateEmailField();
+      if (missingRequired || !phoneValid || !emailValid) {
+        event.preventDefault();
+        if (!phoneValid) {
+          phoneInput.focus();
+          return;
+        }
+        if (!emailValid) {
+          emailInput.focus();
+        }
+      }
+    });
+  })();
+</script>
 {% endblock %}

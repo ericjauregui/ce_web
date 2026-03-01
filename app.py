@@ -271,7 +271,7 @@ def download_order_csv(token: str):
         io.BytesIO(data),
         mimetype="text/csv",
         as_attachment=True,
-        download_name=f"ce_order_{str(date.today().strftime("%m%d%y"))}.csv",
+        download_name=f"ce_order_{str(date.today().strftime("%m%d%y"))}_{token[:4].lower()}.csv",
     )
 
 
@@ -290,7 +290,7 @@ def download_order_pdf(token: str):
         io.BytesIO(pdf_bytes),
         mimetype="application/pdf",
         as_attachment=True,
-        download_name=f"ce_order_{str(date.today().strftime("%m%d%y"))}.pdf",
+        download_name=f"ce_order_{str(date.today().strftime("%m%d%y"))}_{token[:4].lower()}.pdf",
     )
 
 

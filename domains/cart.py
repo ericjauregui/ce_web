@@ -95,9 +95,14 @@ def cart_to_csv_bytes(order_rows: list[dict[str, Any]]) -> bytes:
             ]
         )
 
-    writer.writerow([])
-    writer.writerow(["", "Total items:", total_items, ""])
-    writer.writerow(["", "Total quantity:", total_quantity, ""])
+    writer.writerow(
+        [
+            f"Total Items: {total_items}",
+            "",
+            f"Total Quantity: {total_quantity}",
+            "",
+        ]
+    )
 
     return buffer.getvalue().encode("utf-8")
 
@@ -119,10 +124,32 @@ def cart_to_pdf_bytes(order_rows: list[dict[str, Any]], product_images_dir: Path
     )
 
     styles = getSampleStyleSheet()
-    elements: list[Any] = [
-        Paragraph("California Earrings Order", styles["Title"]),
-        Spacer(1, 10),
-    ]
+    logo_path = product_images_dir.parent / "assets" / "ce_logo_shape.png"
+    title_cell = Paragraph("California Earrings Order", styles["Title"])
+    logo_cell: Any = ""
+    if logo_path.exists():
+        try:
+            logo_cell = Image(str(logo_path), width=150, height=30)
+            logo_cell.hAlign = "LEFT"
+        except Exception:
+            logo_cell = ""
+
+    header_table = Table([[logo_cell, title_cell]], colWidths=[180, 360])
+    header_table.setStyle(
+        TableStyle(
+            [
+                ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+                ("ALIGN", (0, 0), (0, 0), "LEFT"),
+                ("ALIGN", (1, 0), (1, 0), "CENTER"),
+                ("LEFTPADDING", (0, 0), (-1, -1), 0),
+                ("RIGHTPADDING", (0, 0), (-1, -1), 0),
+                ("TOPPADDING", (0, 0), (-1, -1), 0),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
+            ]
+        )
+    )
+
+    elements: list[Any] = [header_table, Spacer(1, 10)]
 
     table_data: list[list[Any]] = [
         ["Image", "Code", "Name", "Quantity", "Notes"]]
@@ -151,8 +178,16 @@ def cart_to_pdf_bytes(order_rows: list[dict[str, Any]], product_images_dir: Path
             ]
         )
 
-    table_data.append(["", "", "Total items:", str(total_items), ""])
-    table_data.append(["", "", "Total quantity:", str(total_quantity), ""])
+    totals_row_idx = len(table_data)
+    table_data.append(
+        [
+            f"Total Items: {total_items}",
+            "",
+            f"Total Quantity: {total_quantity}",
+            "",
+            "",
+        ]
+    )
 
     table = Table(table_data, colWidths=[52, 76, 210, 70, 132], repeatRows=1)
     table.setStyle(
@@ -169,8 +204,10 @@ def cart_to_pdf_bytes(order_rows: list[dict[str, Any]], product_images_dir: Path
                 ("FONTSIZE", (0, 0), (-1, -1), 9),
                 ("TOPPADDING", (0, 0), (-1, -1), 6),
                 ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
-                ("FONTNAME", (2, -2), (3, -1), "Helvetica-Bold"),
-                ("BACKGROUND", (0, -2), (-1, -1), colors.HexColor("#fff8df")),
+                ("SPAN", (0, totals_row_idx), (1, totals_row_idx)),
+                ("SPAN", (2, totals_row_idx), (3, totals_row_idx)),
+                ("FONTNAME", (0, totals_row_idx), (3, totals_row_idx), "Helvetica-Bold"),
+                ("BACKGROUND", (0, totals_row_idx), (-1, totals_row_idx), colors.HexColor("#fff8df")),
             ]
         )
     )

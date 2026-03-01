@@ -6,24 +6,27 @@ copy and contact us with any follow-up details.{% endblock %}
 {% block content %}
 <section class="container py-5 order-submitted-page" style="max-width: 900px;">
   <h1 class="text-gold mb-2">Order Submitted</h1>
-  <p class="text-gold-70">Thank you for your order! We'll contact you shortly with pricing & availability.</p>
 
-  <div class="card bg-dark border-gold p-3 mt-4">
-    <h2 class="h6 text-gold mb-3">Download a copy of your order</h2>
-    <div class="d-flex flex-wrap gap-2 align-items-center">
+  <div class="card bg-dark border-gold p-3 mt-4 order-submitted-card">
+    <p class="text-gold-70 mb-0">Thank you for your order! We'll contact you shortly with pricing & availability.</p>
+    <p class="text-gold-70 small mt-3 mb-0">
+      If you have any questions, feel free to <a href="{{ url_for('contact') }}"
+        class="text-gold-70 text-decoration-none"><u>contact us</u></a>.
+    </p>
+
+    <hr class="border-gold my-4">
+
+    <h2 class="h6 text-gold mb-2">Download a copy of your order below:</h2>
+    <div class="d-flex flex-wrap gap-2 align-items-center mt-2">
       <a class="btn btn-outline-gold" href="{{ url_for('download_order_csv', token=token) }}">Download CSV</a>
       <a class="btn btn-outline-gold" href="{{ url_for('download_order_pdf', token=token) }}">Download PDF</a>
-      </div>
-    <div class="text-gold-70 small mt-3">
-      {% if client_email %}
+    </div>
+
+    {% if client_email %}
+    <p class="text-gold-70 small mt-3 mb-0">
       Email recipients: {{ client_email }}.
-      {% else %}
-      {% endif %}
-    </div>
-    <div class="text-gold-70 small mt-3">
-      We received your order. If you have any questions, feel free to <a href="{{ url_for('contact') }}"
-        class="text-gold-70 text-decoration-none"><u>contact us</u></a>.
-    </div>
+    </p>
+    {% endif %}
   </div>
 
   <div class="mt-4">
