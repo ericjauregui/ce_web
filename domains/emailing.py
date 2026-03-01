@@ -25,10 +25,10 @@ def send_order_email(
     smtp_port = int(os.getenv("SMTP_PORT", "587") or "587")
     smtp_user = os.getenv("SMTP_USER", "").strip()
     smtp_pass = os.getenv("SMTP_PASS", "").strip()
-    email_to = os.getenv("EMAIL_TO", "").strip()
     email_from = os.getenv("EMAIL_FROM", smtp_user).strip()
+    email_to = os.getenv("EMAIL_TO", email_from).strip()
 
-    if not (smtp_host and smtp_user and smtp_pass and email_to and email_from):
+    if not (smtp_host and smtp_user and smtp_pass and email_from):
         return False
 
     primary_recipient = _normalized_email(email_to)
