@@ -1,11 +1,5 @@
 {
-  "order": [
-    "studs",
-    "bezel",
-    "hearts",
-    "more-styles",
-    "nose-rings"
-  ],
+  "order": ["studs", "bezel", "hearts", "more-styles", "nose-rings"],
   "labels": {
     "studs": "Studs",
     "bezel": "Bezel Studs",
