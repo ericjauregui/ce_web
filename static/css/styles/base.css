@@ -11,7 +11,7 @@ body {
 body::before {
   content: "";
   position: fixed;
-  top: var(--nav-height);
+  top: var(--nav-actual-height, var(--nav-height));
   left: 0;
   right: 0;
     bottom: 0;
@@ -31,7 +31,7 @@ body::before {
 body::after {
   content: "";
   position: fixed;
-  top: var(--nav-height);
+  top: var(--nav-actual-height, var(--nav-height));
   left: 0;
   right: 0;
   bottom: 0;
@@ -50,7 +50,7 @@ body::after {
 html::before {
   content: "";
   position: fixed;
-  top: var(--nav-height);
+  top: var(--nav-actual-height, var(--nav-height));
   left: 0;
   right: 0;
   bottom: 0;
@@ -124,7 +124,7 @@ html::before {
 
 
 :root {
-  --nav-height: 50px;
+  --nav-height: 66px;
   --gold-rgb: 215 192 122;
   --gold: #d7c07a;
   --gold-subtle: rgb(var(--gold-rgb) / 0.62);
@@ -144,6 +144,11 @@ body {
   font-family: 'Lato', sans-serif;
   color: #e8e8e8;
   background: #0d0d0d;
+}
+
+main {
+  margin-top: 0 !important;
+  padding-top: var(--nav-actual-height, var(--nav-height)) !important;
 }
 
 .brand {
@@ -286,8 +291,9 @@ body {
     justify-content: center;
   align-items: center;
   gap: clamp(.42rem, 1vw, .68rem);
-    margin-top: auto !important;
-    margin-bottom: auto !important;
+    margin-top: clamp(1.35rem, 2.9vw, 2rem) !important;
+    margin-bottom: 0 !important;
+    padding-bottom: clamp(.18rem, .7vw, .42rem);
   }
 
   .hero-action-btn {
@@ -299,8 +305,9 @@ body {
     padding-inline: var(--cta-btn-pad-x);
     min-height: var(--cta-btn-min-height);
     box-sizing: border-box;
-    display: inline-grid;
-    place-items: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     text-align: center;
     border-radius: 999px;
     border: 1px solid var(--gold-outline) !important;
@@ -312,7 +319,6 @@ body {
   .hero-action-btn__label {
     display: block;
     line-height: 1;
-    transform: translateY(-0.04em);
   }
 
   .hero-action-btn:hover,
@@ -497,6 +503,11 @@ body {
     max-height: var(--drawer-height);
     opacity: 1;
     margin-top: .65rem;
+  }
+
+  .product-pricing-note {
+    font-size: .72rem;
+    line-height: 1.2;
   }
 
   .product-actions {

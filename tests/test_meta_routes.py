@@ -13,6 +13,7 @@ class MetaRouteTests(BaseWebTest):
         self.assertEqual(response.status_code, 200)
         body = response.get_data(as_text=True)
         self.assertIn("https://californiaearrings.com/", body)
+        self.assertIn("https://californiaearrings.com/faqs", body)
         self.assertIn(f"https://californiaearrings.com/team/{self.first_member['slug']}", body)
         self.assertIn(
             f"https://californiaearrings.com/product/{self.valid_code}", body)

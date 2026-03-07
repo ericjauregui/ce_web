@@ -49,8 +49,10 @@ class FrontendContractTests(BaseWebTest):
         self.assertIn(
             "header.hero+section.py-5 { padding-top: 0 !important; }", condensed)
         self.assertIn("min-height: inherit;", css)
-        self.assertIn("margin-top: auto !important;", css)
-        self.assertIn("margin-bottom: auto !important;", css)
+        self.assertIn(
+            "margin-top: clamp(.78rem, 2.8vw, 1.2rem) !important;", css)
+        self.assertIn("margin-bottom: 0 !important;", css)
+        self.assertIn("padding-bottom: clamp(.2rem, 1.4vw, .42rem);", css)
 
     def test_nav_search_centering_and_form_expansion_contracts(self) -> None:
         css = self.load_site_css()
@@ -70,17 +72,123 @@ class FrontendContractTests(BaseWebTest):
     def test_section_chip_row_and_cta_button_stay_vertically_centered(self) -> None:
         css = self.load_site_css()
         condensed = re.sub(r"\s+", " ", css)
+        body = self.client.get("/").get_data(as_text=True)
 
         self.assertIn(".section-header-cats {", css)
         self.assertIn("align-items: center;", css)
         self.assertIn("min-height: 2.15rem;", css)
         self.assertIn(".section-header-jump {", css)
         self.assertIn("align-self: center;", css)
+        self.assertIn(".hero-actions {", css)
+        self.assertIn(
+            "margin-top: clamp(1.35rem, 2.9vw, 2rem) !important;", css)
+        self.assertIn("padding-bottom: clamp(.18rem, .7vw, .42rem);", css)
         self.assertIn(".hero-action-btn {", css)
+        self.assertIn("display: inline-flex;", css)
+        self.assertIn("align-items: center;", css)
+        self.assertIn("justify-content: center;", css)
+        self.assertIn("text-align: center;", css)
+        self.assertIn(
+            "padding-block: max(var(--cta-btn-pad-y), calc((var(--cta-btn-min-height) - 1em) / 2));",
+            css,
+        )
+        self.assertIn(".hero-action-btn__label {", css)
+        self.assertIn("line-height: 1;", css)
+        self.assertIn(".hero-action-btn { flex: 0 1", condensed)
+        self.assertIn("class=\"hero-action-btn__label\"", body)
+
+    def test_main_and_background_layers_follow_actual_nav_height(self) -> None:
+        css = self.load_site_css()
+        body = self.client.get("/").get_data(as_text=True)
+        condensed = re.sub(r"\s+", " ", css)
+
+        self.assertIn("--nav-height: 66px;", css)
+        self.assertIn("top: var(--nav-actual-height, var(--nav-height));", css)
+        self.assertIn(
+            "main { margin-top: 0 !important; padding-top: var(--nav-actual-height, var(--nav-height)) !important; }",
+            condensed,
+        )
+        self.assertIn("<main>", body)
+        self.assertNotIn("<main class=\"mt-5 pt-4\">", body)
+
+    def test_page_titles_keep_centered_grid_layout_and_centered_back_button(self) -> None:
+        css = self.load_site_css()
+        condensed = re.sub(r"\s+", " ", css)
+        about_body = self.client.get("/about").get_data(as_text=True)
+        contact_body = self.client.get("/contact").get_data(as_text=True)
+        faqs_body = self.client.get("/faqs").get_data(as_text=True)
+        team_body = self.client.get("/team").get_data(as_text=True)
+        cart_body = self.client.get("/cart").get_data(as_text=True)
+
+        self.assertIn(".page-title-row {", css)
+        self.assertIn("display: grid;", css)
+        self.assertIn("container-type: inline-size;", css)
+        self.assertIn(
+            "grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);",
+            css,
+        )
+        self.assertIn(".page-title-row .page-title-back {", css)
+        self.assertIn(".page-title-row .page-title-action {", css)
+        self.assertIn(".page-title-row .page-title-spacer {", css)
         self.assertIn("display: inline-flex;", css)
         self.assertIn("justify-content: center;", css)
         self.assertIn("text-align: center;", css)
-        self.assertIn(".hero-action-btn { flex: 0 1", condensed)
+        self.assertIn("white-space: nowrap;", css)
+        self.assertIn("width: fit-content;", css)
+        self.assertIn(".about-page .btn-outline-gold,", css)
+        self.assertIn(".contact-page .btn-outline-gold,", css)
+        self.assertIn(".faqs-page .btn-outline-gold,", css)
+        self.assertIn(".team-page .btn-outline-gold,", css)
+        self.assertIn(".cart-page .btn-outline-gold {", css)
+        self.assertIn("background: rgba(13, 13, 13, 0.88) !important;", css)
+        self.assertIn("backdrop-filter: blur(2px);", css)
+        self.assertIn(".page-title-row > h1 {", css)
+        self.assertIn("grid-column: 2;", css)
+        self.assertIn("justify-self: center;", css)
+        self.assertIn("font-size: clamp(1.75rem, 3.3vw, 2.5rem);", css)
+        self.assertIn("white-space: nowrap;", css)
+        self.assertIn("text-align: center;", condensed)
+        self.assertIn("font-size: clamp(1.45rem, 5.1cqw, 2.05rem);", css)
+        self.assertIn("letter-spacing: -.015em;", css)
+        self.assertIn("class=\"page-title-row mb-4\"", about_body)
+        self.assertIn("class=\"container py-5 about-page\"", about_body)
+        self.assertIn("href=\"/contact\"", about_body)
+        self.assertIn(">Contact Us</a>", about_body)
+        self.assertIn("class=\"page-title-row mb-4\"", contact_body)
+        self.assertIn("href=\"/team\"", contact_body)
+        self.assertIn(">Meet our Team</a>", contact_body)
+        self.assertIn("class=\"container py-5 faqs-page\"", faqs_body)
+        self.assertIn("id=\"faqsAccordion\"", faqs_body)
+        self.assertIn("class=\"accordion faqs-accordion mt-3\"", faqs_body)
+        self.assertIn("data-bs-toggle=\"collapse\"", faqs_body)
+        self.assertIn("How do I place an order?", faqs_body)
+        self.assertIn("class=\"container py-5 team-page\"", team_body)
+        self.assertIn("class=\"page-title-row mb-4\"", team_body)
+        self.assertIn("class=\"btn btn-outline-gold page-back-btn page-title-back\"", team_body)
+        self.assertIn("class=\"page-title-spacer btn btn-outline-gold page-back-btn\" aria-hidden=\"true\"", team_body)
+        self.assertIn("class=\"page-title-row mb-3\"", cart_body)
+        self.assertIn("class=\"btn btn-outline-gold cart-back-btn page-title-back\"", cart_body)
+        self.assertIn("href=\"/contact\"", cart_body)
+        self.assertIn(">Contact Us</a>", cart_body)
+        self.assertIn(">Shopping Cart</h1>", cart_body)
+
+    def test_faqs_page_and_nav_drawer_keep_gold_accordion_contract(self) -> None:
+        css = self.load_site_css()
+        home_body = self.client.get("/").get_data(as_text=True)
+        faqs_body = self.client.get("/faqs").get_data(as_text=True)
+
+        self.assertIn("href=\"/faqs\"", home_body)
+        self.assertIn("FAQs</a>", home_body)
+        self.assertIn(".navbar .navbar-collapse .navbar-nav {", css)
+        self.assertIn("<li class=\"nav-item\"><a class=\"nav-link\" href=\"/faqs\">FAQs</a></li>", home_body)
+        self.assertIn(".faqs-page .faqs-accordion {", css)
+        self.assertIn(".faqs-page .faqs-accordion .accordion-button {", css)
+        self.assertIn(".faqs-page .faqs-accordion .accordion-body {", css)
+        self.assertIn("class=\"accordion-button collapsed\"", faqs_body)
+        self.assertIn("aria-expanded=\"false\"", faqs_body)
+        self.assertNotIn("accordion-collapse collapse show", faqs_body)
+        self.assertIn("We want you to be happy.", faqs_body)
+        self.assertIn("The minimum order is $1000.", faqs_body)
 
     def test_sticky_category_row_stays_flush_under_navbar(self) -> None:
         css = self.load_site_css()
@@ -241,8 +349,10 @@ class FrontendContractTests(BaseWebTest):
         self.assertIn("width: clamp(148px, 51vw, 262px);", css)
         self.assertIn("min-height: clamp(220px, 31vh, 360px);", css)
         self.assertIn("min-height: clamp(196px, 27vh, 286px);", css)
-        self.assertIn("padding-top: clamp(1.05rem, 2.8vw, 1.7rem);", css)
-        self.assertIn("padding-bottom: clamp(.9rem, 2.4vw, 1.45rem);", css)
+        self.assertIn("--hero-pad-y: clamp(1.65rem, 3.2vw, 2.3rem);", css)
+        self.assertIn("--hero-pad-y: clamp(1.1rem, 3.8vw, 1.55rem);", css)
+        self.assertIn("padding-top: var(--hero-pad-y);", css)
+        self.assertIn("padding-bottom: var(--hero-pad-y);", css)
         self.assertIn("opacity: 0.62;", css)
         self.assertIn("opacity: 0.70;", css)
         self.assertIn(

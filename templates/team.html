@@ -4,11 +4,12 @@
 product and ordering support.{% endblock %}
 
 {% block content %}
-<section class="container py-5" style="max-width: 1100px;">
+<section class="container py-5 team-page" style="max-width: 1100px;">
   <div class="page-title-row mb-4">
     <a class="btn btn-outline-gold page-back-btn page-title-back" href="{{ url_for('index') }}#section-studs">Go to
       Catalog</a>
     <h1 class="text-gold mb-0">{{ team.headline }}</h1>
+    <span class="page-title-spacer btn btn-outline-gold page-back-btn" aria-hidden="true">Go to Catalog</span>
   </div>
 
   <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3 mt-1">

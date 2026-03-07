@@ -22,13 +22,14 @@ from domains.cart import (
 from domains.catalog import (
     build_sections,
     find_product_by_code,
-    filter_products,
     load_collections_cfg as load_collections_cfg_from_path,
     load_products as load_products_from_path,
     load_social as load_social_from_path,
+    filter_products,
     products_by_code,
 )
 from domains.emailing import send_order_email
+from domains.faqs import load_faqs as load_faqs_from_path
 from domains.seo import build_sitemap_urls as build_sitemap_urls_from_context
 from domains.seo import canonical_base_url, iso_lastmod
 from domains.team import (
@@ -52,6 +53,7 @@ CATALOG_PATH = BASE_DIR / "catalog" / "products.json"
 COLLECTIONS_PATH = BASE_DIR / "catalog" / "collections.json"
 SOCIAL_PATH = BASE_DIR / "catalog" / "social.json"
 TEAM_PATH = BASE_DIR / "catalog" / "team.json"
+FAQS_PATH = BASE_DIR / "catalog" / "faqs.json"
 
 
 def _canonical_base_url() -> str:
@@ -76,6 +78,10 @@ def load_social() -> dict[str, Any]:
 
 def load_team() -> dict[str, Any]:
     return load_team_from_path(TEAM_PATH)
+
+
+def load_faqs() -> list[dict[str, Any]]:
+    return load_faqs_from_path(FAQS_PATH)
 
 
 def load_collections_cfg() -> dict[str, Any]:
@@ -104,6 +110,7 @@ def build_sitemap_urls(base_url: str) -> list[dict[str, str | float | None]]:
         base_dir=BASE_DIR,
         catalog_path=CATALOG_PATH,
         collections_path=COLLECTIONS_PATH,
+        faqs_path=FAQS_PATH,
         team_path=TEAM_PATH,
         team_members=members,
         product_codes=product_codes,
@@ -425,6 +432,16 @@ def about():
 @app.route("/contact")
 def contact():
     return render_template("contact.html")
+
+
+@app.route("/faq")
+def faq_redirect():
+    return redirect(url_for("faqs_page"), code=301)
+
+
+@app.route("/faqs")
+def faqs_page():
+    return render_template("faqs.html", faq_items=load_faqs())
 
 
 @app.route("/robots.txt")

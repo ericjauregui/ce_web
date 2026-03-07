@@ -27,6 +27,7 @@ def build_sitemap_urls(
     base_dir: Path,
     catalog_path: Path,
     collections_path: Path,
+    faqs_path: Path,
     team_path: Path,
     team_members: list[dict],
     product_codes: list[str] | None = None,
@@ -49,6 +50,12 @@ def build_sitemap_urls(
             "changefreq": "monthly",
             "priority": 0.7,
             "lastmod": iso_lastmod(base_dir / "templates" / "contact.html"),
+        },
+        {
+            "path": "/faqs",
+            "changefreq": "monthly",
+            "priority": 0.6,
+            "lastmod": iso_lastmod(faqs_path, base_dir / "templates" / "faqs.html"),
         },
         {
             "path": "/team",
