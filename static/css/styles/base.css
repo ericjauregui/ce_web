@@ -294,18 +294,25 @@ body {
     flex: 0 1 clamp(8.4rem, 41vw, 12.8rem);
     white-space: nowrap;
     font-size: clamp(.76rem, 2.7cqw, .98rem);
-    line-height: 1.2;
-    padding: var(--cta-btn-pad-y) var(--cta-btn-pad-x);
-      min-height: var(--cta-btn-min-height);
-    display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
+    line-height: 1;
+    padding-block: max(var(--cta-btn-pad-y), calc((var(--cta-btn-min-height) - 1em) / 2));
+    padding-inline: var(--cta-btn-pad-x);
+    min-height: var(--cta-btn-min-height);
+    box-sizing: border-box;
+    display: inline-grid;
+    place-items: center;
+    text-align: center;
     border-radius: 999px;
     border: 1px solid var(--gold-outline) !important;
     background: rgba(13, 13, 13, 0.88) !important;
     color: var(--gold) !important;
     opacity: 1;
+  }
+
+  .hero-action-btn__label {
+    display: block;
+    line-height: 1;
+    transform: translateY(-0.04em);
   }
 
   .hero-action-btn:hover,
@@ -379,9 +386,8 @@ body {
       .hero-action-btn {
         min-height: var(--cta-btn-min-height);
         font-size: clamp(.9rem, 3.2cqw, 1.06rem);
-        line-height: 1.22;
-        padding-top: clamp(.34rem, 1.5cqw, .56rem);
-        padding-bottom: clamp(.34rem, 1.5cqw, .56rem);
+        line-height: 1;
+        padding-block: max(clamp(.34rem, 1.5cqw, .56rem), calc((var(--cta-btn-min-height) - 1em) / 2));
     }
 
     .hero::after {

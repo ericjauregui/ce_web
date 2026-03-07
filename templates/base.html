@@ -8,12 +8,9 @@
   {% set canonical_url = base_url ~ request.path %}
   {% set default_og_image = base_url ~ url_for('static', filename='assets/social_preview.png') %}
 
-  <title>{% block title %}California Earrings | Wholesalers/Manufacturers of 10K/14K Earrings{%
-    endblock
-    %}
-  </title>
+  <title>{% block title %}California Earrings | Wholesalers of 14K Earrings{% endblock %}</title>
   <meta name="description"
-    content="{% block meta_description %}Los Angeles based wholesaler/manufacturer of 10k/14K gold earrings and body jewelry.{% endblock %}">
+    content="{% block meta_description %}Los Angeles based wholesaler of 14K gold earrings and body jewelry.{% endblock %}">
   <link rel="canonical" href="{{ canonical_url }}">
 
   <meta property="og:site_name" content="{{ site_name }}">

@@ -1,18 +1,18 @@
 {% extends "base.html" %}
-{% block title %}California Earrings | Wholesalers/Manufacturers of 10K/14K Gold Earrings & Body Jewelry{% endblock %}
-{% block meta_description %}Wholesale 10k/14k gold earrings and body jewelry from California Earrings in Los Angeles.
-Browse studs, hoops, hearts, gemstones, and more for retail buyers.{% endblock %}
+{% block title %}California Earrings | Wholesalers/Manufacturers of 14K Gold Earrings & Body Jewelry{% endblock %}
+{% block meta_description %}Wholesale 14k gold earrings and body jewelry from California Earrings in Los Angeles.
+Browse studs, hoops, hearts, gemstones, and more for retailers.{% endblock %}
 {% block content %}
 <header class="hero d-flex align-items-center text-center">
   <div class="container">
     <h1 class="visually-hidden">California Earrings</h1>
     <img class="hero-logo" src="{{ url_for('static', filename='assets/ce_logo_full.png') }}" alt="California Earrings" loading="eager" decoding="async">
-    <h2 class="display-8 fw-semibold text-gold">10k/14k Earrings • Body Jewelry</h2>
+    <h2 class="display-8 fw-semibold text-gold">14k Gold Earrings • Body Jewelry</h2>
     <h4 class="display-8 fw-semibold text-gold">Wholesalers • Manufacturers<br></h4>
     <p class="display-10 fw-semibold text-gold">Since 1992 • Shipping globally</p>
     <div class="hero-actions d-flex justify-content-center" aria-label="Hero actions">
-      <a class="btn btn-outline-gold hero-action-btn hero-action-btn--highlight" href="#section-studs">View Catalog</a>
-      <a class="btn btn-outline-gold hero-action-btn" href="{{ url_for('contact') }}">Contact us to Order</a>
+      <a class="btn btn-outline-gold hero-action-btn hero-action-btn--highlight" href="#section-studs"><span class="hero-action-btn__label">View Catalog</span></a>
+      <a class="btn btn-outline-gold hero-action-btn" href="{{ url_for('contact') }}"><span class="hero-action-btn__label">Contact us to Order</span></a>
     </div>
   </div>
 </header>

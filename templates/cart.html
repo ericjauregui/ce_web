@@ -6,7 +6,7 @@
 <div class="d-flex gap-2 cart-top-actions mb-3">
   <a class="btn btn-outline-gold cart-back-btn" href="{{ url_for('index') }}#section-studs">Back to Catalog</a>
   {% if items|length > 0 %}
-  <a class="btn btn-outline-gold cart-checkout-btn" href="{{ url_for('checkout') }}">Submit Inquiry (no payment)</a>
+  <a class="btn btn-outline-gold cart-checkout-btn" href="{{ url_for('checkout') }}">Submit Inquiry</a>
   {% endif %}
 </div>
 
@@ -70,7 +70,7 @@
             <div class="text-gold-70 small">Total Items:<span id="cartLineItemCount">{{ items|length }}</span></div>
             <div class="text-gold-70 small">Total Quantity:<span id="cartTotalQty">{{ total_items }}</span></div>
           </div>
-          <a class="btn btn-outline-gold cart-checkout-btn" href="{{ url_for('checkout') }}">Submit Inquiry (no payment)</a>
+          <a class="btn btn-outline-gold cart-checkout-btn" href="{{ url_for('checkout') }}">Submit Inquiry</a>
         </div>
       </div>
     {% endif %}
