@@ -5,7 +5,12 @@
     "collection": "studs",
     "name": "Petite Round CZ Screwback",
     "description": "Delicate 14K yellow gold stud featuring two round cz stones, secured with a screwback for everyday sparkle.",
-    "tags": ["cz", "round", "double", "screwback"]
+    "tags": [
+      "cz",
+      "round",
+      "double",
+      "screwback"
+    ]
   },
   {
     "code": "102SB",
@@ -13,7 +18,12 @@
     "collection": "studs",
     "name": "Small Round CZ Screwback",
     "description": "Small 14K gold stud with a pair of round cz stones, finished with a secure screwback post.",
-    "tags": ["cz", "round", "double", "screwback"]
+    "tags": [
+      "cz",
+      "round",
+      "double",
+      "screwback"
+    ]
   },
   {
     "code": "103SB",
@@ -21,7 +31,12 @@
     "collection": "studs",
     "name": "Petite Round CZ Screwback",
     "description": "Petite 14K yellow gold stud set with a single sparkling round cz and a screwback fitting for security.",
-    "tags": ["cz", "round", "petite", "screwback"]
+    "tags": [
+      "cz",
+      "round",
+      "petite",
+      "screwback"
+    ]
   },
   {
     "code": "104SB",
@@ -29,7 +44,12 @@
     "collection": "studs",
     "name": "Small Round CZ Screwback",
     "description": "Small 14K gold stud showcasing a brilliant round cz stone secured by a screwback post.",
-    "tags": ["cz", "round", "small", "screwback"]
+    "tags": [
+      "cz",
+      "round",
+      "small",
+      "screwback"
+    ]
   },
   {
     "code": "105SB",
@@ -37,7 +57,12 @@
     "collection": "studs",
     "name": "Medium Round CZ Screwback",
     "description": "Medium-sized 14K yellow gold stud featuring a single round cz with classic screwback closure.",
-    "tags": ["cz", "round", "medium", "screwback"]
+    "tags": [
+      "cz",
+      "round",
+      "medium",
+      "screwback"
+    ]
   },
   {
     "code": "106SB",
@@ -45,7 +70,12 @@
     "collection": "studs",
     "name": "Large Round CZ Screwback",
     "description": "Large 14K gold stud centered on a sparkling round cz stone and secured with a screwback.",
-    "tags": ["cz", "round", "large", "screwback"]
+    "tags": [
+      "cz",
+      "round",
+      "large",
+      "screwback"
+    ]
   },
   {
     "code": "107SB",
@@ -53,7 +83,12 @@
     "collection": "studs",
     "name": "XL Round CZ Screwback",
     "description": "XL round cz set in a 14K yellow gold stud with a secure screwback post.",
-    "tags": ["cz", "round", "extra-large", "screwback"]
+    "tags": [
+      "cz",
+      "round",
+      "extra-large",
+      "screwback"
+    ]
   },
   {
     "code": "108SB",
@@ -61,7 +96,12 @@
     "collection": "studs",
     "name": "UltraLarge Round CZ Screwback",
     "description": "Ultralarge statement stud crafted in 14K gold featuring a dazzling round cz and screwback closure.",
-    "tags": ["cz", "round", "oversized", "screwback"]
+    "tags": [
+      "cz",
+      "round",
+      "oversized",
+      "screwback"
+    ]
   },
   {
     "code": "110PB",
@@ -69,7 +109,12 @@
     "collection": "studs",
     "name": "Round CZ Pushback",
     "description": "Classic 14K yellow gold stud with a brilliant round cz secured by a comfortable pushback.",
-    "tags": ["cz", "round", "stud", "pushback"]
+    "tags": [
+      "cz",
+      "round",
+      "stud",
+      "pushback"
+    ]
   },
   {
     "code": "133SB",
@@ -77,7 +122,12 @@
     "collection": "studs",
     "name": "Small Princesscut CZ Screwback",
     "description": "Small 14K gold stud showcasing a square princess-cut cz stone held by four prongs and finished with a screwback post.",
-    "tags": ["cz", "princess cut", "square", "screwback"]
+    "tags": [
+      "cz",
+      "princess cut",
+      "square",
+      "screwback"
+    ]
   },
   {
     "code": "134SB",
@@ -85,7 +135,12 @@
     "collection": "studs",
     "name": "Medium Princesscut CZ Screwback",
     "description": "Medium 14K yellow gold stud with a princess-cut cz set in four prongs and secured with a screwback.",
-    "tags": ["cz", "princess cut", "square", "screwback"]
+    "tags": [
+      "cz",
+      "princess cut",
+      "square",
+      "screwback"
+    ]
   },
   {
     "code": "135SB",
@@ -93,7 +148,12 @@
     "collection": "studs",
     "name": "Large Princesscut CZ Screwback",
     "description": "Large square stud in 14K gold featuring a brilliant princess-cut cz and a secure screwback closure.",
-    "tags": ["cz", "princess cut", "square", "screwback"]
+    "tags": [
+      "cz",
+      "princess cut",
+      "square",
+      "screwback"
+    ]
   },
   {
     "code": "136SB",
@@ -101,7 +161,12 @@
     "collection": "studs",
     "name": "XL Princesscut CZ Screwback",
     "description": "XL 14K gold stud designed with a striking princess-cut cz secured by four prongs and a screwback post.",
-    "tags": ["cz", "princess cut", "square", "screwback"]
+    "tags": [
+      "cz",
+      "princess cut",
+      "square",
+      "screwback"
+    ]
   },
   {
     "code": "137SB",
@@ -109,7 +174,12 @@
     "collection": "studs",
     "name": "UltraLarge Princesscut CZ Screwback",
     "description": "Statement square stud crafted in 14K yellow gold with an oversized princess-cut cz and secure screwback.",
-    "tags": ["cz", "princess cut", "square", "oversized"]
+    "tags": [
+      "cz",
+      "princess cut",
+      "square",
+      "oversized"
+    ]
   },
   {
     "code": "143SB",
@@ -117,7 +187,12 @@
     "collection": "studs",
     "name": "Cushioncut CZ Screwback",
     "description": "14K gold stud featuring a cushioncut cz with rounded corners and a screwback closure for added security.",
-    "tags": ["cz", "cushion cut", "square", "screwback"]
+    "tags": [
+      "cz",
+      "cushion cut",
+      "square",
+      "screwback"
+    ]
   },
   {
     "code": "144SB",
@@ -125,7 +200,12 @@
     "collection": "studs",
     "name": "Square CZ Screwback",
     "description": "14K yellow gold stud set with a faceted square cz stone and finished with a screwback post.",
-    "tags": ["cz", "square", "stud", "screwback"]
+    "tags": [
+      "cz",
+      "square",
+      "stud",
+      "screwback"
+    ]
   },
   {
     "code": "164SB",
@@ -133,7 +213,12 @@
     "collection": "studs",
     "name": "Trillioncut CZ Screwback",
     "description": "Modern 14K gold stud featuring a triangular trillioncut cz secured by three prongs and a screwback.",
-    "tags": ["cz", "trillion", "triangle", "screwback"]
+    "tags": [
+      "cz",
+      "trillion",
+      "triangle",
+      "screwback"
+    ]
   },
   {
     "code": "165SB",
@@ -141,7 +226,12 @@
     "collection": "hearts",
     "name": "Petite Heart CZ Screwback",
     "description": "Delicate heart-shaped cz set in 14K yellow gold with a secure screwback post.",
-    "tags": ["cz", "heart", "petite", "screwback"]
+    "tags": [
+      "cz",
+      "heart",
+      "petite",
+      "screwback"
+    ]
   },
   {
     "code": "166SB",
@@ -149,7 +239,12 @@
     "collection": "hearts",
     "name": "Medium Heart CZ Screwback",
     "description": "Medium-sized heart-shaped cz stud crafted in 14K gold and finished with a screwback.",
-    "tags": ["cz", "heart", "medium", "screwback"]
+    "tags": [
+      "cz",
+      "heart",
+      "medium",
+      "screwback"
+    ]
   },
   {
     "code": "203SB",
@@ -157,7 +252,13 @@
     "collection": "studs",
     "name": "Small Floral 6Prong Round CZ",
     "description": "Small round cz secured by a sixprong floralinspired setting in 14K yellow gold with screwback closure.",
-    "tags": ["cz", "round", "6-prong", "floral", "screwback"]
+    "tags": [
+      "cz",
+      "round",
+      "6-prong",
+      "floral",
+      "screwback"
+    ]
   },
   {
     "code": "204SB",
@@ -165,7 +266,13 @@
     "collection": "studs",
     "name": "Medium Floral 6Prong Round CZ",
     "description": "Medium 14K gold stud featuring a round cz held in a sixprong floral setting with a screwback.",
-    "tags": ["cz", "round", "6-prong", "floral", "screwback"]
+    "tags": [
+      "cz",
+      "round",
+      "6-prong",
+      "floral",
+      "screwback"
+    ]
   },
   {
     "code": "205SB",
@@ -173,7 +280,13 @@
     "collection": "studs",
     "name": "Large Floral 6Prong Round CZ",
     "description": "Large round cz embraced by a 14K gold sixprong floral setting and secured with a screwback post.",
-    "tags": ["cz", "round", "6-prong", "floral", "screwback"]
+    "tags": [
+      "cz",
+      "round",
+      "6-prong",
+      "floral",
+      "screwback"
+    ]
   },
   {
     "code": "206SB",
@@ -181,7 +294,13 @@
     "collection": "studs",
     "name": "XL Floral 6Prong Round CZ",
     "description": "XL round cz set in a floral sixprong 14K gold mount with screwback closure.",
-    "tags": ["cz", "round", "6-prong", "floral", "screwback"]
+    "tags": [
+      "cz",
+      "round",
+      "6-prong",
+      "floral",
+      "screwback"
+    ]
   },
   {
     "code": "223SB",
@@ -189,7 +308,12 @@
     "collection": "studs",
     "name": "Petite Rainbow Mystic Topaz",
     "description": "Petite stud featuring a multicolor mystic topaz set in 14K yellow gold with a secure screwback.",
-    "tags": ["mystic topaz", "rainbow", "round", "screwback"]
+    "tags": [
+      "mystic topaz",
+      "rainbow",
+      "round",
+      "screwback"
+    ]
   },
   {
     "code": "224SB",
@@ -197,7 +321,12 @@
     "collection": "studs",
     "name": "Small Rainbow Mystic Topaz",
     "description": "Small 14K gold stud showcasing a vibrant round mystic topaz in rainbow hues and secured with a screwback.",
-    "tags": ["mystic topaz", "rainbow", "round", "screwback"]
+    "tags": [
+      "mystic topaz",
+      "rainbow",
+      "round",
+      "screwback"
+    ]
   },
   {
     "code": "225SB",
@@ -205,7 +334,12 @@
     "collection": "studs",
     "name": "Medium Rainbow Mystic Topaz",
     "description": "Medium-sized round mystic topaz stud crafted in 14K yellow gold with a secure screwback.",
-    "tags": ["mystic topaz", "rainbow", "round", "screwback"]
+    "tags": [
+      "mystic topaz",
+      "rainbow",
+      "round",
+      "screwback"
+    ]
   },
   {
     "code": "226SB",
@@ -213,7 +347,12 @@
     "collection": "studs",
     "name": "Large Rainbow Mystic Topaz",
     "description": "Large 14K gold stud set with a radiant rainbow mystic topaz stone and finished with a screwback post.",
-    "tags": ["mystic topaz", "rainbow", "round", "screwback"]
+    "tags": [
+      "mystic topaz",
+      "rainbow",
+      "round",
+      "screwback"
+    ]
   },
   {
     "code": "228SB",
@@ -221,7 +360,12 @@
     "collection": "studs",
     "name": "XL Rainbow Mystic Topaz",
     "description": "XL statement stud showcasing a colorful mystic topaz in a 14K gold setting with screwback closure.",
-    "tags": ["mystic topaz", "rainbow", "round", "screwback"]
+    "tags": [
+      "mystic topaz",
+      "rainbow",
+      "round",
+      "screwback"
+    ]
   },
   {
     "code": "233SB",
@@ -229,7 +373,12 @@
     "collection": "studs",
     "name": "Tiny Gold Ball Screwback",
     "description": "Tiny polished 14K yellow gold ball stud with a secure screwback post for a minimalist look.",
-    "tags": ["gold ball", "tiny", "stud", "screwback"]
+    "tags": [
+      "gold ball",
+      "tiny",
+      "stud",
+      "screwback"
+    ]
   },
   {
     "code": "234SB",
@@ -237,7 +386,12 @@
     "collection": "studs",
     "name": "Small Gold Ball Screwback",
     "description": "Small 14K gold ball stud featuring a smooth polished surface and screwback fastening.",
-    "tags": ["gold ball", "small", "stud", "screwback"]
+    "tags": [
+      "gold ball",
+      "small",
+      "stud",
+      "screwback"
+    ]
   },
   {
     "code": "235SB",
@@ -245,7 +399,12 @@
     "collection": "studs",
     "name": "Medium Gold Ball Screwback",
     "description": "Medium polished gold ball stud crafted in 14K yellow gold with a secure screwback closure.",
-    "tags": ["gold ball", "medium", "stud", "screwback"]
+    "tags": [
+      "gold ball",
+      "medium",
+      "stud",
+      "screwback"
+    ]
   },
   {
     "code": "236SB",
@@ -253,7 +412,12 @@
     "collection": "studs",
     "name": "Large Gold Ball Screwback",
     "description": "Large glossy 14K gold ball stud finished with a screwback post for security and comfort.",
-    "tags": ["gold ball", "large", "stud", "screwback"]
+    "tags": [
+      "gold ball",
+      "large",
+      "stud",
+      "screwback"
+    ]
   },
   {
     "code": "237SB",
@@ -261,7 +425,12 @@
     "collection": "studs",
     "name": "XL Gold Ball Screwback",
     "description": "XL polished gold ball stud offering bold shine in 14K yellow gold with a screwback fitting.",
-    "tags": ["gold ball", "extra-large", "stud", "screwback"]
+    "tags": [
+      "gold ball",
+      "extra-large",
+      "stud",
+      "screwback"
+    ]
   },
   {
     "code": "253SB",
@@ -269,7 +438,12 @@
     "collection": "studs",
     "name": "Huge Round CZ Screwback",
     "description": "Oversized round cz stud set in 14K yellow gold and secured with a screwback post.",
-    "tags": ["cz", "round", "huge", "screwback"]
+    "tags": [
+      "cz",
+      "round",
+      "huge",
+      "screwback"
+    ]
   },
   {
     "code": "254SB",
@@ -277,7 +451,12 @@
     "collection": "studs",
     "name": "Giant Round CZ Screwback",
     "description": "Giant 14K gold stud featuring an impressive round cz with secure screwback closure.",
-    "tags": ["cz", "round", "giant", "screwback"]
+    "tags": [
+      "cz",
+      "round",
+      "giant",
+      "screwback"
+    ]
   },
   {
     "code": "255SB",
@@ -285,7 +464,12 @@
     "collection": "studs",
     "name": "Mega Round CZ Screwback",
     "description": "Megasized statement stud with a brilliant round cz set in 14K gold and finished with a screwback.",
-    "tags": ["cz", "round", "mega", "screwback"]
+    "tags": [
+      "cz",
+      "round",
+      "mega",
+      "screwback"
+    ]
   },
   {
     "code": "256SB",
@@ -293,7 +477,12 @@
     "collection": "studs",
     "name": "Ultra Mega Round CZ Screwback",
     "description": "Ultra mega round cz stud designed for bold shine in 14K yellow gold with screwback post.",
-    "tags": ["cz", "round", "oversized", "screwback"]
+    "tags": [
+      "cz",
+      "round",
+      "oversized",
+      "screwback"
+    ]
   },
   {
     "code": "1459SB",
@@ -301,7 +490,12 @@
     "collection": "more-styles",
     "name": "Floral Cluster CZ Screwback",
     "description": "Artistic 14K gold stud featuring a floral cluster of cz stones secured with a screwback.",
-    "tags": ["cz", "floral", "cluster", "screwback"]
+    "tags": [
+      "cz",
+      "floral",
+      "cluster",
+      "screwback"
+    ]
   },
   {
     "code": "1555SB",
@@ -309,7 +503,12 @@
     "collection": "more-styles",
     "name": "Starburst CZ Screwback",
     "description": "Starburstinspired 14K yellow gold stud accented with sparkling cz and finished with a screwback.",
-    "tags": ["cz", "starburst", "stud", "screwback"]
+    "tags": [
+      "cz",
+      "starburst",
+      "stud",
+      "screwback"
+    ]
   },
   {
     "code": "1556SB",
@@ -317,7 +516,12 @@
     "collection": "more-styles",
     "name": "Flower Cluster CZ Screwback",
     "description": "14K gold stud showcasing a bloom of cz stones arranged in a flower cluster with screwback closure.",
-    "tags": ["cz", "flower", "cluster", "screwback"]
+    "tags": [
+      "cz",
+      "flower",
+      "cluster",
+      "screwback"
+    ]
   },
   {
     "code": "1599SB",
@@ -325,7 +529,12 @@
     "collection": "more-styles",
     "name": "Triple Stone CZ Screwback",
     "description": "Elegant 14K yellow gold stud featuring three graduating cz stones in a linear arrangement, secured with a screwback.",
-    "tags": ["cz", "triple", "stud", "screwback"]
+    "tags": [
+      "cz",
+      "triple",
+      "stud",
+      "screwback"
+    ]
   },
   {
     "code": "1781SB",
@@ -333,7 +542,12 @@
     "collection": "more-styles",
     "name": "Asymmetrical CZ Screwback",
     "description": "Contemporary asymmetrical stud crafted in 14K gold with sparkling cz accents and a screwback post.",
-    "tags": ["cz", "asymmetrical", "modern", "screwback"]
+    "tags": [
+      "cz",
+      "asymmetrical",
+      "modern",
+      "screwback"
+    ]
   },
   {
     "code": "344LSB",
@@ -341,7 +555,12 @@
     "collection": "more-styles",
     "name": "Large Filigree CZ",
     "description": "Large 14K gold stud with intricate filigree detailing and sparkling cz accents, finished with a screwback.",
-    "tags": ["cz", "filigree", "large", "screwback"]
+    "tags": [
+      "cz",
+      "filigree",
+      "large",
+      "screwback"
+    ]
   },
   {
     "code": "344SSB",
@@ -349,7 +568,12 @@
     "collection": "more-styles",
     "name": "Small Filigree CZ",
     "description": "Small filigreepatterned 14K gold stud featuring delicate cz accents and screwback closure.",
-    "tags": ["cz", "filigree", "small", "screwback"]
+    "tags": [
+      "cz",
+      "filigree",
+      "small",
+      "screwback"
+    ]
   },
   {
     "code": "1041LSB",
@@ -357,7 +581,12 @@
     "collection": "more-styles",
     "name": "Large Starburst CZ",
     "description": "Large starburstshaped stud crafted in 14K yellow gold with a central cz and screwback fastening.",
-    "tags": ["cz", "star", "large", "screwback"]
+    "tags": [
+      "cz",
+      "star",
+      "large",
+      "screwback"
+    ]
   },
   {
     "code": "1041MSB",
@@ -365,7 +594,12 @@
     "collection": "more-styles",
     "name": "Medium Starburst CZ",
     "description": "Medium 14K gold starburst stud centered with a sparkling cz and finished with a screwback post.",
-    "tags": ["cz", "star", "medium", "screwback"]
+    "tags": [
+      "cz",
+      "star",
+      "medium",
+      "screwback"
+    ]
   },
   {
     "code": "1041SSB",
@@ -373,7 +607,12 @@
     "collection": "more-styles",
     "name": "Small Starburst CZ",
     "description": "Small starburstinspired stud in 14K gold featuring a petite cz and screwback closure.",
-    "tags": ["cz", "star", "small", "screwback"]
+    "tags": [
+      "cz",
+      "star",
+      "small",
+      "screwback"
+    ]
   },
   {
     "code": "1430LSB",
@@ -381,7 +620,12 @@
     "collection": "more-styles",
     "name": "Large Cluster CZ",
     "description": "Large cluster stud in 14K yellow gold featuring multiple sparkling cz stones with screwback closure.",
-    "tags": ["cz", "cluster", "large", "screwback"]
+    "tags": [
+      "cz",
+      "cluster",
+      "large",
+      "screwback"
+    ]
   },
   {
     "code": "1430MSB",
@@ -389,7 +633,12 @@
     "collection": "more-styles",
     "name": "Medium Cluster CZ",
     "description": "Medium cluster stud crafted in 14K gold with grouped cz stones and a secure screwback.",
-    "tags": ["cz", "cluster", "medium", "screwback"]
+    "tags": [
+      "cz",
+      "cluster",
+      "medium",
+      "screwback"
+    ]
   },
   {
     "code": "1430SSB",
@@ -397,7 +646,12 @@
     "collection": "more-styles",
     "name": "Small Cluster CZ",
     "description": "Small 14K gold stud featuring a tight cluster of cz stones secured with a screwback.",
-    "tags": ["cz", "cluster", "small", "screwback"]
+    "tags": [
+      "cz",
+      "cluster",
+      "small",
+      "screwback"
+    ]
   },
   {
     "code": "1462LSB",
@@ -405,7 +659,12 @@
     "collection": "more-styles",
     "name": "Large Floral CZ",
     "description": "Large flowershaped stud in 14K yellow gold set with sparkling cz petals and a screwback post.",
-    "tags": ["cz", "floral", "large", "screwback"]
+    "tags": [
+      "cz",
+      "floral",
+      "large",
+      "screwback"
+    ]
   },
   {
     "code": "1462MSB",
@@ -413,7 +672,12 @@
     "collection": "more-styles",
     "name": "Medium Floral CZ",
     "description": "Medium floral stud crafted in 14K gold with cz accents and screwback closure.",
-    "tags": ["cz", "floral", "medium", "screwback"]
+    "tags": [
+      "cz",
+      "floral",
+      "medium",
+      "screwback"
+    ]
   },
   {
     "code": "1462SSB",
@@ -421,7 +685,12 @@
     "collection": "more-styles",
     "name": "Small Floral CZ",
     "description": "Small flowerinspired stud in 14K gold featuring cz petals and finished with a screwback post.",
-    "tags": ["cz", "floral", "small", "screwback"]
+    "tags": [
+      "cz",
+      "floral",
+      "small",
+      "screwback"
+    ]
   },
   {
     "code": "1557MSB",
@@ -429,7 +698,13 @@
     "collection": "hearts",
     "name": "Medium RopeEdge Heart CZ",
     "description": "Medium heart-shaped cz surrounded by a ropetextured bezel in 14K gold with screwback fastening.",
-    "tags": ["cz", "heart", "rope-edge", "medium", "screwback"]
+    "tags": [
+      "cz",
+      "heart",
+      "rope-edge",
+      "medium",
+      "screwback"
+    ]
   },
   {
     "code": "1557SSB",
@@ -437,7 +712,13 @@
     "collection": "hearts",
     "name": "Small RopeEdge Heart CZ",
     "description": "Small heart-shaped cz set in a ropeedge bezel crafted from 14K gold with screwback closure.",
-    "tags": ["cz", "heart", "rope-edge", "small", "screwback"]
+    "tags": [
+      "cz",
+      "heart",
+      "rope-edge",
+      "small",
+      "screwback"
+    ]
   },
   {
     "code": "1670SSB",
@@ -445,7 +726,13 @@
     "collection": "hearts",
     "name": "Small Sunburst Textured Gold Heart",
     "description": "Small solid gold heart stud with a radiant sunburst engraved texture and secure screwback.",
-    "tags": ["gold", "heart", "sunburst", "small", "screwback"]
+    "tags": [
+      "gold",
+      "heart",
+      "sunburst",
+      "small",
+      "screwback"
+    ]
   },
   {
     "code": "1981SB3C",
@@ -453,7 +740,13 @@
     "collection": "studs",
     "name": "TriColor Triple CZ",
     "description": "Unique stud crafted in three tones of gold and set with three sparkling cz stones in an ascending arrangement, secured with a screwback.",
-    "tags": ["cz", "tri-color", "triple", "stud", "screwback"]
+    "tags": [
+      "cz",
+      "tri-color",
+      "triple",
+      "stud",
+      "screwback"
+    ]
   },
   {
     "code": "167SB",
@@ -461,7 +754,12 @@
     "collection": "hearts",
     "name": "Classic Heart CZ Screwback",
     "description": "Timeless heart-shaped cz stud mounted in 14K yellow gold with a secure screwback.",
-    "tags": ["cz", "heart", "classic", "screwback"]
+    "tags": [
+      "cz",
+      "heart",
+      "classic",
+      "screwback"
+    ]
   },
   {
     "code": "1258SB",
@@ -469,7 +767,13 @@
     "collection": "hearts",
     "name": "Dual Heart Ruby & CZ",
     "description": "Romantic stud featuring two hearts, one red ruby and one clear cz, set side by side in 14K gold with a screwback post.",
-    "tags": ["ruby", "cz", "heart", "dual", "screwback"]
+    "tags": [
+      "ruby",
+      "cz",
+      "heart",
+      "dual",
+      "screwback"
+    ]
   },
   {
     "code": "1601SB",
@@ -477,7 +781,13 @@
     "collection": "hearts",
     "name": "Textured Heart with CZ Accent",
     "description": "14K gold heart stud with a textured finish and accented by a tiny round cz, secured with a screwback.",
-    "tags": ["gold", "heart", "textured", "accent", "screwback"]
+    "tags": [
+      "gold",
+      "heart",
+      "textured",
+      "accent",
+      "screwback"
+    ]
   },
   {
     "code": "1665SB",
@@ -485,7 +795,13 @@
     "collection": "hearts",
     "name": "Open Heart Flower CZ",
     "description": "Openheart stud crafted in 14K yellow gold adorned with a floral cluster of cz stones and secured with a screwback.",
-    "tags": ["cz", "heart", "open-heart", "flower", "screwback"]
+    "tags": [
+      "cz",
+      "heart",
+      "open-heart",
+      "flower",
+      "screwback"
+    ]
   },
   {
     "code": "1666SB",
@@ -493,7 +809,13 @@
     "collection": "hearts",
     "name": "Open Heart Swirl CZ",
     "description": "Swirling openheart design in 14K gold featuring pave cz accents and finished with a screwback post.",
-    "tags": ["cz", "heart", "open-heart", "swirl", "screwback"]
+    "tags": [
+      "cz",
+      "heart",
+      "open-heart",
+      "swirl",
+      "screwback"
+    ]
   },
   {
     "code": "1667SB",
@@ -501,7 +823,13 @@
     "collection": "hearts",
     "name": "Open Heart Pave CZ",
     "description": "Elegant openheart stud fully pav\u00e9set with tiny cz stones in 14K gold with a screwback.",
-    "tags": ["cz", "heart", "open-heart", "pave", "screwback"]
+    "tags": [
+      "cz",
+      "heart",
+      "open-heart",
+      "pave",
+      "screwback"
+    ]
   },
   {
     "code": "1675SB",
@@ -509,7 +837,12 @@
     "collection": "hearts",
     "name": "Open Frame Heart CZ",
     "description": "Open frame heart stud with a large heart-shaped cz suspended at its center, crafted in 14K gold with screwback fastening.",
-    "tags": ["cz", "heart", "open-frame", "screwback"]
+    "tags": [
+      "cz",
+      "heart",
+      "open-frame",
+      "screwback"
+    ]
   },
   {
     "code": "1782SB",
@@ -517,7 +850,13 @@
     "collection": "hearts",
     "name": "Heart Outline with Bar CZ",
     "description": "Modern heart outline stud accented with a horizontal bar and a single round cz, finished in 14K gold with a screwback.",
-    "tags": ["cz", "heart", "bar", "outline", "screwback"]
+    "tags": [
+      "cz",
+      "heart",
+      "bar",
+      "outline",
+      "screwback"
+    ]
   },
   {
     "code": "1813SB",
@@ -525,7 +864,13 @@
     "collection": "hearts",
     "name": "Swirl Heart CZ",
     "description": "Artistic 14K gold heart stud with a swirling motif and a sparkling round cz accent secured by a screwback post.",
-    "tags": ["cz", "heart", "swirl", "stud", "screwback"]
+    "tags": [
+      "cz",
+      "heart",
+      "swirl",
+      "stud",
+      "screwback"
+    ]
   },
   {
     "code": "1814SB",
@@ -533,7 +878,13 @@
     "collection": "hearts",
     "name": "Milgrain Bezel Heart CZ",
     "description": "heart-shaped cz encased in a milgrain beaded bezel crafted from 14K gold with screwback fastening.",
-    "tags": ["cz", "heart", "bezel", "milgrain", "screwback"]
+    "tags": [
+      "cz",
+      "heart",
+      "bezel",
+      "milgrain",
+      "screwback"
+    ]
   },
   {
     "code": "1557LSB",
@@ -541,7 +892,13 @@
     "collection": "hearts",
     "name": "Large RopeEdge Heart CZ",
     "description": "Large heart-shaped cz encircled by a ropeedge bezel in 14K yellow gold with a screwback post.",
-    "tags": ["cz", "heart", "rope-edge", "large", "screwback"]
+    "tags": [
+      "cz",
+      "heart",
+      "rope-edge",
+      "large",
+      "screwback"
+    ]
   },
   {
     "code": "1603LSB",
@@ -549,7 +906,14 @@
     "collection": "hearts",
     "name": "Large Pav\u00e9 Open Heart CZ",
     "description": "Large open heart stud in 14K yellow gold fully pav\u00e9set with shimmering cz stones and secured with a screwback.",
-    "tags": ["cz", "heart", "open-heart", "pave", "large", "screwback"]
+    "tags": [
+      "cz",
+      "heart",
+      "open-heart",
+      "pave",
+      "large",
+      "screwback"
+    ]
   },
   {
     "code": "1603SSB",
@@ -557,7 +921,14 @@
     "collection": "hearts",
     "name": "Small Pav\u00e9 Open Heart CZ",
     "description": "Small open heart stud crafted in 14K gold and pav\u00e9set with tiny cz stones with a screwback closure.",
-    "tags": ["cz", "heart", "open-heart", "pave", "small", "screwback"]
+    "tags": [
+      "cz",
+      "heart",
+      "open-heart",
+      "pave",
+      "small",
+      "screwback"
+    ]
   },
   {
     "code": "1670LSB",
@@ -565,7 +936,13 @@
     "collection": "hearts",
     "name": "Large Sunburst Textured Gold Heart",
     "description": "Large 14K gold heart stud showcasing a bold sunburst engraved texture and finished with a screwback post.",
-    "tags": ["gold", "heart", "sunburst", "large", "screwback"]
+    "tags": [
+      "gold",
+      "heart",
+      "sunburst",
+      "large",
+      "screwback"
+    ]
   },
   {
     "code": "1671SSB",
@@ -573,7 +950,13 @@
     "collection": "hearts",
     "name": "Small Ridged Gold Heart",
     "description": "Small solid gold heart stud featuring vertical ridges for subtle texture with a secure screwback.",
-    "tags": ["gold", "heart", "ridged", "small", "screwback"]
+    "tags": [
+      "gold",
+      "heart",
+      "ridged",
+      "small",
+      "screwback"
+    ]
   },
   {
     "code": "1041L1SB",
@@ -581,7 +964,12 @@
     "collection": "more-styles",
     "name": "StarShaped CZ",
     "description": "Unique starshaped cz stud crafted in 14K yellow gold with a screwback post.",
-    "tags": ["cz", "star", "stud", "screwback"]
+    "tags": [
+      "cz",
+      "star",
+      "stud",
+      "screwback"
+    ]
   },
   {
     "code": "1601SB3C",
@@ -589,7 +977,13 @@
     "collection": "hearts",
     "name": "TriColor Heart with Flower Accent",
     "description": "Tricolor heart stud combining yellow, white and rose gold segments, adorned with a dainty flower accent featuring a tiny cz and finished with a screwback.",
-    "tags": ["tri-color", "heart", "flower", "accent", "screwback"]
+    "tags": [
+      "tri-color",
+      "heart",
+      "flower",
+      "accent",
+      "screwback"
+    ]
   },
   {
     "code": "103BSB",
@@ -597,7 +991,13 @@
     "collection": "bezel",
     "name": "Small Round BezelSet CZ",
     "description": "Small round cz set in a smooth 14K gold bezel mounting with a secure screwback.",
-    "tags": ["cz", "round", "bezel", "small", "screwback"]
+    "tags": [
+      "cz",
+      "round",
+      "bezel",
+      "small",
+      "screwback"
+    ]
   },
   {
     "code": "104BSB",
@@ -605,7 +1005,13 @@
     "collection": "bezel",
     "name": "Medium Round BezelSet CZ",
     "description": "Medium 14K gold stud with a round cz in a polished bezel setting and screwback closure.",
-    "tags": ["cz", "round", "bezel", "medium", "screwback"]
+    "tags": [
+      "cz",
+      "round",
+      "bezel",
+      "medium",
+      "screwback"
+    ]
   },
   {
     "code": "105BSB",
@@ -613,7 +1019,13 @@
     "collection": "bezel",
     "name": "Large Round BezelSet CZ",
     "description": "Large round cz nestled in a 14K gold bezel setting secured by a screwback.",
-    "tags": ["cz", "round", "bezel", "large", "screwback"]
+    "tags": [
+      "cz",
+      "round",
+      "bezel",
+      "large",
+      "screwback"
+    ]
   },
   {
     "code": "106BSB",
@@ -621,7 +1033,13 @@
     "collection": "bezel",
     "name": "XL Round BezelSet CZ",
     "description": "XL bezelset round cz in 14K yellow gold finished with a screwback post.",
-    "tags": ["cz", "round", "bezel", "extra-large", "screwback"]
+    "tags": [
+      "cz",
+      "round",
+      "bezel",
+      "extra-large",
+      "screwback"
+    ]
   },
   {
     "code": "133BSB",
@@ -629,7 +1047,13 @@
     "collection": "bezel",
     "name": "Small Square BezelSet CZ",
     "description": "Small square cz set in a sleek 14K gold bezel with screwback closure.",
-    "tags": ["cz", "square", "bezel", "small", "screwback"]
+    "tags": [
+      "cz",
+      "square",
+      "bezel",
+      "small",
+      "screwback"
+    ]
   },
   {
     "code": "134BSB",
@@ -637,7 +1061,13 @@
     "collection": "bezel",
     "name": "Medium Square BezelSet CZ",
     "description": "Medium 14K gold stud featuring a square cz in a bezel setting and secured by a screwback post.",
-    "tags": ["cz", "square", "bezel", "medium", "screwback"]
+    "tags": [
+      "cz",
+      "square",
+      "bezel",
+      "medium",
+      "screwback"
+    ]
   },
   {
     "code": "135BSB",
@@ -645,7 +1075,13 @@
     "collection": "bezel",
     "name": "Large Square BezelSet CZ",
     "description": "Large square cz set in a polished 14K gold bezel mount with screwback fastening.",
-    "tags": ["cz", "square", "bezel", "large", "screwback"]
+    "tags": [
+      "cz",
+      "square",
+      "bezel",
+      "large",
+      "screwback"
+    ]
   },
   {
     "code": "163BSB",
@@ -653,7 +1089,13 @@
     "collection": "bezel",
     "name": "Petite Heart BezelSet CZ",
     "description": "Petite heart-shaped cz encased in a smooth bezel mounting crafted from 14K gold with screwback.",
-    "tags": ["cz", "heart", "bezel", "petite", "screwback"]
+    "tags": [
+      "cz",
+      "heart",
+      "bezel",
+      "petite",
+      "screwback"
+    ]
   },
   {
     "code": "164BSB",
@@ -661,7 +1103,13 @@
     "collection": "bezel",
     "name": "Small Heart BezelSet CZ",
     "description": "Small heart-shaped cz set in a polished bezel frame made from 14K yellow gold with screwback closure.",
-    "tags": ["cz", "heart", "bezel", "small", "screwback"]
+    "tags": [
+      "cz",
+      "heart",
+      "bezel",
+      "small",
+      "screwback"
+    ]
   },
   {
     "code": "165BSB",
@@ -669,7 +1117,13 @@
     "collection": "bezel",
     "name": "Medium Heart BezelSet CZ",
     "description": "Medium heart-shaped cz in a sleek 14K gold bezel setting with screwback fastening.",
-    "tags": ["cz", "heart", "bezel", "medium", "screwback"]
+    "tags": [
+      "cz",
+      "heart",
+      "bezel",
+      "medium",
+      "screwback"
+    ]
   },
   {
     "code": "166BSB",
@@ -677,7 +1131,13 @@
     "collection": "bezel",
     "name": "Large Heart BezelSet CZ",
     "description": "Large heart-shaped cz embraced by a polished 14K gold bezel mount secured with a screwback.",
-    "tags": ["cz", "heart", "bezel", "large", "screwback"]
+    "tags": [
+      "cz",
+      "heart",
+      "bezel",
+      "large",
+      "screwback"
+    ]
   },
   {
     "code": "167BSB",
@@ -685,6 +1145,1828 @@
     "collection": "bezel",
     "name": "XL Heart BezelSet CZ",
     "description": "XL heart-shaped cz set in a smooth 14K gold bezel frame with a screwback post.",
-    "tags": ["cz", "heart", "bezel", "extra-large", "screwback"]
+    "tags": [
+      "cz",
+      "heart",
+      "bezel",
+      "extra-large",
+      "screwback"
+    ]
+  },
+  {
+    "code": "1027SB",
+    "image": "1027SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1027SB",
+    "description": "Catalog placeholder metadata for style 1027SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1027SB3C",
+    "image": "1027SB3C.jpg",
+    "collection": "more-styles",
+    "name": "Style 1027SB3C",
+    "description": "Catalog placeholder metadata for style 1027SB3C. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1036WB",
+    "image": "1036WB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1036WB",
+    "description": "Catalog placeholder metadata for style 1036WB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1037WB",
+    "image": "1037WB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1037WB",
+    "description": "Catalog placeholder metadata for style 1037WB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1048LSB",
+    "image": "1048LSB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1048LSB",
+    "description": "Catalog placeholder metadata for style 1048LSB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1048SSB",
+    "image": "1048SSB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1048SSB",
+    "description": "Catalog placeholder metadata for style 1048SSB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1072LSB",
+    "image": "1072LSB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1072LSB",
+    "description": "Catalog placeholder metadata for style 1072LSB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1072SSB",
+    "image": "1072SSB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1072SSB",
+    "description": "Catalog placeholder metadata for style 1072SSB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1075LSB",
+    "image": "1075LSB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1075LSB",
+    "description": "Catalog placeholder metadata for style 1075LSB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1075SSB",
+    "image": "1075SSB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1075SSB",
+    "description": "Catalog placeholder metadata for style 1075SSB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "107BSB",
+    "image": "107BSB.jpg",
+    "collection": "bezel",
+    "name": "Bezel Style 107BSB",
+    "description": "Catalog placeholder metadata for style 107BSB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1082SB",
+    "image": "1082SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1082SB",
+    "description": "Catalog placeholder metadata for style 1082SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1092LSB",
+    "image": "1092LSB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1092LSB",
+    "description": "Catalog placeholder metadata for style 1092LSB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1092MSB",
+    "image": "1092MSB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1092MSB",
+    "description": "Catalog placeholder metadata for style 1092MSB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1092SSB",
+    "image": "1092SSB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1092SSB",
+    "description": "Catalog placeholder metadata for style 1092SSB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1092WB",
+    "image": "1092WB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1092WB",
+    "description": "Catalog placeholder metadata for style 1092WB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1094SB",
+    "image": "1094SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1094SB",
+    "description": "Catalog placeholder metadata for style 1094SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1114NR",
+    "image": "1114NR.jpg",
+    "collection": "nose-rings",
+    "name": "Nose Ring 1114NR",
+    "description": "Catalog placeholder metadata for style 1114NR. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1115LNR",
+    "image": "1115LNR.jpg",
+    "collection": "nose-rings",
+    "name": "Nose Ring 1115LNR",
+    "description": "Catalog placeholder metadata for style 1115LNR. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1115SNR",
+    "image": "1115SNR.jpg",
+    "collection": "nose-rings",
+    "name": "Nose Ring 1115SNR",
+    "description": "Catalog placeholder metadata for style 1115SNR. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1117LNR",
+    "image": "1117LNR.jpg",
+    "collection": "nose-rings",
+    "name": "Nose Ring 1117LNR",
+    "description": "Catalog placeholder metadata for style 1117LNR. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1117SNR",
+    "image": "1117SNR.jpg",
+    "collection": "nose-rings",
+    "name": "Nose Ring 1117SNR",
+    "description": "Catalog placeholder metadata for style 1117SNR. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1119SB",
+    "image": "1119SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1119SB",
+    "description": "Catalog placeholder metadata for style 1119SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1120NR",
+    "image": "1120NR.jpg",
+    "collection": "nose-rings",
+    "name": "Nose Ring 1120NR",
+    "description": "Catalog placeholder metadata for style 1120NR. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1121NR",
+    "image": "1121NR.jpg",
+    "collection": "nose-rings",
+    "name": "Nose Ring 1121NR",
+    "description": "Catalog placeholder metadata for style 1121NR. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1122NR",
+    "image": "1122NR.jpg",
+    "collection": "nose-rings",
+    "name": "Nose Ring 1122NR",
+    "description": "Catalog placeholder metadata for style 1122NR. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1126SB",
+    "image": "1126SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1126SB",
+    "description": "Catalog placeholder metadata for style 1126SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1130NR",
+    "image": "1130NR.jpg",
+    "collection": "nose-rings",
+    "name": "Nose Ring 1130NR",
+    "description": "Catalog placeholder metadata for style 1130NR. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1131NR",
+    "image": "1131NR.jpg",
+    "collection": "nose-rings",
+    "name": "Nose Ring 1131NR",
+    "description": "Catalog placeholder metadata for style 1131NR. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1132NR",
+    "image": "1132NR.jpg",
+    "collection": "nose-rings",
+    "name": "Nose Ring 1132NR",
+    "description": "Catalog placeholder metadata for style 1132NR. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1134NR",
+    "image": "1134NR.jpg",
+    "collection": "nose-rings",
+    "name": "Nose Ring 1134NR",
+    "description": "Catalog placeholder metadata for style 1134NR. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1135LNR",
+    "image": "1135LNR.jpg",
+    "collection": "nose-rings",
+    "name": "Nose Ring 1135LNR",
+    "description": "Catalog placeholder metadata for style 1135LNR. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1135SNR",
+    "image": "1135SNR.jpg",
+    "collection": "nose-rings",
+    "name": "Nose Ring 1135SNR",
+    "description": "Catalog placeholder metadata for style 1135SNR. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1137LNR",
+    "image": "1137LNR.jpg",
+    "collection": "nose-rings",
+    "name": "Nose Ring 1137LNR",
+    "description": "Catalog placeholder metadata for style 1137LNR. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1137SNR",
+    "image": "1137SNR.jpg",
+    "collection": "nose-rings",
+    "name": "Nose Ring 1137SNR",
+    "description": "Catalog placeholder metadata for style 1137SNR. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1140NR",
+    "image": "1140NR.jpg",
+    "collection": "nose-rings",
+    "name": "Nose Ring 1140NR",
+    "description": "Catalog placeholder metadata for style 1140NR. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1141NR",
+    "image": "1141NR.jpg",
+    "collection": "nose-rings",
+    "name": "Nose Ring 1141NR",
+    "description": "Catalog placeholder metadata for style 1141NR. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1142NR",
+    "image": "1142NR.jpg",
+    "collection": "nose-rings",
+    "name": "Nose Ring 1142NR",
+    "description": "Catalog placeholder metadata for style 1142NR. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1144NR",
+    "image": "1144NR.jpg",
+    "collection": "nose-rings",
+    "name": "Nose Ring 1144NR",
+    "description": "Catalog placeholder metadata for style 1144NR. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1145SNR",
+    "image": "1145SNR.jpg",
+    "collection": "nose-rings",
+    "name": "Nose Ring 1145SNR",
+    "description": "Catalog placeholder metadata for style 1145SNR. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1147LNR",
+    "image": "1147LNR.jpg",
+    "collection": "nose-rings",
+    "name": "Nose Ring 1147LNR",
+    "description": "Catalog placeholder metadata for style 1147LNR. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1147SNR",
+    "image": "1147SNR.jpg",
+    "collection": "nose-rings",
+    "name": "Nose Ring 1147SNR",
+    "description": "Catalog placeholder metadata for style 1147SNR. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1151SB",
+    "image": "1151SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1151SB",
+    "description": "Catalog placeholder metadata for style 1151SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1178LSB",
+    "image": "1178LSB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1178LSB",
+    "description": "Catalog placeholder metadata for style 1178LSB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1178SSB",
+    "image": "1178SSB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1178SSB",
+    "description": "Catalog placeholder metadata for style 1178SSB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1179LSB",
+    "image": "1179LSB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1179LSB",
+    "description": "Catalog placeholder metadata for style 1179LSB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1179SSB",
+    "image": "1179SSB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1179SSB",
+    "description": "Catalog placeholder metadata for style 1179SSB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1201NR",
+    "image": "1201NR.jpg",
+    "collection": "nose-rings",
+    "name": "Nose Ring 1201NR",
+    "description": "Catalog placeholder metadata for style 1201NR. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1202NR",
+    "image": "1202NR.jpg",
+    "collection": "nose-rings",
+    "name": "Nose Ring 1202NR",
+    "description": "Catalog placeholder metadata for style 1202NR. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1203NR",
+    "image": "1203NR.jpg",
+    "collection": "nose-rings",
+    "name": "Nose Ring 1203NR",
+    "description": "Catalog placeholder metadata for style 1203NR. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1204NR",
+    "image": "1204NR.jpg",
+    "collection": "nose-rings",
+    "name": "Nose Ring 1204NR",
+    "description": "Catalog placeholder metadata for style 1204NR. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1205NR",
+    "image": "1205NR.jpg",
+    "collection": "nose-rings",
+    "name": "Nose Ring 1205NR",
+    "description": "Catalog placeholder metadata for style 1205NR. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1213SB",
+    "image": "1213SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1213SB",
+    "description": "Catalog placeholder metadata for style 1213SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1369SWB",
+    "image": "1369SWB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1369SWB",
+    "description": "Catalog placeholder metadata for style 1369SWB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "136BSB",
+    "image": "136BSB.jpg",
+    "collection": "bezel",
+    "name": "Bezel Style 136BSB",
+    "description": "Catalog placeholder metadata for style 136BSB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "137BSB",
+    "image": "137BSB.jpg",
+    "collection": "bezel",
+    "name": "Bezel Style 137BSB",
+    "description": "Catalog placeholder metadata for style 137BSB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1434SB",
+    "image": "1434SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1434SB",
+    "description": "Catalog placeholder metadata for style 1434SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1434SSB",
+    "image": "1434SSB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1434SSB",
+    "description": "Catalog placeholder metadata for style 1434SSB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "145SB",
+    "image": "145SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 145SB",
+    "description": "Catalog placeholder metadata for style 145SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "146SB",
+    "image": "146SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 146SB",
+    "description": "Catalog placeholder metadata for style 146SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "147SB",
+    "image": "147SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 147SB",
+    "description": "Catalog placeholder metadata for style 147SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1483SB",
+    "image": "1483SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1483SB",
+    "description": "Catalog placeholder metadata for style 1483SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1517SB",
+    "image": "1517SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1517SB",
+    "description": "Catalog placeholder metadata for style 1517SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1541WBSET",
+    "image": "1541WBSET.jpg",
+    "collection": "more-styles",
+    "name": "Style 1541WBSET",
+    "description": "Catalog placeholder metadata for style 1541WBSET. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1542WBSET",
+    "image": "1542WBSET.jpg",
+    "collection": "more-styles",
+    "name": "Style 1542WBSET",
+    "description": "Catalog placeholder metadata for style 1542WBSET. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1545WBSET",
+    "image": "1545WBSET.jpg",
+    "collection": "more-styles",
+    "name": "Style 1545WBSET",
+    "description": "Catalog placeholder metadata for style 1545WBSET. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1547WBSET",
+    "image": "1547WBSET.jpg",
+    "collection": "more-styles",
+    "name": "Style 1547WBSET",
+    "description": "Catalog placeholder metadata for style 1547WBSET. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1552WBSET",
+    "image": "1552WBSET.jpg",
+    "collection": "more-styles",
+    "name": "Style 1552WBSET",
+    "description": "Catalog placeholder metadata for style 1552WBSET. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1558SB",
+    "image": "1558SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1558SB",
+    "description": "Catalog placeholder metadata for style 1558SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1560SB",
+    "image": "1560SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1560SB",
+    "description": "Catalog placeholder metadata for style 1560SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1560WB",
+    "image": "1560WB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1560WB",
+    "description": "Catalog placeholder metadata for style 1560WB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1560WBSET",
+    "image": "1560WBSET.jpg",
+    "collection": "more-styles",
+    "name": "Style 1560WBSET",
+    "description": "Catalog placeholder metadata for style 1560WBSET. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1563TEL",
+    "image": "1563TEL.jpg",
+    "collection": "more-styles",
+    "name": "Style 1563TEL",
+    "description": "Catalog placeholder metadata for style 1563TEL. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1564SB",
+    "image": "1564SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1564SB",
+    "description": "Catalog placeholder metadata for style 1564SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1565SB",
+    "image": "1565SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1565SB",
+    "description": "Catalog placeholder metadata for style 1565SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1567LTEL",
+    "image": "1567LTEL.jpg",
+    "collection": "more-styles",
+    "name": "Style 1567LTEL",
+    "description": "Catalog placeholder metadata for style 1567LTEL. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1576LSB",
+    "image": "1576LSB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1576LSB",
+    "description": "Catalog placeholder metadata for style 1576LSB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1576SSB",
+    "image": "1576SSB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1576SSB",
+    "description": "Catalog placeholder metadata for style 1576SSB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1576WB",
+    "image": "1576WB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1576WB",
+    "description": "Catalog placeholder metadata for style 1576WB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1583SB",
+    "image": "1583SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1583SB",
+    "description": "Catalog placeholder metadata for style 1583SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1584SB",
+    "image": "1584SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1584SB",
+    "description": "Catalog placeholder metadata for style 1584SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1585SB",
+    "image": "1585SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1585SB",
+    "description": "Catalog placeholder metadata for style 1585SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1586SB",
+    "image": "1586SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1586SB",
+    "description": "Catalog placeholder metadata for style 1586SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1590TEL",
+    "image": "1590TEL.jpg",
+    "collection": "more-styles",
+    "name": "Style 1590TEL",
+    "description": "Catalog placeholder metadata for style 1590TEL. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1617LSB",
+    "image": "1617LSB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1617LSB",
+    "description": "Catalog placeholder metadata for style 1617LSB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1617SSB",
+    "image": "1617SSB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1617SSB",
+    "description": "Catalog placeholder metadata for style 1617SSB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1633SB",
+    "image": "1633SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1633SB",
+    "description": "Catalog placeholder metadata for style 1633SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1637SB",
+    "image": "1637SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1637SB",
+    "description": "Catalog placeholder metadata for style 1637SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1638SB",
+    "image": "1638SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1638SB",
+    "description": "Catalog placeholder metadata for style 1638SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1647L1TEL",
+    "image": "1647L1TEL.jpg",
+    "collection": "more-styles",
+    "name": "Style 1647L1TEL",
+    "description": "Catalog placeholder metadata for style 1647L1TEL. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1647LTEL",
+    "image": "1647LTEL.jpg",
+    "collection": "more-styles",
+    "name": "Style 1647LTEL",
+    "description": "Catalog placeholder metadata for style 1647LTEL. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1647MTEL",
+    "image": "1647MTEL.jpg",
+    "collection": "more-styles",
+    "name": "Style 1647MTEL",
+    "description": "Catalog placeholder metadata for style 1647MTEL. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1647STEL",
+    "image": "1647STEL.jpg",
+    "collection": "more-styles",
+    "name": "Style 1647STEL",
+    "description": "Catalog placeholder metadata for style 1647STEL. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1657LTEL",
+    "image": "1657LTEL.jpg",
+    "collection": "more-styles",
+    "name": "Style 1657LTEL",
+    "description": "Catalog placeholder metadata for style 1657LTEL. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1657MTEL",
+    "image": "1657MTEL.jpg",
+    "collection": "more-styles",
+    "name": "Style 1657MTEL",
+    "description": "Catalog placeholder metadata for style 1657MTEL. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1657TEL",
+    "image": "1657TEL.jpg",
+    "collection": "more-styles",
+    "name": "Style 1657TEL",
+    "description": "Catalog placeholder metadata for style 1657TEL. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1663SB",
+    "image": "1663SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1663SB",
+    "description": "Catalog placeholder metadata for style 1663SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1679LTEL",
+    "image": "1679LTEL.jpg",
+    "collection": "more-styles",
+    "name": "Style 1679LTEL",
+    "description": "Catalog placeholder metadata for style 1679LTEL. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1686WB",
+    "image": "1686WB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1686WB",
+    "description": "Catalog placeholder metadata for style 1686WB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1692SB",
+    "image": "1692SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1692SB",
+    "description": "Catalog placeholder metadata for style 1692SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1694SB",
+    "image": "1694SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1694SB",
+    "description": "Catalog placeholder metadata for style 1694SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1700SB",
+    "image": "1700SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1700SB",
+    "description": "Catalog placeholder metadata for style 1700SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1737SB",
+    "image": "1737SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1737SB",
+    "description": "Catalog placeholder metadata for style 1737SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1739LSB",
+    "image": "1739LSB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1739LSB",
+    "description": "Catalog placeholder metadata for style 1739LSB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1739SSB",
+    "image": "1739SSB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1739SSB",
+    "description": "Catalog placeholder metadata for style 1739SSB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1742SB",
+    "image": "1742SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1742SB",
+    "description": "Catalog placeholder metadata for style 1742SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1754SB",
+    "image": "1754SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1754SB",
+    "description": "Catalog placeholder metadata for style 1754SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1764SB",
+    "image": "1764SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1764SB",
+    "description": "Catalog placeholder metadata for style 1764SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1765SB",
+    "image": "1765SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1765SB",
+    "description": "Catalog placeholder metadata for style 1765SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1769SB2C",
+    "image": "1769SB2C.jpg",
+    "collection": "more-styles",
+    "name": "Style 1769SB2C",
+    "description": "Catalog placeholder metadata for style 1769SB2C. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1770SB3C",
+    "image": "1770SB3C.jpg",
+    "collection": "more-styles",
+    "name": "Style 1770SB3C",
+    "description": "Catalog placeholder metadata for style 1770SB3C. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1803SB",
+    "image": "1803SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1803SB",
+    "description": "Catalog placeholder metadata for style 1803SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1815SB",
+    "image": "1815SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1815SB",
+    "description": "Catalog placeholder metadata for style 1815SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1816LSB",
+    "image": "1816LSB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1816LSB",
+    "description": "Catalog placeholder metadata for style 1816LSB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1817SB",
+    "image": "1817SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1817SB",
+    "description": "Catalog placeholder metadata for style 1817SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1818SB",
+    "image": "1818SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1818SB",
+    "description": "Catalog placeholder metadata for style 1818SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1819SB",
+    "image": "1819SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1819SB",
+    "description": "Catalog placeholder metadata for style 1819SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1820SB",
+    "image": "1820SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1820SB",
+    "description": "Catalog placeholder metadata for style 1820SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1821SB",
+    "image": "1821SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1821SB",
+    "description": "Catalog placeholder metadata for style 1821SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1834SB",
+    "image": "1834SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1834SB",
+    "description": "Catalog placeholder metadata for style 1834SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1837SB",
+    "image": "1837SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1837SB",
+    "description": "Catalog placeholder metadata for style 1837SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1839SB",
+    "image": "1839SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1839SB",
+    "description": "Catalog placeholder metadata for style 1839SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1847SB",
+    "image": "1847SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1847SB",
+    "description": "Catalog placeholder metadata for style 1847SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1848SB",
+    "image": "1848SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1848SB",
+    "description": "Catalog placeholder metadata for style 1848SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1849SB",
+    "image": "1849SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1849SB",
+    "description": "Catalog placeholder metadata for style 1849SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1850SB",
+    "image": "1850SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1850SB",
+    "description": "Catalog placeholder metadata for style 1850SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1852SB",
+    "image": "1852SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1852SB",
+    "description": "Catalog placeholder metadata for style 1852SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1853SB",
+    "image": "1853SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1853SB",
+    "description": "Catalog placeholder metadata for style 1853SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1865SB",
+    "image": "1865SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1865SB",
+    "description": "Catalog placeholder metadata for style 1865SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1865SB3C",
+    "image": "1865SB3C.jpg",
+    "collection": "more-styles",
+    "name": "Style 1865SB3C",
+    "description": "Catalog placeholder metadata for style 1865SB3C. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1868SB",
+    "image": "1868SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1868SB",
+    "description": "Catalog placeholder metadata for style 1868SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1869SB",
+    "image": "1869SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1869SB",
+    "description": "Catalog placeholder metadata for style 1869SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1881SB",
+    "image": "1881SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1881SB",
+    "description": "Catalog placeholder metadata for style 1881SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1886WB",
+    "image": "1886WB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1886WB",
+    "description": "Catalog placeholder metadata for style 1886WB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1887SB",
+    "image": "1887SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1887SB",
+    "description": "Catalog placeholder metadata for style 1887SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1887SB3C",
+    "image": "1887SB3C.jpg",
+    "collection": "more-styles",
+    "name": "Style 1887SB3C",
+    "description": "Catalog placeholder metadata for style 1887SB3C. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1888SB",
+    "image": "1888SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1888SB",
+    "description": "Catalog placeholder metadata for style 1888SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1892SB",
+    "image": "1892SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1892SB",
+    "description": "Catalog placeholder metadata for style 1892SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1898SB",
+    "image": "1898SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1898SB",
+    "description": "Catalog placeholder metadata for style 1898SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1909SB",
+    "image": "1909SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1909SB",
+    "description": "Catalog placeholder metadata for style 1909SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1911SB",
+    "image": "1911SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1911SB",
+    "description": "Catalog placeholder metadata for style 1911SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1912SB",
+    "image": "1912SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1912SB",
+    "description": "Catalog placeholder metadata for style 1912SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1913SB",
+    "image": "1913SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1913SB",
+    "description": "Catalog placeholder metadata for style 1913SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1919SB",
+    "image": "1919SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1919SB",
+    "description": "Catalog placeholder metadata for style 1919SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1921SB",
+    "image": "1921SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1921SB",
+    "description": "Catalog placeholder metadata for style 1921SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1922SB",
+    "image": "1922SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1922SB",
+    "description": "Catalog placeholder metadata for style 1922SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1923SB",
+    "image": "1923SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1923SB",
+    "description": "Catalog placeholder metadata for style 1923SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1924SB",
+    "image": "1924SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1924SB",
+    "description": "Catalog placeholder metadata for style 1924SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1939SB",
+    "image": "1939SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1939SB",
+    "description": "Catalog placeholder metadata for style 1939SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1951SB",
+    "image": "1951SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1951SB",
+    "description": "Catalog placeholder metadata for style 1951SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1953LSB",
+    "image": "1953LSB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1953LSB",
+    "description": "Catalog placeholder metadata for style 1953LSB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1953SB",
+    "image": "1953SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1953SB",
+    "description": "Catalog placeholder metadata for style 1953SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1954SB",
+    "image": "1954SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1954SB",
+    "description": "Catalog placeholder metadata for style 1954SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1957SB",
+    "image": "1957SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1957SB",
+    "description": "Catalog placeholder metadata for style 1957SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1962SB",
+    "image": "1962SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1962SB",
+    "description": "Catalog placeholder metadata for style 1962SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1964SB",
+    "image": "1964SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1964SB",
+    "description": "Catalog placeholder metadata for style 1964SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1965SB",
+    "image": "1965SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1965SB",
+    "description": "Catalog placeholder metadata for style 1965SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1967SB",
+    "image": "1967SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1967SB",
+    "description": "Catalog placeholder metadata for style 1967SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1968SB",
+    "image": "1968SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1968SB",
+    "description": "Catalog placeholder metadata for style 1968SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1969SB",
+    "image": "1969SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1969SB",
+    "description": "Catalog placeholder metadata for style 1969SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1970SB",
+    "image": "1970SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1970SB",
+    "description": "Catalog placeholder metadata for style 1970SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1971SB",
+    "image": "1971SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1971SB",
+    "description": "Catalog placeholder metadata for style 1971SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1972SB",
+    "image": "1972SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1972SB",
+    "description": "Catalog placeholder metadata for style 1972SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1973SB",
+    "image": "1973SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1973SB",
+    "description": "Catalog placeholder metadata for style 1973SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1974SB",
+    "image": "1974SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1974SB",
+    "description": "Catalog placeholder metadata for style 1974SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1975SB",
+    "image": "1975SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1975SB",
+    "description": "Catalog placeholder metadata for style 1975SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1976SB",
+    "image": "1976SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1976SB",
+    "description": "Catalog placeholder metadata for style 1976SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1979SB",
+    "image": "1979SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1979SB",
+    "description": "Catalog placeholder metadata for style 1979SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1982LSB",
+    "image": "1982LSB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1982LSB",
+    "description": "Catalog placeholder metadata for style 1982LSB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1982SSB",
+    "image": "1982SSB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1982SSB",
+    "description": "Catalog placeholder metadata for style 1982SSB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1983SB",
+    "image": "1983SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1983SB",
+    "description": "Catalog placeholder metadata for style 1983SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1990SB",
+    "image": "1990SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1990SB",
+    "description": "Catalog placeholder metadata for style 1990SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1993SB",
+    "image": "1993SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1993SB",
+    "description": "Catalog placeholder metadata for style 1993SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1996SB",
+    "image": "1996SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1996SB",
+    "description": "Catalog placeholder metadata for style 1996SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "1998SB",
+    "image": "1998SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 1998SB",
+    "description": "Catalog placeholder metadata for style 1998SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "2000SB",
+    "image": "2000SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 2000SB",
+    "description": "Catalog placeholder metadata for style 2000SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "2002SB",
+    "image": "2002SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 2002SB",
+    "description": "Catalog placeholder metadata for style 2002SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "238SB",
+    "image": "238SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 238SB",
+    "description": "Catalog placeholder metadata for style 238SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "239SB",
+    "image": "239SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 239SB",
+    "description": "Catalog placeholder metadata for style 239SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "257SB",
+    "image": "257SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 257SB",
+    "description": "Catalog placeholder metadata for style 257SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "258SB",
+    "image": "258SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 258SB",
+    "description": "Catalog placeholder metadata for style 258SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "310TEL",
+    "image": "310TEL.jpg",
+    "collection": "more-styles",
+    "name": "Style 310TEL",
+    "description": "Catalog placeholder metadata for style 310TEL. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "311TEL",
+    "image": "311TEL.jpg",
+    "collection": "more-styles",
+    "name": "Style 311TEL",
+    "description": "Catalog placeholder metadata for style 311TEL. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "314LTEL",
+    "image": "314LTEL.jpg",
+    "collection": "more-styles",
+    "name": "Style 314LTEL",
+    "description": "Catalog placeholder metadata for style 314LTEL. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "314TEL",
+    "image": "314TEL.jpg",
+    "collection": "more-styles",
+    "name": "Style 314TEL",
+    "description": "Catalog placeholder metadata for style 314TEL. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "319MTEL",
+    "image": "319MTEL.jpg",
+    "collection": "more-styles",
+    "name": "Style 319MTEL",
+    "description": "Catalog placeholder metadata for style 319MTEL. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "319STEL",
+    "image": "319STEL.jpg",
+    "collection": "more-styles",
+    "name": "Style 319STEL",
+    "description": "Catalog placeholder metadata for style 319STEL. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "375LWB",
+    "image": "375LWB.jpg",
+    "collection": "more-styles",
+    "name": "Style 375LWB",
+    "description": "Catalog placeholder metadata for style 375LWB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "375SWB",
+    "image": "375SWB.jpg",
+    "collection": "more-styles",
+    "name": "Style 375SWB",
+    "description": "Catalog placeholder metadata for style 375SWB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "388WB",
+    "image": "388WB.jpg",
+    "collection": "more-styles",
+    "name": "Style 388WB",
+    "description": "Catalog placeholder metadata for style 388WB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "405LSB",
+    "image": "405LSB.jpg",
+    "collection": "more-styles",
+    "name": "Style 405LSB",
+    "description": "Catalog placeholder metadata for style 405LSB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "405MSB",
+    "image": "405MSB.jpg",
+    "collection": "more-styles",
+    "name": "Style 405MSB",
+    "description": "Catalog placeholder metadata for style 405MSB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "405SSB",
+    "image": "405SSB.jpg",
+    "collection": "more-styles",
+    "name": "Style 405SSB",
+    "description": "Catalog placeholder metadata for style 405SSB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "406SB",
+    "image": "406SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 406SB",
+    "description": "Catalog placeholder metadata for style 406SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "473SB",
+    "image": "473SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 473SB",
+    "description": "Catalog placeholder metadata for style 473SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "474SB",
+    "image": "474SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 474SB",
+    "description": "Catalog placeholder metadata for style 474SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "474SB3C",
+    "image": "474SB3C.jpg",
+    "collection": "more-styles",
+    "name": "Style 474SB3C",
+    "description": "Catalog placeholder metadata for style 474SB3C. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "474WB",
+    "image": "474WB.jpg",
+    "collection": "more-styles",
+    "name": "Style 474WB",
+    "description": "Catalog placeholder metadata for style 474WB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "475SB",
+    "image": "475SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 475SB",
+    "description": "Catalog placeholder metadata for style 475SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "475SB3C",
+    "image": "475SB3C.jpg",
+    "collection": "more-styles",
+    "name": "Style 475SB3C",
+    "description": "Catalog placeholder metadata for style 475SB3C. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "488SWB",
+    "image": "488SWB.jpg",
+    "collection": "more-styles",
+    "name": "Style 488SWB",
+    "description": "Catalog placeholder metadata for style 488SWB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "502SB",
+    "image": "502SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 502SB",
+    "description": "Catalog placeholder metadata for style 502SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "505WB",
+    "image": "505WB.jpg",
+    "collection": "more-styles",
+    "name": "Style 505WB",
+    "description": "Catalog placeholder metadata for style 505WB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "506WB",
+    "image": "506WB.jpg",
+    "collection": "more-styles",
+    "name": "Style 506WB",
+    "description": "Catalog placeholder metadata for style 506WB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "508WB",
+    "image": "508WB.jpg",
+    "collection": "more-styles",
+    "name": "Style 508WB",
+    "description": "Catalog placeholder metadata for style 508WB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "594SB",
+    "image": "594SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 594SB",
+    "description": "Catalog placeholder metadata for style 594SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "679SB",
+    "image": "679SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 679SB",
+    "description": "Catalog placeholder metadata for style 679SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "700WB",
+    "image": "700WB.jpg",
+    "collection": "more-styles",
+    "name": "Style 700WB",
+    "description": "Catalog placeholder metadata for style 700WB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "847LWB",
+    "image": "847LWB.jpg",
+    "collection": "more-styles",
+    "name": "Style 847LWB",
+    "description": "Catalog placeholder metadata for style 847LWB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "847SWB",
+    "image": "847SWB.jpg",
+    "collection": "more-styles",
+    "name": "Style 847SWB",
+    "description": "Catalog placeholder metadata for style 847SWB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "901SB",
+    "image": "901SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 901SB",
+    "description": "Catalog placeholder metadata for style 901SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "912LSB",
+    "image": "912LSB.jpg",
+    "collection": "more-styles",
+    "name": "Style 912LSB",
+    "description": "Catalog placeholder metadata for style 912LSB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "912MSB",
+    "image": "912MSB.jpg",
+    "collection": "more-styles",
+    "name": "Style 912MSB",
+    "description": "Catalog placeholder metadata for style 912MSB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "912SSB",
+    "image": "912SSB.jpg",
+    "collection": "more-styles",
+    "name": "Style 912SSB",
+    "description": "Catalog placeholder metadata for style 912SSB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "914SB",
+    "image": "914SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 914SB",
+    "description": "Catalog placeholder metadata for style 914SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "915SB",
+    "image": "915SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 915SB",
+    "description": "Catalog placeholder metadata for style 915SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "921SB3C",
+    "image": "921SB3C.jpg",
+    "collection": "more-styles",
+    "name": "Style 921SB3C",
+    "description": "Catalog placeholder metadata for style 921SB3C. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "927SB",
+    "image": "927SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 927SB",
+    "description": "Catalog placeholder metadata for style 927SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "927WB",
+    "image": "927WB.jpg",
+    "collection": "more-styles",
+    "name": "Style 927WB",
+    "description": "Catalog placeholder metadata for style 927WB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "929SB",
+    "image": "929SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 929SB",
+    "description": "Catalog placeholder metadata for style 929SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "931SB",
+    "image": "931SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 931SB",
+    "description": "Catalog placeholder metadata for style 931SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "932SB",
+    "image": "932SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 932SB",
+    "description": "Catalog placeholder metadata for style 932SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "933SB",
+    "image": "933SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 933SB",
+    "description": "Catalog placeholder metadata for style 933SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "942SB",
+    "image": "942SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 942SB",
+    "description": "Catalog placeholder metadata for style 942SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "969SB",
+    "image": "969SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 969SB",
+    "description": "Catalog placeholder metadata for style 969SB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "982LSB",
+    "image": "982LSB.jpg",
+    "collection": "more-styles",
+    "name": "Style 982LSB",
+    "description": "Catalog placeholder metadata for style 982LSB. Contact us for wholesale pricing.",
+    "tags": []
+  },
+  {
+    "code": "997SB",
+    "image": "997SB.jpg",
+    "collection": "more-styles",
+    "name": "Style 997SB",
+    "description": "Catalog placeholder metadata for style 997SB. Contact us for wholesale pricing.",
+    "tags": []
   }
 ]

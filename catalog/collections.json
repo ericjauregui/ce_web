@@ -3,12 +3,14 @@
     "studs",
     "bezel",
     "hearts",
-    "more-styles"
+    "more-styles",
+    "nose-rings"
   ],
   "labels": {
     "studs": "Studs",
     "bezel": "Bezel Studs",
     "hearts": "Heart Studs",
-    "more-styles": "More Styles"
+    "more-styles": "More Styles",
+    "nose-rings": "Nose Rings"
   }
 }
