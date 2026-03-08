@@ -5,6 +5,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from domains.file_cache import load_json_cached
+
 
 @dataclass
 class Section:
@@ -39,8 +41,7 @@ def normalize_product(product: dict[str, Any]) -> dict[str, Any]:
 
 
 def load_products(catalog_path: Path) -> list[dict[str, Any]]:
-    with open(catalog_path, "r", encoding="utf-8") as file:
-        raw = json.load(file)
+    raw = load_json_cached(catalog_path, [])
     return [normalize_product(item) for item in (raw or [])]
 
 
@@ -68,15 +69,13 @@ def find_product_by_code(products: list[dict[str, Any]], code: str) -> dict[str,
 
 def load_social(social_path: Path) -> dict[str, Any]:
     if social_path.exists():
-        with open(social_path, "r", encoding="utf-8") as file:
-            return json.load(file)
-    return {"tiktok": {"profile_url": "", "videos": []}, "instagram": {"profile_url": "", "reels_url": ""}}
+        return load_json_cached(social_path, {})
+    return {"tiktok": {"profile_url": ""}, "instagram": {"profile_url": "", "reels_url": ""}}
 
 
 def load_collections_cfg(collections_path: Path) -> dict[str, Any]:
     if collections_path.exists():
-        with open(collections_path, "r", encoding="utf-8") as file:
-            return json.load(file)
+        return load_json_cached(collections_path, {})
     return {"order": [], "labels": {}}
 
 

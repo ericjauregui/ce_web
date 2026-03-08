@@ -41,14 +41,6 @@
         <div class="product-detail-meta text-gold-70 mb-4">
           <p class="mb-2"><span class="text-gold fw-semibold">Collection:</span> {{ collection_label }}</p>
           <p class="mb-2"><span class="text-gold fw-semibold">Description:</span> {{ product.description or 'No description provided.' }}</p>
-          <p class="mb-0">
-            <span class="text-gold fw-semibold">Tags:</span>
-            {% if product.tags and product.tags|length > 0 %}
-              {{ product.tags|join(', ') }}
-            {% else %}
-              none
-            {% endif %}
-          </p>
           <p class="mb-0 mt-2">*CZs available in all birthstones.</p>
           <p class="mb-0">*Contact us for wholesale pricing.</p>
         </div>
@@ -93,5 +85,5 @@
 {% endblock %}
 
 {% block body_end %}
-<script src="{{ url_for('static', filename='js/product_detail.js') }}"></script>
+<script src="{{ asset_url('js/product_detail.js') }}"></script>
 {% endblock %}

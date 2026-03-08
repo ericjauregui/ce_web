@@ -1,0 +1,45 @@
+<section class="latest-videos-section pb-3" aria-label="Product Reels">
+  <div class="sticky-section-header border-top border-bottom border-gold mb-3">
+    <div class="container section-header-row py-3">
+      <h2 class="m-0 section-title catalog-section-title">
+        <span class="catalog-section-title-text">Product Reels</span>
+        <span class="catalog-section-title-rule" aria-hidden="true"></span>
+      </h2>
+      <div class="section-header-cats" aria-hidden="true"></div>
+      <div class="section-header-jump d-flex gap-3 align-items-center">
+        <a class="chip" href="{{ url_for('reels_page') }}">View All</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="latest-videos-shell scroll-cue-shell scroll-cue-shell--reels">
+      <div class="latest-videos-track inline-reel-track scroll-cue-track" id="latestVideosTrack" role="list" aria-label="Latest video previews">
+        {% for reel in latest_reels %}
+        <article
+          class="latest-video-card inline-reel-card"
+          data-reel-url="{{ reel.url }}"
+          tabindex="0"
+          role="button"
+          aria-expanded="false"
+          aria-label="Expand video {{ loop.index }} and play with sound"
+        >
+          <div class="latest-video-card__media inline-reel-media">
+            <video
+              class="latest-video-preview inline-reel-video"
+              {% if loop.first %}src="{{ reel.url }}"{% endif %}
+              data-src="{{ reel.url }}"
+              muted
+              loop
+              playsinline
+              preload="none"
+            ></video>
+            <div class="latest-video-placeholder inline-reel-placeholder" aria-hidden="true"></div>
+            <div class="inline-reel-hitbox" aria-hidden="true"></div>
+          </div>
+        </article>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>

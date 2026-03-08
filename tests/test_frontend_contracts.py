@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import tempfile
 import re
 from pathlib import Path
 
@@ -8,6 +9,64 @@ from tests.common import BaseWebTest
 
 
 class FrontendContractTests(BaseWebTest):
+    def test_homepage_renders_latest_videos_strip_with_inline_expand_and_lazy_load(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            reels_dir = Path(temp_dir)
+            for idx in range(22):
+                (reels_dir / f"clip_{idx:02d}.mp4").write_bytes(b"")
+
+            original_path = webapp.REELS_PATH
+            webapp.REELS_PATH = reels_dir
+            try:
+                response = self.client.get("/")
+            finally:
+                webapp.REELS_PATH = original_path
+
+        self.assertEqual(response.status_code, 200)
+        body = response.get_data(as_text=True)
+
+        self.assertIn("latest-videos-section", body)
+        self.assertIn("latest-videos-shell scroll-cue-shell", body)
+        self.assertIn("latest-videos-track inline-reel-track scroll-cue-track", body)
+        self.assertIn("Product Reels", body)
+        self.assertEqual(body.count("class=\"latest-video-card inline-reel-card\""), 15)
+        self.assertIn("sticky-section-header", body)
+        self.assertIn(">View All</a>", body)
+        self.assertIn("/static/js/scroll_cue.js", body)
+        self.assertIn("/static/js/inline_reels.js", body)
+        self.assertIn("/static/js/home_reels.js", body)
+        self.assertIn("href=\"/reels\"", body)
+        self.assertIn("/static/reels/", body)
+        self.assertIn("muted", body)
+        self.assertIn("loop", body)
+        self.assertIn("playsinline", body)
+        self.assertIn("data-src=", body)
+        self.assertIn("preload=\"none\"", body)
+        self.assertIn("inline-reel-placeholder", body)
+        self.assertIn("inline-reel-hitbox", body)
+        self.assertNotIn("data-reel-name=", body)
+        self.assertNotIn("latestVideoModal", body)
+        self.assertNotIn("tiktok-embed", body)
+
+    def test_homepage_hides_latest_videos_strip_when_no_reels_available(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            reels_dir = Path(temp_dir)
+            (reels_dir / "readme.txt").write_text("none", encoding="utf-8")
+
+            original_path = webapp.REELS_PATH
+            webapp.REELS_PATH = reels_dir
+            try:
+                response = self.client.get("/")
+            finally:
+                webapp.REELS_PATH = original_path
+
+        self.assertEqual(response.status_code, 200)
+        body = response.get_data(as_text=True)
+
+        self.assertNotIn("latest-videos-section", body)
+        self.assertIn("/static/js/scroll_cue.js", body)
+        self.assertNotIn("/static/js/home_reels.js", body)
+
     def test_nav_search_clear_logic_uses_input_and_search_events(self) -> None:
         response = self.client.get("/")
         self.assertEqual(response.status_code, 200)
@@ -74,9 +133,17 @@ class FrontendContractTests(BaseWebTest):
         condensed = re.sub(r"\s+", " ", css)
         body = self.client.get("/").get_data(as_text=True)
 
+        self.assertIn(".scroll-cue-shell {", css)
+        self.assertIn(".scroll-cue-shell::after {", css)
+        self.assertIn("pointer-events: none;", css)
+        self.assertIn(".scroll-cue-shell.is-overflowing.can-scroll-right::after {", css)
         self.assertIn(".section-header-cats {", css)
+        self.assertIn("width: 100%;", css)
         self.assertIn("align-items: center;", css)
         self.assertIn("min-height: 2.15rem;", css)
+        self.assertIn(".section-header-cats-scroll {", css)
+        self.assertIn("justify-content: flex-start;", css)
+        self.assertIn("overflow-x: auto;", css)
         self.assertIn(".section-header-jump {", css)
         self.assertIn("align-self: center;", css)
         self.assertIn(".hero-actions {", css)
@@ -92,6 +159,8 @@ class FrontendContractTests(BaseWebTest):
             "padding-block: max(var(--cta-btn-pad-y), calc((var(--cta-btn-min-height) - 1em) / 2));",
             css,
         )
+        self.assertIn("class=\"section-header-cats scroll-cue-shell scroll-cue-shell--chips\"", body)
+        self.assertIn("class=\"section-header-cats-scroll scroll-cue-track\"", body)
         self.assertIn(".hero-action-btn__label {", css)
         self.assertIn("line-height: 1;", css)
         self.assertIn(".hero-action-btn { flex: 0 1", condensed)
@@ -243,6 +312,44 @@ class FrontendContractTests(BaseWebTest):
         self.assertIn(".product-detail-link", script)
         self.assertIn("data-detail-url=", body)
         self.assertIn("class=\"small code-badge product-detail-link", body)
+
+    def test_inline_reels_click_toggles_audio_without_overriding_native_video_controls(self) -> None:
+        script = (Path(webapp.BASE_DIR) / "static" / "js" /
+                  "inline_reels.js").read_text(encoding="utf-8")
+        css = self.load_site_css()
+
+        self.assertIn("function toggleCardAudio(card)", script)
+        self.assertIn("video.muted = !video.muted;", script)
+        self.assertIn("syncPreferredAudiblePlayback(video);", script)
+        self.assertIn("if (target.closest(\"video\")) {", script)
+        self.assertIn("toggleCardAudio(card);", script)
+        self.assertIn(".inline-reel-hitbox {", css)
+        self.assertIn(".inline-reel-card.is-active .inline-reel-hitbox {", css)
+
+    def test_inline_reels_persist_native_audio_state_for_next_autoplay(self) -> None:
+        script = (Path(webapp.BASE_DIR) / "static" / "js" /
+                  "inline_reels.js").read_text(encoding="utf-8")
+
+        self.assertIn("let preferredAudiblePlayback = false;", script)
+        self.assertIn("function isVideoAudible(video)", script)
+        self.assertIn("video.addEventListener(\"volumechange\", () => {", script)
+        self.assertIn("window.triggerScrollCueAttention(track);", script)
+        self.assertIn("syncPreferredAudiblePlayback(video);\n        void playNextReel(card, preferredAudiblePlayback);", script)
+
+    def test_reels_scroll_cue_uses_triple_arrow_attention_style(self) -> None:
+        css = self.load_site_css()
+
+        self.assertIn(".scroll-cue-shell--reels::after {", css)
+        self.assertIn('content: \">\";', css)
+        self.assertIn(".scroll-cue-shell--reels.is-attentioning::after {", css)
+        self.assertIn("@keyframes scrollCueReelsAttention", css)
+
+    def test_inline_reels_hover_keeps_autoplay_muted(self) -> None:
+        script = (Path(webapp.BASE_DIR) / "static" / "js" /
+                  "inline_reels.js").read_text(encoding="utf-8")
+
+        self.assertNotIn("requestAudiblePlayback", script)
+        self.assertIn("void activateCard(card, { unmute: false, scrollIntoView: false });", script)
 
     def test_stylesheet_has_balanced_braces(self) -> None:
         css = self.load_site_css()

@@ -7,9 +7,12 @@ Browse studs, hoops, hearts, gemstones, and more for retailers.{% endblock %}
   <div class="container">
     <h1 class="visually-hidden">California Earrings</h1>
     <img class="hero-logo" src="{{ url_for('static', filename='assets/ce_logo_full.png') }}" alt="California Earrings" loading="eager" decoding="async">
-    <h2 class="display-8 fw-semibold text-gold">14k Gold Earrings • Body Jewelry</h2>
-    <h4 class="display-8 fw-semibold text-gold">Wholesalers • Manufacturers • Importers<br></h4>
-    <p class="display-10 fw-semibold text-gold">Since 1992 • Shipping globally</p>
+    <div class="hero-copy">
+      <h2 class="display-8 fw-semibold text-gold">14k Gold</h2>
+      <h3 class="display-8 fw-semibold text-gold">Earrings • Body Jewelry</h3>
+      <h5 class="display-8 fw-semibold text-gold">Wholesalers • Manufacturers • Importers</h5>
+      <p class="display-10 fw-semibold text-gold">Since 1992 • Shipping globally</p>
+    </div>
     <div class="hero-actions d-flex justify-content-center" aria-label="Hero actions">
       <a class="btn btn-outline-gold hero-action-btn hero-action-btn--highlight" href="#section-studs"><span class="hero-action-btn__label">View Catalog</span></a>
       <a class="btn btn-outline-gold hero-action-btn" href="{{ url_for('contact') }}"><span class="hero-action-btn__label">Contact us to Order</span></a>
@@ -17,7 +20,11 @@ Browse studs, hoops, hearts, gemstones, and more for retailers.{% endblock %}
   </div>
 </header>
 
-<section class="py-5">
+{% if latest_reels %}
+{% include "partials/latest_videos_strip.html" %}
+{% endif %}
+
+<section class="{% if latest_reels %}pt-0 pb-5{% else %}py-5{% endif %}">
   {% for section in sections %}
   <div id="section-{{ section.key }}" class="section-anchor" aria-hidden="true"></div>
   <div class="sticky-section-header border-top border-bottom border-gold mb-3">
@@ -27,12 +34,14 @@ Browse studs, hoops, hearts, gemstones, and more for retailers.{% endblock %}
         <span class="catalog-section-title-rule" aria-hidden="true"></span>
       </h2>
       {% if sections|length > 1 %}
-      <div class="section-header-cats" aria-label="Other categories">
-        {% for other in sections %}
-        {% if other.key != section.key %}
-        <button type="button" class="chip section-chip-btn" data-target="section-{{ other.key }}">{{ other.title }}</button>
-        {% endif %}
-        {% endfor %}
+      <div class="section-header-cats scroll-cue-shell scroll-cue-shell--chips" aria-label="Other categories">
+        <div class="section-header-cats-scroll scroll-cue-track">
+          {% for other in sections %}
+          {% if other.key != section.key %}
+          <button type="button" class="chip section-chip-btn" data-target="section-{{ other.key }}">{{ other.title }}</button>
+          {% endif %}
+          {% endfor %}
+        </div>
       </div>
       {% endif %}
       <div class="section-header-jump d-flex gap-3 align-items-center">
@@ -50,56 +59,6 @@ Browse studs, hoops, hearts, gemstones, and more for retailers.{% endblock %}
   {% endfor %}
 </section>
 
-<section class="pb-5">
-  <div class="social-section-header border-top border-bottom border-gold mb-3">
-    <div class="container section-header-row py-3">
-      <h2 class="m-0 section-title catalog-section-title">
-        <span class="catalog-section-title-text">Social reels</span>
-        <span class="catalog-section-title-rule" aria-hidden="true"></span>
-      </h2>
-      <div class="section-header-cats" aria-hidden="true"></div>
-      <div class="section-header-jump d-flex gap-3 align-items-center social-brand-links" aria-label="Social links">
-        <a class="social-brand-link" href="{{ social.instagram.profile_url }}" target="_blank" rel="noopener"
-          aria-label="Open Instagram" title="Instagram">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <rect x="3.5" y="3.5" width="17" height="17" rx="5" ry="5" fill="none" stroke="currentColor"
-              stroke-width="1.8" />
-            <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8" />
-            <circle cx="17.3" cy="6.8" r="1.1" fill="currentColor" />
-          </svg>
-        </a>
-        <a class="social-brand-link" href="{{ social.tiktok.profile_url }}" target="_blank" rel="noopener"
-          aria-label="Open TikTok" title="TikTok">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M14.5 4v9.2a3.7 3.7 0 1 1-3.7-3.7" fill="none" stroke="currentColor" stroke-width="1.9"
-              stroke-linecap="round" stroke-linejoin="round" />
-            <path d="M14.5 4c.6 1.7 2 3 3.7 3.7" fill="none" stroke="currentColor" stroke-width="1.9"
-              stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-        </a>
-      </div>
-    </div>
-  </div>
-
-  <div class="container">
-    <div class="reels-row">
-    {% for url in social.tiktok.videos %}
-    {% set video_id = url.split('/video/')[-1].split('?')[0] %}
-    <div class="reel-card bg-dark border-gold">
-      <blockquote class="tiktok-embed" cite="{{ url }}" data-video-id="{{ video_id }}"
-        style="max-width: 320px; min-width: 260px;">
-        <section>
-          <a target="_blank" rel="noopener" href="{{ url }}">Watch on TikTok</a>
-        </section>
-      </blockquote>
-      </div>
-    {% endfor %}
-    </div>
-  </div>
-</section>
-
-<script async src="https://www.tiktok.com/embed.js"></script>
-
   <a class="whatsapp-float"
     href="https://wa.me/18183319292?text=Hello%20I%27d%20like%20more%20information"
     target="_blank" rel="noopener" aria-label="Chat on WhatsApp">
@@ -111,5 +70,10 @@ Browse studs, hoops, hearts, gemstones, and more for retailers.{% endblock %}
 {% endblock %}
 
 {% block body_end %}
-<script src="{{ url_for('static', filename='js/catalog.js') }}"></script>
+<script src="{{ asset_url('js/scroll_cue.js') }}"></script>
+<script src="{{ asset_url('js/catalog.js') }}"></script>
+{% if latest_reels %}
+<script src="{{ asset_url('js/inline_reels.js') }}"></script>
+<script src="{{ asset_url('js/home_reels.js') }}"></script>
+{% endif %}
 {% endblock %}

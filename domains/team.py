@@ -1,16 +1,16 @@
 from __future__ import annotations
 
-import json
 import re
 from pathlib import Path
 from typing import Any
 from urllib.parse import quote_plus
 
+from domains.file_cache import load_json_cached
+
 
 def load_team(team_path: Path) -> dict[str, Any]:
     if team_path.exists():
-        with open(team_path, "r", encoding="utf-8") as file:
-            return json.load(file)
+        return load_json_cached(team_path, {})
     return {
         "headline": "Meet the Team",
         "company": "California Earrings",
@@ -116,18 +116,26 @@ def vcard_escape(value: str) -> str:
     return (value or "").replace("\\", "\\\\").replace("\n", "\\n").replace(";", "\\;").replace(",", "\\,")
 
 
-def build_member_vcard(member: dict[str, Any], team: dict[str, Any]) -> str:
+def _split_vcard_name(name: str) -> tuple[str, str]:
+    parts = [part for part in (name or "").strip().split() if part]
+    if not parts:
+        return "", ""
+    if len(parts) == 1:
+        return parts[0], ""
+    return parts[-1], " ".join(parts[:-1])
+
+
+def build_member_vcard(member: dict[str, Any], team: dict[str, Any], photo_url: str | None = None) -> str:
     company = (team.get("company") or "California Earrings").strip() or "California Earrings"
+    full_name = str(member.get("name") or "").strip()
+    family_name, given_name = _split_vcard_name(full_name)
     lines = [
         "BEGIN:VCARD",
         "VERSION:3.0",
-        f"FN:{vcard_escape(member.get('name', ''))}",
+        f"FN:{vcard_escape(full_name)}",
+        f"N:{vcard_escape(family_name)};{vcard_escape(given_name)};;;",
         f"ORG:{vcard_escape(company)}",
     ]
-
-    title = member.get("title") or ""
-    if title:
-        lines.append(f"TITLE:{vcard_escape(title)}")
 
     phone_digits = member.get("phone_digits") or ""
     if phone_digits:
@@ -136,6 +144,9 @@ def build_member_vcard(member: dict[str, Any], team: dict[str, Any]) -> str:
     email = member.get("email") or ""
     if email:
         lines.append(f"EMAIL;TYPE=INTERNET:{vcard_escape(email)}")
+
+    if photo_url:
+        lines.append(f"PHOTO;VALUE=URI:{photo_url}")
 
     lines.extend(["END:VCARD", ""])
     return "\n".join(lines)

@@ -25,11 +25,12 @@ from domains.catalog import (
     load_collections_cfg as load_collections_cfg_from_path,
     load_products as load_products_from_path,
     load_social as load_social_from_path,
-    filter_products,
     products_by_code,
 )
 from domains.emailing import send_order_email
 from domains.faqs import load_faqs as load_faqs_from_path
+from domains.homepage import build_homepage_context
+from domains.reels import load_random_reels
 from domains.seo import build_sitemap_urls as build_sitemap_urls_from_context
 from domains.seo import canonical_base_url, iso_lastmod
 from domains.team import (
@@ -41,10 +42,18 @@ from domains.team import (
 )
 
 app = Flask(__name__)
+app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 60 * 60 * 24 * 30
 
 load_dotenv()
 app.secret_key = os.environ["SECRET_KEY"]
 
+@app.after_request
+def add_no_cache_for_html(response):
+    if response.mimetype == "text/html":
+        response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "0"
+    return response
 if not app.secret_key:
     raise RuntimeError("SECRET_KEY env var not set")
 
@@ -54,6 +63,7 @@ COLLECTIONS_PATH = BASE_DIR / "catalog" / "collections.json"
 SOCIAL_PATH = BASE_DIR / "catalog" / "social.json"
 TEAM_PATH = BASE_DIR / "catalog" / "team.json"
 FAQS_PATH = BASE_DIR / "catalog" / "faqs.json"
+REELS_PATH = BASE_DIR / "static" / "reels"
 
 
 def _canonical_base_url() -> str:
@@ -66,6 +76,14 @@ def _iso_lastmod(*paths: Path) -> str | None:
 
 def _slugify(value: str) -> str:
     return slugify(value)
+
+
+def asset_url(filename: str) -> str:
+    static_path = BASE_DIR / "static" / filename
+    if not static_path.exists() or not static_path.is_file():
+        return url_for("static", filename=filename)
+
+    return url_for("static", filename=filename, v=static_path.stat().st_mtime_ns)
 
 
 def load_products() -> list[dict[str, Any]]:
@@ -120,6 +138,7 @@ def build_sitemap_urls(base_url: str) -> list[dict[str, str | float | None]]:
 @app.context_processor
 def inject_site_config():
     return {
+        "asset_url": asset_url,
         "plausible_domain": os.getenv("PLAUSIBLE_DOMAIN", "").strip(),
         "site_base_url": os.getenv("SITE_BASE_URL", "").strip(),
         "social": load_social(),
@@ -128,16 +147,14 @@ def inject_site_config():
     }
 
 
+
 @app.route("/")
 def index():
     products = load_products()
     q = request.args.get("q", "")
-    products = filter_products(products, q)
-
     cfg = load_collections_cfg()
-    sections = build_sections(products, cfg)
-
-    return render_template("index.html", sections=sections, q=q)
+    context = build_homepage_context(products, q, cfg, REELS_PATH)
+    return render_template("index.html", **context)
 
 
 @app.route("/catalog/")
@@ -278,7 +295,7 @@ def download_order_csv(token: str):
         io.BytesIO(data),
         mimetype="text/csv",
         as_attachment=True,
-        download_name=f"ce_order_{str(date.today().strftime("%m%d%y"))}_{token[:4].lower()}.csv",
+        download_name=f"ce_order_{date.today().strftime('%m%d%y')}_{token[:4].lower()}.csv",
     )
 
 
@@ -297,7 +314,7 @@ def download_order_pdf(token: str):
         io.BytesIO(pdf_bytes),
         mimetype="application/pdf",
         as_attachment=True,
-        download_name=f"ce_order_{str(date.today().strftime("%m%d%y"))}_{token[:4].lower()}.pdf",
+        download_name=f"ce_order_{date.today().strftime('%m%d%y')}_{token[:4].lower()}.pdf",
     )
 
 
@@ -414,7 +431,11 @@ def team_member_vcard(member_slug: str):
     if not member:
         abort(404)
 
-    vcard_text = build_member_vcard(member, team)
+    photo_url = None
+    if member.get("photo"):
+        photo_url = url_for("static", filename=f"team/{member['photo']}", _external=True)
+
+    vcard_text = build_member_vcard(member, team, photo_url=photo_url)
     filename = f"{_slugify(member.get('name', 'contact'))}.vcf"
     return send_file(
         io.BytesIO(vcard_text.encode("utf-8")),
@@ -442,6 +463,12 @@ def faq_redirect():
 @app.route("/faqs")
 def faqs_page():
     return render_template("faqs.html", faq_items=load_faqs())
+
+
+@app.route("/reels")
+def reels_page():
+    reels = load_random_reels(REELS_PATH)
+    return render_template("reels.html", reels=reels)
 
 
 @app.route("/robots.txt")

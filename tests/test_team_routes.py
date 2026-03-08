@@ -47,3 +47,29 @@ class TeamRouteTests(BaseWebTest):
         vcard_body = vcard.get_data(as_text=True)
         self.assertIn("BEGIN:VCARD", vcard_body)
         self.assertIn(f"FN:{member_name}", vcard_body)
+        self.assertNotIn("TITLE:", vcard_body)
+        self.assertIn(f"TEL;TYPE=CELL:{self.first_member['phone_digits']}", vcard_body)
+        self.assertIn(f"EMAIL;TYPE=INTERNET:{self.first_member['email']}", vcard_body)
+        self.assertNotIn("PHOTO;VALUE=URI:", vcard_body)
+
+    def test_build_member_vcard_includes_photo_only_when_present(self) -> None:
+        member = {
+            "name": "Jane Smith",
+            "photo": "jane.jpg",
+            "phone_digits": "12135551212",
+            "email": "jane@example.com",
+            "title": "Ignored Title",
+        }
+
+        with_photo = webapp.build_member_vcard(
+            member,
+            {"company": "California Earrings"},
+            photo_url="https://example.com/static/team/jane.jpg",
+        )
+        without_photo = webapp.build_member_vcard(member, {"company": "California Earrings"})
+
+        self.assertIn("FN:Jane Smith", with_photo)
+        self.assertIn("N:Smith;Jane;;;", with_photo)
+        self.assertNotIn("TITLE:", with_photo)
+        self.assertIn("PHOTO;VALUE=URI:https://example.com/static/team/jane.jpg", with_photo)
+        self.assertNotIn("PHOTO;VALUE=URI:", without_photo)

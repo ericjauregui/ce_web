@@ -1,16 +1,16 @@
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from typing import Any
+
+from domains.file_cache import load_json_cached
 
 
 def load_faqs(faqs_path: Path) -> list[dict[str, Any]]:
     if not faqs_path.exists():
         return []
 
-    with open(faqs_path, "r", encoding="utf-8") as file:
-        raw = json.load(file)
+    raw = load_json_cached(faqs_path, [])
 
     if not isinstance(raw, list):
         return []

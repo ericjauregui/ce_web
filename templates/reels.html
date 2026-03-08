@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Reels | California Earrings{% endblock %}
+{% block meta_description %}Explore California Earrings reels with inline previews, fast lazy loading, and tap-to-hear playback.{% endblock %}
+
+{% block content %}
+<section class="container py-5 reels-page">
+  <div class="page-title-row mb-4">
+    <a class="btn btn-outline-gold page-title-back" href="{{ url_for('index') }}">Back to Catalog</a>
+    <h1 class="text-gold">Product Reels</h1>
+    <span class="page-title-spacer btn btn-outline-gold" aria-hidden="true">Back to Catalog</span>
+  </div>
+
+  {% if reels %}
+
+  <div class="reels-stage card bg-dark border-gold p-3 p-md-4">
+    <div class="reels-track-shell scroll-cue-shell scroll-cue-shell--reels">
+      <div id="reelRow" class="reel-row inline-reel-track scroll-cue-track" role="list" aria-label="Reel playlist">
+      {% for reel in reels %}
+      <article
+        class="reel-card inline-reel-card"
+        role="button"
+        aria-expanded="false"
+        tabindex="0"
+        aria-label="Expand reel {{ loop.index }} and play with sound"
+        data-reel-url="{{ reel.url }}"
+      >
+        <div class="reel-media inline-reel-media">
+          <video
+            class="reel-video inline-reel-video"
+            {% if loop.first %}src="{{ reel.url }}"{% endif %}
+            data-src="{{ reel.url }}"
+            muted
+            loop
+            playsinline
+            preload="none"
+          ></video>
+          <div class="reel-placeholder inline-reel-placeholder" aria-hidden="true"></div>
+          <div class="inline-reel-hitbox" aria-hidden="true"></div>
+        </div>
+      </article>
+      {% endfor %}
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <div class="card bg-dark border-gold p-4 p-md-5 text-center">
+    <p class="m-0 text-gold-70">No reels available yet.</p>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}
+
+{% block body_end %}
+  {{ super() }}
+  {% if reels %}
+  <script src="{{ asset_url('js/scroll_cue.js') }}" defer></script>
+  <script src="{{ asset_url('js/inline_reels.js') }}" defer></script>
+  <script src="{{ asset_url('js/reels.js') }}" defer></script>
+  {% endif %}
+{% endblock %}

@@ -1,0 +1,60 @@
+.reels-page {
+  position: relative;
+}
+
+.reels-stage {
+  background:
+    radial-gradient(140% 100% at 50% 8%, rgb(var(--gold-rgb) / 0.08), transparent 58%),
+    linear-gradient(180deg, rgba(10, 10, 10, 0.82), rgba(13, 13, 13, 0.92));
+  box-shadow:
+    inset 0 0 0 1px rgb(var(--gold-rgb) / 0.16),
+    0 14px 32px rgba(0, 0, 0, 0.34);
+}
+
+.reel-row {
+  padding: 0.32rem 0 0.35rem;
+  --inline-reel-width: clamp(178px, 19vw, 236px);
+  --inline-reel-active-width: clamp(268px, 30vw, 360px);
+  --inline-reel-height: clamp(360px, 58vh, 680px);
+  --inline-reel-mobile-width: clamp(132px, 46vw, 170px);
+  --inline-reel-mobile-active-width: clamp(208px, 76vw, 260px);
+  --inline-reel-mobile-height: clamp(264px, 64vh, 520px);
+}
+
+.reels-track-shell {
+  --scroll-cue-right: clamp(.3rem, 1vw, .7rem);
+  --scroll-cue-fade-width: clamp(3.4rem, 10.5vw, 5.4rem);
+  --scroll-cue-size: clamp(2rem, 3.8vw, 2.55rem);
+  --scroll-cue-arrow-size: clamp(1.04rem, 2.1vw, 1.24rem);
+  --scroll-cue-bg: rgba(10, 10, 10, 0.82);
+  --scroll-cue-border-color: rgb(var(--gold-rgb) / 0.5);
+  --scroll-cue-shadow: 0 14px 30px rgba(0, 0, 0, 0.3);
+  --scroll-cue-track-end-pad: clamp(2.8rem, 8vw, 4rem);
+}
+
+.reels-page .reel-card {
+  opacity: 0.84;
+}
+
+.reels-page .reel-card.is-active {
+  opacity: 1;
+}
+
+.reels-page .reel-card .inline-reel-video {
+  border-radius: 0.85rem;
+}
+
+.reel-media {
+  border-radius: 0.85rem;
+  overflow: hidden;
+}
+
+.reel-status-pill {
+  color: var(--gold);
+}
+
+@media (max-width: 767.98px) {
+  .reels-stage {
+    padding-inline: 0.8rem !important;
+  }
+}
