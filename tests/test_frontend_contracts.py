@@ -67,6 +67,14 @@ class FrontendContractTests(BaseWebTest):
         self.assertIn("/static/js/scroll_cue.js", body)
         self.assertNotIn("/static/js/home_reels.js", body)
 
+    def test_homepage_includes_flower_studs_section(self) -> None:
+        response = self.client.get("/")
+        self.assertEqual(response.status_code, 200)
+
+        body = response.get_data(as_text=True)
+        self.assertIn("section-flower-studs", body)
+        self.assertIn("Flower Studs", body)
+
     def test_nav_search_clear_logic_uses_input_and_search_events(self) -> None:
         response = self.client.get("/")
         self.assertEqual(response.status_code, 200)

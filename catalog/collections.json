@@ -4,11 +4,12 @@
     "ball-studs",
     "bezel",
     "hearts",
+    "flower-studs",
     "animal-studs",
     "telephone-earrings",
     "nose-rings",
-    "jewelry-sets",
-    "more-styles"
+    "more-styles",
+    "jewelry-sets"
   ],
   "labels": {
     "studs": "Studs",
@@ -19,6 +20,7 @@
     "more-styles": "More Styles",
     "jewelry-sets": "Jewelry Sets",
     "ball-studs": "Ball Studs",
-    "animal-studs": "Animal Studs"
+    "animal-studs": "Animal Studs",
+    "flower-studs": "Flower Studs"
   }
 }
