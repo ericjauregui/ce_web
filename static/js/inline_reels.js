@@ -27,6 +27,7 @@
     let preferredVolumeLevel = 1;
     let scrollCueFrame = 0;
     let trackInViewport = true;
+    let viewportPausedPlayback = false;
     let keepFullscreenOnAdvance = false;
     let fullscreenHostCard = null;
     let fullscreenPlaybackIndex = -1;
@@ -47,6 +48,39 @@
       }
 
       video.pause();
+    }
+
+    function pauseActiveCardPlaybackForViewport() {
+      if (!activeCard) {
+        return;
+      }
+
+      const video = activeCard.querySelector(".inline-reel-video");
+      if (!video || video.paused || video.ended) {
+        return;
+      }
+
+      viewportPausedPlayback = true;
+      video.pause();
+    }
+
+    function resumeViewportPausedPlayback() {
+      if (!viewportPausedPlayback || !activeCard) {
+        return;
+      }
+
+      const video = activeCard.querySelector(".inline-reel-video");
+      if (!video || video.ended || isVideoPresentingFullscreen(video)) {
+        return;
+      }
+
+      viewportPausedPlayback = false;
+      const playPromise = video.play();
+      if (playPromise && typeof playPromise.catch === "function") {
+        playPromise.catch(() => {
+          viewportPausedPlayback = true;
+        });
+      }
     }
 
     function rememberPreferredPlaybackState(video) {
@@ -271,8 +305,11 @@
           trackInViewport = isVisible;
 
           if (!isVisible) {
-            pauseActiveCardPlayback();
+            pauseActiveCardPlaybackForViewport();
+            return;
           }
+
+          resumeViewportPausedPlayback();
         },
         {
           root: null,
@@ -465,6 +502,40 @@
       return true;
     }
 
+    async function transferWebkitFullscreenPlayback(currentVideo, nextCard) {
+      if (!currentVideo || !nextCard) {
+        return false;
+      }
+
+      const nextVideo = nextCard.querySelector(".inline-reel-video");
+      if (!nextVideo || typeof nextVideo.webkitEnterFullscreen !== "function") {
+        return false;
+      }
+
+      if (typeof currentVideo.webkitExitFullscreen === "function") {
+        try {
+          currentVideo.webkitExitFullscreen();
+        } catch (_err) {
+          // Some WebKit builds do not expose a working exit hook.
+        }
+      }
+
+      await activateCard(nextCard, {
+        scrollIntoView: true,
+        scrollAlignment: "start",
+      });
+
+      keepFullscreenOnAdvance = true;
+      setControlsVisibility(nextVideo, true);
+      try {
+        nextVideo.webkitEnterFullscreen();
+        return true;
+      } catch (_err) {
+        keepFullscreenOnAdvance = false;
+        return false;
+      }
+    }
+
     async function activateCard(card, options = {}) {
       const {
         scrollIntoView = true,
@@ -484,6 +555,7 @@
         ? activeCard.querySelector(".inline-reel-video")
         : null;
       rememberPreferredPlaybackState(previousActiveVideo);
+      viewportPausedPlayback = false;
 
       muteAndPauseOtherReels(card);
 
@@ -532,6 +604,7 @@
         ? currentCard.querySelector(".inline-reel-video")
         : null;
       rememberPreferredPlaybackState(currentVideo);
+      viewportPausedPlayback = false;
 
       const keepFullscreen =
         keepFullscreenOnAdvance || isVideoPresentingFullscreen(currentVideo);
@@ -543,6 +616,16 @@
       const nextCard = cards[(currentIndex + 1) % cards.length];
       if (!nextCard) {
         return;
+      }
+
+      if (currentVideo && currentVideo.webkitDisplayingFullscreen) {
+        const transferredFullscreen = await transferWebkitFullscreenPlayback(
+          currentVideo,
+          nextCard,
+        );
+        if (transferredFullscreen) {
+          return;
+        }
       }
 
       if (keepFullscreen && currentVideo) {
@@ -644,11 +727,9 @@
           return;
         }
 
-        const volumeWasRaisedWhileMuted =
-          preferredMutedState &&
-          video.muted &&
-          video.volume > preferredVolumeLevel;
-        if (volumeWasRaisedWhileMuted) {
+        const volumeChangeRequestedWhileMuted =
+          preferredMutedState && video.muted && video.volume > 0;
+        if (volumeChangeRequestedWhileMuted) {
           video.muted = false;
         }
 
@@ -708,7 +789,7 @@
         return;
       }
 
-      void activateCard(card);
+      void activateCard(card, { scrollAlignment: "start" });
     });
 
     track.addEventListener("keydown", (event) => {
@@ -726,7 +807,7 @@
           revealControlsForCard(card, { autoHide: false });
           return;
         }
-        void activateCard(card);
+        void activateCard(card, { scrollAlignment: "start" });
       }
     });
 
@@ -833,7 +914,7 @@
         }
 
         nextCard.focus({ preventScroll: true });
-        void activateCard(nextCard);
+        void activateCard(nextCard, { scrollAlignment: "start" });
       });
     }
 

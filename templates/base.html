@@ -30,7 +30,10 @@
   <meta name="twitter:image" content="{% block twitter_image %}{{ self.og_image()|striptags|trim }}{% endblock %}">
   <meta name="robots" content="{% block robots_meta %}index,follow{% endblock %}">
 
-  <link rel="icon" type="image/png" href="{{ url_for('static', filename='assets/ce_logo_shape.png') }}">
+  <link rel="icon" href="{{ asset_url('favicon.ico') }}" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="{{ asset_url('favicon/favicon-32x32.png') }}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{{ asset_url('favicon/favicon-16x16.png') }}">
+  <link rel="apple-touch-icon" href="{{ asset_url('favicon/apple-touch-icon.png') }}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>

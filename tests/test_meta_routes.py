@@ -39,6 +39,10 @@ class MetaRouteTests(BaseWebTest):
         home = self.client.get("/")
         self.assertEqual(home.status_code, 200)
         home_body = home.get_data(as_text=True)
+        self.assertIn('rel="icon" href="/static/favicon.ico?v=', home_body)
+        self.assertIn('rel="icon" type="image/png" sizes="32x32" href="/static/favicon/favicon-32x32.png?v=', home_body)
+        self.assertIn('rel="icon" type="image/png" sizes="16x16" href="/static/favicon/favicon-16x16.png?v=', home_body)
+        self.assertIn('rel="apple-touch-icon" href="/static/favicon/apple-touch-icon.png?v=', home_body)
         self.assertIn('"@type": "Organization"', home_body)
         self.assertIn('"@type": "WebSite"', home_body)
         self.assertIn('"@type": "CollectionPage"', home_body)
@@ -71,3 +75,11 @@ class MetaRouteTests(BaseWebTest):
         self.assertEqual(not_found.status_code, 404)
         self.assertIn('meta name="robots" content="noindex,nofollow"',
                       not_found.get_data(as_text=True))
+
+    def test_root_favicon_route_serves_ico_file(self) -> None:
+        response = self.client.get("/favicon.ico")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.mimetype, "image/x-icon")
+        self.assertGreater(len(response.data), 0)
+        response.close()

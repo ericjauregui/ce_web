@@ -474,6 +474,15 @@ def reels_page():
     return render_template("reels.html", reels=reels)
 
 
+@app.route("/favicon.ico")
+def favicon():
+    return send_file(
+        BASE_DIR / "static" / "favicon.ico",
+        mimetype="image/x-icon",
+        max_age=60 * 60 * 24 * 30,
+    )
+
+
 @app.route("/robots.txt")
 def robots():
     base = _canonical_base_url()
