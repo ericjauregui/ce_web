@@ -23,6 +23,27 @@
 {% include "partials/latest_videos_strip.html" %}
 {% endif %}
 
+<aside class="catalog-density-rail" data-density-rail aria-label="Catalog zoom controls" aria-hidden="true">
+  <button type="button" class="catalog-density-btn" data-density-action="zoom-in" aria-label="Zoom in catalog grid" title="Zoom in to fewer columns">+</button>
+  <div class="catalog-density-track-shell">
+    <div class="catalog-density-track" data-density-track>
+      <button
+        type="button"
+        class="catalog-density-thumb"
+        data-density-thumb
+        role="slider"
+        aria-label="Catalog zoom level"
+        aria-orientation="vertical"
+        aria-valuemin="1"
+        aria-valuemax="20"
+        aria-valuenow="6"
+        aria-valuetext="Catalog zoom level 6"
+      ></button>
+    </div>
+  </div>
+  <button type="button" class="catalog-density-btn" data-density-action="zoom-out" aria-label="Zoom out catalog grid" title="Zoom out to more columns">-</button>
+</aside>
+
 <section class="{% if latest_reels %}pt-0 pb-5{% else %}py-5{% endif %}">
   {% for section in sections %}
   <div id="section-{{ section.key }}" class="section-anchor" aria-hidden="true"></div>
@@ -49,7 +70,7 @@
       </div>
   </div>
   <div class="container{% if not loop.last %} mb-3{% endif %}">
-    <div class="row row-cols-2 row-cols-md-3 row-cols-xl-4 g-4 product-grid-row">
+    <div class="product-grid-row" data-density-grid data-density="6">
       {% for p in section.items %}
       {% include "partials/product_card.html" %}
       {% endfor %}

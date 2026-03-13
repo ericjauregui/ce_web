@@ -515,13 +515,88 @@ main {
     margin-top: .65rem;
   }
 
+  .product-grid-row {
+    --catalog-card-pad: clamp(.92rem, 2vw, 1.08rem);
+    --catalog-code-badge-padding: .18rem .58rem;
+    --catalog-code-badge-font-size: clamp(.82rem, 2.2cqw, .94rem);
+    --catalog-pricing-font-size: .72rem;
+    --catalog-pricing-line-height: 1.2;
+    --catalog-actions-gap: .45rem;
+    --catalog-qty-inline-pad: 2rem;
+    --catalog-cta-font-size: clamp(.82rem, 2.25cqw, .92rem);
+  }
+
+  .product-grid-row .product-card {
+    --cta-btn-min-height: 36px;
+    --cta-btn-pad-y: .4rem;
+    --cta-btn-pad-x: .9rem;
+  }
+
+  .product-grid-row .product-card .card-body {
+    padding: var(--catalog-card-pad);
+  }
+
+  .product-grid-row .product-card .code-badge {
+    padding: var(--catalog-code-badge-padding);
+    font-size: var(--catalog-code-badge-font-size);
+    letter-spacing: .03rem;
+  }
+
   .product-pricing-note {
-    font-size: .72rem;
-    line-height: 1.2;
+    font-size: var(--catalog-pricing-font-size, .72rem);
+    line-height: var(--catalog-pricing-line-height, 1.2);
+  }
+
+  .product-grid-row[data-density-tier="1"] {
+    --catalog-card-pad: clamp(.82rem, 1.9vw, .96rem);
+    --catalog-code-badge-padding: .16rem .52rem;
+    --catalog-code-badge-font-size: clamp(.78rem, 2.15cqw, .88rem);
+    --catalog-pricing-font-size: .68rem;
+    --catalog-pricing-line-height: 1.16;
+    --catalog-actions-gap: .38rem;
+    --catalog-cta-font-size: clamp(.76rem, 2.2cqw, .88rem);
+  }
+
+  .product-grid-row[data-density-tier="1"] .product-card {
+    --cta-btn-pad-x: .78rem;
+  }
+
+  .product-grid-row[data-density-tier="2"] {
+    --catalog-card-pad: clamp(.72rem, 1.75vw, .84rem);
+    --catalog-code-badge-padding: .15rem .46rem;
+    --catalog-code-badge-font-size: clamp(.72rem, 2cqw, .82rem);
+    --catalog-pricing-font-size: .64rem;
+    --catalog-pricing-line-height: 1.12;
+    --catalog-actions-gap: .34rem;
+    --catalog-qty-inline-pad: 1.9rem;
+    --catalog-cta-font-size: clamp(.72rem, 2cqw, .82rem);
+  }
+
+  .product-grid-row[data-density-tier="2"] .product-card {
+    --cta-btn-min-height: 34px;
+    --cta-btn-pad-y: .34rem;
+    --cta-btn-pad-x: .72rem;
+  }
+
+  .product-grid-row[data-density-tier="3"] {
+    --catalog-card-pad: clamp(.62rem, 1.45vw, .74rem);
+    --catalog-code-badge-padding: .14rem .4rem;
+    --catalog-code-badge-font-size: clamp(.68rem, 1.8cqw, .78rem);
+    --catalog-pricing-font-size: .6rem;
+    --catalog-pricing-line-height: 1.08;
+    --catalog-actions-gap: .3rem;
+    --catalog-qty-inline-pad: 1.55rem;
+    --catalog-cta-font-size: clamp(.68rem, 1.8cqw, .78rem);
+  }
+
+  .product-grid-row[data-density-tier="3"] .product-card {
+    --cta-btn-min-height: 32px;
+    --cta-btn-pad-y: .28rem;
+    --cta-btn-pad-x: .6rem;
   }
 
   .product-actions {
-    gap: .45rem;
+      gap: var(--catalog-actions-gap, .45rem);
     min-width: 0;
   }
 
@@ -532,12 +607,14 @@ main {
     overflow: hidden;
     text-overflow: ellipsis;
     min-height: var(--cta-btn-min-height);
+    font-size: var(--catalog-cta-font-size, clamp(.82rem, 2.25cqw, .92rem));
     }
 
     .product-card .product-detail-link.code-badge {
       width: 100%;
       min-height: var(--cta-btn-min-height);
         padding: var(--cta-btn-pad-y) var(--cta-btn-pad-x);
+        font-size: var(--catalog-cta-font-size, clamp(.82rem, 2.25cqw, .92rem));
       border-radius: 999px;
       text-decoration-line: underline;
       text-underline-offset: .12em;
@@ -577,6 +654,8 @@ main {
   }
 
   .product-qty-control {
+    padding-left: var(--catalog-qty-inline-pad, 2rem);
+    padding-right: var(--catalog-qty-inline-pad, 2rem);
     position: relative;
     display: flex;
     align-items: center;

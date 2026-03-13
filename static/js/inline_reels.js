@@ -29,6 +29,7 @@
     let trackInViewport = true;
     let viewportPausedPlayback = false;
     let keepFullscreenOnAdvance = false;
+    let pendingFullscreenTransfer = false;
     let fullscreenHostCard = null;
     let fullscreenPlaybackIndex = -1;
     let alignmentSettleTimers = [];
@@ -512,6 +513,8 @@
         return false;
       }
 
+      pendingFullscreenTransfer = true;
+
       if (typeof currentVideo.webkitExitFullscreen === "function") {
         try {
           currentVideo.webkitExitFullscreen();
@@ -531,6 +534,7 @@
         nextVideo.webkitEnterFullscreen();
         return true;
       } catch (_err) {
+        pendingFullscreenTransfer = false;
         keepFullscreenOnAdvance = false;
         return false;
       }
@@ -741,11 +745,16 @@
           return;
         }
 
+        pendingFullscreenTransfer = false;
         keepFullscreenOnAdvance = true;
         setControlsVisibility(video, true);
       });
 
       video.addEventListener("webkitendfullscreen", () => {
+        if (pendingFullscreenTransfer) {
+          return;
+        }
+
         if (card !== activeCard || isNearPlaybackEnd(video)) {
           return;
         }
@@ -922,7 +931,12 @@
       const activeVideo = activeCard
         ? activeCard.querySelector(".inline-reel-video")
         : null;
+      if (pendingFullscreenTransfer && !document.fullscreenElement) {
+        return;
+      }
+
       if (activeVideo && document.fullscreenElement === activeVideo) {
+        pendingFullscreenTransfer = false;
         keepFullscreenOnAdvance = true;
         setControlsVisibility(activeVideo, true);
         return;
