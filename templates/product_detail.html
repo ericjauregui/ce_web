@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% set product_image_url = (site_base_url or request.url_root).rstrip('/') ~ url_for('static', filename='product_images/' ~ product.image) %}
 {% block title %}{{ product.name }} ({{ product.code }}) | Wholesale 14K Jewelry | California Earrings{% endblock %}
-{% block meta_description %}{% if product.description %}{{ product.description|trim }} Wholesale 14K gold jewelry style from California Earrings in Los Angeles.{% else %}{{ product.name }} is a wholesale 14K gold jewelry style from California Earrings in Los Angeles.{% endif %}{% endblock %}
+{% block meta_description %}{% if product.description %}{{ product.description|trim }} 14K gold jewelry style from California Earrings in Los Angeles.{% else %}{{ product.name }} is an authentic 14K gold jewelry style from California Earrings in Los Angeles.{% endif %}{% endblock %}
 {% block og_type %}product{% endblock %}
 {% block og_image %}{{ product_image_url }}{% endblock %}
 {% block og_image_alt %}{{ product.name }}{% endblock %}
