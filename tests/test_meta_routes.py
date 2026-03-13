@@ -14,6 +14,7 @@ class MetaRouteTests(BaseWebTest):
         body = response.get_data(as_text=True)
         self.assertIn("https://californiaearrings.com/", body)
         self.assertIn("https://californiaearrings.com/faqs", body)
+        self.assertIn("https://californiaearrings.com/reels", body)
         self.assertIn(f"https://californiaearrings.com/team/{self.first_member['slug']}", body)
         self.assertIn(
             f"https://californiaearrings.com/product/{self.valid_code}", body)
@@ -31,6 +32,7 @@ class MetaRouteTests(BaseWebTest):
         robots_body = robots_response.get_data(as_text=True)
         self.assertIn("Disallow: /api/", robots_body)
         self.assertIn("Disallow: /checkout", robots_body)
+        self.assertIn("Disallow: /*?q=", robots_body)
         self.assertIn("Sitemap: https://californiaearrings.com/sitemap.xml", robots_body)
 
     def test_base_layout_exposes_global_schema_and_noindex_for_transaction_pages(self) -> None:
@@ -39,6 +41,21 @@ class MetaRouteTests(BaseWebTest):
         home_body = home.get_data(as_text=True)
         self.assertIn('"@type": "Organization"', home_body)
         self.assertIn('"@type": "WebSite"', home_body)
+        self.assertIn('"@type": "CollectionPage"', home_body)
+
+        faq = self.client.get("/faqs")
+        self.assertEqual(faq.status_code, 200)
+        self.assertIn('"@type": "FAQPage"', faq.get_data(as_text=True))
+
+        contact = self.client.get("/contact")
+        self.assertEqual(contact.status_code, 200)
+        contact_body = contact.get_data(as_text=True)
+        self.assertIn('"@type": "ContactPage"', contact_body)
+        self.assertIn('"@type": "JewelryStore"', contact_body)
+
+        reels = self.client.get("/reels")
+        self.assertEqual(reels.status_code, 200)
+        self.assertIn('"@type": "CollectionPage"', reels.get_data(as_text=True))
 
         cart = self.client.get("/cart")
         self.assertEqual(cart.status_code, 200)

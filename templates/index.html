@@ -1,7 +1,6 @@
 {% extends "base.html" %}
-{% block title %}California Earrings | Manufacturers, Importers, & Wholesalers of 14K Gold Earrings & Body Jewelry{% endblock %}
-{% block meta_description %}Wholesale 14k gold earrings and body jewelry from California Earrings in Los Angeles.
-Browse studs, hoops, hearts, gemstones, and more for retailers.{% endblock %}
+{% block title %}California Earrings | Luxury Wholesale 14K Gold Earrings & Body Jewelry{% endblock %}
+{% block meta_description %}Shop luxury wholesale 14K gold earrings, piercing jewelry, hoops, studs, hearts, and body jewelry from California Earrings in Los Angeles. Built for boutiques, jewelry stores, and resellers.{% endblock %}
 {% block content %}
 <header class="hero d-flex align-items-center text-center">
   <div class="container">
@@ -67,6 +66,32 @@ Browse studs, hoops, hearts, gemstones, and more for retailers.{% endblock %}
         d="M380.9 97.1C339 55.2 283.2 32 223.9 32 100.5 32 0 132.5 0 256c0 45.4 11.9 89.5 34.5 128.4L0 480l98.8-32.5C136.9 469 179.7 480 223.9 480c123.4 0 224-100.5 224-224 0-59.2-23.2-115-65-156.9zM223.9 438.7c-38.8 0-76.8-10.4-110.1-30.1l-7.9-4.7-58.6 19.3 19.1-57.1-5.1-8.2C41.6 323.6 30.3 290.1 30.3 256 30.3 149.3 117.1 62.5 223.9 62.5c51.8 0 100.5 20.2 137.1 56.8 36.6 36.6 56.8 85.3 56.8 137.1 0 106.8-86.8 193.6-193.9 193.6zm101.7-145.5c-5.6-2.8-33.1-16.3-38.2-18.1-5.1-1.9-8.9-2.8-12.6 2.8-3.7 5.6-14.5 18.1-17.7 21.8-3.3 3.7-6.5 4.2-12.1 1.4-32.9-16.5-54.4-29.5-76.2-66.9-5.8-9.9 5.8-9.2 16.5-30.7 1.8-3.7.9-6.8-.5-9.6-1.4-2.8-12.6-30.3-17.3-41.5-4.6-11.1-9.3-9.6-12.6-9.8-3.3-.2-7.1-.2-10.8-.2-3.7 0-9.6 1.4-14.6 6.8-5.1 5.6-19.1 18.7-19.1 45.6 0 26.8 19.6 52.8 22.3 56.5 2.8 3.7 38.4 58.6 93.1 82.1 34.5 14.9 48 16.1 65.1 13.5 10.4-1.6 33.1-13.5 37.7-26.6 4.7-13.1 4.7-24.3 3.3-26.6-1.3-2.4-5.1-3.8-10.7-6.6z" />
     </svg>
   </a>
+{% endblock %}
+
+{% block schema_json_ld %}
+{{ super() }}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "California Earrings Wholesale Catalog",
+  "url": {{ canonical_url|tojson }},
+  "description": "Luxury wholesale 14K gold earrings and body jewelry catalog for boutiques, jewelry stores, and resellers worldwide.",
+  "mainEntity": {
+    "@type": "ItemList",
+    "itemListElement": [
+      {% for section in sections %}
+      {
+        "@type": "ListItem",
+        "position": {{ loop.index }},
+        "name": {{ section.title|tojson }},
+        "url": {{ (canonical_url ~ '#section-' ~ section.key)|tojson }}
+      }{% if not loop.last %},{% endif %}
+      {% endfor %}
+    ]
+  }
+}
+</script>
 {% endblock %}
 
 {% block body_end %}

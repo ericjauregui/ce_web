@@ -28,6 +28,7 @@ def build_sitemap_urls(
     catalog_path: Path,
     collections_path: Path,
     faqs_path: Path,
+    reels_path: Path,
     team_path: Path,
     team_members: list[dict],
     product_codes: list[str] | None = None,
@@ -56,6 +57,12 @@ def build_sitemap_urls(
             "changefreq": "monthly",
             "priority": 0.6,
             "lastmod": iso_lastmod(faqs_path, base_dir / "templates" / "faqs.html"),
+        },
+        {
+            "path": "/reels",
+            "changefreq": "weekly",
+            "priority": 0.8,
+            "lastmod": iso_lastmod(reels_path, base_dir / "templates" / "reels.html"),
         },
         {
             "path": "/team",

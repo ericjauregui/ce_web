@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block title %}FAQs | California Earrings{% endblock %}
-{% block meta_description %}Frequently asked questions at California Earrings.{% endblock %}
+{% block meta_description %}Read California Earrings wholesale FAQs covering 14K gold authenticity, minimum orders, shipping, showroom visits, back orders, and retailer support.{% endblock %}
 
 {% block content %}
 <section class="container py-5 faqs-page" style="max-width: 980px;">
@@ -35,4 +35,26 @@
     {% endfor %}
   </div>
 </section>
+{% endblock %}
+
+{% block schema_json_ld %}
+{{ super() }}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {% for item in faq_items %}
+    {
+      "@type": "Question",
+      "name": {{ item.question|tojson }},
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": {{ item.answer|tojson }}
+      }
+    }{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ]
+}
+</script>
 {% endblock %}

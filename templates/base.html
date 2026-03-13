@@ -8,12 +8,13 @@
   {% set canonical_url = base_url ~ request.path %}
   {% set default_og_image = base_url ~ url_for('static', filename='assets/social_preview.png') %}
 
-  <title>{% block title %}California Earrings | Wholesalers of 14K Earrings{% endblock %}</title>
+  <title>{% block title %}California Earrings | Luxury Wholesale 14K Gold Earrings & Body Jewelry{% endblock %}</title>
   <meta name="description"
-    content="{% block meta_description %}Los Angeles based wholesaler of 14K gold earrings and body jewelry.{% endblock %}">
+    content="{% block meta_description %}Luxury wholesale 14K gold earrings and body jewelry from Los Angeles for jewelry stores, boutiques, and resellers worldwide.{% endblock %}">
   <link rel="canonical" href="{{ canonical_url }}">
 
   <meta property="og:site_name" content="{{ site_name }}">
+  <meta property="og:locale" content="en_US">
   <meta property="og:type" content="{% block og_type %}website{% endblock %}">
   <meta property="og:title" content="{% block og_title %}{{ self.title()|striptags|trim }}{% endblock %}">
   <meta property="og:description"
@@ -53,12 +54,30 @@
             "@type": "Organization",
             "name": site_name,
             "url": base_url,
+            "description": "Luxury wholesale 14K gold earrings and body jewelry for boutiques, jewelry stores, and resellers.",
             "logo": base_url ~ url_for('static', filename='assets/ce_logo_shape.png'),
+            "email": "californiaearrings@gmail.com",
+            "telephone": "+1-213-935-7272",
+            "areaServed": "Worldwide",
+            "sameAs": [
+              social.instagram.profile_url,
+              social.tiktok.profile_url,
+              "https://linktr.ee/californiaearrings"
+            ],
+            "address": {
+              "@type": "PostalAddress",
+              "streetAddress": "650 S. Hill St, Suite 518",
+              "addressLocality": "Los Angeles",
+              "addressRegion": "CA",
+              "postalCode": "90014",
+              "addressCountry": "US"
+            },
             "contactPoint": [{
               "@type": "ContactPoint",
               "telephone": "+1-213-935-7272",
               "contactType": "sales",
-              "areaServed": "US"
+              "availableLanguage": ["en", "es"],
+              "areaServed": "Worldwide"
             }]
           }|tojson }}
   </script>
@@ -189,7 +208,7 @@
         </a>
       </div>
     </div>
-    © {{ 2026 }} California Earrings · Los Angeles, CA, USA
+    © {{ current_year }} California Earrings · Los Angeles, CA, USA
   </footer>
 
   <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

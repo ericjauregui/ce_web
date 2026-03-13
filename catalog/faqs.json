@@ -21,7 +21,15 @@
   },
   {
     "question": "How do I place an order?",
-    "answer": "Call us at (213) 935-7272 or text or WhatsApp at (818) 331-9292 to place an order."
+    "answer": "Call us at (213) 935-7272 or text/WhatsApp at (818) 331-9292 to place an order."
+  },
+  {
+    "question": "What payment and shipping options do you offer?",
+    "answer": "We accept all forms of payment. Free shipping is available within the USA. International shipping is available when order exceeds $1000 minimum and is subject to additional fees based on destination."
+  },
+  {
+    "question": "Can customers request photos, videos, or product help before ordering?",
+    "answer": "Yes. Call, text, or WhatsApp us at (818) 331-9292 and we can share more photos, videos, and product details to help you place your wholesale order with confidence."
   },
   {
     "question": "Can I buy in person?",
@@ -42,14 +50,6 @@
   {
     "question": "Do you release new designs regularly?",
     "answer": "Yes, ask for our new designs every month."
-  },
-  {
-    "question": "Can I request more photos or information?",
-    "answer": "Yes, text or WhatsApp at (818) 331-9292 to see more photos or get more information."
-  },
-  {
-    "question": "What payment and shipping options do you offer?",
-    "answer": "We accept all forms of payment. Free shipping is available within the USA. International shipping is available for an added fee."
   },
   {
     "question": "Are your styles protected?",

@@ -1,69 +1,55 @@
-# California Earrings (Flask Catalog)
+# California Earrings
 
-JSON-backed wholesale product catalog built with Flask and server-rendered templates.
+Flask-based wholesale jewelry site for California Earrings. The app serves a server-rendered luxury wholesale catalog, product pages, reels landing page, team/contact pages, FAQ content, and a session-backed order workflow for buyers worldwide.
 
-## Architecture overview
+## What the app does
 
-This repository is a modular Flask monolith:
+- Renders the wholesale catalog at `/` with in-page collection sections and query-driven inventory search.
+- Serves product detail pages at `/product/<product_code>` with canonical redirects, product schema, and share-friendly metadata.
+- Surfaces the latest short-form inventory videos on the homepage and the full reels experience at `/reels`.
+- Supports a session-backed cart and inquiry checkout flow with CSV/PDF order exports.
+- Publishes crawlable marketing/support pages at `/about`, `/contact`, `/faqs`, `/team`, and `/team/<member_slug>`.
+- Exposes SEO infrastructure at `/robots.txt`, `/sitemap.xml`, and `/sitemaps.xml`.
 
-- `app.py` wires routes, session state, template rendering, and domain services.
-- `domains/` holds business logic split by concern:
-	- `catalog.py`: product normalization, loading, filtering, and section building
-	- `cart.py`: cart/session normalization, notes, CSV/PDF generation
-	- `team.py`: team-member shaping, slug generation, WhatsApp links, vCard output
-	- `seo.py`: canonical URL and sitemap URL/lastmod generation
-	- `emailing.py`: SMTP order-email delivery with CSV attachment
-- `catalog/` stores editable content (`products.json`, `collections.json`, `social.json`, `team.json`).
-- `templates/` contains Jinja views for catalog, product detail, cart/checkout, and SEO pages.
-- `static/` contains CSS, JS, images, logos, and team photos.
-- `tests/` contains HTTP contract tests and Playwright E2E UX tests.
+## Architecture
 
-## Project structure
+The codebase is kept modular so content and feature logic do not accumulate in `app.py`.
 
-```text
-ce_web/
-├── app.py
-├── pyproject.toml
-├── render.yaml
-├── catalog/
-│   ├── products.json
-│   ├── collections.json
-│   ├── social.json
-│   └── team.json
-├── domains/
-│   ├── cart.py
-│   ├── catalog.py
-│   ├── emailing.py
-│   ├── seo.py
-│   └── team.py
-├── static/
-│   ├── css/
-│   ├── js/
-│   ├── assets/
-│   ├── product_images/
-│   └── team/
-├── templates/
-│   ├── index.html
-│   ├── product_detail.html
-│   ├── cart.html
-│   ├── checkout.html
-│   ├── team.html
-│   ├── team_member.html
-│   └── sitemap.xml
-└── tests/
-    ├── test_*.py
-    └── e2e/
-        └── e2e_*.py
-```
+- `app.py`: route wiring, session lifecycle, template rendering, and endpoint composition.
+- `domains/catalog.py`: catalog loading, normalization, search/filtering, and collection section assembly.
+- `domains/homepage.py`: homepage context building and latest-reels selection.
+- `domains/reels.py`: reel discovery and shuffled reel lists from `static/reels/`.
+- `domains/cart.py`: cart state, item shaping, notes, CSV output, and PDF generation.
+- `domains/team.py`: team normalization, slugs, WhatsApp/call links, and vCard generation.
+- `domains/faqs.py`: FAQ loading.
+- `domains/seo.py`: canonical base URL handling plus sitemap `lastmod` generation.
+- `domains/emailing.py`: optional SMTP order email delivery.
 
-## Runtime behavior
+## Content model
 
-- Catalog/search page is rendered at `/` with optional query `?q=...`.
-- Product detail page is rendered at `/product/<product_code>` with canonical-code redirect support.
-- Cart state is session-backed and modified via `/api/cart/*` endpoints.
-- Checkout (`/checkout`) stores an order snapshot in session and supports CSV/PDF download links.
-- Team pages are generated from `catalog/team.json` and include downloadable contact cards (`.vcf`).
-- SEO endpoints include `/robots.txt`, `/sitemap.xml`, and `/sitemaps.xml`.
+Most site content is JSON-backed and editable without changing templates:
+
+- `catalog/products.json`: product inventory records.
+- `catalog/collections.json`: homepage/catalog section ordering and display labels.
+- `catalog/faqs.json`: FAQ accordion content and FAQ schema content.
+- `catalog/social.json`: TikTok and Instagram profile URLs.
+- `catalog/team.json`: team directory data, bios, titles, and contact info.
+
+Static media lives in:
+
+- `static/product_images/`: product photography.
+- `static/reels/`: MP4 reels used on the homepage strip and `/reels` page.
+- `static/team/`: team photos.
+
+## Key templates and UX surfaces
+
+- `templates/index.html`: homepage hero, catalog sections, and latest inventory reels strip.
+- `templates/reels.html`: all-reels landing page with the newer swipe-and-play UX.
+- `templates/product_detail.html`: product detail page with product schema.
+- `templates/faqs.html`: FAQ accordion plus FAQPage schema.
+- `templates/contact.html`: contact page plus local business/contact schema.
+- `templates/team.html` and `templates/team_member.html`: team directory and individual contact-card pages.
+- `templates/sitemap.xml` and `templates/robots.txt`: SEO endpoint templates.
 
 ## Requirements
 
@@ -76,7 +62,7 @@ Install runtime dependencies:
 uv sync
 ```
 
-Install development extras (Playwright + pre-commit):
+Install development extras:
 
 ```bash
 uv sync --extra dev
@@ -85,147 +71,131 @@ uv run python -m playwright install chromium webkit
 
 ## Environment variables
 
-`app.py` calls `load_dotenv()`, so variables can be provided via shell env or a local `.env` file.
+`load_dotenv()` is enabled in `app.py`, so variables can come from the shell or a local `.env` file.
 
 Required:
 
-- `SECRET_KEY`: Flask session secret (app fails fast if missing/empty)
+- `SECRET_KEY`: Flask session secret. The app fails fast if it is missing or empty.
 
 Optional:
 
-- `PORT`: server port (default `5001` when running `python app.py`)
-- `FLASK_DEBUG`: set to `1` for debug mode
-- `SITE_BASE_URL`: canonical public base URL for sitemap and absolute OG image links
-- `PLAUSIBLE_DOMAIN`: enables Plausible script injection in base template
+- `PORT`: local bind port. Defaults to `5001`.
+- `FLASK_DEBUG`: set to `1` to enable Flask debug mode.
+- `SITE_BASE_URL`: public canonical base URL used for sitemap entries, canonical URLs, and absolute OG image links.
+- `PLAUSIBLE_DOMAIN`: enables Plausible analytics injection in the base template.
 
-Order email delivery (optional; send is skipped if incomplete):
+Optional SMTP settings for order emails:
 
 - `SMTP_HOST`
-- `SMTP_PORT` (default `587`)
+- `SMTP_PORT` with default `587`
 - `SMTP_USER`
 - `SMTP_PASS`
 - `EMAIL_TO`
-- `EMAIL_FROM` (defaults to `SMTP_USER`)
+- `EMAIL_FROM` with fallback to `SMTP_USER`
 
 ## Running locally
 
-Set a secret key (or place it in `.env`):
+Set a secret key:
 
 ```bash
 export SECRET_KEY="dev-secret"
 ```
 
-Start the app:
+Start the development server:
 
 ```bash
 uv run python app.py
 ```
 
-Or run production-style locally:
+Run production-style locally:
 
 ```bash
 uv run gunicorn --bind 0.0.0.0:5001 app:app
 ```
 
-## Managing catalog content
+## Public routes
 
-- Edit `catalog/products.json` for product records.
-	- Typical fields: `code`, `name`, `collection`, `description`, `image`, `tags`
-- Edit `catalog/collections.json` for section ordering/labels.
-	- `order`: ordered list of collection keys
-	- `labels`: map of collection key -> display label
-- Edit `catalog/social.json` for TikTok/Instagram profile/video links.
-- Edit `catalog/team.json` for team cards/profile pages.
-
-## Key routes
-
-Page routes:
+Marketing and catalog routes:
 
 - `/`
-- `/catalog/`
+- `/catalog/` redirect to the first homepage catalog section
 - `/product/<product_code>`
-- `/cart`
-- `/checkout` (`GET`, `POST`)
-- `/download/order/<token>.csv`
-- `/download/order/<token>.pdf`
+- `/reels`
 - `/team`
 - `/team/<member_slug>`
 - `/team/<member_slug>/contact.vcf`
 - `/about`
 - `/contact`
+- `/faqs`
+- `/faq` redirect to `/faqs`
+
+Order workflow routes:
+
+- `/cart`
+- `/checkout`
+- `/download/order/<token>.csv`
+- `/download/order/<token>.pdf`
+
+SEO routes:
+
 - `/robots.txt`
-- `/sitemap.xml` and `/sitemaps.xml`
+- `/sitemap.xml`
+- `/sitemaps.xml`
 
 Cart API routes:
 
-- `/api/cart/count` (`GET`)
-- `/api/cart/add` (`POST`)
-- `/api/cart/set` (`POST`)
-- `/api/cart/remove` (`POST`)
-- `/api/cart/clear` (`POST`)
-- `/api/cart/note` (`POST`)
+- `/api/cart/count`
+- `/api/cart/add`
+- `/api/cart/set`
+- `/api/cart/remove`
+- `/api/cart/clear`
+- `/api/cart/note`
+
+## SEO and search behavior
+
+- Canonical URLs are built from `SITE_BASE_URL` when present, otherwise from the current request root.
+- Search-result URLs like `/?q=...` canonicalize back to `/`.
+- Transactional and non-landing routes are excluded from crawling through `robots.txt` and per-page `robots` meta tags.
+- The sitemap includes the homepage, FAQ page, reels page, team pages, and all product detail pages.
+- Structured data is emitted for organization/site-wide info, product pages, FAQ content, contact/local business info, team members, and collection-style landing pages.
+- Public-facing copy is intentionally positioned as worldwide coverage.
+- Internal market emphasis and strongest legacy volume currently center on California, Texas, Florida, Puerto Rico, Trinidad, the wider Caribbean, Mexico, and Central America.
+
+## Updating site content
+
+- Add or remove product records in `catalog/products.json`.
+- Change collection order or labels in `catalog/collections.json`.
+- Update FAQs in `catalog/faqs.json`.
+- Drop new MP4 files into `static/reels/` to update the homepage strip and `/reels` page.
+- Update team bios/contact details in `catalog/team.json`.
+- Refresh social profiles in `catalog/social.json`.
 
 ## Tests
 
-Run unit/contract tests:
+Run the full unit and contract suite:
 
 ```bash
 uv run python -m unittest discover -s tests
 ```
 
-Run E2E tests:
+Run E2E coverage separately:
 
 ```bash
 uv run python -m unittest discover -s tests/e2e -p "e2e_*.py" -t .
 ```
 
-E2E tests cover nav/search layout stability, resize/scroll resilience, and core catalog UX contracts in Chromium and WebKit.
-
-## Pre-commit hooks
-
-Install hooks:
-
-```bash
-uv run pre-commit install
-```
-
-Run manually:
-
-```bash
-uv run pre-commit run --all-files
-```
-
-Configured behavior in `.pre-commit-config.yaml`:
-
-- Always runs `python -m unittest discover -s tests`
-- Runs Playwright E2E only when current branch is `dev`
-- Uses `CE_REQUIRE_E2E=1` on `dev` so missing Playwright deps fail the commit
+The test suite covers route contracts, metadata endpoints, reels/homepage frontend contracts, and cross-browser E2E layout/resilience behavior.
 
 ## Troubleshooting
 
-- **App fails at startup with `SECRET_KEY env var not set`**
-	- Set `SECRET_KEY` in your shell or `.env` (loaded via `load_dotenv()` in `app.py`).
-	- Example: `export SECRET_KEY="dev-secret"`
+- If startup fails with `SECRET_KEY env var not set`, define `SECRET_KEY` in your shell or `.env`.
+- If canonical URLs or sitemap entries point to localhost in production, set `SITE_BASE_URL` to the public domain.
+- If order submission succeeds but no email is sent, confirm the SMTP variables are fully configured.
+- If Playwright-based tests are skipped or fail due to missing browsers, run `uv sync --extra dev` and install Chromium/WebKit with Playwright.
 
-- **E2E tests are skipped or fail due to missing Playwright/browser binaries**
-	- Install dev extras and browsers:
-		- `uv sync --extra dev`
-		- `uv run python -m playwright install chromium webkit`
+## Deployment
 
-- **Order submission works but no email is sent**
-	- This is expected when SMTP variables are incomplete.
-	- Configure `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `EMAIL_TO`, and optionally `EMAIL_FROM`.
-
-- **Sitemap or OG image URLs show localhost in non-local environments**
-	- Set `SITE_BASE_URL` to your public domain (for example `https://californiaearrings.com`).
-
-- **Pre-commit appears to skip Playwright E2E**
-	- E2E hooks only run on branch `dev` by design.
-	- To force locally: `CE_REQUIRE_E2E=1 uv run python -m unittest discover -s tests/e2e -p "e2e_*.py" -t .`
-
-## Deployment (Render)
-
-`render.yaml` is configured for a Python web service using `uv sync --frozen` and starts with:
+`render.yaml` runs the site as a Python web service using `uv sync --frozen` and starts Gunicorn with:
 
 ```bash
 .venv/bin/gunicorn --bind 0.0.0.0:$PORT app:app

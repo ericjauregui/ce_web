@@ -3,6 +3,7 @@ from __future__ import annotations
 import io
 import os
 import secrets
+from datetime import date
 from pathlib import Path
 from typing import Any
 
@@ -129,6 +130,7 @@ def build_sitemap_urls(base_url: str) -> list[dict[str, str | float | None]]:
         catalog_path=CATALOG_PATH,
         collections_path=COLLECTIONS_PATH,
         faqs_path=FAQS_PATH,
+        reels_path=REELS_PATH,
         team_path=TEAM_PATH,
         team_members=members,
         product_codes=product_codes,
@@ -139,6 +141,7 @@ def build_sitemap_urls(base_url: str) -> list[dict[str, str | float | None]]:
 def inject_site_config():
     return {
         "asset_url": asset_url,
+        "current_year": date.today().year,
         "plausible_domain": os.getenv("PLAUSIBLE_DOMAIN", "").strip(),
         "site_base_url": os.getenv("SITE_BASE_URL", "").strip(),
         "social": load_social(),
@@ -474,15 +477,11 @@ def reels_page():
 @app.route("/robots.txt")
 def robots():
     base = _canonical_base_url()
-    body = f"""User-agent: *
-Allow: /
-Disallow: /api/
-Disallow: /cart
-Disallow: /checkout
-Disallow: /download/
-Sitemap: {base}/sitemap.xml
-"""
-    return body, 200, {"Content-Type": "text/plain; charset=utf-8"}
+    return (
+        render_template("robots.txt", sitemap_url=f"{base}/sitemap.xml"),
+        200,
+        {"Content-Type": "text/plain; charset=utf-8"},
+    )
 
 
 @app.route("/sitemaps.xml")

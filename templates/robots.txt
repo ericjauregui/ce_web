@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Allow: /static/
+Disallow: /api/
+Disallow: /cart
+Disallow: /checkout
+Disallow: /download/
+Disallow: /*?q=
+
+Sitemap: {{ sitemap_url }}
