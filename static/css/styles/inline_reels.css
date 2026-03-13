@@ -17,7 +17,13 @@
   padding: 0;
   box-shadow: 0 7px 16px rgba(0, 0, 0, 0.26);
   scroll-snap-align: start;
-  transition: width 220ms ease, transform 170ms ease, border-color 170ms ease, filter 170ms ease, box-shadow 170ms ease, opacity 170ms ease;
+  transition:
+    width 220ms ease,
+    transform 170ms ease,
+    border-color 170ms ease,
+    filter 170ms ease,
+    box-shadow 170ms ease,
+    opacity 170ms ease;
 }
 
 .inline-reel-card:focus-visible {
@@ -27,24 +33,19 @@
 }
 
 .inline-reel-card.is-active {
-  width: var(--inline-reel-active-width, var(--inline-reel-width, clamp(102px, 13vw, 124px)));
+  width: var(
+    --inline-reel-active-width,
+    var(--inline-reel-width, clamp(102px, 13vw, 124px))
+  );
   border-color: var(--gold-outline-strong);
-  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.34), 0 0 24px rgb(var(--gold-rgb) / 0.18);
+  box-shadow:
+    0 14px 30px rgba(0, 0, 0, 0.34),
+    0 0 24px rgb(var(--gold-rgb) / 0.18);
   opacity: 1;
 }
 
 .inline-reel-media {
   position: relative;
-}
-
-.inline-reel-hitbox {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-}
-
-.inline-reel-card.is-active .inline-reel-hitbox {
-  bottom: var(--inline-reel-controls-hitbox-offset, 3.55rem);
 }
 
 .inline-reel-video {
@@ -54,7 +55,11 @@
   object-fit: cover;
   display: block;
   filter: saturate(0.95) brightness(0.95);
-  background: linear-gradient(180deg, rgba(18, 18, 18, 0.98), rgba(8, 8, 8, 0.98));
+  background: linear-gradient(
+    180deg,
+    rgba(18, 18, 18, 0.98),
+    rgba(8, 8, 8, 0.98)
+  );
   transition: filter 170ms ease;
 }
 
@@ -66,7 +71,11 @@
   z-index: 1;
   background:
     linear-gradient(135deg, rgba(13, 13, 13, 0.96), rgba(24, 24, 24, 0.92)),
-    radial-gradient(120% 80% at 50% 0%, rgb(var(--gold-rgb) / 0.08), transparent 58%);
+    radial-gradient(
+      120% 80% at 50% 0%,
+      rgb(var(--gold-rgb) / 0.08),
+      transparent 58%
+    );
   transition: opacity 180ms ease;
   pointer-events: none;
 }
@@ -85,7 +94,12 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.07) 50%, transparent 100%);
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.07) 50%,
+    transparent 100%
+  );
   transform: translateX(-100%);
   animation: inlineReelShimmer 1.4s ease-in-out infinite;
 }
@@ -118,10 +132,6 @@
 @media (max-width: 767.98px) {
   .inline-reel-card {
     width: var(--inline-reel-mobile-width, clamp(88px, 25vw, 108px));
-  }
-
-  .inline-reel-card.is-active .inline-reel-hitbox {
-    bottom: var(--inline-reel-mobile-controls-hitbox-offset, 3.8rem);
   }
 
   .inline-reel-card.is-active {

@@ -4,5 +4,6 @@
   }
   window.initializeInlineReelTrack({
     trackId: "latestVideosTrack",
+    pauseWhenOutOfView: true,
   });
 })();

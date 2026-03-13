@@ -14,11 +14,11 @@
 .reel-row {
   padding: 0.32rem 0 0.35rem;
   --inline-reel-width: clamp(178px, 19vw, 236px);
-  --inline-reel-active-width: clamp(268px, 30vw, 360px);
   --inline-reel-height: clamp(360px, 58vh, 680px);
+  --inline-reel-active-width: calc(var(--inline-reel-height) * 9 / 16);
   --inline-reel-mobile-width: clamp(132px, 46vw, 170px);
-  --inline-reel-mobile-active-width: clamp(208px, 76vw, 260px);
   --inline-reel-mobile-height: clamp(264px, 64vh, 520px);
+  --inline-reel-mobile-active-width: calc(var(--inline-reel-mobile-height) * 9 / 16);
 }
 
 .reels-track-shell {
@@ -38,6 +38,11 @@
 
 .reels-page .reel-card.is-active {
   opacity: 1;
+}
+
+.reels-page .reel-card.is-active .inline-reel-video {
+  object-fit: contain;
+  background: rgba(5, 5, 5, 0.98);
 }
 
 .reels-page .reel-card .inline-reel-video {

@@ -28,7 +28,7 @@ class FrontendContractTests(BaseWebTest):
         self.assertIn("latest-videos-section", body)
         self.assertIn("latest-videos-shell scroll-cue-shell", body)
         self.assertIn("latest-videos-track inline-reel-track scroll-cue-track", body)
-        self.assertIn("Product Reels", body)
+        self.assertIn("Inventory Reels", body)
         self.assertEqual(body.count("class=\"latest-video-card inline-reel-card\""), 15)
         self.assertIn("sticky-section-header", body)
         self.assertIn(">View All</a>", body)
@@ -43,7 +43,7 @@ class FrontendContractTests(BaseWebTest):
         self.assertIn("data-src=", body)
         self.assertIn("preload=\"none\"", body)
         self.assertIn("inline-reel-placeholder", body)
-        self.assertIn("inline-reel-hitbox", body)
+        self.assertNotIn("inline-reel-hitbox", body)
         self.assertNotIn("data-reel-name=", body)
         self.assertNotIn("latestVideoModal", body)
         self.assertNotIn("tiktok-embed", body)
@@ -131,8 +131,10 @@ class FrontendContractTests(BaseWebTest):
         self.assertIn("transform: translate(-50%, -50%);", css)
         self.assertIn("width: min(52rem, calc(100vw - .9rem));", css)
         self.assertIn("function syncNavMetrics()", body)
-        self.assertIn(
-            "window.addEventListener(\"resize\", queueSyncNavMetrics, { passive: true });", body)
+        self.assertRegex(
+            body,
+            r'window\.addEventListener\("resize",\s*queueSyncNavMetrics,\s*\{\s*passive:\s*true\s*,?\s*\}\);',
+        )
         self.assertNotIn(
             "window.addEventListener(\"scroll\", syncSearchCenter", body)
 
@@ -257,7 +259,10 @@ class FrontendContractTests(BaseWebTest):
         self.assertIn("href=\"/faqs\"", home_body)
         self.assertIn("FAQs</a>", home_body)
         self.assertIn(".navbar .navbar-collapse .navbar-nav {", css)
-        self.assertIn("<li class=\"nav-item\"><a class=\"nav-link\" href=\"/faqs\">FAQs</a></li>", home_body)
+        self.assertRegex(
+            home_body,
+            r'<li class="nav-item">\s*<a class="nav-link" href="/faqs">FAQs</a>\s*</li>',
+        )
         self.assertIn(".faqs-page .faqs-accordion {", css)
         self.assertIn(".faqs-page .faqs-accordion .accordion-button {", css)
         self.assertIn(".faqs-page .faqs-accordion .accordion-body {", css)
@@ -321,28 +326,60 @@ class FrontendContractTests(BaseWebTest):
         self.assertIn("data-detail-url=", body)
         self.assertIn("class=\"small code-badge product-detail-link", body)
 
-    def test_inline_reels_click_toggles_audio_without_overriding_native_video_controls(self) -> None:
+    def test_inline_reels_leave_active_video_controls_to_native_ui(self) -> None:
         script = (Path(webapp.BASE_DIR) / "static" / "js" /
                   "inline_reels.js").read_text(encoding="utf-8")
         css = self.load_site_css()
 
-        self.assertIn("function toggleCardAudio(card)", script)
-        self.assertIn("video.muted = !video.muted;", script)
-        self.assertIn("syncPreferredAudiblePlayback(video);", script)
-        self.assertIn("if (target.closest(\"video\")) {", script)
-        self.assertIn("toggleCardAudio(card);", script)
-        self.assertIn(".inline-reel-hitbox {", css)
-        self.assertIn(".inline-reel-card.is-active .inline-reel-hitbox {", css)
+        self.assertNotIn("function toggleCardAudio(card)", script)
+        self.assertNotIn("video.muted = !video.muted;", script)
+        self.assertNotIn("if (target.closest(\"video\")) {", script)
+        self.assertNotIn(".inline-reel-hitbox {", css)
+        self.assertNotIn(".inline-reel-card.is-active .inline-reel-hitbox {", css)
+        self.assertIn("function revealControlsForCard(card, options = {})", script)
+        self.assertIn("setControlsVisibility(video, false);", script)
+        self.assertIn("playMuted(firstVideo);", script)
+        self.assertNotIn("playMuted(firstVideo, true);", script)
+        self.assertIn("track.addEventListener(\"focusin\", (event) => {", script)
+        self.assertIn('"touchstart"', script)
+        self.assertIn("if (card === activeCard) {", script)
+        self.assertIn("return;", script)
 
-    def test_inline_reels_persist_native_audio_state_for_next_autoplay(self) -> None:
+    def test_inline_reels_pause_out_of_view_and_autoplay_next_preserves_audio_state_without_scroll_jump(self) -> None:
         script = (Path(webapp.BASE_DIR) / "static" / "js" /
                   "inline_reels.js").read_text(encoding="utf-8")
 
-        self.assertIn("let preferredAudiblePlayback = false;", script)
-        self.assertIn("function isVideoAudible(video)", script)
+        self.assertIn("let preferredMutedState = true;", script)
+        self.assertIn("let preferredVolumeLevel = 1;", script)
+        self.assertIn("let keepFullscreenOnAdvance = false;", script)
+        self.assertIn("let fullscreenHostCard = null;", script)
+        self.assertIn("let fullscreenPlaybackIndex = -1;", script)
+        self.assertIn("function rememberPreferredPlaybackState(video)", script)
+        self.assertIn("async function continueFullscreenPlayback(", script)
+        self.assertIn("void syncInlineCardFromFullscreenExit();", script)
+        self.assertIn("function alignCardToTrackStart(card, behavior = \"smooth\")", script)
+        self.assertIn("function settleCardAtTrackStart(card, behavior = \"smooth\")", script)
+        self.assertIn("function isVideoPresentingFullscreen(video)", script)
+        self.assertIn("video.webkitEnterFullscreen();", script)
+        self.assertIn("let trackInViewport = true;", script)
+        self.assertIn("function setupViewportPauseGuard()", script)
+        self.assertIn("if (pauseWhenOutOfView && !trackInViewport)", script)
+        self.assertIn("video.volume = preferredVolumeLevel;", script)
+        self.assertIn("video.muted = preferredMutedState;", script)
+        self.assertIn("rememberPreferredPlaybackState(currentVideo);", script)
+        self.assertIn("scrollAlignment: \"start\"", script)
+        self.assertIn("preserveFullscreen: keepFullscreen", script)
+        self.assertNotIn("function isVideoAudible(video)", script)
         self.assertIn("video.addEventListener(\"volumechange\", () => {", script)
+        self.assertIn("const volumeWasRaisedWhileMuted =", script)
         self.assertIn("window.triggerScrollCueAttention(track);", script)
-        self.assertIn("syncPreferredAudiblePlayback(video);\n        void playNextReel(card, preferredAudiblePlayback);", script)
+        self.assertIn("void playNextReel(card);", script)
+
+    def test_homepage_reels_enable_out_of_view_pause_guard(self) -> None:
+        script = (Path(webapp.BASE_DIR) / "static" / "js" /
+                  "home_reels.js").read_text(encoding="utf-8")
+
+        self.assertIn("pauseWhenOutOfView: true", script)
 
     def test_reels_scroll_cue_uses_triple_arrow_attention_style(self) -> None:
         css = self.load_site_css()
@@ -357,7 +394,17 @@ class FrontendContractTests(BaseWebTest):
                   "inline_reels.js").read_text(encoding="utf-8")
 
         self.assertNotIn("requestAudiblePlayback", script)
-        self.assertIn("void activateCard(card, { unmute: false, scrollIntoView: false });", script)
+        self.assertIn("scrollIntoView: false", script)
+
+    def test_active_reels_use_full_frame_sizing(self) -> None:
+        css = self.load_site_css()
+
+        self.assertIn(".reels-page .reel-card.is-active .inline-reel-video {", css)
+        self.assertIn("object-fit: contain;", css)
+        self.assertIn("--inline-reel-active-width: calc(var(--inline-reel-height) * 9 / 16);", css)
+        self.assertIn("--inline-reel-mobile-active-width: calc(var(--inline-reel-mobile-height) * 9 / 16);", css)
+        self.assertIn("--inline-reel-active-width: clamp(304px, 34vw, 354px);", css)
+        self.assertIn("--inline-reel-mobile-active-width: clamp(234px, 62vw, 272px);", css)
 
     def test_stylesheet_has_balanced_braces(self) -> None:
         css = self.load_site_css()
@@ -437,7 +484,7 @@ class FrontendContractTests(BaseWebTest):
         body = response.get_data(as_text=True)
 
         self.assertIn(
-            "<nav class=\"navbar navbar-dark bg-black border-bottom border-gold fixed-top\"", body)
+            'class="navbar navbar-dark bg-black border-bottom border-gold fixed-top"', body)
         self.assertIn(
             "<footer class=\"text-center py-4 border-top border-gold", body)
 

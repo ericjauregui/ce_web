@@ -38,7 +38,7 @@ class ReelsRouteTests(BaseWebTest):
         self.assertEqual(body.count('class="reel-card inline-reel-card"'), 2)
         self.assertIn("class=\"reel-card inline-reel-card\"", body)
         self.assertIn("class=\"reel-placeholder inline-reel-placeholder\"", body)
-        self.assertIn("class=\"inline-reel-hitbox\"", body)
+        self.assertNotIn("class=\"inline-reel-hitbox\"", body)
         self.assertIn("src=\"/static/reels/", body)
         self.assertIn("data-src=\"/static/reels/a_clip.mp4\"", body)
         self.assertIn("preload=\"none\"", body)

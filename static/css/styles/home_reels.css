@@ -16,11 +16,11 @@
 .latest-videos-track {
   padding: 0.2rem 0.1rem 0.2rem;
   --inline-reel-width: clamp(173px, 19vw, 197px);
-  --inline-reel-active-width: clamp(304px, 34vw, 354px);
   --inline-reel-height: clamp(205px, 26vw, 245px);
+  --inline-reel-active-width: clamp(304px, 34vw, 354px);
   --inline-reel-mobile-width: clamp(128px, 35vw, 148px);
-  --inline-reel-mobile-active-width: clamp(234px, 62vw, 272px);
   --inline-reel-mobile-height: clamp(165px, 46vw, 201px);
+  --inline-reel-mobile-active-width: clamp(234px, 62vw, 272px);
 }
 
 @media (max-width: 767.98px) {
