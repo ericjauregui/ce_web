@@ -1,11 +1,21 @@
 {% extends "base.html" %}
 {% block title %}California Earrings | Luxury Wholesale 14K Gold Earrings & Body Jewelry{% endblock %}
 {% block meta_description %}Shop luxury wholesale authentic 14K gold earrings, piercing jewelry, hoops, studs, hearts, and body jewelry from California Earrings in Los Angeles. Built for boutiques, jewelry stores, and resellers.{% endblock %}
+{% block page_preloads %}
+  <link rel="preload" as="image" href="{{ asset_url('assets/hero_bg.png') }}">
+  <link rel="preload" as="image" href="{{ asset_url('assets/ce_logo_full.png') }}">
+{% endblock %}
+{% block page_css %}
+{% if latest_reels %}
+  <link href="{{ asset_url('css/styles/inline_reels.css') }}" rel="stylesheet">
+  <link href="{{ asset_url('css/styles/home_reels.css') }}" rel="stylesheet">
+{% endif %}
+{% endblock %}
 {% block content %}
 <header class="hero d-flex align-items-center text-center">
   <div class="container">
     <h1 class="visually-hidden">California Earrings</h1>
-    <img class="hero-logo" src="{{ url_for('static', filename='assets/ce_logo_full.png') }}" alt="California Earrings" loading="eager" decoding="async">
+    <img class="hero-logo" src="{{ url_for('static', filename='assets/ce_logo_full.png') }}" alt="California Earrings" loading="eager" decoding="async" fetchpriority="high" width="339" height="88">
     <div class="hero-copy">
       <h2 class="display-8 fw-semibold text-gold">14k Gold</h2>
       <h3 class="display-8 fw-semibold text-gold">Earrings • Body Jewelry</h3>

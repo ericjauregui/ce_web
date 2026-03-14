@@ -23,7 +23,7 @@
               <div class="d-flex gap-3 align-items-center">
                 <div class="team-avatar">
                   {% if m.photo %}
-                  <img src="{{ url_for('static', filename='team/' ~ m.photo) }}" alt="{{ m.name }}">
+                  <img src="{{ url_for('static', filename='team/' ~ m.photo) }}" alt="{{ m.name }}" loading="lazy" decoding="async" width="56" height="56">
                   {% else %}
                   <div class="team-initials">{{ (m.name or 'CE')[:2]|upper }}</div>
                   {% endif %}

@@ -1,11 +1,16 @@
 from __future__ import annotations
 
 import json
+from threading import Lock
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
 from domains.file_cache import load_json_cached
+
+
+_products_cache_lock = Lock()
+_products_cache: dict[str, tuple[int, int, list[dict[str, Any]]]] = {}
 
 
 @dataclass
@@ -41,8 +46,25 @@ def normalize_product(product: dict[str, Any]) -> dict[str, Any]:
 
 
 def load_products(catalog_path: Path) -> list[dict[str, Any]]:
+    if not catalog_path.exists():
+        return []
+
+    resolved = str(catalog_path.resolve())
+    stat = catalog_path.stat()
+    stamp = (stat.st_mtime_ns, stat.st_size)
+
+    with _products_cache_lock:
+        cached = _products_cache.get(resolved)
+        if cached and cached[0] == stamp[0] and cached[1] == stamp[1]:
+            return cached[2]
+
     raw = load_json_cached(catalog_path, [])
-    return [normalize_product(item) for item in (raw or [])]
+    normalized = [normalize_product(item) for item in (raw or [])]
+
+    with _products_cache_lock:
+        _products_cache[resolved] = (stamp[0], stamp[1], normalized)
+
+    return normalized
 
 
 def products_by_code(products: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
@@ -102,6 +124,7 @@ def filter_products(products: list[dict[str, Any]], query: str) -> list[dict[str
 
 def build_sections(products: list[dict[str, Any]], cfg: dict[str, Any]) -> list[Section]:
     order: list[str] = cfg.get("order") or []
+    ordered_keys = set(order)
     labels: dict[str, str] = cfg.get("labels") or {}
 
     by_collection: dict[str, list[dict[str, Any]]] = {}
@@ -115,7 +138,7 @@ def build_sections(products: list[dict[str, Any]], cfg: dict[str, Any]) -> list[
             sections.append(Section(key=key, title=labels.get(key, key.replace("-", " ").title()), items=items))
 
     for key, items in by_collection.items():
-        if key in set(order):
+        if key in ordered_keys:
             continue
         sections.append(Section(key=key, title=labels.get(key, key.replace("-", " ").title()), items=items))
 

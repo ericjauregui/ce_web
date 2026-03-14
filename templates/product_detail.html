@@ -5,6 +5,9 @@
 {% block og_type %}product{% endblock %}
 {% block og_image %}{{ product_image_url }}{% endblock %}
 {% block og_image_alt %}{{ product.name }}{% endblock %}
+{% block page_preloads %}
+<link rel="preload" as="image" href="{{ url_for('static', filename='product_images/' ~ product.image) }}">
+{% endblock %}
 
 {% block content %}
 <section class="container py-5 product-detail-page" style="max-width: 1060px;">
@@ -27,6 +30,7 @@
             class="product-detail-image"
             loading="eager"
             decoding="async"
+            fetchpriority="high"
           >
         </div>
       </article>

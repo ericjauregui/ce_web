@@ -39,7 +39,7 @@
             <tr>
               <td class="cell-item" data-label="Item">
                 <div class="d-flex align-items-center gap-3">
-                  <img src="{{ url_for('static', filename='product_images/' ~ row.product.image) }}" class="cart-thumb" alt="">
+                  <img src="{{ url_for('static', filename='product_images/' ~ row.product.image) }}" class="cart-thumb" alt="" loading="lazy" decoding="async" width="56" height="56">
                   <div>
                     <div class="text-gold fw-semibold">{{ row.product.name }}</div>
                   </div>

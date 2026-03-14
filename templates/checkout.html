@@ -89,7 +89,7 @@
               {% for row in items %}
               <tr>
                 <td class="cell-item" data-label="Item">
-                  <img src="{{ url_for('static', filename='product_images/' ~ row.product.image) }}" class="cart-thumb" alt="{{ row.product.name }}">
+                  <img src="{{ url_for('static', filename='product_images/' ~ row.product.image) }}" class="cart-thumb" alt="{{ row.product.name }}" loading="lazy" decoding="async" width="56" height="56">
                 </td>
                 <td class="cell-code" data-label="Code"><span class="code-badge">{{ row.product.code }}</span></td>
                 <td class="cell-item" data-label="Item">{{ row.product.name }}</td>
