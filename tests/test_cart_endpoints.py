@@ -1,7 +1,12 @@
 from __future__ import annotations
 
 import re
+import sys
+import types
+from unittest.mock import patch
 
+import app as webapp
+from domains import cart as cart_domain
 from tests.common import BaseWebTest
 
 
@@ -132,9 +137,9 @@ class CartEndpointTests(BaseWebTest):
         self.assertEqual(csv_response.status_code, 200)
         csv_text = csv_response.get_data(as_text=True)
 
-        self.assertIn("notes", csv_text)
+        self.assertIn("Notes", csv_text)
         self.assertIn("Need matching pair", csv_text)
-        self.assertIn("code,name,quantity,notes", csv_text)
+        self.assertIn("Code,Name,Quantity,Notes", csv_text)
         self.assertNotIn("collection", csv_text)
         self.assertNotIn("material", csv_text)
         self.assertNotIn("size_mm", csv_text)
@@ -162,6 +167,128 @@ class CartEndpointTests(BaseWebTest):
         self.assertEqual(pdf_response.status_code, 200)
         self.assertEqual(pdf_response.mimetype, "application/pdf")
         self.assertTrue(pdf_response.get_data().startswith(b"%PDF"))
+
+    def test_cart_pdf_layout_centers_title_and_all_table_cells(self) -> None:
+        class FakeStyle:
+            def __init__(self, name: str) -> None:
+                self.name = name
+                self.alignment: int | None = None
+
+            def clone(self, name: str) -> "FakeStyle":
+                cloned = FakeStyle(name)
+                cloned.alignment = self.alignment
+                return cloned
+
+        class FakeParagraph:
+            def __init__(self, text: str, style: FakeStyle) -> None:
+                self.text = text
+                self.style = style
+
+        class FakeImage:
+            def __init__(self, path: str, width: int, height: int) -> None:
+                self.path = path
+                self.width = width
+                self.height = height
+                self.hAlign: str | None = None
+
+        class FakeTableStyle:
+            def __init__(self, commands: list[tuple[object, ...]]) -> None:
+                self.commands = commands
+
+        class FakeTable:
+            instances: list["FakeTable"] = []
+
+            def __init__(self, data: list[list[object]], colWidths: list[float] | None = None, repeatRows: int = 0) -> None:
+                self.data = data
+                self.colWidths = colWidths
+                self.repeatRows = repeatRows
+                self.styles: list[tuple[object, ...]] = []
+                FakeTable.instances.append(self)
+
+            def setStyle(self, style: FakeTableStyle) -> None:
+                self.styles.extend(style.commands)
+
+        class FakeSimpleDocTemplate:
+            def __init__(
+                self,
+                buffer: object,
+                pagesize: tuple[int, int],
+                leftMargin: int,
+                rightMargin: int,
+                topMargin: int,
+                bottomMargin: int,
+            ) -> None:
+                self.buffer = buffer
+                self.width = pagesize[0] - leftMargin - rightMargin
+
+            def build(self, elements: list[object]) -> None:
+                self.buffer.write(b"%PDF-test")
+
+        def fake_styles() -> dict[str, FakeStyle]:
+            return {"Title": FakeStyle("Title")}
+
+        fake_colors = types.ModuleType("reportlab.lib.colors")
+        fake_colors.white = "white"
+        fake_colors.HexColor = lambda value: value
+
+        fake_pagesizes = types.ModuleType("reportlab.lib.pagesizes")
+        fake_pagesizes.letter = (612, 792)
+
+        fake_styles_module = types.ModuleType("reportlab.lib.styles")
+        fake_styles_module.getSampleStyleSheet = fake_styles
+
+        fake_platypus = types.ModuleType("reportlab.platypus")
+        fake_platypus.Image = FakeImage
+        fake_platypus.Paragraph = FakeParagraph
+        fake_platypus.SimpleDocTemplate = FakeSimpleDocTemplate
+        fake_platypus.Spacer = lambda width, height: (width, height)
+        fake_platypus.Table = FakeTable
+        fake_platypus.TableStyle = FakeTableStyle
+
+        fake_reportlab = types.ModuleType("reportlab")
+        fake_reportlab_lib = types.ModuleType("reportlab.lib")
+        fake_reportlab_lib.colors = fake_colors
+        fake_reportlab_lib.pagesizes = fake_pagesizes
+        fake_reportlab_lib.styles = fake_styles_module
+
+        FakeTable.instances.clear()
+        order_rows = [{"code": "102SB", "name": "Classic Gold Diamond Studs", "quantity": 4, "notes": "", "image": ""}]
+        product_images_dir = webapp.BASE_DIR / "static" / "product_images"
+
+        with patch.dict(
+            sys.modules,
+            {
+                "reportlab": fake_reportlab,
+                "reportlab.lib": fake_reportlab_lib,
+                "reportlab.lib.colors": fake_colors,
+                "reportlab.lib.pagesizes": fake_pagesizes,
+                "reportlab.lib.styles": fake_styles_module,
+                "reportlab.platypus": fake_platypus,
+            },
+        ):
+            pdf_bytes = cart_domain.cart_to_pdf_bytes(order_rows, product_images_dir)
+
+        self.assertEqual(pdf_bytes, b"%PDF-test")
+        self.assertEqual(len(FakeTable.instances), 2)
+
+        header_table = FakeTable.instances[0]
+        order_table = FakeTable.instances[1]
+
+        self.assertEqual(header_table.colWidths, [180, 192, 180])
+        title_cell = header_table.data[0][1]
+        self.assertEqual(title_cell.text, "Order Summary")
+        self.assertEqual(title_cell.style.alignment, 1)
+        self.assertIn(("ALIGN", (1, 0), (1, 0), "CENTER"), header_table.styles)
+
+        self.assertEqual(order_table.colWidths, [64, 76, 198, 74, 128])
+        self.assertIn(("ALIGN", (0, 0), (-1, -1), "CENTER"), order_table.styles)
+        totals_row_idx = len(order_table.data) - 1
+        self.assertEqual(totals_row_idx, len(order_rows) + 1)
+        self.assertEqual(order_table.data[totals_row_idx], ["Total Items: 1", "", "", "Total Quantity: 4", ""])
+        self.assertIn(("SPAN", (0, totals_row_idx), (2, totals_row_idx)), order_table.styles)
+        self.assertIn(("SPAN", (3, totals_row_idx), (4, totals_row_idx)), order_table.styles)
+        self.assertIn(("ALIGN", (0, totals_row_idx), (2, totals_row_idx), "CENTER"), order_table.styles)
+        self.assertIn(("ALIGN", (3, totals_row_idx), (4, totals_row_idx), "CENTER"), order_table.styles)
 
     def test_default_catalog_state_has_more_cards_than_filtered_query(self) -> None:
         full_response = self.client.get("/")

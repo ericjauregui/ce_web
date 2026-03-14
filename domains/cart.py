@@ -80,7 +80,7 @@ def order_rows_from_items(items: list[dict[str, Any]]) -> list[dict[str, Any]]:
 def cart_to_csv_bytes(order_rows: list[dict[str, Any]]) -> bytes:
     buffer = io.StringIO()
     writer = csv.writer(buffer)
-    writer.writerow(["code", "name", "quantity", "notes"])
+    writer.writerow(["Code", "Name", "Quantity", "Notes"])
 
     total_items = len(order_rows)
     total_quantity = sum(int(row.get("quantity") or 0) for row in order_rows)
@@ -124,23 +124,30 @@ def cart_to_pdf_bytes(order_rows: list[dict[str, Any]], product_images_dir: Path
     )
 
     styles = getSampleStyleSheet()
-    logo_path = product_images_dir.parent / "assets" / "ce_logo_shape.png"
-    title_cell = Paragraph("California Earrings Order", styles["Title"])
+    logo_path = product_images_dir.parent / "assets" / "ce_logo_dark.png"
+    title_style = styles["Title"].clone("OrderSummaryTitle")
+    title_style.alignment = 1
+    title_cell = Paragraph("Order Summary", title_style)
     logo_cell: Any = ""
     if logo_path.exists():
         try:
-            logo_cell = Image(str(logo_path), width=150, height=30)
+            logo_cell = Image(str(logo_path), width=155, height=40)
             logo_cell.hAlign = "LEFT"
         except Exception:
             logo_cell = ""
 
-    header_table = Table([[logo_cell, title_cell]], colWidths=[180, 360])
+    header_side_width = 180
+    header_table = Table(
+        [[logo_cell, title_cell, ""]],
+        colWidths=[header_side_width, doc.width - (header_side_width * 2), header_side_width],
+    )
     header_table.setStyle(
         TableStyle(
             [
                 ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
                 ("ALIGN", (0, 0), (0, 0), "LEFT"),
                 ("ALIGN", (1, 0), (1, 0), "CENTER"),
+                ("ALIGN", (2, 0), (2, 0), "RIGHT"),
                 ("LEFTPADDING", (0, 0), (-1, -1), 0),
                 ("RIGHTPADDING", (0, 0), (-1, -1), 0),
                 ("TOPPADDING", (0, 0), (-1, -1), 0),
@@ -163,7 +170,7 @@ def cart_to_pdf_bytes(order_rows: list[dict[str, Any]], product_images_dir: Path
         image_path = product_images_dir / image_name if image_name else None
         if image_path and image_path.exists():
             try:
-                image_cell = Image(str(image_path), width=34, height=34)
+                image_cell = Image(str(image_path), width=40, height=40)
                 image_cell.hAlign = "CENTER"
             except Exception:
                 image_cell = ""
@@ -183,20 +190,20 @@ def cart_to_pdf_bytes(order_rows: list[dict[str, Any]], product_images_dir: Path
         [
             f"Total Items: {total_items}",
             "",
-            f"Total Quantity: {total_quantity}",
             "",
+            f"Total Quantity: {total_quantity}",
             "",
         ]
     )
 
-    table = Table(table_data, colWidths=[52, 76, 210, 70, 132], repeatRows=1)
+    table = Table(table_data, colWidths=[64, 76, 198, 74, 128], repeatRows=1)
     table.setStyle(
         TableStyle(
             [
                 ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#f1e2a3")),
                 ("TEXTCOLOR", (0, 0), (-1, 0), colors.HexColor("#101010")),
                 ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-                ("ALIGN", (0, 0), (-1, -1), "LEFT"),
+                ("ALIGN", (0, 0), (-1, -1), "CENTER"),
                 ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
                 ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#8d7a3e")),
                 ("ROWBACKGROUNDS", (0, 1), (-1, -1),
@@ -204,9 +211,11 @@ def cart_to_pdf_bytes(order_rows: list[dict[str, Any]], product_images_dir: Path
                 ("FONTSIZE", (0, 0), (-1, -1), 9),
                 ("TOPPADDING", (0, 0), (-1, -1), 6),
                 ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
-                ("SPAN", (0, totals_row_idx), (1, totals_row_idx)),
-                ("SPAN", (2, totals_row_idx), (3, totals_row_idx)),
-                ("FONTNAME", (0, totals_row_idx), (3, totals_row_idx), "Helvetica-Bold"),
+                ("SPAN", (0, totals_row_idx), (2, totals_row_idx)),
+                ("SPAN", (3, totals_row_idx), (4, totals_row_idx)),
+                ("FONTNAME", (0, totals_row_idx), (4, totals_row_idx), "Helvetica-Bold"),
+                ("ALIGN", (0, totals_row_idx), (2, totals_row_idx), "CENTER"),
+                ("ALIGN", (3, totals_row_idx), (4, totals_row_idx), "CENTER"),
                 ("BACKGROUND", (0, totals_row_idx), (-1, totals_row_idx), colors.HexColor("#fff8df")),
             ]
         )

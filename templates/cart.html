@@ -67,13 +67,17 @@
         </table>
       </div>
 
-      <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2" id="cartSummaryBar">
-        <button type="button" class="btn btn-outline-gold" id="clearOrderBtn">Clear Order</button>
-        <div class="d-flex align-items-center justify-content-end flex-wrap gap-2 cart-summary-right">
+      <div class="cart-summary-bar mt-3" id="cartSummaryBar">
+        <div class="cart-summary-bar__left">
+          <button type="button" class="btn btn-outline-gold" id="clearOrderBtn">Clear Order</button>
+        </div>
+        <div class="cart-summary-bar__center">
           <div class="d-flex align-items-center flex-wrap gap-2 cart-summary-metrics">
             <div class="text-gold-70 small">Total Items:<span id="cartLineItemCount">{{ items|length }}</span></div>
             <div class="text-gold-70 small">Total Quantity:<span id="cartTotalQty">{{ total_items }}</span></div>
           </div>
+        </div>
+        <div class="cart-summary-bar__right">
           <a class="btn btn-outline-gold cart-checkout-btn" href="{{ url_for('checkout') }}">Submit Inquiry</a>
         </div>
       </div>
