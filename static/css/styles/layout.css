@@ -108,7 +108,7 @@
 }
 
 .scroll-cue-shell::after {
-  content: ">";
+  content: none;
   right: var(--scroll-cue-right);
   width: var(--scroll-cue-size);
   height: var(--scroll-cue-size);
@@ -126,14 +126,51 @@
   z-index: 4;
 }
 
-.scroll-cue-shell--chips::after {
-  content: ">";
+.scroll-cue-button {
+  position: absolute;
+  top: 50%;
+  right: var(--scroll-cue-right);
+  width: var(--scroll-cue-size);
+  height: var(--scroll-cue-size);
+  transform: translateY(-50%);
+  border-radius: 999px;
+  border: 1px solid var(--scroll-cue-border-color);
+  background: var(--scroll-cue-bg);
+  color: var(--scroll-cue-color);
+  display: grid;
+  place-items: center;
+  font-size: var(--scroll-cue-arrow-size);
+  font-weight: 700;
+  line-height: 1;
+  box-shadow: var(--scroll-cue-shadow);
+  z-index: 5;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 160ms ease, background-color 160ms ease, color 160ms ease, border-color 160ms ease;
+  padding: 0;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.scroll-cue-button--left {
+  left: var(--scroll-cue-right);
+  right: auto;
+}
+
+.scroll-cue-shell--chips .scroll-cue-button {
   width: var(--scroll-cue-size);
   min-width: 0;
-  padding-inline: 0;
   font-size: clamp(.95rem, 1.9vw, 1.12rem);
-  letter-spacing: 0;
-  text-transform: none;
+}
+
+.scroll-cue-shell--reels .scroll-cue-button {
+  width: auto;
+  min-width: clamp(1.85rem, 4vw, 2.2rem);
+  font-size: clamp(.82rem, 1.7vw, 1.02rem);
+}
+
+.scroll-cue-shell--reels .scroll-cue-button--left {
+  display: none;
 }
 
 .scroll-cue-shell--reels::after {
@@ -145,8 +182,20 @@
   font-size: clamp(.82rem, 1.7vw, 1.02rem);
 }
 
+.scroll-cue-shell--reels.is-attentioning .scroll-cue-button {
+  animation: scrollCueReelsAttention 620ms ease-out;
+}
+
 .scroll-cue-shell--reels.is-attentioning::after {
   animation: scrollCueReelsAttention 620ms ease-out;
+}
+
+.scroll-cue-button:hover,
+.scroll-cue-button:focus-visible {
+  background: rgba(215, 192, 122, 0.14);
+  color: #fff;
+  border-color: rgb(var(--gold-rgb) / 0.72);
+  outline: none;
 }
 
 @keyframes scrollCueReelsAttention {
@@ -168,6 +217,34 @@
 }
 
 .scroll-cue-shell.is-overflowing.can-scroll-right::before,
+.scroll-cue-shell.is-overflowing.can-scroll-right::after {
+  opacity: 1;
+}
+
+.scroll-cue-shell .scroll-cue-button--left {
+  opacity: 0;
+}
+
+.scroll-cue-shell.is-overflowing.can-scroll-left .scroll-cue-button--left {
+  opacity: 1;
+}
+
+.scroll-cue-shell.is-overflowing.can-scroll-right .scroll-cue-button--right {
+  opacity: 1;
+}
+
+.scroll-cue-shell.is-overflowing.can-scroll-left .scroll-cue-button--left {
+  pointer-events: auto;
+}
+
+.scroll-cue-shell.is-overflowing.can-scroll-right .scroll-cue-button--right {
+  pointer-events: auto;
+}
+
+.scroll-cue-button:disabled {
+  cursor: default;
+}
+
 .scroll-cue-shell.is-overflowing.can-scroll-right::after {
   opacity: 1;
 }

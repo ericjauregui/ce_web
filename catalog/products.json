@@ -330,7 +330,8 @@
       "elegant",
       "sparkling",
       "timeless"
-    ]
+    ],
+    "aliases": ["heart studs", "hearts", "corazon", "corazones"]
   },
   {
     "code": "165SB",
@@ -350,6 +351,12 @@
       "classic",
       "romantic",
       "timeless"
+    ],
+    "aliases": [
+      "heart earrings",
+      "heart stud earrings",
+      "corazon",
+      "corazon studs"
     ]
   },
   {
@@ -370,7 +377,8 @@
       "wholesale",
       "sparkling",
       "timeless"
-    ]
+    ],
+    "aliases": ["heart shaped studs", "heart studs", "corazon", "corazones"]
   },
   {
     "code": "203SB",
@@ -1807,7 +1815,8 @@
       "childrens earrings",
       "cute studs",
       "fine jewelry"
-    ]
+    ],
+    "aliases": ["turtles", "trtle", "tortuga", "tortugas"]
   },
   {
     "code": "1072SSB",
@@ -1827,7 +1836,8 @@
       "luxury",
       "wholesale",
       "cute"
-    ]
+    ],
+    "aliases": ["turtles", "trtle", "tortuga", "tortugas"]
   },
   {
     "code": "1075LSB",
@@ -2135,6 +2145,12 @@
       "luxury",
       "fashion",
       "accessory"
+    ],
+    "aliases": [
+      "heart nose stud",
+      "corazon nose ring",
+      "heart piercing",
+      "hrt nose ring"
     ]
   },
   {
@@ -2178,7 +2194,7 @@
   {
     "code": "1126SB",
     "image": "1126SB.jpg",
-    "collection": "studs",
+    "collection": "religious-studs",
     "name": "Gold Cross Diamond Studs",
     "description": "Elevate your collection with these exquisite gold cross stud earrings, adorned with brilliant-cut diamonds for a radiant finish. The timeless cross design is expertly crafted, offering both elegance and spiritual significance. Perfect for everyday luxury or special occasions, these studs promise enduring style and sophistication. Ideal for discerning wholesale buyers seeking premium quality and classic appeal.",
     "tags": [
@@ -2212,6 +2228,12 @@
       "piercing",
       "jewelry",
       "fashion"
+    ],
+    "aliases": [
+      "heart nose ring",
+      "corazon nose ring",
+      "heart piercing",
+      "hrt nose ring"
     ]
   },
   {
@@ -2874,7 +2896,7 @@
   {
     "code": "1517SB",
     "image": "1517SB.jpg",
-    "collection": "studs",
+    "collection": "religious-studs",
     "name": "Guadalupe Gold Studs",
     "description": "These exquisite Guadalupe gold stud earrings feature vibrant enamel detailing, capturing a timeless spiritual motif with elegance. Crafted for premium wholesale buyers, they offer a luxurious finish and secure fit, perfect for everyday wear or special occasions. Elevate your jewelry selection with this meaningful and eye-catching piece.",
     "tags": [
@@ -3263,7 +3285,7 @@
   {
     "code": "1586SB",
     "image": "1586SB.jpg",
-    "collection": "studs",
+    "collection": "religious-studs",
     "name": "Gold Cross CZ Studs",
     "description": "Elevate your collection with these exquisite gold cross stud earrings, adorned with sparkling cubic zirconia stones for a radiant finish. The timeless cross design offers a blend of elegance and spiritual symbolism, making them a versatile choice for both everyday wear and special occasions. Crafted for premium wholesale buyers, these studs promise enduring shine and exceptional craftsmanship.",
     "tags": [
@@ -3358,12 +3380,13 @@
       "animal motif",
       "fine jewelry",
       "playful"
-    ]
+    ],
+    "aliases": ["turtles", "trtle", "tortuga", "sea turtle"]
   },
   {
     "code": "1637SB",
     "image": "1637SB.jpg",
-    "collection": "studs",
+    "collection": "religious-studs",
     "name": "Gold Cherub Studs",
     "description": "Delight in the charm of these gold cherub stud earrings, exquisitely crafted for a touch of celestial elegance. Each earring features a finely detailed angel holding a sparkling stone, perfect for adding a whimsical yet luxurious accent to any ensemble. Ideal for premium wholesale collections, these studs offer timeless appeal and superior craftsmanship. Elevate your jewelry selection with this enchanting piece.",
     "tags": [
@@ -3791,7 +3814,7 @@
   {
     "code": "1769SB2C",
     "image": "1769SB2C.jpg",
-    "collection": "studs",
+    "collection": "religious-studs",
     "name": "Two-Tone Oval Guadalupe Studs",
     "description": "Elevate your collection with these exquisite two-tone oval Guadalupe stud earrings, expertly crafted for a refined and spiritual touch. The radiant gold and rose gold finish highlights intricate detailing, making them a standout piece for discerning clientele. Perfect for daily elegance or special occasions, these studs offer both timeless style and meaningful symbolism. Ideal for luxury wholesale buyers seeking premium religious jewelry.",
     "tags": [
@@ -3811,7 +3834,7 @@
   {
     "code": "1770SB3C",
     "image": "1770SB3C.jpg",
-    "collection": "studs",
+    "collection": "religious-studs",
     "name": "Tri-Color Religious Studs",
     "description": "Elevate your collection with these exquisite tri-color religious stud earrings, crafted to perfection for discerning clientele. Featuring a radiant blend of yellow, white, and rose gold tones, each stud showcases a detailed religious motif, ideal for both daily wear and special occasions. The secure screw-back design ensures comfort and peace of mind, making them a premium choice for luxury wholesale buyers.",
     "tags": [
@@ -3909,7 +3932,7 @@
   {
     "code": "1818SB",
     "image": "1818SB.jpg",
-    "collection": "studs",
+    "collection": "religious-studs",
     "name": "Gold Guadalupe Studs",
     "description": "These exquisite gold stud earrings feature a detailed depiction of the revered Guadalupe, framed by a textured, rope-inspired border. Crafted for timeless elegance, they offer a meaningful touch to any jewelry collection. Perfect for clients seeking both spiritual significance and luxurious style in their wholesale selection.",
     "tags": [
@@ -3928,7 +3951,7 @@
   {
     "code": "1819SB",
     "image": "1819SB.jpg",
-    "collection": "studs",
+    "collection": "religious-studs",
     "name": "Gold Cross Studs",
     "description": "Elevate your collection with these exquisite gold cross stud earrings, crafted for timeless elegance and spiritual significance. The detailed crucifix design offers a refined yet meaningful accent, perfect for daily wear or special occasions. Ideal for premium wholesale buyers seeking classic religious jewelry with a luxurious finish.",
     "tags": [
@@ -3948,7 +3971,7 @@
   {
     "code": "1820SB",
     "image": "1820SB.jpg",
-    "collection": "studs",
+    "collection": "religious-studs",
     "name": "Gold Crucifix Studs",
     "description": "Elevate your collection with these intricately detailed gold crucifix stud earrings, crafted for timeless elegance and spiritual significance. The rich gold finish and precise design make them a standout piece for both everyday wear and special occasions. Perfect for discerning clients seeking luxury and meaning in their jewelry selections.",
     "tags": [
@@ -3968,7 +3991,7 @@
   {
     "code": "1821SB",
     "image": "1821SB.jpg",
-    "collection": "studs",
+    "collection": "religious-studs",
     "name": "Gold Cross Studs",
     "description": "Elevate your collection with these timeless gold cross stud earrings, expertly crafted for a refined and elegant look. Their minimalist design ensures versatile wear, making them a staple for both everyday sophistication and special occasions. Perfect for clients seeking classic style with a touch of modern luxury. Ideal for premium wholesale jewelry assortments.",
     "tags": [
@@ -3988,7 +4011,7 @@
   {
     "code": "1834SB",
     "image": "1834SB.jpg",
-    "collection": "studs",
+    "collection": "religious-studs",
     "name": "Textured Gold Cross Studs",
     "description": "Elevate your collection with these textured gold cross stud earrings, crafted for timeless elegance and modern appeal. The intricate detailing and polished finish make them a versatile choice for both everyday wear and special occasions. Designed for comfort and durability, these studs are a must-have for luxury wholesale buyers seeking refined simplicity. Perfect for adding a subtle yet sophisticated touch to any ensemble.",
     "tags": [
@@ -4164,7 +4187,7 @@
   {
     "code": "1865SB",
     "image": "1865SB.jpg",
-    "collection": "studs",
+    "collection": "religious-studs",
     "name": "Saint Figure Gold Studs",
     "description": "Elevate your collection with these exquisite Saint Figure Gold Studs, expertly crafted for a refined and spiritual touch. The intricate detailing and radiant gold finish make these studs a standout piece for discerning clientele. Perfect for daily wear or special occasions, they offer timeless elegance and meaningful symbolism. Ideal for luxury wholesale buyers seeking unique, faith-inspired jewelry.",
     "tags": [
@@ -4183,7 +4206,7 @@
   {
     "code": "1865SB3C",
     "image": "1865SB3C.jpg",
-    "collection": "studs",
+    "collection": "religious-studs",
     "name": "Tri-Color Saint Studs",
     "description": "Elevate your collection with these exquisite tri-color saint stud earrings, expertly crafted for a refined and spiritual touch. Featuring a harmonious blend of gold, silver, and rose tones, these studs offer a unique and meaningful accent for any jewelry selection. Perfect for clients seeking both elegance and symbolism in their accessories. Ideal for premium wholesale buyers looking to diversify their luxury offerings.",
     "tags": [
@@ -4242,7 +4265,7 @@
   {
     "code": "1881SB",
     "image": "1881SB.jpg",
-    "collection": "studs",
+    "collection": "religious-studs",
     "name": "Gold Cross Studs",
     "description": "Elevate your collection with these timeless gold cross stud earrings, crafted for a refined and elegant look. The minimalist cross design offers a classic touch, perfect for both everyday wear and special occasions. Ideal for retailers seeking versatile, high-quality pieces that appeal to a wide clientele. These studs promise enduring style and premium craftsmanship.",
     "tags": [
@@ -4281,7 +4304,7 @@
   {
     "code": "1887SB",
     "image": "1887SB.jpg",
-    "collection": "studs",
+    "collection": "religious-studs",
     "name": "Saint Benedict Gold Studs",
     "description": "Elevate your jewelry selection with these exquisite Saint Benedict gold stud earrings, featuring intricate detailing and a radiant finish. Crafted for both elegance and spiritual significance, these studs are perfect for discerning clientele seeking timeless luxury. Their classic round design ensures versatility, making them suitable for both daily wear and special occasions. Offer your customers a piece that blends tradition with refined style.",
     "tags": [
@@ -4300,7 +4323,7 @@
   {
     "code": "1887SB3C",
     "image": "1887SB3C.jpg",
-    "collection": "studs",
+    "collection": "religious-studs",
     "name": "Two-Tone Saint Benedict Studs",
     "description": "Elevate your collection with these exquisite two-tone Saint Benedict stud earrings, crafted for discerning wholesale buyers. Featuring a striking blend of gold and silver finishes, each stud showcases intricate religious detailing for a timeless, elegant appeal. Ideal for luxury boutiques seeking unique, faith-inspired jewelry, these studs offer both spiritual significance and sophisticated style.",
     "tags": [
@@ -4733,7 +4756,7 @@
   {
     "code": "1967SB",
     "image": "1967SB.jpg",
-    "collection": "studs",
+    "collection": "religious-studs",
     "name": "Gold Cross Studs",
     "description": "Elevate your collection with these timeless gold cross stud earrings, crafted for enduring elegance and subtle sophistication. Their classic design makes them a versatile choice for both everyday wear and special occasions. Perfectly polished for a radiant finish, these studs offer a refined touch to any jewelry assortment. Ideal for retailers seeking premium, faith-inspired accessories.",
     "tags": [
@@ -5042,7 +5065,7 @@
   {
     "code": "1996SB",
     "image": "1996SB.jpg",
-    "collection": "studs",
+    "collection": "religious-studs",
     "name": "Gold Cross Studs",
     "description": "Elevate your collection with these exquisite gold cross stud earrings, featuring a radiant arrangement of sparkling stones set in a classic cross silhouette. Perfectly blending timeless elegance with modern sophistication, these studs are ideal for both everyday luxury and special occasions. Crafted for premium wholesale buyers seeking refined, versatile pieces that make a statement.",
     "tags": [
@@ -5101,7 +5124,7 @@
   {
     "code": "2002SB",
     "image": "2002SB.jpg",
-    "collection": "studs",
+    "collection": "religious-studs",
     "name": "Gold Oval Religious Studs",
     "description": "Elevate your collection with these exquisite gold oval stud earrings, featuring a delicately embossed religious motif. Crafted for timeless elegance, these studs offer a refined touch of spirituality and sophistication, perfect for daily wear or special occasions. Their secure backing ensures comfort and durability, making them a must-have for discerning jewelry buyers.",
     "tags": [
@@ -5447,7 +5470,7 @@
   {
     "code": "473SB",
     "image": "473SB.jpg",
-    "collection": "studs",
+    "collection": "religious-studs",
     "name": "Gold Oval Religious Studs",
     "description": "Elevate your collection with these exquisite gold oval stud earrings, featuring a finely detailed religious motif. Crafted for timeless elegance, these studs offer a sophisticated touch suitable for both daily wear and special occasions. Their secure screw-back design ensures comfort and durability, making them a premium choice for discerning clientele.",
     "tags": [
@@ -5466,7 +5489,7 @@
   {
     "code": "474SB",
     "image": "474SB.jpg",
-    "collection": "studs",
+    "collection": "religious-studs",
     "name": "Gold Oval Guadalupe Studs",
     "description": "Elevate your collection with these exquisite gold oval stud earrings, featuring a finely detailed Guadalupe motif. The elegant beaded border adds a touch of sophistication, making them a timeless choice for both everyday wear and special occasions. Crafted for premium wholesale buyers, these studs offer both cultural significance and luxurious appeal.",
     "tags": [
@@ -5484,7 +5507,7 @@
   {
     "code": "474SB3C",
     "image": "474SB3C.jpg",
-    "collection": "studs",
+    "collection": "religious-studs",
     "name": "Tri-Color Oval Religious Studs",
     "description": "Elevate your collection with these exquisite tri-color oval religious studs, expertly crafted for a refined and meaningful statement. Featuring a detailed religious motif framed by yellow, rose, and white gold tones, these studs offer a luxurious blend of tradition and elegance. Perfect for discerning clients seeking both spiritual significance and premium craftsmanship. Ideal for everyday wear or special occasions, these studs promise timeless appeal.",
     "tags": [
@@ -5522,7 +5545,7 @@
   {
     "code": "475SB",
     "image": "475SB.jpg",
-    "collection": "studs",
+    "collection": "religious-studs",
     "name": "Gold Guadalupe Studs",
     "description": "These exquisite gold stud earrings feature a detailed depiction inspired by the iconic Guadalupe motif, offering a blend of spiritual elegance and timeless style. Crafted for discerning clients, each piece radiates a luxurious finish and fine craftsmanship, making them a standout addition to any premium jewelry collection. Ideal for everyday sophistication or meaningful gifting.",
     "tags": [
@@ -5541,7 +5564,7 @@
   {
     "code": "475SB3C",
     "image": "475SB3C.jpg",
-    "collection": "studs",
+    "collection": "religious-studs",
     "name": "Tri-Color Guadalupe Studs",
     "description": "These exquisite stud earrings feature a striking tri-color design, blending yellow, white, and rose gold tones for a sophisticated look. The detailed depiction of the Guadalupe motif adds a touch of spiritual elegance, making them ideal for both everyday wear and special occasions. Crafted with precision, these studs offer a luxurious finish that appeals to discerning wholesale buyers. Elevate your jewelry collection with this timeless and meaningful piece.",
     "tags": [
@@ -6027,7 +6050,7 @@
   {
     "code": "969SB",
     "image": "969SB.jpg",
-    "collection": "studs",
+    "collection": "religious-studs",
     "name": "Gold Cherub Studs",
     "description": "Elevate your collection with these exquisite gold cherub stud earrings, crafted for timeless elegance and charm. The intricate angelic design offers a touch of celestial luxury, perfect for discerning clients seeking unique, high-quality pieces. Ideal for both everyday sophistication and special occasions, these studs promise enduring appeal and premium craftsmanship.",
     "tags": [

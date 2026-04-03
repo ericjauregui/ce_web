@@ -98,6 +98,16 @@ def load_collections_cfg() -> dict[str, Any]:
     return load_collections_cfg_from_path(COLLECTIONS_PATH)
 
 
+def warm_runtime_caches() -> None:
+    # Warm catalog and search caches once per process so initial customer
+    # requests avoid cold-path indexing work.
+    try:
+        load_products()
+    except Exception:
+        # Do not fail app startup if warmup misses; normal request path will recover.
+        pass
+
+
 def get_cart() -> dict[str, int]:
     return get_cart_from_session(session)
 
@@ -164,6 +174,8 @@ register_cart_routes(
     send_order_email=send_order_email,
     canonical_base_url=_canonical_base_url,
 )
+
+warm_runtime_caches()
 
 
 if __name__ == "__main__":

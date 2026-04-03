@@ -4,6 +4,7 @@
     "ball-studs",
     "bezel",
     "hearts",
+    "religious-studs",
     "flower-studs",
     "animal-studs",
     "telephone-earrings",
@@ -14,13 +15,14 @@
   "labels": {
     "studs": "Studs",
     "bezel": "Bezel Studs",
-    "hearts": "Heart Studs",
-    "telephone-earrings": "Telephones",
     "nose-rings": "Nose Rings",
-    "more-styles": "More Styles",
-    "jewelry-sets": "Jewelry Sets",
+    "hearts": "Heart Studs",
     "ball-studs": "Ball Studs",
+    "flower-studs": "Flower Studs",
     "animal-studs": "Animal Studs",
-    "flower-studs": "Flower Studs"
+    "religious-studs": "Religious Studs",
+    "telephone-earrings": "Telephones",
+    "jewelry-sets": "Jewelry Sets",
+    "more-styles": "More Styles"
   }
 }
