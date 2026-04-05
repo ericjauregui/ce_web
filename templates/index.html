@@ -12,6 +12,7 @@
 {% endif %}
 {% endblock %}
 {% block content %}
+{% set show_reels_after_results = q|default('', true)|trim != '' %}
 <header class="hero d-flex align-items-center text-center">
   <div class="container">
     <h1 class="visually-hidden">California Earrings</h1>
@@ -29,11 +30,11 @@
   </div>
 </header>
 
-{% if latest_reels %}
+{% if latest_reels and not show_reels_after_results %}
 {% include "partials/latest_videos_strip.html" %}
 {% endif %}
 
-<section class="{% if latest_reels %}pt-0 pb-5{% else %}py-5{% endif %}">
+<section class="{% if latest_reels and not show_reels_after_results %}pt-0 pb-5{% else %}py-5{% endif %}">
   {% for section in sections %}
   <div id="section-{{ section.key }}" class="section-anchor" aria-hidden="true"></div>
   <div class="sticky-section-header border-top border-bottom border-gold mb-3">
@@ -67,6 +68,10 @@
   </div>
   {% endfor %}
 </section>
+
+{% if latest_reels and show_reels_after_results %}
+{% include "partials/latest_videos_strip.html" %}
+{% endif %}
 
   <a class="whatsapp-float"
     href="https://wa.me/18183319292?text=Hello%20I%27d%20like%20more%20information"
@@ -107,6 +112,7 @@
 {% block body_end %}
 <script src="{{ asset_url('js/scroll_cue.js') }}"></script>
 <script src="{{ asset_url('js/catalog.js') }}"></script>
+<script src="{{ asset_url('js/whatsapp_float.js') }}"></script>
 {% if latest_reels %}
 <script src="{{ asset_url('js/inline_reels.js') }}"></script>
 <script src="{{ asset_url('js/home_reels.js') }}"></script>

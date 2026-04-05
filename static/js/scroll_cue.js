@@ -6,6 +6,8 @@
   const rightButtonSelector = ".scroll-cue-button--right";
   const rafIds = new WeakMap();
   const attentionTimers = new WeakMap();
+  const activationTimers = new WeakMap();
+  const pendingActivationDirections = new WeakMap();
   const observedShells = new WeakSet();
 
   function getButtonLabel(shell, direction) {
@@ -82,6 +84,49 @@
     return shell ? shell.querySelector(trackSelector) : null;
   }
 
+  function isReelTrack(shell, track) {
+    return Boolean(
+      shell &&
+      track &&
+      shell.classList.contains("scroll-cue-shell--reels") &&
+      track.classList.contains("inline-reel-track"),
+    );
+  }
+
+  function queueVisibleReelActivation(track) {
+    const direction = pendingActivationDirections.get(track);
+    if (!direction) {
+      return;
+    }
+
+    const existingTimer = activationTimers.get(track);
+    if (existingTimer) {
+      window.clearTimeout(existingTimer);
+    }
+
+    const timer = window.setTimeout(() => {
+      activationTimers.delete(track);
+      pendingActivationDirections.delete(track);
+      track.dispatchEvent(
+        new CustomEvent("ce:scroll-cue-activate-visible", {
+          bubbles: false,
+          detail: { direction },
+        }),
+      );
+    }, 150);
+
+    activationTimers.set(track, timer);
+  }
+
+  function requestVisibleReelActivation(shell, track, direction) {
+    if (!isReelTrack(shell, track)) {
+      return;
+    }
+
+    pendingActivationDirections.set(track, direction);
+    queueVisibleReelActivation(track);
+  }
+
   function syncShell(shell) {
     const track = getTrack(shell);
     const leftButton = getButton(shell, "left");
@@ -147,7 +192,16 @@
     }
 
     observedShells.add(shell);
-    track.addEventListener("scroll", () => queueSync(shell), { passive: true });
+    track.addEventListener(
+      "scroll",
+      () => {
+        queueSync(shell);
+        if (pendingActivationDirections.has(track)) {
+          queueVisibleReelActivation(track);
+        }
+      },
+      { passive: true },
+    );
     window.addEventListener("resize", () => queueSync(shell), {
       passive: true,
     });
@@ -164,12 +218,14 @@
     if (leftButton) {
       leftButton.addEventListener("click", () => {
         track.scrollBy({ left: -getScrollStep(track), behavior: "smooth" });
+        requestVisibleReelActivation(shell, track, "left");
       });
     }
 
     if (rightButton) {
       rightButton.addEventListener("click", () => {
         track.scrollBy({ left: getScrollStep(track), behavior: "smooth" });
+        requestVisibleReelActivation(shell, track, "right");
       });
     }
 

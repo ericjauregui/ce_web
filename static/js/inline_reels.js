@@ -28,11 +28,13 @@
     let scrollCueFrame = 0;
     let trackInViewport = true;
     let viewportPausedPlayback = false;
+    let searchFocusPausedPlayback = false;
     let keepFullscreenOnAdvance = false;
     let fullscreenHostCard = null;
     let fullscreenPlaybackIndex = -1;
     let alignmentSettleTimers = [];
     let controlsHideTimer = 0;
+    const searchInputSelector = 'input[type="search"], .nav-search-input';
     const supportsHover =
       window.matchMedia &&
       window.matchMedia("(hover: hover) and (pointer: fine)").matches;
@@ -64,8 +66,43 @@
       video.pause();
     }
 
-    function resumeViewportPausedPlayback() {
-      if (!viewportPausedPlayback || !activeCard) {
+    function isSearchInputTarget(target) {
+      return Boolean(
+        target instanceof Element && target.matches(searchInputSelector),
+      );
+    }
+
+    function isSearchInputFocused() {
+      return isSearchInputTarget(document.activeElement);
+    }
+
+    function pauseActiveCardPlaybackForSearchFocus() {
+      if (!activeCard) {
+        return;
+      }
+
+      const video = activeCard.querySelector(".inline-reel-video");
+      if (!video) {
+        return;
+      }
+
+      searchFocusPausedPlayback = true;
+      video.pause();
+    }
+
+    function resumeDeferredPlayback() {
+      if (
+        (!viewportPausedPlayback && !searchFocusPausedPlayback) ||
+        !activeCard
+      ) {
+        return;
+      }
+
+      if (pauseWhenOutOfView && !trackInViewport) {
+        return;
+      }
+
+      if (isSearchInputFocused()) {
         return;
       }
 
@@ -75,12 +112,24 @@
       }
 
       viewportPausedPlayback = false;
+      searchFocusPausedPlayback = false;
       const playPromise = video.play();
       if (playPromise && typeof playPromise.catch === "function") {
         playPromise.catch(() => {
-          viewportPausedPlayback = true;
+          if (isSearchInputFocused()) {
+            searchFocusPausedPlayback = true;
+            return;
+          }
+
+          if (pauseWhenOutOfView && !trackInViewport) {
+            viewportPausedPlayback = true;
+          }
         });
       }
+    }
+
+    function resumeViewportPausedPlayback() {
+      resumeDeferredPlayback();
     }
 
     function rememberPreferredPlaybackState(video) {
@@ -337,6 +386,71 @@
       }
     }
 
+    function getVisibleCardMetrics(card) {
+      if (!card) {
+        return null;
+      }
+
+      const trackRect = track.getBoundingClientRect();
+      const cardRect = card.getBoundingClientRect();
+      const visibleWidth =
+        Math.min(trackRect.right, cardRect.right) -
+        Math.max(trackRect.left, cardRect.left);
+      if (visibleWidth <= 0) {
+        return null;
+      }
+
+      const cardWidth = Math.max(cardRect.width, 1);
+      const trackCenter = trackRect.left + trackRect.width / 2;
+      const cardCenter = cardRect.left + cardRect.width / 2;
+
+      return {
+        card,
+        index: cards.indexOf(card),
+        visibleRatio: visibleWidth / cardWidth,
+        centerOffset: Math.abs(cardCenter - trackCenter),
+      };
+    }
+
+    function getScrollCueTargetCard(direction) {
+      const visibleCards = cards
+        .map((card) => getVisibleCardMetrics(card))
+        .filter((metric) => metric && metric.visibleRatio >= 0.2);
+      if (!visibleCards.length) {
+        return null;
+      }
+
+      const activeIndex = activeCard ? cards.indexOf(activeCard) : -1;
+      const directionalCards = visibleCards.filter(({ index }) => {
+        if (activeIndex < 0) {
+          return true;
+        }
+
+        return direction === "left" ? index < activeIndex : index > activeIndex;
+      });
+      const preferredCards = directionalCards.length
+        ? directionalCards
+        : visibleCards;
+
+      preferredCards.sort((leftMetric, rightMetric) => {
+        if (directionalCards.length) {
+          return direction === "left"
+            ? rightMetric.index - leftMetric.index
+            : leftMetric.index - rightMetric.index;
+        }
+
+        if (leftMetric.centerOffset !== rightMetric.centerOffset) {
+          return leftMetric.centerOffset - rightMetric.centerOffset;
+        }
+
+        return direction === "left"
+          ? rightMetric.index - leftMetric.index
+          : leftMetric.index - rightMetric.index;
+      });
+
+      return preferredCards[0] ? preferredCards[0].card : null;
+    }
+
     function loadVideo(video) {
       if (!video) {
         return;
@@ -556,6 +670,7 @@
         : null;
       rememberPreferredPlaybackState(previousActiveVideo);
       viewportPausedPlayback = false;
+      searchFocusPausedPlayback = false;
 
       muteAndPauseOtherReels(card);
 
@@ -570,6 +685,11 @@
       video.muted = preferredMutedState;
       syncCardState(card, true);
       setTrackStatus(activeStatusText || defaultStatus);
+
+      if (isSearchInputFocused()) {
+        searchFocusPausedPlayback = true;
+        return;
+      }
 
       try {
         await video.play();
@@ -595,6 +715,11 @@
     }
 
     async function playNextReel(currentCard) {
+      if (isSearchInputFocused()) {
+        pauseActiveCardPlaybackForSearchFocus();
+        return;
+      }
+
       if (pauseWhenOutOfView && !trackInViewport) {
         pauseActiveCardPlayback();
         return;
@@ -770,6 +895,10 @@
 
       syncCardState(firstCard, true);
       activeCard = firstCard;
+      if (isSearchInputFocused()) {
+        searchFocusPausedPlayback = true;
+        return;
+      }
       playMuted(firstVideo);
     }
 
@@ -838,6 +967,22 @@
       }
 
       scheduleControlsHide(card.querySelector(".inline-reel-video"), 120);
+    });
+
+    track.addEventListener("ce:scroll-cue-activate-visible", (event) => {
+      const direction =
+        event instanceof CustomEvent &&
+        event.detail &&
+        event.detail.direction === "left"
+          ? "left"
+          : "right";
+      const nextCard = getScrollCueTargetCard(direction);
+      if (!nextCard || nextCard === activeCard) {
+        resumeDeferredPlayback();
+        return;
+      }
+
+      void activateCard(nextCard, { scrollIntoView: false });
     });
 
     track.addEventListener(
@@ -934,6 +1079,37 @@
         void syncInlineCardFromFullscreenExit();
       }
     });
+
+    document.addEventListener(
+      "focusin",
+      (event) => {
+        if (!isSearchInputTarget(event.target)) {
+          return;
+        }
+
+        pauseActiveCardPlaybackForSearchFocus();
+      },
+      true,
+    );
+
+    document.addEventListener(
+      "focusout",
+      (event) => {
+        if (!isSearchInputTarget(event.target)) {
+          return;
+        }
+
+        const nextTarget = event.relatedTarget;
+        if (isSearchInputTarget(nextTarget)) {
+          return;
+        }
+
+        window.setTimeout(() => {
+          resumeDeferredPlayback();
+        }, 0);
+      },
+      true,
+    );
 
     setTrackStatus(defaultStatus);
     setupViewportPauseGuard();

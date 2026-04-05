@@ -6,21 +6,21 @@
     {
       "name": "Miguel Jauregui",
       "title": "CEO",
-      "photo": null,
+      "photo": "miguel_j.jpg",
       "phone": "+1 (818) 331-9595",
       "email": "miguel@californiaearrings.com"
     },
     {
       "name": "Giancarlo Jauregui",
       "title": "SVP, Operations",
-      "photo": null,
+      "photo": "giancarlo_j.jpg",
       "phone": "+1 (818) 331-9292",
       "email": "giancarlo@californiaearrings.com"
     },
     {
       "name": "Ari Guel",
       "title": "Sales Representative",
-      "photo": null,
+      "photo": "ari_g.jpg",
       "phone": "+1 (213) 440-5005",
       "email": "aricaliforniaearrings@gmail.com"
     }
