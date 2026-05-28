@@ -206,7 +206,13 @@ class FrontendContractTests(BaseWebTest):
             data={
                 "name": "Test Buyer",
                 "company": "Sample Co",
+                "phone_country": "United States (+1)",
+                "phone_country_code": "us",
                 "phone": "555-0101",
+                "city": "Los Angeles",
+                "state": "California",
+                "country": "United States",
+                "country_key": "us",
                 "notes": "frontend contract",
             },
         )
@@ -242,6 +248,8 @@ class FrontendContractTests(BaseWebTest):
         self.assertIn(".checkout-page .checkout-summary-bar__center {", css)
         self.assertIn(".cart-page .cart-summary-bar__right,", css)
         self.assertIn(".checkout-page .checkout-summary-bar__right {", css)
+        self.assertIn(".checkout-page .checkout-phone-group {", css)
+        self.assertIn("grid-template-columns: minmax(13rem, 16.5rem) minmax(0, 1fr);", css)
         self.assertIn(".page-title-row > h1 {", css)
         self.assertIn("grid-column: 2;", css)
         self.assertIn("justify-self: center;", css)
@@ -283,8 +291,20 @@ class FrontendContractTests(BaseWebTest):
         self.assertIn("class=\"page-title-spacer btn btn-outline-gold\" aria-hidden=\"true\"", checkout_body)
         self.assertIn(">Submit Inquiry</h1>", checkout_body)
         self.assertIn("class=\"checkout-summary-bar mt-3\"", checkout_body)
-        self.assertIn("class=\"checkout-summary-bar__left text-gold-70 small\"", checkout_body)
-        self.assertIn("class=\"checkout-summary-bar__center text-gold-70 small\"", checkout_body)
+        self.assertIn("name=\"phone_country_code\"", checkout_body)
+        self.assertIn("id=\"checkoutPhoneCountry\"", checkout_body)
+        self.assertIn("list=\"checkoutPhoneCountryList\"", checkout_body)
+        self.assertIn("name=\"city\"", checkout_body)
+        self.assertIn("name=\"state\"", checkout_body)
+        self.assertIn("name=\"country\"", checkout_body)
+        self.assertIn("name=\"country_key\"", checkout_body)
+        self.assertIn("list=\"checkoutCountryList\"", checkout_body)
+        self.assertIn("list=\"checkoutStateList\"", checkout_body)
+        self.assertIn("value=\"United States (+1)\"", checkout_body)
+        self.assertIn("value=\"Mexico (+52)\"", checkout_body)
+        self.assertIn("class=\"checkout-summary-bar__left\" aria-hidden=\"true\"", checkout_body)
+        self.assertIn("class=\"checkout-summary-bar__center\"", checkout_body)
+        self.assertIn("class=\"d-flex align-items-center flex-wrap gap-2 checkout-summary-metrics\"", checkout_body)
         self.assertIn("class=\"checkout-summary-bar__right\"", checkout_body)
         self.assertIn("type=\"submit\">Submit Inquiry</button>", checkout_body)
         self.assertIn("class=\"page-title-row mb-3\"", order_submitted_body)
@@ -437,11 +457,14 @@ class FrontendContractTests(BaseWebTest):
 
     def test_reels_scroll_cue_uses_triple_arrow_attention_style(self) -> None:
         css = self.load_site_css()
+        script = (Path(webapp.BASE_DIR) / "static" / "js" /
+                  "scroll_cue.js").read_text(encoding="utf-8")
 
         self.assertIn(".scroll-cue-shell--reels::after {", css)
         self.assertIn('content: \">\";', css)
         self.assertIn(".scroll-cue-shell--reels.is-attentioning::after {", css)
         self.assertIn("@keyframes scrollCueReelsAttention", css)
+        self.assertNotIn("rightButton.click();", script)
 
     def test_inline_reels_hover_keeps_autoplay_muted(self) -> None:
         script = (Path(webapp.BASE_DIR) / "static" / "js" /
@@ -449,6 +472,8 @@ class FrontendContractTests(BaseWebTest):
 
         self.assertNotIn("requestAudiblePlayback", script)
         self.assertIn("scrollIntoView: false", script)
+        self.assertIn('track.addEventListener("ce:scroll-cue-activate-visible", (event) => {', script)
+        self.assertIn('void activateCard(nextCard, { scrollAlignment: "start" });', script)
 
     def test_active_reels_use_full_frame_sizing(self) -> None:
         css = self.load_site_css()

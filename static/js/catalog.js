@@ -7,7 +7,8 @@ async function postJson(url, payload) {
   return response.json();
 }
 
-const CARD_INTERACTIVE_SELECTOR = ".add-to-cart-btn, .product-qty-control, .product-qty-input, .product-detail-link";
+const CARD_INTERACTIVE_SELECTOR =
+  ".add-to-cart-btn, .product-qty-control, .product-qty-input, .product-detail-link";
 
 function isCardInteractiveTarget(target) {
   return !!target.closest(CARD_INTERACTIVE_SELECTOR);
@@ -64,10 +65,14 @@ function scrollToCatalogStart() {
   if (!firstAnchor) return;
 
   const styles = getComputedStyle(document.documentElement);
-  const navActual = parseFloat(styles.getPropertyValue("--nav-actual-height")) || 0;
+  const navActual =
+    parseFloat(styles.getPropertyValue("--nav-actual-height")) || 0;
   const navFallback = parseFloat(styles.getPropertyValue("--nav-height")) || 50;
   const topOffset = navActual || navFallback;
-  const targetTop = Math.max(0, firstAnchor.getBoundingClientRect().top + window.scrollY - topOffset);
+  const targetTop = Math.max(
+    0,
+    firstAnchor.getBoundingClientRect().top + window.scrollY - topOffset,
+  );
 
   window.scrollTo({ top: targetTop, behavior: "smooth" });
 
@@ -83,10 +88,14 @@ function scrollSectionToTop(target, behavior = "smooth", updateHash = false) {
   if (!target) return;
 
   const styles = getComputedStyle(document.documentElement);
-  const navActual = parseFloat(styles.getPropertyValue("--nav-actual-height")) || 0;
+  const navActual =
+    parseFloat(styles.getPropertyValue("--nav-actual-height")) || 0;
   const navFallback = parseFloat(styles.getPropertyValue("--nav-height")) || 50;
   const topOffset = navActual || navFallback;
-  const targetTop = Math.max(0, target.getBoundingClientRect().top + window.scrollY - topOffset);
+  const targetTop = Math.max(
+    0,
+    target.getBoundingClientRect().top + window.scrollY - topOffset,
+  );
 
   window.scrollTo({ top: targetTop, behavior });
 
@@ -198,7 +207,10 @@ document.addEventListener("pointermove", (event) => {
   if (!longPressCard || longPressPointerId !== event.pointerId) return;
   const deltaX = Math.abs(event.clientX - longPressStartX);
   const deltaY = Math.abs(event.clientY - longPressStartY);
-  if (deltaX > LONG_PRESS_MOVE_TOLERANCE || deltaY > LONG_PRESS_MOVE_TOLERANCE) {
+  if (
+    deltaX > LONG_PRESS_MOVE_TOLERANCE ||
+    deltaY > LONG_PRESS_MOVE_TOLERANCE
+  ) {
     clearLongPressState();
   }
 });
@@ -209,20 +221,30 @@ window.addEventListener("scroll", clearLongPressState, { passive: true });
 
 let resizeRafId = 0;
 
-window.addEventListener("resize", () => {
-  if (resizeRafId) return;
-  resizeRafId = window.requestAnimationFrame(() => {
-    resizeRafId = 0;
-    document.querySelectorAll(".product-card.is-open").forEach(syncDrawerHeight);
-  });
-}, { passive: true });
+window.addEventListener(
+  "resize",
+  () => {
+    if (resizeRafId) return;
+    resizeRafId = window.requestAnimationFrame(() => {
+      resizeRafId = 0;
+      document
+        .querySelectorAll(".product-card.is-open")
+        .forEach(syncDrawerHeight);
+    });
+  },
+  { passive: true },
+);
 
 function initializeCatalogCards(root = document) {
   root.querySelectorAll(".product-card").forEach((card) => {
     syncDrawerHeight(card);
     setCardExpanded(card, false);
-    setCardQty(card, 0);
-    setAddButtonLabel(card, 0);
+    const initialQty = Math.max(
+      0,
+      Math.min(999, Number(card.dataset.qty) || 0),
+    );
+    setCardQty(card, initialQty);
+    setAddButtonLabel(card, initialQty);
   });
 }
 
@@ -367,5 +389,9 @@ document.addEventListener("click", (event) => {
 
   event.preventDefault();
   window.scrollTo({ top: 0, behavior: "smooth" });
-  window.history.replaceState(null, "", window.location.pathname + window.location.search);
+  window.history.replaceState(
+    null,
+    "",
+    window.location.pathname + window.location.search,
+  );
 });

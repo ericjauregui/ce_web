@@ -685,9 +685,51 @@ main {
   border-radius: 999px;
 }
 
-.product-detail-page .product-detail-top-actions,
-.product-detail-page .product-detail-top-left {
+.product-detail-page .product-detail-top-actions {
+  position: sticky;
+  top: var(--nav-actual-height, var(--nav-height, 50px));
+  z-index: 30;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: .55rem;
   align-items: center;
+  padding: .55rem;
+  border: 1px solid rgb(var(--gold-rgb) / 0.18);
+  border-radius: 18px;
+  background: rgb(10 10 10 / 0.88);
+  box-shadow: 0 12px 28px rgb(0 0 0 / 0.24);
+  backdrop-filter: blur(10px);
+}
+
+.product-detail-page .product-detail-top-action {
+  min-width: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  padding-block: clamp(.7rem, .95vw, .9rem);
+  padding-inline: clamp(.7rem, 1.35vw, 1.1rem);
+  font-size: clamp(.96rem, 1.55vw, 1.28rem);
+  line-height: 1.05;
+}
+
+.product-detail-page .product-detail-top-action.add-to-cart-btn {
+  min-height: 0;
+}
+
+@media (max-width: 767.98px) {
+  .product-detail-page .product-detail-top-actions {
+    gap: .4rem;
+    padding: .45rem;
+  }
+
+  .product-detail-page .product-detail-top-action {
+    padding-block: .62rem;
+    padding-inline: .45rem;
+    font-size: clamp(.84rem, 2.4vw, .98rem);
+    letter-spacing: -.01em;
+  }
 }
 
 .product-detail-content-row {
@@ -725,16 +767,39 @@ main {
   min-height: 100%;
 }
 
+.product-detail-title-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(140px, 34%);
+  align-items: center;
+  gap: .9rem;
+}
+
+.product-detail-title {
+  min-width: 0;
+}
+
 .product-detail-code-badge {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
   min-height: var(--cta-btn-min-height);
+  min-width: 140px;
   margin-left: 0;
   margin-right: 0;
   padding: var(--cta-btn-pad-y) var(--cta-btn-pad-x);
   font-size: 1.04rem;
+  white-space: nowrap;
+}
+
+@media (max-width: 767.98px) {
+  .product-detail-title-row {
+    grid-template-columns: minmax(0, 1fr) minmax(112px, 30%);
+    gap: .7rem;
+  }
+
+  .product-detail-code-badge {
+    min-width: 112px;
+  }
 }
 
 .product-detail-meta p {

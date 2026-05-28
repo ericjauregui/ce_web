@@ -43,7 +43,7 @@ def register_site_routes(
         products = load_products()
         q = request.args.get("q", "")
         cfg = load_collections_cfg()
-        context = build_homepage_context(products, q, cfg, get_reels_path())
+        context = build_homepage_context(products, q, cfg, get_reels_path(), get_cart())
         return render_template("index.html", **context)
 
     @app.route("/catalog/")

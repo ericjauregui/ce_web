@@ -982,7 +982,7 @@
         return;
       }
 
-      void activateCard(nextCard, { scrollIntoView: false });
+      void activateCard(nextCard, { scrollAlignment: "start" });
     });
 
     track.addEventListener(

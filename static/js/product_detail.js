@@ -18,17 +18,21 @@ function updateCartBadge(totalItems) {
   badge.style.display = (totalItems || 0) > 0 ? "inline-block" : "none";
 }
 
-function setAddButtonLabel(card, qty) {
-  const button = card.querySelector(".add-to-cart-btn");
-  if (!button) return;
+function setAddButtonLabels(code, qty) {
+  const buttons = document.querySelectorAll(
+    `.add-to-cart-btn[data-code="${code}"]`,
+  );
+  if (!buttons.length) return;
 
-  if (qty <= 0) {
-    button.textContent = "Add to Order";
-    return;
+  let label = "Add to Order";
+  if (qty > 0) {
+    const noun = qty === 1 ? "item" : "items";
+    label = `${qty} ${noun} in order`;
   }
 
-  const noun = qty === 1 ? "item" : "items";
-  button.textContent = `${qty} ${noun} in order`;
+  buttons.forEach((button) => {
+    button.textContent = label;
+  });
 }
 
 function setDetailQty(card, qty) {
@@ -40,7 +44,10 @@ function setDetailQty(card, qty) {
   card.dataset.qty = String(safeQty);
   control.classList.toggle("d-none", safeQty <= 0);
   input.value = String(safeQty > 0 ? safeQty : 1);
-  setAddButtonLabel(card, safeQty);
+  const code = card.getAttribute("data-code") || "";
+  if (code) {
+    setAddButtonLabels(code, safeQty);
+  }
 }
 
 async function setQtyOnServer(card, nextQty) {
@@ -64,18 +71,25 @@ document.addEventListener("DOMContentLoaded", async () => {
   const initialQty = clampQty(card.getAttribute("data-initial-qty") || 0);
   setDetailQty(card, initialQty);
 
-  const shareButton = document.querySelector(".product-share-btn[data-share-url]");
+  const shareButton = document.querySelector(
+    ".product-share-btn[data-share-url]",
+  );
   if (shareButton) {
     shareButton.addEventListener("click", async () => {
-      const shareUrl = shareButton.getAttribute("data-share-url") || window.location.href;
-      const shareTitle = shareButton.getAttribute("data-share-title") || document.title;
+      const shareUrl =
+        shareButton.getAttribute("data-share-url") || window.location.href;
+      const shareTitle =
+        shareButton.getAttribute("data-share-title") || document.title;
 
       if (navigator.share) {
         try {
           await navigator.share({ title: shareTitle, url: shareUrl });
           return;
         } catch (error) {
-          if (error && (error.name === "AbortError" || error.name === "NotAllowedError")) {
+          if (
+            error &&
+            (error.name === "AbortError" || error.name === "NotAllowedError")
+          ) {
             return;
           }
         }
@@ -90,8 +104,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             shareButton.textContent = originalLabel || "Share";
           }, 1300);
           return;
-        } catch (_err) {
-        }
+        } catch (_err) {}
       }
 
       window.prompt("Copy this product link", shareUrl);
@@ -101,12 +114,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   try {
     const countData = await fetch("/api/cart/count").then((r) => r.json());
     updateCartBadge(countData.total_items || 0);
-  } catch (_err) {
-  }
+  } catch (_err) {}
 
   document.addEventListener("click", async (event) => {
     const addButton = event.target.closest(".add-to-cart-btn");
-    if (!addButton || !card.contains(addButton)) return;
+    if (!addButton || addButton.getAttribute("data-code") !== code) return;
 
     event.preventDefault();
 

@@ -3,15 +3,12 @@
 {% block robots_meta %}noindex,nofollow{% endblock %}
 {% block content %}
 <section class="container-fluid py-5 checkout-page">
-  <div class="container">
+  <div class="container checkout-shell" style="max-width: 900px;">
     <div class="page-title-row mb-3">
       <a class="btn btn-outline-gold page-title-back" href="{{ url_for('cart') }}">Back to Order</a>
       <h1 class="text-gold mb-0">Submit Inquiry</h1>
       <span class="page-title-spacer btn btn-outline-gold" aria-hidden="true">Back to Order</span>
     </div>
-  </div>
-
-  <div class="container" style="max-width: 900px;">
   <div class="card bg-dark border-gold p-3 checkout-intro-card">
     <p class="text-gold-70 mb-0">We'll contact you with availability & wholesale pricing.<br><br>After submitting, your order will
       be shared with our team and you'll be able to download a CSV/PDF.</p>
@@ -27,25 +24,47 @@
   {% else %}
     <div class="card bg-dark border-gold p-3 mt-4">
       <form method="post" action="{{ url_for('checkout') }}" id="checkoutForm" novalidate>
+        <p class="text-gold-70 small mb-3"><i>*Required Fields</i></p>
         <div class="row g-3">
           <div class="col-12 col-md-6">
             <label class="form-label text-gold-70">Name*</label>
-            <input name="name" class="form-control bg-black text-light border-gold" required>
+            <input name="name" class="form-control bg-black text-light border-gold" required value="{{ form_values.name }}">
           </div>
           <div class="col-12 col-md-6">
             <label class="form-label text-gold-70">Company Name*</label>
-            <input name="company" class="form-control bg-black text-light border-gold" required>
+            <input name="company" class="form-control bg-black text-light border-gold" required value="{{ form_values.company }}">
           </div>
           <div class="col-12 col-md-6">
             <label class="form-label text-gold-70">Phone Number*</label>
-            <input
-              name="phone"
-              class="form-control bg-black text-light border-gold"
-              required
-              placeholder="(###) ###-####"
-              id="checkoutPhone"
-              aria-describedby="checkoutPhoneError"
-            >
+            <div class="checkout-phone-group">
+              <input type="hidden" name="phone_country_code" id="checkoutPhoneCountryCode" value="{{ form_values.phone_country_code }}">
+              <input
+                name="phone_country"
+                class="form-control bg-black text-light border-gold checkout-phone-country"
+                id="checkoutPhoneCountry"
+                list="checkoutPhoneCountryList"
+                placeholder="Country code"
+                autocomplete="country-name"
+                aria-describedby="checkoutPhoneError"
+                value="{{ form_values.phone_country }}"
+              >
+              <datalist id="checkoutPhoneCountryList">
+                {% for country_key, label, dial_code in phone_country_options %}
+                  <option value="{{ phone_country_display_by_key[country_key] }}"></option>
+                {% endfor %}
+              </datalist>
+              <input
+                name="phone"
+                class="form-control bg-black text-light border-gold"
+                required
+                placeholder="555 123 4567"
+                id="checkoutPhone"
+                inputmode="tel"
+                autocomplete="tel-national"
+                aria-describedby="checkoutPhoneError"
+                value="{{ form_values.phone }}"
+              >
+            </div>
             <div id="checkoutPhoneError" class="checkout-field-error" aria-live="polite"></div>
           </div>
           <div class="col-12 col-md-6">
@@ -59,42 +78,93 @@
               placeholder="you@company.com"
               id="checkoutEmail"
               aria-describedby="checkoutEmailError"
+              value="{{ form_values.email }}"
             >
             <div id="checkoutEmailError" class="checkout-field-error" aria-live="polite"></div>
+          </div>
+          <div class="col-12 col-md-4">
+            <label class="form-label text-gold-70">City*</label>
+            <input
+              name="city"
+              class="form-control bg-black text-light border-gold"
+              id="checkoutCity"
+              autocomplete="address-level2"
+              required
+              value="{{ form_values.city }}"
+              aria-describedby="checkoutCityError"
+            >
+            <div id="checkoutCityError" class="checkout-field-error" aria-live="polite"></div>
+          </div>
+          <div class="col-12 col-md-4">
+            <label class="form-label text-gold-70">State*</label>
+            <input
+              name="state"
+              class="form-control bg-black text-light border-gold"
+              id="checkoutState"
+              list="checkoutStateList"
+              autocomplete="address-level1"
+              required
+              value="{{ form_values.state }}"
+              aria-describedby="checkoutStateError"
+            >
+            <datalist id="checkoutStateList"></datalist>
+            <div id="checkoutStateError" class="checkout-field-error" aria-live="polite"></div>
+          </div>
+          <div class="col-12 col-md-4">
+            <label class="form-label text-gold-70">Country*</label>
+            <input type="hidden" name="country_key" id="checkoutCountryKey" value="{{ form_values.country_key }}">
+            <input
+              name="country"
+              class="form-control bg-black text-light border-gold"
+              id="checkoutCountry"
+              list="checkoutCountryList"
+              autocomplete="country-name"
+              required
+              value="{{ form_values.country }}"
+              aria-describedby="checkoutCountryError"
+            >
+            <datalist id="checkoutCountryList">
+              {% for country_key, label in country_options %}
+                <option value="{{ label }}"></option>
+              {% endfor %}
+            </datalist>
+            <div id="checkoutCountryError" class="checkout-field-error" aria-live="polite"></div>
           </div>
           <div class="col-12">
             <label class="form-label text-gold-70">Notes</label>
             <input name="notes" class="form-control bg-black text-light border-gold"
-              placeholder="Shipping state/country, preferred stones, etc.">
+              placeholder="Preferred stones, shipping notes, or anything else we should know."
+              value="{{ form_values.notes }}">
           </div>
         </div>
 
-        <p class="text-gold-70 small mt-2 mb-0"><i>*Required fields</i></p>
-
         <hr class="border-gold my-4">
 
-        <h2 class="h6 text-gold mb-3">Your items</h2>
+        <div class="checkout-items-header mb-3">
+          <h2 class="h6 text-gold mb-0">Your items</h2>
+          <button class="btn btn-outline-gold" type="submit">Submit Inquiry</button>
+        </div>
         <div class="table-responsive">
           <table class="table table-dark align-middle mb-0 minimal-items-table checkout-items-table">
             <thead>
               <tr>
-                <th>Item</th>
-                <th>Code</th>
-                <th>Name</th>
-                <th>Quantity</th>
-                <th>Item notes</th>
+                <th class="checkout-col-item">Item</th>
+                <th class="checkout-col-code">Code</th>
+                <th class="checkout-col-qty">Quantity</th>
+                <th class="checkout-col-notes">Item Notes</th>
               </tr>
             </thead>
             <tbody>
               {% for row in items %}
               <tr>
                 <td class="cell-item" data-label="Item">
-                  <img src="{{ url_for('static', filename='product_images/' ~ row.product.image) }}" class="cart-thumb" alt="{{ row.product.name }}" loading="lazy" decoding="async" width="56" height="56">
+                  <a class="checkout-product-link checkout-product-thumb-link" href="{{ url_for('product_detail', product_code=row.product.code) }}" aria-label="View {{ row.product.code }} product details">
+                    <img src="{{ url_for('static', filename='product_images/' ~ row.product.image) }}" class="cart-thumb" alt="{{ row.product.name }}" loading="lazy" decoding="async" width="56" height="56">
+                  </a>
                 </td>
-                <td class="cell-code" data-label="Code"><span class="code-badge">{{ row.product.code }}</span></td>
-                <td class="cell-item" data-label="Item">{{ row.product.name }}</td>
+                <td class="cell-code" data-label="Code"><a class="code-badge checkout-product-link checkout-product-code-link" href="{{ url_for('product_detail', product_code=row.product.code) }}">{{ row.product.code }}</a></td>
                 <td class="cell-qty" data-label="Quantity">{{ row.qty }}</td>
-                <td class="cell-notes" data-label="Item notes">{{ row.note or "—" }}</td>
+                <td class="cell-notes" data-label="Item Notes">{{ row.note or "—" }}</td>
               </tr>
               {% endfor %}
             </tbody>
@@ -102,10 +172,15 @@
         </div>
 
         <div class="checkout-summary-bar mt-3">
-          <div class="checkout-summary-bar__left text-gold-70 small">Total Items: <span class="text-gold">{{ items|length }}</span></div>
-          <div class="checkout-summary-bar__center text-gold-70 small">Total Quantity: <span class="text-gold">{{ items|sum(attribute='qty') }}</span></div>
+          <div class="checkout-summary-bar__left" aria-hidden="true"></div>
+          <div class="checkout-summary-bar__center">
+            <div class="d-flex align-items-center flex-wrap gap-2 checkout-summary-metrics">
+              <div class="text-gold-70 small">Total Items:<span class="text-gold">{{ items|length }}</span></div>
+              <div class="text-gold-70 small">Total Quantity:<span class="text-gold">{{ items|sum(attribute='qty') }}</span></div>
+            </div>
+          </div>
           <div class="checkout-summary-bar__right">
-            <button class="btn btn-outline-gold" type="submit">Submit Inquiry</button>
+            <button class="btn btn-outline-gold checkout-summary-submit-btn" type="submit">Submit Inquiry</button>
           </div>
         </div>
       </form>
@@ -119,20 +194,51 @@
 <script>
   (function () {
     const form = document.getElementById("checkoutForm");
+    const phoneCountryInput = document.getElementById("checkoutPhoneCountry");
+    const phoneCountryCodeInput = document.getElementById("checkoutPhoneCountryCode");
     const phoneInput = document.getElementById("checkoutPhone");
     const phoneError = document.getElementById("checkoutPhoneError");
     const emailInput = document.getElementById("checkoutEmail");
     const emailError = document.getElementById("checkoutEmailError");
-    if (!form || !phoneInput || !phoneError || !emailInput || !emailError) return;
+    const cityInput = document.getElementById("checkoutCity");
+    const cityError = document.getElementById("checkoutCityError");
+    const stateInput = document.getElementById("checkoutState");
+    const stateError = document.getElementById("checkoutStateError");
+    const stateList = document.getElementById("checkoutStateList");
+    const countryInput = document.getElementById("checkoutCountry");
+    const countryKeyInput = document.getElementById("checkoutCountryKey");
+    const countryError = document.getElementById("checkoutCountryError");
+    if (!form || !phoneCountryInput || !phoneCountryCodeInput || !phoneInput || !phoneError || !emailInput || !emailError || !cityInput || !cityError || !stateInput || !stateError || !stateList || !countryInput || !countryKeyInput || !countryError) return;
 
     const phoneAllowedPattern = /^[0-9()+\-\.\s]+$/;
     const phoneInvalidMessage = "Please enter a valid phone number";
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const invalidMessage = "Please enter a valid email address";
+    const phoneCountryDisplayByKey = {{ phone_country_display_by_key|tojson }};
+    const phoneCountryKeyByDisplay = Object.fromEntries(
+      Object.entries(phoneCountryDisplayByKey).map(function ([key, value]) {
+        return [value.toLowerCase(), key];
+      })
+    );
+    const countryKeyByLabel = {{ country_key_by_label|tojson }};
+    const countryLabelByKey = {{ country_label_by_key|tojson }};
+    const subdivisionsByCountryKey = {{ subdivisions_by_country_key|tojson }};
+
+    function normalizeLookupValue(value) {
+      return (value || "").trim().toLowerCase();
+    }
+
+    function setFieldError(input, errorElement, message) {
+      errorElement.textContent = message;
+      input.classList.toggle("checkout-input-invalid", Boolean(message));
+      input.setAttribute("aria-invalid", message ? "true" : "false");
+    }
 
     function setPhoneError(message) {
       phoneError.textContent = message;
+      phoneCountryInput.classList.toggle("checkout-input-invalid", Boolean(message));
       phoneInput.classList.toggle("checkout-input-invalid", Boolean(message));
+      phoneCountryInput.setAttribute("aria-invalid", message ? "true" : "false");
       phoneInput.setAttribute("aria-invalid", message ? "true" : "false");
     }
 
@@ -142,8 +248,50 @@
       emailInput.setAttribute("aria-invalid", message ? "true" : "false");
     }
 
+    function syncPhoneCountryKey() {
+      const nextKey = phoneCountryKeyByDisplay[normalizeLookupValue(phoneCountryInput.value)] || "";
+      phoneCountryCodeInput.value = nextKey;
+      return nextKey;
+    }
+
+    function populateStateOptions(countryKey) {
+      const options = subdivisionsByCountryKey[countryKey] || [];
+      stateList.innerHTML = "";
+      options.forEach(function (name) {
+        const option = document.createElement("option");
+        option.value = name;
+        stateList.appendChild(option);
+      });
+
+      if (options.length) {
+        stateInput.placeholder = "Start typing to choose a state";
+      } else {
+        stateInput.placeholder = "Type your state";
+      }
+    }
+
+    function syncCountryKey(options) {
+      const shouldClearState = !(options && options.clearState === false);
+      const previousKey = countryKeyInput.value;
+      const nextKey = countryKeyByLabel[normalizeLookupValue(countryInput.value)] || "";
+      countryKeyInput.value = nextKey;
+      if (nextKey && countryLabelByKey[nextKey] && countryInput.value !== countryLabelByKey[nextKey]) {
+        countryInput.value = countryLabelByKey[nextKey];
+      }
+      populateStateOptions(nextKey);
+      if (shouldClearState && previousKey && previousKey !== nextKey) {
+        stateInput.value = "";
+      }
+      return nextKey;
+    }
+
     function validatePhoneField() {
+      const countryCode = syncPhoneCountryKey();
       const value = phoneInput.value.trim();
+      if (!countryCode) {
+        setPhoneError("Please select a country code");
+        return false;
+      }
       if (!value) {
         setPhoneError("Please enter a phone number");
         return false;
@@ -157,6 +305,41 @@
       }
 
       setPhoneError("");
+      return true;
+    }
+
+    function validateCityField() {
+      const value = cityInput.value.trim();
+      if (!value) {
+        setFieldError(cityInput, cityError, "Please enter a city");
+        return false;
+      }
+      setFieldError(cityInput, cityError, "");
+      return true;
+    }
+
+    function validateStateField() {
+      const value = stateInput.value.trim();
+      if (!value) {
+        setFieldError(stateInput, stateError, "Please enter a state");
+        return false;
+      }
+      setFieldError(stateInput, stateError, "");
+      return true;
+    }
+
+    function validateCountryField() {
+      const nextKey = syncCountryKey({ clearState: false });
+      const value = countryInput.value.trim();
+      if (!value) {
+        setFieldError(countryInput, countryError, "Please select a country");
+        return false;
+      }
+      if (!nextKey) {
+        setFieldError(countryInput, countryError, "Please select a country from the list");
+        return false;
+      }
+      setFieldError(countryInput, countryError, "");
       return true;
     }
 
@@ -174,10 +357,28 @@
       return true;
     }
 
+    phoneCountryInput.addEventListener("input", validatePhoneField);
+    phoneCountryInput.addEventListener("change", validatePhoneField);
     phoneInput.addEventListener("input", validatePhoneField);
     phoneInput.addEventListener("blur", validatePhoneField);
     emailInput.addEventListener("input", validateEmailField);
     emailInput.addEventListener("blur", validateEmailField);
+    cityInput.addEventListener("input", validateCityField);
+    cityInput.addEventListener("blur", validateCityField);
+    stateInput.addEventListener("input", validateStateField);
+    stateInput.addEventListener("blur", validateStateField);
+    countryInput.addEventListener("input", function () {
+      syncCountryKey();
+      validateCountryField();
+    });
+    countryInput.addEventListener("change", function () {
+      syncCountryKey();
+      validateCountryField();
+    });
+    countryInput.addEventListener("blur", validateCountryField);
+
+    syncPhoneCountryKey();
+    syncCountryKey({ clearState: false });
 
     form.addEventListener("submit", function (event) {
       const requiredFields = form.querySelectorAll("input[required]");
@@ -190,10 +391,29 @@
 
       const phoneValid = validatePhoneField();
       const emailValid = validateEmailField();
-      if (missingRequired || !phoneValid || !emailValid) {
+      const cityValid = validateCityField();
+      const stateValid = validateStateField();
+      const countryValid = validateCountryField();
+      if (missingRequired || !phoneValid || !emailValid || !cityValid || !stateValid || !countryValid) {
         event.preventDefault();
         if (!phoneValid) {
+          if (!phoneCountryCodeInput.value.trim()) {
+            phoneCountryInput.focus();
+            return;
+          }
           phoneInput.focus();
+          return;
+        }
+        if (!cityValid) {
+          cityInput.focus();
+          return;
+        }
+        if (!stateValid) {
+          stateInput.focus();
+          return;
+        }
+        if (!countryValid) {
+          countryInput.focus();
           return;
         }
         if (!emailValid) {

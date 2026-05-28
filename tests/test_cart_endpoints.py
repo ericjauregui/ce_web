@@ -18,6 +18,18 @@ class CartEndpointTests(BaseWebTest):
         self.assertIn("product-grid-row", body)
         self.assertIn("/static/js/catalog.js", body)
 
+    def test_index_preserves_cart_quantity_on_product_card(self) -> None:
+        self.client.post("/api/cart/add", json={"code": self.valid_code, "qty": 2})
+
+        response = self.client.get("/")
+        self.assertEqual(response.status_code, 200)
+        body = response.get_data(as_text=True)
+
+        self.assertIn(f'data-code="{self.valid_code}"', body)
+        self.assertIn('data-qty="2"', body)
+        self.assertIn('value="2" aria-label="Quantity"', body)
+        self.assertIn('2 items in order', body)
+
     def test_add_set_and_count_flow(self) -> None:
         add_response = self.client.post("/api/cart/add", json={"code": self.valid_code, "qty": 2})
         self.assertEqual(add_response.status_code, 200)
@@ -96,6 +108,44 @@ class CartEndpointTests(BaseWebTest):
         self.assertIn("item-note-input", cart_body)
         self.assertIn("Please match screwback style", cart_body)
 
+    def test_cart_view_keeps_item_column_thumbnail_without_rendering_name(self) -> None:
+        product_name = webapp.load_products()[0]["name"]
+        self.client.post(
+            "/api/cart/add", json={"code": self.valid_code, "qty": 1})
+
+        cart_response = self.client.get("/cart")
+        self.assertEqual(cart_response.status_code, 200)
+        cart_body = cart_response.get_data(as_text=True)
+        self.assertIn('class="cart-col-item">Item</th>', cart_body)
+        self.assertIn("Item Notes", cart_body)
+        self.assertIn("class=\"cart-thumb\"", cart_body)
+        self.assertIn(f'href="/product/{self.valid_code}"', cart_body)
+        self.assertIn("cart-product-thumb-link", cart_body)
+        self.assertIn("cart-product-code-link", cart_body)
+        self.assertIn("item-note-shell", cart_body)
+        self.assertIn('e.key !== "Escape"', cart_body)
+        self.assertIn('if (!nextValue) {', cart_body)
+        self.assertNotIn(product_name, cart_body)
+
+    def test_checkout_view_uses_capitalized_item_notes_label(self) -> None:
+        self.client.post(
+            "/api/cart/add", json={"code": self.valid_code, "qty": 1})
+
+        checkout_response = self.client.get("/checkout")
+        self.assertEqual(checkout_response.status_code, 200)
+        checkout_body = checkout_response.get_data(as_text=True)
+        self.assertIn('class="checkout-col-notes">Item Notes</th>', checkout_body)
+        self.assertIn('data-label="Item Notes"', checkout_body)
+        self.assertIn('class="checkout-items-header mb-3">', checkout_body)
+        self.assertIn('class="d-flex align-items-center flex-wrap gap-2 checkout-summary-metrics"', checkout_body)
+        self.assertIn(f'href="/product/{self.valid_code}"', checkout_body)
+        self.assertIn("checkout-product-thumb-link", checkout_body)
+        self.assertIn("checkout-product-code-link", checkout_body)
+        self.assertIn("Your items", checkout_body)
+        self.assertIn(">Submit Inquiry</button>", checkout_body)
+        self.assertNotIn("<th>Name</th>", checkout_body)
+        self.assertEqual(checkout_body.count("<th class=\"checkout-col-"), 4)
+
     def test_item_note_requires_item_in_cart(self) -> None:
         self.client.post(
             "/api/cart/add", json={"code": self.valid_code, "qty": 1})
@@ -123,7 +173,13 @@ class CartEndpointTests(BaseWebTest):
             data={
                 "name": "Test Buyer",
                 "company": "Sample Co",
+                "phone_country": "United States (+1)",
+                "phone_country_code": "us",
                 "phone": "555-0101",
+                "city": "Los Angeles",
+                "state": "California",
+                "country": "United States",
+                "country_key": "us",
                 "notes": "general order note",
             },
         )
@@ -153,7 +209,13 @@ class CartEndpointTests(BaseWebTest):
             data={
                 "name": "Test Buyer",
                 "company": "Sample Co",
+                "phone_country": "United States (+1)",
+                "phone_country_code": "us",
                 "phone": "555-0101",
+                "city": "Los Angeles",
+                "state": "California",
+                "country": "United States",
+                "country_key": "us",
                 "notes": "general order note",
             },
         )
@@ -167,6 +229,45 @@ class CartEndpointTests(BaseWebTest):
         self.assertEqual(pdf_response.status_code, 200)
         self.assertEqual(pdf_response.mimetype, "application/pdf")
         self.assertTrue(pdf_response.get_data().startswith(b"%PDF"))
+
+    def test_checkout_view_renders_searchable_country_inputs(self) -> None:
+        self.client.post(
+            "/api/cart/add", json={"code": self.valid_code, "qty": 1})
+
+        checkout_response = self.client.get("/checkout")
+        self.assertEqual(checkout_response.status_code, 200)
+        checkout_body = checkout_response.get_data(as_text=True)
+
+        self.assertIn('name="phone_country_code"', checkout_body)
+        self.assertIn('id="checkoutPhoneCountry"', checkout_body)
+        self.assertIn('list="checkoutPhoneCountryList"', checkout_body)
+        self.assertIn('class="checkout-phone-group"', checkout_body)
+        self.assertIn('name="city"', checkout_body)
+        self.assertIn('name="state"', checkout_body)
+        self.assertIn('name="country"', checkout_body)
+        self.assertIn('name="country_key"', checkout_body)
+        self.assertIn('list="checkoutCountryList"', checkout_body)
+        self.assertIn('list="checkoutStateList"', checkout_body)
+        self.assertGreater(checkout_body.count("<option value=\""), 300)
+        self.assertIn('value="United States (+1)"', checkout_body)
+        self.assertIn('value="Mexico (+52)"', checkout_body)
+        self.assertIn('value="Canada"', checkout_body)
+        self.assertLess(
+            checkout_body.index('value="United States (+1)"'),
+            checkout_body.index('value="Mexico (+52)"'),
+        )
+        self.assertLess(
+            checkout_body.index('value="Mexico (+52)"'),
+            checkout_body.index('value="Afghanistan (+93)"'),
+        )
+        self.assertLess(
+            checkout_body.index('value="United States"'),
+            checkout_body.index('value="Mexico"'),
+        )
+        self.assertLess(
+            checkout_body.index('value="Mexico"'),
+            checkout_body.index('value="Afghanistan"'),
+        )
 
     def test_cart_pdf_layout_centers_title_and_all_table_cells(self) -> None:
         class FakeStyle:

@@ -11,12 +11,13 @@
 
 {% block content %}
 <section class="container py-5 product-detail-page" style="max-width: 1060px;">
-  <div class="product-detail-top-actions d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
-    <div class="d-flex flex-wrap gap-2 product-detail-top-left">
-      <a class="btn btn-outline-gold" href="{{ url_for('index') }}#section-{{ product.collection }}">← Back to Catalog</a>
-      <a class="btn btn-outline-gold" href="{{ url_for('contact') }}">Contact Us</a>
-    </div>
-    <button type="button" class="btn btn-outline-gold product-share-btn" data-share-url="{{ canonical_url }}"
+  <div class="product-detail-top-actions mb-3">
+    <a class="btn btn-outline-gold product-detail-top-action" href="{{ url_for('index') }}#section-{{ product.collection }}">← Back to Catalog</a>
+    <button type="button" class="btn btn-outline-gold add-to-cart-btn product-detail-top-action product-detail-top-add-btn" data-code="{{ product.code }}">
+      Add to Order
+    </button>
+    <a class="btn btn-outline-gold product-detail-top-action" href="{{ url_for('contact') }}">Contact Us</a>
+    <button type="button" class="btn btn-outline-gold product-share-btn product-detail-top-action" data-share-url="{{ canonical_url }}"
       data-share-title="{{ product.name }} | {{ site_name }}">Share</button>
   </div>
 
@@ -39,8 +40,10 @@
     <div class="col-12 col-lg-5">
       <article class="card bg-dark border-gold p-3 p-md-4 product-detail-meta-card" data-code="{{ product.code }}"
         data-initial-qty="{{ initial_qty }}">
-        <h1 class="text-gold mb-2">{{ product.name }}</h1>
-        <div class="small code-badge mb-3 product-detail-code-badge">{{ product.code }}</div>
+        <div class="product-detail-title-row mb-3">
+          <h1 class="text-gold mb-0 product-detail-title">{{ product.name }}</h1>
+          <div class="small code-badge product-detail-code-badge">{{ product.code }}</div>
+        </div>
 
         <div class="product-detail-meta text-gold-70 mb-4">
           <p class="mb-2"><span class="text-gold fw-semibold">Collection:</span> {{ collection_label }}</p>
@@ -50,9 +53,6 @@
         </div>
 
         <div class="product-actions mt-auto d-grid gap-2">
-          <button type="button" class="btn btn-outline-gold btn-sm rounded-pill add-to-cart-btn" data-code="{{ product.code }}">
-            Add to Order
-          </button>
           <div class="product-qty-control {% if initial_qty <= 0 %}d-none{% endif %}" data-code="{{ product.code }}" aria-label="Inline quantity controls">
             <button type="button" class="btn btn-outline-gold btn-sm rounded-pill qty-clear-btn" aria-label="Clear item from cart">×</button>
             <div class="qty-center-group" aria-hidden="false">

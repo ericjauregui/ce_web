@@ -1,8 +1,10 @@
 <div class="col">
   {% set drawer_id = 'drawer-' ~ p.code|lower|replace(' ', '-')|replace('/', '-') %}
+  {% set initial_qty = p.initial_qty|default(0, true)|int %}
   <article class="card product product-card shadow-sm bg-dark border-0"
        role="button"
        tabindex="0"
+      data-qty="{{ initial_qty }}"
       data-detail-url="{{ url_for('product_detail', product_code=p.code) }}"
        aria-expanded="false"
        aria-controls="{{ drawer_id }}">
@@ -24,16 +26,16 @@
         <button type="button"
                 class="btn btn-outline-gold btn-sm rounded-pill add-to-cart-btn"
                 data-code="{{ p.code }}">
-          Add to Order
+          {% if initial_qty > 0 %}{{ initial_qty }} {% if initial_qty == 1 %}item{% else %}items{% endif %} in order{% else %}Add to Order{% endif %}
         </button>
-        <div class="product-qty-control d-none" data-code="{{ p.code }}" aria-label="Inline quantity controls">
+        <div class="product-qty-control{% if initial_qty <= 0 %} d-none{% endif %}" data-code="{{ p.code }}" aria-label="Inline quantity controls">
           <button type="button" class="btn btn-outline-gold btn-sm rounded-pill qty-clear-btn"
             aria-label="Clear item from cart">×</button>
           <div class="qty-center-group" aria-hidden="false">
             <button type="button" class="btn btn-outline-gold btn-sm rounded-pill qty-adjust-btn" data-delta="-1"
               aria-label="Decrease quantity">−</button>
             <input type="number" min="0" max="999" step="1" inputmode="numeric" class="product-qty-pill product-qty-input"
-              value="1" aria-label="Quantity" />
+              value="{{ initial_qty if initial_qty > 0 else 1 }}" aria-label="Quantity" />
             <button type="button" class="btn btn-outline-gold btn-sm rounded-pill qty-adjust-btn" data-delta="1"
               aria-label="Increase quantity">+</button>
           </div>

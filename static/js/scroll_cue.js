@@ -255,11 +255,6 @@
     }
 
     const rightButton = getButton(shell, "right");
-    if (rightButton && !rightButton.disabled) {
-      rightButton.click();
-      return;
-    }
-
     const existingTimer = attentionTimers.get(shell);
     if (existingTimer) {
       window.clearTimeout(existingTimer);

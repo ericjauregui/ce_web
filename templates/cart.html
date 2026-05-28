@@ -8,11 +8,6 @@
     <h1 class="text-gold mb-0">Shopping Cart</h1>
     <a class="btn btn-outline-gold page-title-action" href="{{ url_for('contact') }}">Contact Us</a>
   </div>
-  <div class="d-flex gap-2 cart-top-actions mb-3">
-    {% if items|length > 0 %}
-    <a class="btn btn-outline-gold cart-checkout-btn" href="{{ url_for('checkout') }}">Submit Inquiry</a>
-    {% endif %}
-  </div>
 
   <div class="card bg-dark border-gold p-3 cart-intro-card" id="cartIntroCard">
       <p class="text-gold-70 mb-0">Checkout your order and we'll follow up with wholesale pricing & availability. No payment
@@ -27,25 +22,24 @@
         <table class="table table-dark align-middle mb-0 minimal-items-table cart-items-table">
           <thead>
             <tr>
-              <th>Item</th>
-              <th>Code</th>
-              <th style="width: 220px;">Quantity</th>
-              <th style="min-width: 250px;">Item notes</th>
-              <th style="width: 90px;"></th>
+              <th class="cart-col-item">Item</th>
+              <th class="cart-col-code">Code</th>
+              <th class="cart-col-qty">Quantity</th>
+              <th class="cart-col-notes">Item Notes</th>
+              <th class="cart-col-remove"></th>
             </tr>
           </thead>
           <tbody id="cartTableBody">
             {% for row in items %}
             <tr>
               <td class="cell-item" data-label="Item">
-                <div class="d-flex align-items-center gap-3">
-                  <img src="{{ url_for('static', filename='product_images/' ~ row.product.image) }}" class="cart-thumb" alt="" loading="lazy" decoding="async" width="56" height="56">
-                  <div>
-                    <div class="text-gold fw-semibold">{{ row.product.name }}</div>
-                  </div>
+                <div class="d-flex align-items-center">
+                  <a class="cart-product-link cart-product-thumb-link" href="{{ url_for('product_detail', product_code=row.product.code) }}" aria-label="View {{ row.product.code }} product details">
+                    <img src="{{ url_for('static', filename='product_images/' ~ row.product.image) }}" class="cart-thumb" alt="" loading="lazy" decoding="async" width="56" height="56">
+                  </a>
                 </div>
               </td>
-              <td class="cell-code" data-label="Code"><span class="code-badge">{{ row.product.code }}</span></td>
+              <td class="cell-code" data-label="Code"><a class="code-badge cart-product-link cart-product-code-link" href="{{ url_for('product_detail', product_code=row.product.code) }}">{{ row.product.code }}</a></td>
               <td class="cell-qty" data-label="Quantity">
                 <div class="qty-control" data-code="{{ row.product.code }}">
                   <button class="btn btn-outline-gold qty-adjust-btn qty-minus" type="button">−</button>
@@ -53,13 +47,15 @@
                   <button class="btn btn-outline-gold qty-adjust-btn qty-plus" type="button">+</button>
                 </div>
               </td>
-              <td class="cell-notes" data-label="Item notes">
-                <textarea class="form-control form-control-sm bg-black text-light border-gold item-note-input"
-                  data-code="{{ row.product.code }}" rows="1" maxlength="500"
-                  placeholder="Add note for this item (optional)">{{ row.note }}</textarea>
+              <td class="cell-notes" data-label="Item Notes">
+                <div class="item-note-shell is-collapsed" data-compact-label="Note">
+                  <textarea class="form-control form-control-sm bg-black text-light border-gold item-note-input"
+                    data-code="{{ row.product.code }}" rows="1" maxlength="500"
+                    placeholder="Add note for this item (optional)" aria-label="Item Notes">{{ row.note }}</textarea>
+                </div>
                 </td>
                 <td class="cell-remove" data-label="">
-                <button class="btn btn-outline-gold btn-sm qty-remove" type="button" data-code="{{ row.product.code }}">Remove</button>
+                <button class="btn btn-outline-gold qty-remove" type="button" data-code="{{ row.product.code }}">Remove</button>
               </td>
             </tr>
             {% endfor %}
@@ -105,9 +101,40 @@ function clampQty(q){
 
 function autoResizeNoteInput(input) {
   if (!input) return;
-  input.style.height = "auto";
   const minHeight = 36;
-  input.style.height = `${Math.max(minHeight, input.scrollHeight)}px`;
+  const maxHeight = Math.min(180, Math.round(window.innerHeight * 0.42));
+  const noteValue = (input.value || "").trim();
+
+  const noteShell = input.closest(".item-note-shell");
+  if (noteShell && noteShell.classList.contains("is-collapsed")) {
+    input.style.height = `${minHeight}px`;
+    input.style.overflowY = "hidden";
+    return;
+  }
+
+  if (!noteValue) {
+    input.style.height = `${minHeight}px`;
+    input.style.overflowY = "hidden";
+    return;
+  }
+
+  input.style.height = "auto";
+  const nextHeight = Math.max(minHeight, input.scrollHeight);
+  input.style.height = `${Math.min(nextHeight, maxHeight)}px`;
+  input.style.overflowY = nextHeight > maxHeight ? "auto" : "hidden";
+}
+
+function syncCompactCartNoteInput(input) {
+  if (!input) return;
+  const shell = input.closest(".item-note-shell");
+  if (!shell) return;
+
+  const hasValue = Boolean((input.value || "").trim());
+  const isFocused = document.activeElement === input;
+
+  shell.classList.toggle("has-value", hasValue);
+  shell.classList.toggle("is-expanded", isFocused);
+  shell.classList.toggle("is-collapsed", !isFocused);
 }
 
 function setCheckoutVisibility(hasItems) {
@@ -201,9 +228,23 @@ document.addEventListener("DOMContentLoaded", () => {
   setCartIntroVisibility(hasItems);
 
   document.querySelectorAll(".item-note-input").forEach((input) => {
+    syncCompactCartNoteInput(input);
     autoResizeNoteInput(input);
   });
 });
+document.addEventListener("focusin", (e) => {
+  const input = e.target.closest(".item-note-input");
+  if (!input) return;
+  syncCompactCartNoteInput(input);
+  autoResizeNoteInput(input);
+}, true);
+document.addEventListener("keydown", (e) => {
+  const input = e.target.closest(".item-note-input");
+  if (!input || e.key !== "Escape") return;
+
+  e.preventDefault();
+  input.blur();
+}, true);
 document.addEventListener("click", async (e) => {
   const minus = e.target.closest(".qty-minus");
   const plus = e.target.closest(".qty-plus");
@@ -258,9 +299,21 @@ document.addEventListener("change", async (e) => {
     const input = e.target.closest(".item-note-input");
     if (!input) return;
 
+    syncCompactCartNoteInput(input);
     autoResizeNoteInput(input);
 
     const code = input.getAttribute("data-code") || "";
+    const nextValue = (input.value || "").trim();
+    if (!nextValue) {
+      input.value = "";
+      if (code && noteSaveTimers[code]) {
+        window.clearTimeout(noteSaveTimers[code]);
+        delete noteSaveTimers[code];
+      }
+      input.blur();
+      return;
+    }
+
     if (!code) return;
 
     if (noteSaveTimers[code]) {
@@ -283,6 +336,8 @@ document.addEventListener("change", async (e) => {
       delete noteSaveTimers[code];
     }
 
+    syncCompactCartNoteInput(input);
+    autoResizeNoteInput(input);
     await persistItemNote(input);
   }, true);
 </script>
