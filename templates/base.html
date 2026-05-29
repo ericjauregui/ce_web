@@ -8,9 +8,9 @@
   {% set canonical_url = base_url ~ request.path %}
   {% set default_og_image = base_url ~ url_for('static', filename='assets/social_preview.png') %}
 
-  <title>{% block title %}California Earrings | Luxury Wholesale 14K Gold Earrings & Body Jewelry{% endblock %}</title>
+  <title>{% block title %}California Earrings | Wholesaler of 14K Gold Earrings & Body Jewelry{% endblock %}</title>
   <meta name="description"
-    content="{% block meta_description %}Luxury wholesale authentic 14K gold earrings and body jewelry from Los Angeles for jewelry stores, boutiques, and resellers worldwide.{% endblock %}">
+    content="{% block meta_description %}Wholesaler of 10K/14K gold earrings and body jewelry from Los Angeles for jewelry stores, retailers, and resellers globally.{% endblock %}">
   <link rel="canonical" href="{{ canonical_url }}">
 
   <meta property="og:site_name" content="{{ site_name }}">
@@ -55,7 +55,7 @@
             "@type": "Organization",
             "name": site_name,
             "url": base_url,
-            "description": "Luxury wholesaler of authentic 14K gold earrings and body jewelry for boutiques, jewelry stores, and resellers.",
+            "description": "Wholesaler of 10K/14K gold earrings and body jewelry from Los Angeles for jewelry stores, retailers, and resellers globally.",
             "logo": base_url ~ url_for('static', filename='assets/ce_logo_shape.png'),
             "email": "californiaearrings@gmail.com",
             "telephone": "+1-213-935-7272",
