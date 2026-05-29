@@ -517,7 +517,7 @@ class ProductRouteTests(BaseWebTest):
         self.assertEqual(response.status_code, 200)
 
         body = response.get_data(as_text=True)
-        self.assertIn("Back to Catalog", body)
+        self.assertIn("← Catalog", body)
         self.assertIn("Contact Us", body)
         self.assertIn("Share", body)
         self.assertIn("Add to Order", body)
