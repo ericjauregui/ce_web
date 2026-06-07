@@ -172,19 +172,37 @@ Cart API routes:
 
 ## Tests
 
-Run the full unit and contract suite:
+Use the unified runner for the standard route/contract suite:
 
 ```bash
-uv run python -m unittest discover -s tests
+uv run python -m tests.run standard
 ```
 
-Run E2E coverage separately:
+Run the Playwright E2E suite:
 
 ```bash
-uv run python -m unittest discover -s tests/e2e -p "e2e_*.py" -t .
+uv run python -m tests.run e2e
 ```
 
-The test suite covers route contracts, metadata endpoints, reels/homepage frontend contracts, and cross-browser E2E layout/resilience behavior.
+Run everything together:
+
+```bash
+uv run python -m tests.run all
+```
+
+Useful E2E options:
+
+```bash
+uv run python -m tests.run e2e --require-e2e
+uv run python -m tests.run e2e --browser webkit
+uv run python -m tests.run e2e --headed
+uv run python -m tests.run e2e --keep-artifacts
+```
+
+Failing E2E tests write screenshots, page HTML, and browser event logs into `.test-artifacts/e2e/` by default.
+That directory is cleaned automatically at the start of each new E2E run unless you pass `--keep-artifacts`.
+
+The test suite covers route contracts, metadata endpoints, reels/homepage frontend contracts, and cross-browser E2E layout/resilience behavior, including mobile checkout field behavior.
 
 ## Troubleshooting
 

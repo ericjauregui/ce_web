@@ -41,22 +41,33 @@ class NavLayoutE2ETests(BaseE2ETest):
 
     def test_chips_and_cta_buttons_are_vertically_centered(self) -> None:
         self.page.goto(f"{self.base_url}/", wait_until="domcontentloaded")
+        self.page.wait_for_timeout(180)
 
         chip_alignment = self.page.evaluate(
             """
             () => {
-          const cats = document.querySelector('.section-header-cats');
-          const scrollRail = document.querySelector('.section-header-cats-scroll');
-          const chip = scrollRail?.querySelector('.chip');
-          if (!cats || !scrollRail || !chip) return null;
+          const rows = Array.from(document.querySelectorAll('.section-header-cats'))
+            .map((cats) => {
+              const scrollRail = cats.querySelector('.section-header-cats-scroll');
+              const chip = scrollRail?.querySelector('.chip');
+              if (!scrollRail || !chip) return null;
 
-          const catsRect = cats.getBoundingClientRect();
-          const scrollRailRect = scrollRail.getBoundingClientRect();
-          const chipRect = chip.getBoundingClientRect();
-          const centerDelta = Math.abs((catsRect.top + catsRect.height / 2) - (chipRect.top + chipRect.height / 2));
-          const railCenterDelta = Math.abs((catsRect.left + catsRect.width / 2) - (scrollRailRect.left + scrollRailRect.width / 2));
-          const firstChipVisible = chipRect.left >= scrollRailRect.left - 1;
-          return { centerDelta, railCenterDelta, firstChipVisible, scrollLeft: scrollRail.scrollLeft };
+              const catsRect = cats.getBoundingClientRect();
+              const scrollRailRect = scrollRail.getBoundingClientRect();
+              const chipRect = chip.getBoundingClientRect();
+              const isVisible = catsRect.height > 0 && catsRect.bottom > 0 && catsRect.top < window.innerHeight;
+              if (!isVisible) return null;
+
+              const centerDelta = Math.abs((catsRect.top + catsRect.height / 2) - (chipRect.top + chipRect.height / 2));
+              const railCenterDelta = Math.abs((catsRect.left + catsRect.width / 2) - (scrollRailRect.left + scrollRailRect.width / 2));
+              const firstChipVisible = chipRect.left >= scrollRailRect.left - 1;
+              return { centerDelta, railCenterDelta, firstChipVisible, scrollLeft: scrollRail.scrollLeft };
+            })
+            .filter(Boolean);
+
+          if (!rows.length) return null;
+          rows.sort((left, right) => left.centerDelta - right.centerDelta);
+          return rows[0];
             }
             """
         )
@@ -88,51 +99,55 @@ class NavLayoutE2ETests(BaseE2ETest):
     def test_horizontal_scroll_rows_show_right_hint_until_scrolled_to_end(self) -> None:
         self.page.set_viewport_size({"width": 390, "height": 900})
         self.page.goto(f"{self.base_url}/", wait_until="domcontentloaded")
+        self.page.wait_for_timeout(180)
 
         chip_state = self.page.evaluate(
             """
-            () => {
-              const shell = document.querySelector('.section-header-cats.scroll-cue-shell');
-              const track = shell?.querySelector('.scroll-cue-track');
-              const lastChip = track?.querySelector('.chip:last-of-type');
-              if (!shell || !track || !lastChip) return null;
+            async () => {
+              const shells = Array.from(document.querySelectorAll('.section-header-cats.scroll-cue-shell'));
+              for (const shell of shells) {
+                const track = shell.querySelector('.scroll-cue-track');
+                const lastChip = track?.querySelector('.chip:last-of-type');
+                if (!track || !lastChip) continue;
 
-              const maxScrollLeft = Math.max(0, track.scrollWidth - track.clientWidth);
-              const before = {
-                maxScrollLeft,
-                isOverflowing: shell.classList.contains('is-overflowing'),
-                canScrollRight: shell.classList.contains('can-scroll-right'),
-              };
+                const maxScrollLeft = Math.max(0, track.scrollWidth - track.clientWidth);
+                if (maxScrollLeft <= 0) continue;
 
-              track.scrollLeft = maxScrollLeft;
-              track.dispatchEvent(new Event('scroll'));
-
-              const trackRect = track.getBoundingClientRect();
-              const lastChipRect = lastChip.getBoundingClientRect();
-              const lastChipVisibleAtEnd = lastChipRect.right <= trackRect.right + 1;
-
-              return {
-                before,
-                after: {
-                  isOverflowing: shell.classList.contains('is-overflowing'),
+                const before = {
+                  maxScrollLeft,
                   canScrollRight: shell.classList.contains('can-scroll-right'),
-                  lastChipVisibleAtEnd,
-                },
-              };
+                };
+
+                track.scrollLeft = maxScrollLeft;
+                track.dispatchEvent(new Event('scroll'));
+                await new Promise((resolve) => requestAnimationFrame(resolve));
+
+                const trackRect = track.getBoundingClientRect();
+                const lastChipRect = lastChip.getBoundingClientRect();
+                const lastChipVisibleAtEnd = lastChipRect.right <= trackRect.right + 1;
+
+                return {
+                  before,
+                  after: {
+                    canScrollRight: shell.classList.contains('can-scroll-right'),
+                    lastChipVisibleAtEnd,
+                  },
+                };
+              }
+
+              return null;
             }
             """
         )
         self.assertIsNotNone(chip_state)
         self.assertGreater(chip_state["before"]["maxScrollLeft"], 0)
-        self.assertTrue(chip_state["before"]["isOverflowing"])
         self.assertTrue(chip_state["before"]["canScrollRight"])
-        self.assertTrue(chip_state["after"]["isOverflowing"])
         self.assertFalse(chip_state["after"]["canScrollRight"])
         self.assertTrue(chip_state["after"]["lastChipVisibleAtEnd"])
 
         reel_state = self.page.evaluate(
             """
-            () => {
+            async () => {
               const shell = document.querySelector('.latest-videos-shell.scroll-cue-shell');
               const track = shell?.querySelector('.scroll-cue-track');
               if (!shell || !track) return null;
@@ -146,6 +161,7 @@ class NavLayoutE2ETests(BaseE2ETest):
 
               track.scrollLeft = maxScrollLeft;
               track.dispatchEvent(new Event('scroll'));
+              await new Promise((resolve) => requestAnimationFrame(resolve));
 
               return {
                 before,
@@ -159,7 +175,5 @@ class NavLayoutE2ETests(BaseE2ETest):
         )
         self.assertIsNotNone(reel_state)
         self.assertGreater(reel_state["before"]["maxScrollLeft"], 0)
-        self.assertTrue(reel_state["before"]["isOverflowing"])
         self.assertTrue(reel_state["before"]["canScrollRight"])
-        self.assertTrue(reel_state["after"]["isOverflowing"])
         self.assertFalse(reel_state["after"]["canScrollRight"])

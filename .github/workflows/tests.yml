@@ -1,0 +1,59 @@
+name: Tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  standard:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Install dependencies
+        run: uv sync --frozen
+
+      - name: Run standard suite
+        run: .venv/bin/python -m tests.run standard
+
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Install dependencies
+        run: uv sync --extra dev --frozen
+
+      - name: Install Playwright browsers
+        run: |
+          .venv/bin/python -m playwright install --with-deps webkit
+          .venv/bin/python -m playwright install --with-deps --no-shell chromium
+
+      - name: Run E2E suite
+        run: .venv/bin/python -m tests.run e2e --require-e2e
+
+      - name: Upload E2E failure artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-failure-artifacts
+          path: .test-artifacts/e2e
+          if-no-files-found: ignore

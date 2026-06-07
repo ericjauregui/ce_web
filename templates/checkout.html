@@ -38,21 +38,19 @@
             <label class="form-label text-gold-70">Phone Number*</label>
             <div class="checkout-phone-group">
               <input type="hidden" name="phone_country_code" id="checkoutPhoneCountryCode" value="{{ form_values.phone_country_code }}">
-              <input
+              <select
                 name="phone_country"
-                class="form-control bg-black text-light border-gold checkout-phone-country"
+                class="form-select bg-black text-light border-gold checkout-phone-country"
                 id="checkoutPhoneCountry"
-                list="checkoutPhoneCountryList"
-                placeholder="Country code"
-                autocomplete="country-name"
+                required
                 aria-describedby="checkoutPhoneError"
-                value="{{ form_values.phone_country }}"
               >
-              <datalist id="checkoutPhoneCountryList">
+                <option value="" {% if not form_values.phone_country %}selected{% endif %}>Select country code</option>
                 {% for country_key, label, dial_code in phone_country_options %}
-                  <option value="{{ phone_country_display_by_key[country_key] }}"></option>
+                  {% set phone_country_display = phone_country_display_by_key[country_key] %}
+                  <option value="{{ phone_country_display }}" {% if form_values.phone_country == phone_country_display %}selected{% endif %}>{{ phone_country_display }}</option>
                 {% endfor %}
-              </datalist>
+              </select>
               <input
                 name="phone"
                 class="form-control bg-black text-light border-gold"
@@ -97,37 +95,50 @@
           </div>
           <div class="col-12 col-md-4">
             <label class="form-label text-gold-70">State*</label>
+            <input type="hidden" name="state" id="checkoutState" value="{{ form_values.state }}">
+            {% set state_options = subdivisions_by_country_key.get(form_values.country_key, []) %}
+            {% set state_uses_select = form_values.country_key and state_options and ((not form_values.state) or form_values.state in state_options) %}
+            <select
+              class="form-select bg-black text-light border-gold{% if not state_uses_select %} d-none{% endif %}"
+              id="checkoutStateSelect"
+              aria-describedby="checkoutStateError"
+              {% if not state_uses_select %}disabled{% endif %}
+            >
+              {% if state_options %}
+                <option value="" {% if not form_values.state or form_values.state not in state_options %}selected{% endif %}>Select a state</option>
+                {% for state_name in state_options %}
+                  <option value="{{ state_name }}" {% if form_values.state == state_name %}selected{% endif %}>{{ state_name }}</option>
+                {% endfor %}
+              {% else %}
+                <option value="" selected>Type your state</option>
+              {% endif %}
+            </select>
             <input
-              name="state"
-              class="form-control bg-black text-light border-gold"
-              id="checkoutState"
-              list="checkoutStateList"
+              class="form-control bg-black text-light border-gold{% if state_uses_select %} d-none{% endif %}"
+              id="checkoutStateText"
               autocomplete="address-level1"
-              required
+              placeholder="Type your state"
               value="{{ form_values.state }}"
               aria-describedby="checkoutStateError"
+              {% if state_uses_select %}disabled{% endif %}
             >
-            <datalist id="checkoutStateList"></datalist>
             <div id="checkoutStateError" class="checkout-field-error" aria-live="polite"></div>
           </div>
           <div class="col-12 col-md-4">
             <label class="form-label text-gold-70">Country*</label>
             <input type="hidden" name="country_key" id="checkoutCountryKey" value="{{ form_values.country_key }}">
-            <input
+            <select
               name="country"
-              class="form-control bg-black text-light border-gold"
+              class="form-select bg-black text-light border-gold"
               id="checkoutCountry"
-              list="checkoutCountryList"
-              autocomplete="country-name"
               required
-              value="{{ form_values.country }}"
               aria-describedby="checkoutCountryError"
             >
-            <datalist id="checkoutCountryList">
+              <option value="" {% if not form_values.country %}selected{% endif %}>Select a country</option>
               {% for country_key, label in country_options %}
-                <option value="{{ label }}"></option>
+                <option value="{{ label }}" {% if form_values.country == label %}selected{% endif %}>{{ label }}</option>
               {% endfor %}
-            </datalist>
+            </select>
             <div id="checkoutCountryError" class="checkout-field-error" aria-live="polite"></div>
           </div>
           <div class="col-12">
@@ -203,12 +214,13 @@
     const cityInput = document.getElementById("checkoutCity");
     const cityError = document.getElementById("checkoutCityError");
     const stateInput = document.getElementById("checkoutState");
+    const stateSelect = document.getElementById("checkoutStateSelect");
+    const stateTextInput = document.getElementById("checkoutStateText");
     const stateError = document.getElementById("checkoutStateError");
-    const stateList = document.getElementById("checkoutStateList");
     const countryInput = document.getElementById("checkoutCountry");
     const countryKeyInput = document.getElementById("checkoutCountryKey");
     const countryError = document.getElementById("checkoutCountryError");
-    if (!form || !phoneCountryInput || !phoneCountryCodeInput || !phoneInput || !phoneError || !emailInput || !emailError || !cityInput || !cityError || !stateInput || !stateError || !stateList || !countryInput || !countryKeyInput || !countryError) return;
+    if (!form || !phoneCountryInput || !phoneCountryCodeInput || !phoneInput || !phoneError || !emailInput || !emailError || !cityInput || !cityError || !stateInput || !stateSelect || !stateTextInput || !stateError || !countryInput || !countryKeyInput || !countryError) return;
 
     const phoneAllowedPattern = /^[0-9()+\-\.\s]+$/;
     const phoneInvalidMessage = "Please enter a valid phone number";
@@ -248,6 +260,39 @@
       emailInput.setAttribute("aria-invalid", message ? "true" : "false");
     }
 
+    function setStateError(message) {
+      stateError.textContent = message;
+      stateSelect.classList.toggle("checkout-input-invalid", Boolean(message));
+      stateTextInput.classList.toggle("checkout-input-invalid", Boolean(message));
+      stateSelect.setAttribute("aria-invalid", message ? "true" : "false");
+      stateTextInput.setAttribute("aria-invalid", message ? "true" : "false");
+    }
+
+    function syncStateValue() {
+      const nextValue = stateSelect.disabled ? stateTextInput.value : stateSelect.value;
+      stateInput.value = (nextValue || "").trim();
+      return stateInput.value;
+    }
+
+    function getActiveStateField() {
+      return stateSelect.disabled ? stateTextInput : stateSelect;
+    }
+
+    function setStateMode(useSelect) {
+      stateSelect.classList.toggle("d-none", !useSelect);
+      stateSelect.disabled = !useSelect;
+      stateTextInput.classList.toggle("d-none", useSelect);
+      stateTextInput.disabled = useSelect;
+      syncStateValue();
+    }
+
+    function shouldUseStateSelect(countryKey, options, stateValue) {
+      const normalizedStateValue = (stateValue || "").trim();
+      if (!countryKey || !options.length) return false;
+      if (!normalizedStateValue) return true;
+      return options.includes(normalizedStateValue);
+    }
+
     function syncPhoneCountryKey() {
       const nextKey = phoneCountryKeyByDisplay[normalizeLookupValue(phoneCountryInput.value)] || "";
       phoneCountryCodeInput.value = nextKey;
@@ -256,32 +301,58 @@
 
     function populateStateOptions(countryKey) {
       const options = subdivisionsByCountryKey[countryKey] || [];
-      stateList.innerHTML = "";
+      const selectedValue = (stateInput.value || "").trim();
+      const useSelect = shouldUseStateSelect(countryKey, options, selectedValue);
+      stateSelect.innerHTML = "";
+
+      const placeholderOption = document.createElement("option");
+      placeholderOption.value = "";
+      if (options.length) {
+        placeholderOption.textContent = "Select a state";
+      } else {
+        placeholderOption.textContent = "Type your state";
+      }
+      stateSelect.appendChild(placeholderOption);
+
       options.forEach(function (name) {
         const option = document.createElement("option");
         option.value = name;
-        stateList.appendChild(option);
+        option.textContent = name;
+        stateSelect.appendChild(option);
       });
 
-      if (options.length) {
-        stateInput.placeholder = "Start typing to choose a state";
+      if (useSelect) {
+        setStateMode(true);
+        if (selectedValue && options.includes(selectedValue)) {
+          stateSelect.value = selectedValue;
+        } else {
+          stateSelect.value = "";
+        }
       } else {
-        stateInput.placeholder = "Type your state";
+        stateTextInput.placeholder = "Type your state";
+        stateTextInput.value = selectedValue;
+        stateSelect.value = "";
+        setStateMode(false);
       }
+
+      syncStateValue();
     }
 
     function syncCountryKey(options) {
       const shouldClearState = !(options && options.clearState === false);
       const previousKey = countryKeyInput.value;
       const nextKey = countryKeyByLabel[normalizeLookupValue(countryInput.value)] || "";
+      const shouldResetState = shouldClearState && previousKey && previousKey !== nextKey;
       countryKeyInput.value = nextKey;
       if (nextKey && countryLabelByKey[nextKey] && countryInput.value !== countryLabelByKey[nextKey]) {
         countryInput.value = countryLabelByKey[nextKey];
       }
-      populateStateOptions(nextKey);
-      if (shouldClearState && previousKey && previousKey !== nextKey) {
+      if (shouldResetState) {
         stateInput.value = "";
+        stateSelect.value = "";
+        stateTextInput.value = "";
       }
+      populateStateOptions(nextKey);
       return nextKey;
     }
 
@@ -319,12 +390,12 @@
     }
 
     function validateStateField() {
-      const value = stateInput.value.trim();
+      const value = syncStateValue();
       if (!value) {
-        setFieldError(stateInput, stateError, "Please enter a state");
+        setStateError("Please enter a state");
         return false;
       }
-      setFieldError(stateInput, stateError, "");
+      setStateError("");
       return true;
     }
 
@@ -357,20 +428,18 @@
       return true;
     }
 
-    phoneCountryInput.addEventListener("input", validatePhoneField);
     phoneCountryInput.addEventListener("change", validatePhoneField);
+    phoneCountryInput.addEventListener("blur", validatePhoneField);
     phoneInput.addEventListener("input", validatePhoneField);
     phoneInput.addEventListener("blur", validatePhoneField);
     emailInput.addEventListener("input", validateEmailField);
     emailInput.addEventListener("blur", validateEmailField);
     cityInput.addEventListener("input", validateCityField);
     cityInput.addEventListener("blur", validateCityField);
-    stateInput.addEventListener("input", validateStateField);
-    stateInput.addEventListener("blur", validateStateField);
-    countryInput.addEventListener("input", function () {
-      syncCountryKey();
-      validateCountryField();
-    });
+    stateSelect.addEventListener("change", validateStateField);
+    stateSelect.addEventListener("blur", validateStateField);
+    stateTextInput.addEventListener("input", validateStateField);
+    stateTextInput.addEventListener("blur", validateStateField);
     countryInput.addEventListener("change", function () {
       syncCountryKey();
       validateCountryField();
@@ -379,9 +448,10 @@
 
     syncPhoneCountryKey();
     syncCountryKey({ clearState: false });
+    syncStateValue();
 
     form.addEventListener("submit", function (event) {
-      const requiredFields = form.querySelectorAll("input[required]");
+      const requiredFields = form.querySelectorAll("input[required], select[required]");
       let missingRequired = false;
       requiredFields.forEach(function (field) {
         if (!field.value.trim()) {
@@ -409,7 +479,7 @@
           return;
         }
         if (!stateValid) {
-          stateInput.focus();
+          getActiveStateField().focus();
           return;
         }
         if (!countryValid) {

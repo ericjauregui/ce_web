@@ -270,6 +270,26 @@
               if (restoreValue) resetInputValue();
             }
 
+              function submitSearch() {
+                if (!form || !input) return;
+                setOpen(false, { restoreValue: false });
+                if (document.activeElement === input) input.blur();
+                if (typeof form.requestSubmit === "function") {
+                  form.requestSubmit();
+                  return;
+                }
+                form.submit();
+              }
+
+              function maybeSubmitOrClearSearch() {
+                if (!input) return;
+                if (input.value.trim() === "") {
+                  maybeClearSearch();
+                  return;
+                }
+                submitSearch();
+              }
+
                 btn.addEventListener("click", (e) => {
                   e.preventDefault();
                 const open = !wrap.classList.contains("is-open");
@@ -313,6 +333,12 @@
 
               if (input) {
                 input.addEventListener("keydown", (e) => {
+                  if (e.key === "Enter" && !e.isComposing) {
+                    e.preventDefault();
+                    maybeSubmitOrClearSearch();
+                    return;
+                  }
+
                   const isSelectAll = (e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "a";
                   if (!isSelectAll) return;
                   e.preventDefault();
@@ -359,8 +385,20 @@
                   handleClearedSearch();
                 }
 
-                input.addEventListener("search", maybeClearSearch);
+                input.addEventListener("search", maybeSubmitOrClearSearch);
                 input.addEventListener("input", maybeClearSearch);
+              }
+
+              if (form) {
+                form.addEventListener("submit", (e) => {
+                  if (!input) return;
+                  if (input.value.trim() === "") {
+                    e.preventDefault();
+                    handleClearedSearch();
+                    return;
+                  }
+                  setOpen(false, { restoreValue: false });
+                });
               }
 
               document.addEventListener("keydown", (e) => {

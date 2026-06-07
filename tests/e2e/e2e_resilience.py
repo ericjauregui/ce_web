@@ -6,17 +6,15 @@ from tests.e2e.common import BaseE2ETest
 class WebKitResilienceE2ETests(BaseE2ETest):
     browser_name = "webkit"
     viewport = {"width": 390, "height": 844}
+    enforce_clean_browser = True
 
     @staticmethod
-    def _is_known_third_party_noise(error_message: str) -> bool:
+    def is_ignored_page_error(error_message: str) -> bool:
         normalized = error_message.lower()
         return "tiktok.com" in normalized and "accessing a frame" in normalized
 
     def test_rapid_resize_and_scroll_keeps_nav_search_stable(self) -> None:
-        page_errors: list[str] = []
-        self.page.on("pageerror", lambda error: page_errors.append(str(error)))
-
-        self.page.goto(f"{self.base_url}/", wait_until="domcontentloaded")
+        self.goto("/")
 
         sizes = [
             {"width": 390, "height": 844},
@@ -45,14 +43,10 @@ class WebKitResilienceE2ETests(BaseE2ETest):
         trigger_center = trigger_rect["y"] + (trigger_rect["height"] / 2)
         nav_center = nav_rect["y"] + (nav_rect["height"] / 2)
         self.assertLessEqual(abs(trigger_center - nav_center), 8)
-        actionable_errors = [
-            message for message in page_errors
-            if not self._is_known_third_party_noise(message)
-        ]
-        self.assertEqual(actionable_errors, [])
+        self.assert_browser_clean()
 
     def test_catalog_images_use_native_lazy_loading_hint(self) -> None:
-        self.page.goto(f"{self.base_url}/", wait_until="domcontentloaded")
+        self.goto("/")
 
         lazy_count = self.page.locator("img.product-img[loading='lazy'][decoding='async']").count()
         total_count = self.page.locator("img.product-img").count()

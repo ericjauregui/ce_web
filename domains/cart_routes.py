@@ -23,9 +23,7 @@ from domains.location_options import (
     CHECKOUT_COUNTRY_LABELS_BY_KEY,
     CHECKOUT_COUNTRY_OPTIONS,
     CHECKOUT_SUBDIVISION_OPTIONS_BY_COUNTRY_KEY,
-    DEFAULT_LOCATION_COUNTRY_KEY,
     get_location_country_key_from_label,
-    get_location_country_option,
 )
 from domains.phone_country_codes import (
     CHECKOUT_PHONE_COUNTRY_DISPLAY_BY_KEY,
@@ -161,19 +159,17 @@ ce_logo_full.png
             status_code: int = 200,
             form_values: dict[str, str] | None = None,
         ):
-            default_country_key, default_country_label = get_location_country_option(DEFAULT_LOCATION_COUNTRY_KEY)
-            default_phone_country_key, _, _ = get_phone_country_option(DEFAULT_PHONE_COUNTRY_KEY)
             values = {
                 "name": "",
                 "company": "",
                 "phone": "",
-                "phone_country_code": default_phone_country_key,
-                "phone_country": CHECKOUT_PHONE_COUNTRY_DISPLAY_BY_KEY[default_phone_country_key],
+                "phone_country_code": "",
+                "phone_country": "",
                 "email": "",
                 "city": "",
                 "state": "",
-                "country_key": default_country_key,
-                "country": default_country_label,
+                "country_key": "",
+                "country": "",
                 "notes": "",
             }
             if form_values:
@@ -182,7 +178,6 @@ ce_logo_full.png
             resolved_phone_key = resolve_checkout_phone_country_key(
                 values.get("phone_country_code", ""),
                 values.get("phone_country", ""),
-                default_to_default=not values.get("phone_country") and not values.get("phone_country_code"),
             )
             values["phone_country_code"] = resolved_phone_key
             if resolved_phone_key and not values.get("phone_country"):
