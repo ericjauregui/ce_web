@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import re
 import sys
 import types
@@ -230,7 +231,7 @@ class CartEndpointTests(BaseWebTest):
         self.assertEqual(pdf_response.mimetype, "application/pdf")
         self.assertTrue(pdf_response.get_data().startswith(b"%PDF"))
 
-    def test_checkout_view_renders_mobile_friendly_country_selects_without_prefill(self) -> None:
+    def test_checkout_view_renders_searchable_checkout_comboboxes_without_prefill(self) -> None:
         self.client.post(
             "/api/cart/add", json={"code": self.valid_code, "qty": 1})
 
@@ -239,45 +240,52 @@ class CartEndpointTests(BaseWebTest):
         checkout_body = checkout_response.get_data(as_text=True)
 
         self.assertIn('name="phone_country_code"', checkout_body)
+        self.assertIn('id="checkoutPhoneCountryCombobox"', checkout_body)
         self.assertIn('id="checkoutPhoneCountry"', checkout_body)
-        self.assertIn('class="form-select bg-black text-light border-gold checkout-phone-country"', checkout_body)
+        self.assertIn('aria-controls="checkoutPhoneCountryListbox"', checkout_body)
         self.assertIn('class="checkout-phone-group"', checkout_body)
         self.assertIn('name="city"', checkout_body)
-        self.assertIn('type="hidden" name="state" id="checkoutState" value=""', checkout_body)
-        self.assertIn('id="checkoutStateSelect"', checkout_body)
-        self.assertIn('id="checkoutStateText"', checkout_body)
+        self.assertIn('id="checkoutStateCombobox"', checkout_body)
+        self.assertIn('name="state"', checkout_body)
+        self.assertIn('placeholder="Search or type a state"', checkout_body)
         self.assertIn('name="country"', checkout_body)
         self.assertIn('name="country_key"', checkout_body)
         self.assertNotIn('list="checkoutPhoneCountryList"', checkout_body)
         self.assertNotIn('list="checkoutCountryList"', checkout_body)
         self.assertNotIn('list="checkoutStateList"', checkout_body)
-        self.assertGreater(checkout_body.count("<option value=\""), 300)
+        self.assertIn('id="checkoutCountryCombobox"', checkout_body)
+        self.assertIn('id="checkoutComboboxData" type="application/json"', checkout_body)
+        self.assertIn('/static/js/checkout.js', checkout_body)
         self.assertIn('id="checkoutPhoneCountryCode" value=""', checkout_body)
         self.assertIn('id="checkoutCountryKey" value=""', checkout_body)
-        self.assertIn('value="" selected>Select country code</option>', checkout_body)
-        self.assertIn('value="" selected>Select a country</option>', checkout_body)
-        self.assertIn('placeholder="Type your state"', checkout_body)
-        self.assertNotIn('Select a country first', checkout_body)
-        self.assertIn('value="United States (+1)"', checkout_body)
-        self.assertIn('value="Mexico (+52)"', checkout_body)
-        self.assertIn('value="Canada"', checkout_body)
-        self.assertNotIn('value="United States (+1)" selected', checkout_body)
-        self.assertNotIn('value="United States" selected', checkout_body)
+        script_match = re.search(
+            r'<script id="checkoutComboboxData" type="application/json">\s*(.*?)\s*</script>',
+            checkout_body,
+            re.DOTALL,
+        )
+        self.assertIsNotNone(script_match)
+        combobox_data = json.loads(script_match.group(1))
+        country_options = combobox_data["countryOptions"]
+        phone_country_options = combobox_data["phoneCountryOptions"]
+        self.assertEqual(country_options[0], ["us", "United States"])
+        self.assertEqual(country_options[1], ["af", "Afghanistan"])
+        self.assertEqual(phone_country_options[0], ["us", "United States", "+1"])
+        self.assertEqual(phone_country_options[1], ["af", "Afghanistan", "+93"])
         self.assertLess(
-            checkout_body.index('value="United States (+1)"'),
-            checkout_body.index('value="Mexico (+52)"'),
+            phone_country_options.index(["us", "United States", "+1"]),
+            phone_country_options.index(["af", "Afghanistan", "+93"]),
         )
         self.assertLess(
-            checkout_body.index('value="Mexico (+52)"'),
-            checkout_body.index('value="Afghanistan (+93)"'),
+            phone_country_options.index(["af", "Afghanistan", "+93"]),
+            phone_country_options.index(["mx", "Mexico", "+52"]),
         )
         self.assertLess(
-            checkout_body.index('value="United States"'),
-            checkout_body.index('value="Mexico"'),
+            country_options.index(["us", "United States"]),
+            country_options.index(["af", "Afghanistan"]),
         )
         self.assertLess(
-            checkout_body.index('value="Mexico"'),
-            checkout_body.index('value="Afghanistan"'),
+            country_options.index(["af", "Afghanistan"]),
+            country_options.index(["mx", "Mexico"]),
         )
 
     def test_cart_pdf_layout_centers_title_and_all_table_cells(self) -> None:

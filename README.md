@@ -172,6 +172,8 @@ Cart API routes:
 
 ## Tests
 
+Tests are intended to run locally in this repo. No GitHub Actions or other CI workflow is maintained here.
+
 Use the unified runner for the standard route/contract suite:
 
 ```bash

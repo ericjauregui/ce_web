@@ -38,19 +38,33 @@
             <label class="form-label text-gold-70">Phone Number*</label>
             <div class="checkout-phone-group">
               <input type="hidden" name="phone_country_code" id="checkoutPhoneCountryCode" value="{{ form_values.phone_country_code }}">
-              <select
-                name="phone_country"
-                class="form-select bg-black text-light border-gold checkout-phone-country"
-                id="checkoutPhoneCountry"
-                required
-                aria-describedby="checkoutPhoneError"
-              >
-                <option value="" {% if not form_values.phone_country %}selected{% endif %}>Select country code</option>
-                {% for country_key, label, dial_code in phone_country_options %}
-                  {% set phone_country_display = phone_country_display_by_key[country_key] %}
-                  <option value="{{ phone_country_display }}" {% if form_values.phone_country == phone_country_display %}selected{% endif %}>{{ phone_country_display }}</option>
-                {% endfor %}
-              </select>
+              <div class="checkout-combobox checkout-phone-country" id="checkoutPhoneCountryCombobox">
+                <div class="checkout-combobox__field">
+                  <input
+                    name="phone_country"
+                    class="form-control bg-black text-light border-gold checkout-combobox__input"
+                    id="checkoutPhoneCountry"
+                    type="text"
+                    placeholder="Search country code"
+                    autocomplete="off"
+                    autocorrect="off"
+                    autocapitalize="words"
+                    spellcheck="false"
+                    inputmode="search"
+                    required
+                    aria-autocomplete="list"
+                    aria-expanded="false"
+                    aria-haspopup="listbox"
+                    aria-controls="checkoutPhoneCountryListbox"
+                    aria-describedby="checkoutPhoneError"
+                    value="{{ form_values.phone_country }}"
+                  >
+                  <button type="button" class="checkout-combobox__toggle" aria-label="Show country codes" tabindex="-1">
+                    <span class="checkout-combobox__chevron" aria-hidden="true"></span>
+                  </button>
+                </div>
+                <div class="checkout-combobox__menu" id="checkoutPhoneCountryListbox" role="listbox" hidden></div>
+              </div>
               <input
                 name="phone"
                 class="form-control bg-black text-light border-gold"
@@ -95,50 +109,65 @@
           </div>
           <div class="col-12 col-md-4">
             <label class="form-label text-gold-70">State*</label>
-            <input type="hidden" name="state" id="checkoutState" value="{{ form_values.state }}">
-            {% set state_options = subdivisions_by_country_key.get(form_values.country_key, []) %}
-            {% set state_uses_select = form_values.country_key and state_options and ((not form_values.state) or form_values.state in state_options) %}
-            <select
-              class="form-select bg-black text-light border-gold{% if not state_uses_select %} d-none{% endif %}"
-              id="checkoutStateSelect"
-              aria-describedby="checkoutStateError"
-              {% if not state_uses_select %}disabled{% endif %}
-            >
-              {% if state_options %}
-                <option value="" {% if not form_values.state or form_values.state not in state_options %}selected{% endif %}>Select a state</option>
-                {% for state_name in state_options %}
-                  <option value="{{ state_name }}" {% if form_values.state == state_name %}selected{% endif %}>{{ state_name }}</option>
-                {% endfor %}
-              {% else %}
-                <option value="" selected>Type your state</option>
-              {% endif %}
-            </select>
-            <input
-              class="form-control bg-black text-light border-gold{% if state_uses_select %} d-none{% endif %}"
-              id="checkoutStateText"
-              autocomplete="address-level1"
-              placeholder="Type your state"
-              value="{{ form_values.state }}"
-              aria-describedby="checkoutStateError"
-              {% if state_uses_select %}disabled{% endif %}
-            >
+            <div class="checkout-combobox" id="checkoutStateCombobox">
+              <div class="checkout-combobox__field">
+                <input
+                  name="state"
+                  class="form-control bg-black text-light border-gold checkout-combobox__input"
+                  id="checkoutState"
+                  type="text"
+                  placeholder="Search or type a state"
+                  autocomplete="off"
+                  autocorrect="off"
+                  autocapitalize="words"
+                  spellcheck="false"
+                  inputmode="search"
+                  required
+                  aria-autocomplete="list"
+                  aria-expanded="false"
+                  aria-haspopup="listbox"
+                  aria-controls="checkoutStateListbox"
+                  aria-describedby="checkoutStateError"
+                  value="{{ form_values.state }}"
+                >
+                <button type="button" class="checkout-combobox__toggle" aria-label="Show state suggestions" tabindex="-1">
+                  <span class="checkout-combobox__chevron" aria-hidden="true"></span>
+                </button>
+              </div>
+              <div class="checkout-combobox__menu" id="checkoutStateListbox" role="listbox" hidden></div>
+            </div>
             <div id="checkoutStateError" class="checkout-field-error" aria-live="polite"></div>
           </div>
           <div class="col-12 col-md-4">
             <label class="form-label text-gold-70">Country*</label>
             <input type="hidden" name="country_key" id="checkoutCountryKey" value="{{ form_values.country_key }}">
-            <select
-              name="country"
-              class="form-select bg-black text-light border-gold"
-              id="checkoutCountry"
-              required
-              aria-describedby="checkoutCountryError"
-            >
-              <option value="" {% if not form_values.country %}selected{% endif %}>Select a country</option>
-              {% for country_key, label in country_options %}
-                <option value="{{ label }}" {% if form_values.country == label %}selected{% endif %}>{{ label }}</option>
-              {% endfor %}
-            </select>
+            <div class="checkout-combobox" id="checkoutCountryCombobox">
+              <div class="checkout-combobox__field">
+                <input
+                  name="country"
+                  class="form-control bg-black text-light border-gold checkout-combobox__input"
+                  id="checkoutCountry"
+                  type="text"
+                  placeholder="Search country"
+                  autocomplete="off"
+                  autocorrect="off"
+                  autocapitalize="words"
+                  spellcheck="false"
+                  inputmode="search"
+                  required
+                  aria-autocomplete="list"
+                  aria-expanded="false"
+                  aria-haspopup="listbox"
+                  aria-controls="checkoutCountryListbox"
+                  aria-describedby="checkoutCountryError"
+                  value="{{ form_values.country }}"
+                >
+                <button type="button" class="checkout-combobox__toggle" aria-label="Show countries" tabindex="-1">
+                  <span class="checkout-combobox__chevron" aria-hidden="true"></span>
+                </button>
+              </div>
+              <div class="checkout-combobox__menu" id="checkoutCountryListbox" role="listbox" hidden></div>
+            </div>
             <div id="checkoutCountryError" class="checkout-field-error" aria-live="polite"></div>
           </div>
           <div class="col-12">
@@ -202,295 +231,15 @@
 {% endblock %}
 
 {% block body_end %}
-<script>
-  (function () {
-    const form = document.getElementById("checkoutForm");
-    const phoneCountryInput = document.getElementById("checkoutPhoneCountry");
-    const phoneCountryCodeInput = document.getElementById("checkoutPhoneCountryCode");
-    const phoneInput = document.getElementById("checkoutPhone");
-    const phoneError = document.getElementById("checkoutPhoneError");
-    const emailInput = document.getElementById("checkoutEmail");
-    const emailError = document.getElementById("checkoutEmailError");
-    const cityInput = document.getElementById("checkoutCity");
-    const cityError = document.getElementById("checkoutCityError");
-    const stateInput = document.getElementById("checkoutState");
-    const stateSelect = document.getElementById("checkoutStateSelect");
-    const stateTextInput = document.getElementById("checkoutStateText");
-    const stateError = document.getElementById("checkoutStateError");
-    const countryInput = document.getElementById("checkoutCountry");
-    const countryKeyInput = document.getElementById("checkoutCountryKey");
-    const countryError = document.getElementById("checkoutCountryError");
-    if (!form || !phoneCountryInput || !phoneCountryCodeInput || !phoneInput || !phoneError || !emailInput || !emailError || !cityInput || !cityError || !stateInput || !stateSelect || !stateTextInput || !stateError || !countryInput || !countryKeyInput || !countryError) return;
-
-    const phoneAllowedPattern = /^[0-9()+\-\.\s]+$/;
-    const phoneInvalidMessage = "Please enter a valid phone number";
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const invalidMessage = "Please enter a valid email address";
-    const phoneCountryDisplayByKey = {{ phone_country_display_by_key|tojson }};
-    const phoneCountryKeyByDisplay = Object.fromEntries(
-      Object.entries(phoneCountryDisplayByKey).map(function ([key, value]) {
-        return [value.toLowerCase(), key];
-      })
-    );
-    const countryKeyByLabel = {{ country_key_by_label|tojson }};
-    const countryLabelByKey = {{ country_label_by_key|tojson }};
-    const subdivisionsByCountryKey = {{ subdivisions_by_country_key|tojson }};
-
-    function normalizeLookupValue(value) {
-      return (value || "").trim().toLowerCase();
-    }
-
-    function setFieldError(input, errorElement, message) {
-      errorElement.textContent = message;
-      input.classList.toggle("checkout-input-invalid", Boolean(message));
-      input.setAttribute("aria-invalid", message ? "true" : "false");
-    }
-
-    function setPhoneError(message) {
-      phoneError.textContent = message;
-      phoneCountryInput.classList.toggle("checkout-input-invalid", Boolean(message));
-      phoneInput.classList.toggle("checkout-input-invalid", Boolean(message));
-      phoneCountryInput.setAttribute("aria-invalid", message ? "true" : "false");
-      phoneInput.setAttribute("aria-invalid", message ? "true" : "false");
-    }
-
-    function setEmailError(message) {
-      emailError.textContent = message;
-      emailInput.classList.toggle("checkout-input-invalid", Boolean(message));
-      emailInput.setAttribute("aria-invalid", message ? "true" : "false");
-    }
-
-    function setStateError(message) {
-      stateError.textContent = message;
-      stateSelect.classList.toggle("checkout-input-invalid", Boolean(message));
-      stateTextInput.classList.toggle("checkout-input-invalid", Boolean(message));
-      stateSelect.setAttribute("aria-invalid", message ? "true" : "false");
-      stateTextInput.setAttribute("aria-invalid", message ? "true" : "false");
-    }
-
-    function syncStateValue() {
-      const nextValue = stateSelect.disabled ? stateTextInput.value : stateSelect.value;
-      stateInput.value = (nextValue || "").trim();
-      return stateInput.value;
-    }
-
-    function getActiveStateField() {
-      return stateSelect.disabled ? stateTextInput : stateSelect;
-    }
-
-    function setStateMode(useSelect) {
-      stateSelect.classList.toggle("d-none", !useSelect);
-      stateSelect.disabled = !useSelect;
-      stateTextInput.classList.toggle("d-none", useSelect);
-      stateTextInput.disabled = useSelect;
-      syncStateValue();
-    }
-
-    function shouldUseStateSelect(countryKey, options, stateValue) {
-      const normalizedStateValue = (stateValue || "").trim();
-      if (!countryKey || !options.length) return false;
-      if (!normalizedStateValue) return true;
-      return options.includes(normalizedStateValue);
-    }
-
-    function syncPhoneCountryKey() {
-      const nextKey = phoneCountryKeyByDisplay[normalizeLookupValue(phoneCountryInput.value)] || "";
-      phoneCountryCodeInput.value = nextKey;
-      return nextKey;
-    }
-
-    function populateStateOptions(countryKey) {
-      const options = subdivisionsByCountryKey[countryKey] || [];
-      const selectedValue = (stateInput.value || "").trim();
-      const useSelect = shouldUseStateSelect(countryKey, options, selectedValue);
-      stateSelect.innerHTML = "";
-
-      const placeholderOption = document.createElement("option");
-      placeholderOption.value = "";
-      if (options.length) {
-        placeholderOption.textContent = "Select a state";
-      } else {
-        placeholderOption.textContent = "Type your state";
-      }
-      stateSelect.appendChild(placeholderOption);
-
-      options.forEach(function (name) {
-        const option = document.createElement("option");
-        option.value = name;
-        option.textContent = name;
-        stateSelect.appendChild(option);
-      });
-
-      if (useSelect) {
-        setStateMode(true);
-        if (selectedValue && options.includes(selectedValue)) {
-          stateSelect.value = selectedValue;
-        } else {
-          stateSelect.value = "";
-        }
-      } else {
-        stateTextInput.placeholder = "Type your state";
-        stateTextInput.value = selectedValue;
-        stateSelect.value = "";
-        setStateMode(false);
-      }
-
-      syncStateValue();
-    }
-
-    function syncCountryKey(options) {
-      const shouldClearState = !(options && options.clearState === false);
-      const previousKey = countryKeyInput.value;
-      const nextKey = countryKeyByLabel[normalizeLookupValue(countryInput.value)] || "";
-      const shouldResetState = shouldClearState && previousKey && previousKey !== nextKey;
-      countryKeyInput.value = nextKey;
-      if (nextKey && countryLabelByKey[nextKey] && countryInput.value !== countryLabelByKey[nextKey]) {
-        countryInput.value = countryLabelByKey[nextKey];
-      }
-      if (shouldResetState) {
-        stateInput.value = "";
-        stateSelect.value = "";
-        stateTextInput.value = "";
-      }
-      populateStateOptions(nextKey);
-      return nextKey;
-    }
-
-    function validatePhoneField() {
-      const countryCode = syncPhoneCountryKey();
-      const value = phoneInput.value.trim();
-      if (!countryCode) {
-        setPhoneError("Please select a country code");
-        return false;
-      }
-      if (!value) {
-        setPhoneError("Please enter a phone number");
-        return false;
-      }
-
-      const digitCount = (value.match(/\d/g) || []).length;
-      const hasValidChars = phoneAllowedPattern.test(value);
-      if (!hasValidChars || digitCount < 7) {
-        setPhoneError(phoneInvalidMessage);
-        return false;
-      }
-
-      setPhoneError("");
-      return true;
-    }
-
-    function validateCityField() {
-      const value = cityInput.value.trim();
-      if (!value) {
-        setFieldError(cityInput, cityError, "Please enter a city");
-        return false;
-      }
-      setFieldError(cityInput, cityError, "");
-      return true;
-    }
-
-    function validateStateField() {
-      const value = syncStateValue();
-      if (!value) {
-        setStateError("Please enter a state");
-        return false;
-      }
-      setStateError("");
-      return true;
-    }
-
-    function validateCountryField() {
-      const nextKey = syncCountryKey({ clearState: false });
-      const value = countryInput.value.trim();
-      if (!value) {
-        setFieldError(countryInput, countryError, "Please select a country");
-        return false;
-      }
-      if (!nextKey) {
-        setFieldError(countryInput, countryError, "Please select a country from the list");
-        return false;
-      }
-      setFieldError(countryInput, countryError, "");
-      return true;
-    }
-
-    function validateEmailField() {
-      const value = emailInput.value.trim();
-      if (!value) {
-        setEmailError("");
-        return true;
-      }
-      if (!emailPattern.test(value)) {
-        setEmailError(invalidMessage);
-        return false;
-      }
-      setEmailError("");
-      return true;
-    }
-
-    phoneCountryInput.addEventListener("change", validatePhoneField);
-    phoneCountryInput.addEventListener("blur", validatePhoneField);
-    phoneInput.addEventListener("input", validatePhoneField);
-    phoneInput.addEventListener("blur", validatePhoneField);
-    emailInput.addEventListener("input", validateEmailField);
-    emailInput.addEventListener("blur", validateEmailField);
-    cityInput.addEventListener("input", validateCityField);
-    cityInput.addEventListener("blur", validateCityField);
-    stateSelect.addEventListener("change", validateStateField);
-    stateSelect.addEventListener("blur", validateStateField);
-    stateTextInput.addEventListener("input", validateStateField);
-    stateTextInput.addEventListener("blur", validateStateField);
-    countryInput.addEventListener("change", function () {
-      syncCountryKey();
-      validateCountryField();
-    });
-    countryInput.addEventListener("blur", validateCountryField);
-
-    syncPhoneCountryKey();
-    syncCountryKey({ clearState: false });
-    syncStateValue();
-
-    form.addEventListener("submit", function (event) {
-      const requiredFields = form.querySelectorAll("input[required], select[required]");
-      let missingRequired = false;
-      requiredFields.forEach(function (field) {
-        if (!field.value.trim()) {
-          missingRequired = true;
-        }
-      });
-
-      const phoneValid = validatePhoneField();
-      const emailValid = validateEmailField();
-      const cityValid = validateCityField();
-      const stateValid = validateStateField();
-      const countryValid = validateCountryField();
-      if (missingRequired || !phoneValid || !emailValid || !cityValid || !stateValid || !countryValid) {
-        event.preventDefault();
-        if (!phoneValid) {
-          if (!phoneCountryCodeInput.value.trim()) {
-            phoneCountryInput.focus();
-            return;
-          }
-          phoneInput.focus();
-          return;
-        }
-        if (!cityValid) {
-          cityInput.focus();
-          return;
-        }
-        if (!stateValid) {
-          getActiveStateField().focus();
-          return;
-        }
-        if (!countryValid) {
-          countryInput.focus();
-          return;
-        }
-        if (!emailValid) {
-          emailInput.focus();
-        }
-      }
-    });
-  })();
+<script id="checkoutComboboxData" type="application/json">
+{{ {
+      "countryOptions": country_options,
+      "phoneCountryOptions": phone_country_options,
+      "phoneCountryDisplayByKey": phone_country_display_by_key,
+      "countryKeyByLabel": country_key_by_label,
+      "countryLabelByKey": country_label_by_key,
+      "subdivisionsByCountryKey": subdivisions_by_country_key
+    }|tojson }}
 </script>
+<script defer src="{{ asset_url('js/checkout.js') }}"></script>
 {% endblock %}

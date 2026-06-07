@@ -5,7 +5,7 @@ from typing import Final
 PhoneCountryOption = tuple[str, str, str]
 
 DEFAULT_PHONE_COUNTRY_KEY: Final[str] = "us"
-_PREFERRED_PHONE_COUNTRY_KEYS: Final[tuple[str, ...]] = ("us", "mx")
+_PREFERRED_PHONE_COUNTRY_KEYS: Final[tuple[str, ...]] = ("us",)
 
 _PHONE_COUNTRY_OPTIONS_RAW: Final[tuple[PhoneCountryOption, ...]] = (
     ("us", "United States", "+1"),

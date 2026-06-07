@@ -8,7 +8,7 @@ import pycountry
 CountryOption = tuple[str, str]
 
 DEFAULT_LOCATION_COUNTRY_KEY: Final[str] = "us"
-_PREFERRED_LOCATION_COUNTRY_KEYS: Final[tuple[str, ...]] = ("us", "mx")
+_PREFERRED_LOCATION_COUNTRY_KEYS: Final[tuple[str, ...]] = ("us",)
 _COUNTRY_LABEL_OVERRIDES: Final[dict[str, str]] = {
     "bo": "Bolivia",
     "ci": "Cote d'Ivoire",

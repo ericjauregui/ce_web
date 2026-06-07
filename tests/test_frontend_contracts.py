@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import tempfile
 import re
 from pathlib import Path
@@ -294,12 +295,13 @@ class FrontendContractTests(BaseWebTest):
         self.assertIn(">Submit Inquiry</h1>", checkout_body)
         self.assertIn("class=\"checkout-summary-bar mt-3\"", checkout_body)
         self.assertIn("name=\"phone_country_code\"", checkout_body)
+        self.assertIn("id=\"checkoutPhoneCountryCombobox\"", checkout_body)
         self.assertIn("id=\"checkoutPhoneCountry\"", checkout_body)
-        self.assertIn("class=\"form-select bg-black text-light border-gold checkout-phone-country\"", checkout_body)
+        self.assertIn("aria-controls=\"checkoutPhoneCountryListbox\"", checkout_body)
         self.assertIn("name=\"city\"", checkout_body)
-        self.assertIn("type=\"hidden\" name=\"state\" id=\"checkoutState\" value=\"\"", checkout_body)
-        self.assertIn("id=\"checkoutStateSelect\"", checkout_body)
-        self.assertIn("id=\"checkoutStateText\"", checkout_body)
+        self.assertIn("id=\"checkoutStateCombobox\"", checkout_body)
+        self.assertIn("name=\"state\"", checkout_body)
+        self.assertIn("placeholder=\"Search or type a state\"", checkout_body)
         self.assertIn("name=\"country\"", checkout_body)
         self.assertIn("name=\"country_key\"", checkout_body)
         self.assertIn("id=\"checkoutPhoneCountryCode\" value=\"\"", checkout_body)
@@ -307,14 +309,20 @@ class FrontendContractTests(BaseWebTest):
         self.assertNotIn("list=\"checkoutPhoneCountryList\"", checkout_body)
         self.assertNotIn("list=\"checkoutCountryList\"", checkout_body)
         self.assertNotIn("list=\"checkoutStateList\"", checkout_body)
-        self.assertIn("value=\"\" selected>Select country code</option>", checkout_body)
-        self.assertIn("value=\"\" selected>Select a country</option>", checkout_body)
-        self.assertIn("placeholder=\"Type your state\"", checkout_body)
-        self.assertNotIn("Select a country first", checkout_body)
-        self.assertIn("value=\"United States (+1)\"", checkout_body)
-        self.assertIn("value=\"Mexico (+52)\"", checkout_body)
-        self.assertNotIn("value=\"United States (+1)\" selected", checkout_body)
-        self.assertNotIn("value=\"United States\" selected", checkout_body)
+        self.assertIn("id=\"checkoutCountryCombobox\"", checkout_body)
+        self.assertIn("id=\"checkoutComboboxData\" type=\"application/json\"", checkout_body)
+        self.assertIn("/static/js/checkout.js", checkout_body)
+        script_match = re.search(
+            r'<script id="checkoutComboboxData" type="application/json">\s*(.*?)\s*</script>',
+            checkout_body,
+            re.DOTALL,
+        )
+        self.assertIsNotNone(script_match)
+        combobox_data = json.loads(script_match.group(1))
+        self.assertEqual(combobox_data["countryOptions"][0], ["us", "United States"])
+        self.assertEqual(combobox_data["countryOptions"][1], ["af", "Afghanistan"])
+        self.assertEqual(combobox_data["phoneCountryOptions"][0], ["us", "United States", "+1"])
+        self.assertEqual(combobox_data["phoneCountryOptions"][1], ["af", "Afghanistan", "+93"])
         self.assertIn("class=\"checkout-summary-bar__left\" aria-hidden=\"true\"", checkout_body)
         self.assertIn("class=\"checkout-summary-bar__center\"", checkout_body)
         self.assertIn("class=\"d-flex align-items-center flex-wrap gap-2 checkout-summary-metrics\"", checkout_body)
@@ -389,8 +397,9 @@ class FrontendContractTests(BaseWebTest):
         self.assertIn("let resizeRafId = 0;", script)
         self.assertIn(
             "resizeRafId = window.requestAnimationFrame(() => {", script)
-        self.assertIn("window.addEventListener(\"resize\", () => {", script)
-        self.assertIn("}, { passive: true });", script)
+        self.assertIn("window.addEventListener(", script)
+        self.assertIn('  "resize",', script)
+        self.assertIn("  { passive: true },", script)
 
     def test_catalog_supports_expanded_long_press_and_detail_link(self) -> None:
         script = (Path(webapp.BASE_DIR) / "static" / "js" /
