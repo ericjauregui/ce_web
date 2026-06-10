@@ -279,8 +279,9 @@ ce_logo_full.png
         except Exception:
             sent = False
 
-        session["cart"] = {}
-        session["cart_notes"] = {}
+        if sent:
+            session["cart"] = {}
+            session["cart_notes"] = {}
         return render_template(
             "order_submitted.html",
             token=token,

@@ -51,7 +51,7 @@
                 <div class="item-note-shell is-collapsed" data-compact-label="Note">
                   <textarea class="form-control form-control-sm bg-black text-light border-gold item-note-input"
                     data-code="{{ row.product.code }}" rows="1" maxlength="500"
-                    placeholder="Add note for this item (optional)" aria-label="Item Notes">{{ row.note }}</textarea>
+                    placeholder="Add a note for this item (optional)" aria-label="Item Notes">{{ row.note }}</textarea>
                 </div>
                 </td>
                 <td class="cell-remove" data-label="">
@@ -74,7 +74,7 @@
           </div>
         </div>
         <div class="cart-summary-bar__right">
-          <a class="btn btn-outline-gold cart-checkout-btn" href="{{ url_for('checkout') }}">Submit Inquiry</a>
+          <a class="btn btn-outline-gold cart-checkout-btn summary-submit-btn--highlight" href="{{ url_for('checkout') }}">Submit Inquiry</a>
         </div>
       </div>
     {% endif %}

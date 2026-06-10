@@ -212,7 +212,9 @@
         </div>
 
         <div class="checkout-summary-bar mt-3">
-          <div class="checkout-summary-bar__left" aria-hidden="true"></div>
+          <div class="checkout-summary-bar__left">
+            <a class="btn btn-outline-gold checkout-summary-back-btn" href="{{ url_for('cart') }}">Back to Order</a>
+          </div>
           <div class="checkout-summary-bar__center">
             <div class="d-flex align-items-center flex-wrap gap-2 checkout-summary-metrics">
               <div class="text-gold-70 small">Total Items:<span class="text-gold">{{ items|length }}</span></div>
@@ -220,7 +222,7 @@
             </div>
           </div>
           <div class="checkout-summary-bar__right">
-            <button class="btn btn-outline-gold checkout-summary-submit-btn" type="submit">Submit Inquiry</button>
+            <button class="btn btn-outline-gold checkout-summary-submit-btn summary-submit-btn--highlight" type="submit">Submit Inquiry</button>
           </div>
         </div>
       </form>

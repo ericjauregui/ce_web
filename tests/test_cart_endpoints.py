@@ -12,6 +12,31 @@ from tests.common import BaseWebTest
 
 
 class CartEndpointTests(BaseWebTest):
+    def test_cart_session_cookie_is_permanent_with_30_day_ttl(self) -> None:
+        response = self.client.post("/api/cart/add", json={"code": self.valid_code, "qty": 1})
+        self.assertEqual(response.status_code, 200)
+
+        cookies = response.headers.getlist("Set-Cookie")
+        session_cookie = next((value for value in cookies if value.startswith("session=")), "")
+
+        self.assertTrue(session_cookie)
+        self.assertIn("Expires=", session_cookie)
+        self.assertIn("HttpOnly", session_cookie)
+        self.assertIn("SameSite=Lax", session_cookie)
+
+    def test_cart_is_unique_per_browser_client(self) -> None:
+        self.client.post("/api/cart/add", json={"code": self.valid_code, "qty": 2})
+
+        first_client_count = self.client.get("/api/cart/count").get_json()
+        self.assertEqual(first_client_count["total_items"], 2)
+
+        with webapp.app.test_client() as second_client:
+            second_client_count = second_client.get("/api/cart/count")
+            self.assertEqual(second_client_count.status_code, 200)
+            second_count_data = second_client_count.get_json()
+            self.assertEqual(second_count_data["total_items"], 0)
+            self.assertEqual(second_count_data["distinct_items"], 0)
+
     def test_index_renders_catalog_and_script(self) -> None:
         response = self.client.get("/")
         self.assertEqual(response.status_code, 200)

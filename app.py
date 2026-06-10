@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import os
-from datetime import date
+from datetime import date, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -34,9 +34,18 @@ from domains.team import (
 
 app = Flask(__name__)
 app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 60 * 60 * 24 * 30
+app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=30)
+app.config["SESSION_COOKIE_HTTPONLY"] = True
+app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 
 load_dotenv()
 app.secret_key = os.environ["SECRET_KEY"]
+
+
+@app.before_request
+def keep_session_permanent() -> None:
+    # Persist cart state across visits until the configured session TTL is reached.
+    session.permanent = True
 
 @app.after_request
 def add_no_cache_for_html(response):

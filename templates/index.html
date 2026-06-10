@@ -1,6 +1,6 @@
 {% extends "base.html" %}
-{% block title %}California Earrings | Luxury Wholesale 14K Gold Earrings & Body Jewelry{% endblock %}
-{% block meta_description %}Shop luxury wholesale authentic 14K gold earrings, piercing jewelry, hoops, studs, hearts, and body jewelry from California Earrings in Los Angeles. Built for boutiques, jewelry stores, and resellers.{% endblock %}
+{% block title %}California Earrings | Wholesale 14K Gold Earrings & Body Jewelry{% endblock %}
+{% block meta_description %}Wholesaler of authentic 14K gold earrings, piercing jewelry, hoops, studs, hearts, and body jewelry from California Earrings in Los Angeles. Built for boutiques, jewelry stores, and resellers.{% endblock %}
 {% block page_preloads %}
   <link rel="preload" as="image" href="{{ asset_url('assets/hero_bg.png') }}">
   <link rel="preload" as="image" href="{{ asset_url('assets/ce_logo_full.png') }}">
@@ -55,7 +55,11 @@
       </div>
       {% endif %}
       <div class="section-header-jump d-flex gap-3 align-items-center">
+        {% if section.key == 'search-results' %}
+        <a class="chip" href="{{ url_for('index') }}#section-studs">← Full Catalog</a>
+        {% else %}
         <a class="chip" href="#top">Jump to Top</a>
+        {% endif %}
       </div>
       </div>
   </div>
@@ -91,7 +95,7 @@
   "@type": "CollectionPage",
   "name": "California Earrings Wholesale Catalog",
   "url": {{ canonical_url|tojson }},
-  "description": "Luxury wholesale 14K gold earrings and body jewelry catalog for boutiques, jewelry stores, and resellers worldwide.",
+  "description": "Wholesale 14K gold earrings and body jewelry catalog for boutiques, jewelry stores, and resellers worldwide.",
   "mainEntity": {
     "@type": "ItemList",
     "itemListElement": [

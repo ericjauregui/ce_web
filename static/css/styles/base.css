@@ -691,9 +691,9 @@ main {
   z-index: 30;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: .55rem;
+  gap: .45rem;
   align-items: center;
-  padding: .55rem;
+  padding: .45rem;
   border: 1px solid rgb(var(--gold-rgb) / 0.18);
   border-radius: 18px;
   background: rgb(10 10 10 / 0.88);
@@ -703,31 +703,69 @@ main {
 
 .product-detail-page .product-detail-top-action {
   min-width: 0;
+  min-height: 42px;
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
   white-space: nowrap;
-  padding-block: clamp(.7rem, .95vw, .9rem);
-  padding-inline: clamp(.7rem, 1.35vw, 1.1rem);
-  font-size: clamp(.96rem, 1.55vw, 1.28rem);
-  line-height: 1.05;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: var(--bs-btn-padding-y) var(--bs-btn-padding-x);
+  font-size: var(--bs-btn-font-size);
+  font-weight: var(--bs-btn-font-weight);
+  line-height: var(--bs-btn-line-height);
 }
 
 .product-detail-page .product-detail-top-action.add-to-cart-btn {
-  min-height: 0;
+  min-height: 42px;
+}
+
+@media (max-width: 991.98px) {
+  .product-detail-page .product-detail-top-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-areas:
+      "catalog share"
+      "add contact";
+    gap: .38rem;
+    padding: .42rem;
+  }
+
+  .product-detail-page .product-detail-top-action {
+    width: 100%;
+    max-width: none;
+    flex: 0 0 auto;
+  }
+
+  .product-detail-page .product-detail-top-action--catalog {
+    grid-area: catalog;
+  }
+
+  .product-detail-page .product-detail-top-action--share {
+    grid-area: share;
+  }
+
+  .product-detail-page .product-detail-top-action--add {
+    grid-area: add;
+  }
+
+  .product-detail-page .product-detail-top-action--contact {
+    grid-area: contact;
+  }
 }
 
 @media (max-width: 767.98px) {
   .product-detail-page .product-detail-top-actions {
-    gap: .4rem;
-    padding: .45rem;
+    gap: .34rem;
+    padding: .4rem;
   }
 
   .product-detail-page .product-detail-top-action {
-    padding-block: .62rem;
-    padding-inline: .45rem;
-    font-size: clamp(.84rem, 2.4vw, .98rem);
+    min-height: 40px;
+    padding-block: .42rem;
+    padding-inline: .58rem;
+    font-size: .91rem;
     letter-spacing: -.01em;
   }
 }
