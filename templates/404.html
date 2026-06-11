@@ -4,9 +4,41 @@
 continue shopping.{% endblock %}
 {% block robots_meta %}noindex,nofollow{% endblock %}
 {% block content %}
-<section class="container py-5" style="max-width: 900px;">
-  <h1 class="text-gold mb-3">Sorry! Page not found</h1>
-  <p class="text-gold-70">The page you're looking for doesn't exist or has moved. Click below to return.</p>
-  <a class="btn btn-outline-gold" href="{{ url_for('index') }}#section-studs">Go to catalog</a>
+<section class="container py-5 not-found-page" style="max-width: 1080px;">
+  <div class="card bg-dark border-gold p-4 p-lg-5 not-found-shell overflow-hidden">
+    <div class="row g-4 align-items-center not-found-content-row">
+      <div class="col-12 col-lg-5">
+        <div class="not-found-code-panel">
+          <div class="not-found-code text-gold">404</div>
+          <p class="text-gold-70 mb-0 not-found-code-copy">This link may be outdated, moved, or typed incorrectly.</p>
+        </div>
+      </div>
+
+      <div class="col-12 col-lg-7">
+        <div class="not-found-copy">
+          <p class="not-found-kicker text-uppercase text-gold-70 mb-2">Lost in the Catalog?</p>
+          <h1 class="text-gold mb-3">Page not found</h1>
+          <p class="text-gold-70 mb-0">The page you're looking for doesn't exist or has moved. Use one of the options below to get back into the collection quickly.</p>
+        </div>
+
+        <div class="d-flex flex-wrap gap-2 mt-4 not-found-actions">
+          <a class="btn btn-outline-gold not-found-primary-btn" href="{{ url_for('index') }}#section-studs">Browse Our Catalog</a>
+          <a class="btn btn-outline-gold" href="{{ url_for('contact') }}">Contact Us</a>
+        </div>
+
+        <div class="not-found-quick-links mt-4">
+          <div class="not-found-links-title mb-3">
+            <span class="not-found-links-title-text">Quick links</span>
+            <span class="not-found-links-title-rule" aria-hidden="true"></span>
+          </div>
+          <div class="d-flex flex-wrap gap-2">
+            <a class="btn btn-outline-gold not-found-chip" href="{{ url_for('reels_page') }}">Reels</a>
+            <a class="btn btn-outline-gold not-found-chip" href="{{ url_for('team_page') }}">Team</a>
+            <a class="btn btn-outline-gold not-found-chip" href="{{ url_for('faqs_page') }}">FAQs</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
 {% endblock %}

@@ -219,12 +219,41 @@ class CartEndpointTests(BaseWebTest):
         self.assertEqual(csv_response.status_code, 200)
         csv_text = csv_response.get_data(as_text=True)
 
-        self.assertIn("Notes", csv_text)
         self.assertIn("Need matching pair", csv_text)
-        self.assertIn("Code,Name,Quantity,Notes", csv_text)
-        self.assertNotIn("collection", csv_text)
+        self.assertIn("order_id,#00001", csv_text)
+        self.assertIn("code,name,collection,quantity,item_notes", csv_text.lower())
         self.assertNotIn("material", csv_text)
         self.assertNotIn("size_mm", csv_text)
+
+    def test_checkout_keeps_cart_when_email_delivery_fails(self) -> None:
+        self.client.post(
+            "/api/cart/add", json={"code": self.valid_code, "qty": 1})
+
+        with patch("domains.emailing.graph_send", side_effect=RuntimeError("graph down")):
+            checkout_response = self.client.post(
+                "/checkout",
+                data={
+                    "name": "Test Buyer",
+                    "company": "Sample Co",
+                    "phone_country": "United States (+1)",
+                    "phone_country_code": "us",
+                    "phone": "555-0101",
+                    "city": "Los Angeles",
+                    "state": "California",
+                    "country": "United States",
+                    "country_key": "us",
+                    "notes": "general order note",
+                },
+            )
+
+        self.assertEqual(checkout_response.status_code, 200)
+        checkout_body = checkout_response.get_data(as_text=True)
+        self.assertIn("We couldn't deliver the order email", checkout_body)
+        self.assertIn("Reference order ID: #00001", checkout_body)
+
+        with self.client.session_transaction() as sess:
+            self.assertEqual(sess["cart"], {self.valid_code: 1})
+            self.assertEqual(sess.get("last_order_id"), "#00001")
 
     def test_checkout_pdf_download_endpoint_returns_pdf(self) -> None:
         self.client.post(
@@ -255,6 +284,39 @@ class CartEndpointTests(BaseWebTest):
         self.assertEqual(pdf_response.status_code, 200)
         self.assertEqual(pdf_response.mimetype, "application/pdf")
         self.assertTrue(pdf_response.get_data().startswith(b"%PDF"))
+
+    def test_checkout_email_pdf_rows_preserve_product_images(self) -> None:
+        captured_rows: list[dict[str, object]] = []
+
+        def fake_cart_to_pdf_bytes(order_rows, product_images_dir):
+            captured_rows.extend(order_rows)
+            return b"%PDF-test%"
+
+        self.client.post(
+            "/api/cart/add", json={"code": self.valid_code, "qty": 1})
+
+        with patch("domains.emailing.cart_to_pdf_bytes", side_effect=fake_cart_to_pdf_bytes):
+            with patch("domains.emailing.graph_send", return_value=None):
+                checkout_response = self.client.post(
+                    "/checkout",
+                    data={
+                        "name": "Test Buyer",
+                        "company": "Sample Co",
+                        "phone_country": "United States (+1)",
+                        "phone_country_code": "us",
+                        "phone": "555-0101",
+                        "city": "Los Angeles",
+                        "state": "California",
+                        "country": "United States",
+                        "country_key": "us",
+                        "notes": "general order note",
+                    },
+                )
+
+        self.assertEqual(checkout_response.status_code, 200)
+        self.assertEqual(len(captured_rows), 1)
+        self.assertEqual(captured_rows[0]["code"], self.valid_code)
+        self.assertTrue(captured_rows[0]["image"])
 
     def test_checkout_view_renders_searchable_checkout_comboboxes_without_prefill(self) -> None:
         self.client.post(

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import base64
 import re
 from pathlib import Path
 from typing import Any
@@ -125,7 +126,36 @@ def _split_vcard_name(name: str) -> tuple[str, str]:
     return parts[-1], " ".join(parts[:-1])
 
 
-def build_member_vcard(member: dict[str, Any], team: dict[str, Any], photo_url: str | None = None) -> str:
+def _fold_vcard_line(line: str, limit: int = 75) -> str:
+    if len(line) <= limit:
+        return line
+
+    chunks = [line[:limit]]
+    remaining = line[limit:]
+    while remaining:
+        chunks.append(f" {remaining[: limit - 1]}")
+        remaining = remaining[limit - 1:]
+    return "\n".join(chunks)
+
+
+def _normalize_vcard_photo_type(photo_filename: str | None) -> str | None:
+    suffix = Path(photo_filename or "").suffix.lower()
+    if suffix in {".jpg", ".jpeg"}:
+        return "JPEG"
+    if suffix == ".png":
+        return "PNG"
+    if suffix == ".gif":
+        return "GIF"
+    return None
+
+
+def build_member_vcard(
+    member: dict[str, Any],
+    team: dict[str, Any],
+    *,
+    photo_bytes: bytes | None = None,
+    photo_type: str | None = None,
+) -> str:
     company = (team.get("company") or "California Earrings").strip() or "California Earrings"
     full_name = str(member.get("name") or "").strip()
     family_name, given_name = _split_vcard_name(full_name)
@@ -145,8 +175,9 @@ def build_member_vcard(member: dict[str, Any], team: dict[str, Any], photo_url: 
     if email:
         lines.append(f"EMAIL;TYPE=INTERNET:{vcard_escape(email)}")
 
-    if photo_url:
-        lines.append(f"PHOTO;VALUE=URI:{photo_url}")
+    if photo_bytes and photo_type:
+        encoded_photo = base64.b64encode(photo_bytes).decode("ascii")
+        lines.append(_fold_vcard_line(f"PHOTO;ENCODING=b;TYPE={photo_type}:{encoded_photo}"))
 
     lines.extend(["END:VCARD", ""])
     return "\n".join(lines)

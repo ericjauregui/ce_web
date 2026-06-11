@@ -10,7 +10,6 @@ from flask import Flask, abort, jsonify, render_template, request, send_file, se
 
 from domains.cart import (
     cart_items,
-    cart_to_csv_bytes,
     cart_to_pdf_bytes,
     cart_total_items,
     get_cart_notes,
@@ -18,6 +17,7 @@ from domains.cart import (
     order_rows_from_items,
 )
 from domains.catalog import products_by_code
+from domains.emailing import OrderEmailDeliveryError
 from domains.location_options import (
     CHECKOUT_COUNTRY_KEY_BY_LABEL,
     CHECKOUT_COUNTRY_LABELS_BY_KEY,
@@ -35,8 +35,9 @@ from domains.phone_country_codes import (
 
 LoadProducts = Callable[[], list[dict[str, Any]]]
 GetCart = Callable[[], dict[str, int]]
-SendOrderEmail = Callable[..., bool]
+SendOrderEmail = Callable[..., dict[str, Any]]
 CanonicalBaseUrl = Callable[[], str]
+MAX_VALIDATED_ORDER_QUANTITY = 999
 
 
 def normalize_checkout_phone(country_key: str, phone: str) -> str:
@@ -92,52 +93,55 @@ def register_cart_routes(
     send_order_email: SendOrderEmail,
     canonical_base_url: CanonicalBaseUrl,
 ) -> None:
-    def _build_order_email(
-        name: str,
-        company: str,
-        phone: str,
-        client_email: str,
-        city: str,
-        state: str,
-        country: str,
-        total_items: int,
-        total_quantity: int,
-    ) -> tuple[str, str, str]:
-        subject = "Thank you for your Order | California Earrings"
-        contact_lines = [
-            f"Contact: {name}",
-            f"Company: {company}",
-            f"Phone: {phone}",
-            f"Email: {client_email or 'Not provided'}",
-            f"Location: {city}, {state}, {country}",
-        ]
-        contact_block = "\n".join(contact_lines)
-        body = f"""Hi {company},
+    def _build_order_customer(form_values: dict[str, str]) -> dict[str, str]:
+        return {
+            "name": form_values.get("name", ""),
+            "company": form_values.get("company", ""),
+            "phone": normalize_checkout_phone(
+                form_values.get("phone_country_code", ""),
+                form_values.get("phone", ""),
+            ),
+            "email": form_values.get("email", ""),
+            "city": form_values.get("city", ""),
+            "state": form_values.get("state", ""),
+            "country": form_values.get("country", ""),
+            "notes": form_values.get("notes", ""),
+        }
 
-Thank you for submtiting your inquiry. We'll get back to you shortly with the full invoice.
+    def _validated_order_items(
+        product_map: dict[str, dict[str, Any]],
+        cart_data: dict[str, int],
+        notes_by_code: dict[str, str],
+    ) -> list[dict[str, Any]]:
+        validated_items: list[dict[str, Any]] = []
+        for code, raw_qty in cart_data.items():
+            product = product_map.get(code)
+            if not product:
+                raise ValueError(f"Unknown product code in cart: {code}")
 
-{contact_block}
+            try:
+                quantity = int(raw_qty)
+            except (TypeError, ValueError) as exc:
+                raise ValueError(f"Invalid quantity for product {code}") from exc
 
-Total items: {total_items}
-Total quantity: {total_quantity}
+            if quantity <= 0 or quantity > MAX_VALIDATED_ORDER_QUANTITY:
+                raise ValueError(f"Quantity out of range for product {code}")
 
-Best,
+            validated_items.append(
+                {
+                    "code": str(product.get("code") or code),
+                    "name": str(product.get("name") or code),
+                    "collection": str(product.get("collection") or ""),
+                    "quantity": quantity,
+                    "notes": notes_by_code.get(code, ""),
+                    "image": str(product.get("image") or ""),
+                }
+            )
 
-California Earrings
-ce_logo_full.png
-"""
-        logo_url = f"{canonical_base_url()}{url_for('static', filename='assets/ce_logo_full.png')}"
-        html_contact_lines = "".join(f"<li>{line}</li>" for line in contact_lines)
-        html_body = f"""<p>Hi {company},</p>
-    <p>Thank you for submtiting your inquiry. We'll get back to you shortly with the full invoice.</p>
-    <ul>{html_contact_lines}</ul>
-    <p>Total items: {total_items}<br>
-    Total quantity: {total_quantity}</p>
-    <p>Best,</p>
-    <p>California Earrings<br><br>
-    <img src=\"{logo_url}\" alt=\"California Earrings\" style=\"max-width: 220px; height: auto;\"></p>
-    """
-        return subject, body, html_body
+        if not validated_items:
+            raise ValueError("Order cart is empty.")
+
+        return validated_items
 
     @app.route("/cart")
     def cart():
@@ -158,6 +162,7 @@ ce_logo_full.png
             *,
             status_code: int = 200,
             form_values: dict[str, str] | None = None,
+            submission_error: str = "",
         ):
             values = {
                 "name": "",
@@ -202,6 +207,7 @@ ce_logo_full.png
                 country_label_by_key=CHECKOUT_COUNTRY_LABELS_BY_KEY,
                 subdivisions_by_country_key=CHECKOUT_SUBDIVISION_OPTIONS_BY_COUNTRY_KEY,
                 form_values=values,
+                submission_error=submission_error,
             ), status_code
 
         if request.method == "GET":
@@ -243,50 +249,60 @@ ce_logo_full.png
                 form_values=form_values,
             )
 
-        order_rows = order_rows_from_items(items)
-        csv_bytes = cart_to_csv_bytes(order_rows)
-
-        token = secrets.token_urlsafe(24)
-        session["last_order_csv"] = csv_bytes.decode("utf-8")
-        session["last_order_rows"] = order_rows
-        session["last_order_token"] = token
-
-        total_items = len(items)
-        total_quantity = cart_total_items(cart_data)
-        subject, body, html_body = _build_order_email(
-            name,
-            company,
-            phone,
-            client_email,
-            city,
-            state,
-            country,
-            total_items,
-            total_quantity,
-        )
-        filename = f"order_{company.lower().replace(' ', '_')}_{token[:8]}.csv"
-
-        sent = False
         try:
-            sent = send_order_email(
-                subject,
-                body,
-                csv_bytes,
-                filename,
+            validated_items = _validated_order_items(pmap, cart_data, notes_by_code)
+        except ValueError:
+            return render_checkout_page(
+                status_code=400,
+                form_values=form_values,
+                submission_error="We couldn't validate the items in your order. Please review your cart and try again.",
+            )
+
+        customer = _build_order_customer(form_values)
+        order_rows = order_rows_from_items(items)
+
+        def store_order_session(csv_text: str, order_id: str, csv_filename: str) -> str:
+            token = secrets.token_urlsafe(24)
+            session["last_order_csv"] = csv_text
+            session["last_order_rows"] = order_rows
+            session["last_order_token"] = token
+            session["last_order_id"] = order_id
+            session["last_order_csv_filename"] = csv_filename
+            return token
+
+        try:
+            result = send_order_email(customer, validated_items)
+        except OrderEmailDeliveryError as exc:
+            token = store_order_session(exc.csv_text, exc.order_id, exc.csv_path.name)
+            return render_template(
+                "order_submitted.html",
+                token=token,
+                email_sent=False,
+                fallback_used=False,
                 client_email=client_email,
-                html_body=html_body,
+                order_id=exc.order_id,
             )
         except Exception:
-            sent = False
+            return render_checkout_page(
+                status_code=500,
+                form_values=form_values,
+                submission_error="Order could not be submitted automatically. Please contact us directly.",
+            )
 
-        if sent:
-            session["cart"] = {}
-            session["cart_notes"] = {}
+        token = store_order_session(
+            str(result.get("csv_text") or ""),
+            str(result.get("order_id") or ""),
+            str(result.get("csv_filename") or "order.csv"),
+        )
+        session["cart"] = {}
+        session["cart_notes"] = {}
         return render_template(
             "order_submitted.html",
             token=token,
-            email_sent=sent,
+            email_sent=bool(result.get("ok")),
+            fallback_used=bool(result.get("fallback_used")),
             client_email=client_email,
+            order_id=str(result.get("order_id") or ""),
         )
 
     @app.route("/download/order/<token>.csv")
@@ -300,11 +316,15 @@ ce_logo_full.png
             abort(404)
 
         data = csv_text.encode("utf-8")
+        filename = session.get("last_order_csv_filename")
+        if not isinstance(filename, str) or not filename:
+            order_id = str(session.get("last_order_id") or "").replace("#", "")
+            filename = f"order_{order_id or date.today().strftime('%Y%m%d')}.csv"
         return send_file(
             io.BytesIO(data),
             mimetype="text/csv",
             as_attachment=True,
-            download_name=f"ce_order_{date.today().strftime('%m%d%y')}_{token[:4].lower()}.csv",
+            download_name=filename,
         )
 
     @app.route("/download/order/<token>.pdf")
@@ -319,11 +339,16 @@ ce_logo_full.png
             abort(404)
 
         pdf_bytes = cart_to_pdf_bytes(rows, base_dir / "static" / "product_images")
+        order_id = str(session.get("last_order_id") or "").replace("#", "")
         return send_file(
             io.BytesIO(pdf_bytes),
             mimetype="application/pdf",
             as_attachment=True,
-            download_name=f"ce_order_{date.today().strftime('%m%d%y')}_{token[:4].lower()}.pdf",
+            download_name=(
+                f"ce_order_{order_id}.pdf"
+                if order_id
+                else f"ce_order_{date.today().strftime('%m%d%y')}_{token[:4].lower()}.pdf"
+            ),
         )
 
     @app.route("/api/cart/count")

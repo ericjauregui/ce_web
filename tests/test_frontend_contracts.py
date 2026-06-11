@@ -10,6 +10,26 @@ from tests.common import BaseWebTest
 
 
 class FrontendContractTests(BaseWebTest):
+    def test_404_page_has_branded_recovery_actions(self) -> None:
+        css = self.load_site_css()
+        response = self.client.get("/does-not-exist")
+
+        self.assertEqual(response.status_code, 404)
+        body = response.get_data(as_text=True)
+
+        self.assertIn("class=\"container py-5 not-found-page\"", body)
+        self.assertIn("class=\"card bg-dark border-gold p-4 p-lg-5 not-found-shell overflow-hidden\"", body)
+        self.assertIn("class=\"not-found-code text-gold\">404</div>", body)
+        self.assertIn("Browse Our Catalog", body)
+        self.assertIn("href=\"/#section-studs\"", body)
+        self.assertIn("href=\"/contact\"", body)
+        self.assertIn("href=\"/reels\"", body)
+        self.assertIn("href=\"/team\"", body)
+        self.assertIn("href=\"/faqs\"", body)
+        self.assertIn(".not-found-page .not-found-shell {", css)
+        self.assertIn(".not-found-page .not-found-primary-btn {", css)
+        self.assertIn(".not-found-page .not-found-code {", css)
+
     def test_homepage_renders_latest_videos_strip_with_inline_expand_and_lazy_load(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             reels_dir = Path(temp_dir)

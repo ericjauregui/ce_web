@@ -100,11 +100,22 @@ def register_site_routes(
         if not member:
             abort(404)
 
-        photo_url = None
-        if member.get("photo"):
-            photo_url = url_for("static", filename=f"team/{member['photo']}", _external=True)
+        photo_bytes = None
+        photo_type = None
+        photo_name = str(member.get("photo") or "").strip()
+        if photo_name:
+            photo_path = base_dir / "static" / "team" / photo_name
+            if photo_path.exists() and photo_path.is_file():
+                photo_type = {
+                    ".jpg": "JPEG",
+                    ".jpeg": "JPEG",
+                    ".png": "PNG",
+                    ".gif": "GIF",
+                }.get(photo_path.suffix.lower())
+                if photo_type:
+                    photo_bytes = photo_path.read_bytes()
 
-        vcard_text = build_member_vcard(member, team, photo_url=photo_url)
+        vcard_text = build_member_vcard(member, team, photo_bytes=photo_bytes, photo_type=photo_type)
         filename = f"{slugify(member.get('name', 'contact'))}.vcf"
         return send_file(
             io.BytesIO(vcard_text.encode("utf-8")),

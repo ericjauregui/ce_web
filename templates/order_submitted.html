@@ -15,12 +15,23 @@ copy and contact us with any follow-up details.{% endblock %}
 
   <div class="container" style="max-width: 900px;">
   <div class="card bg-dark border-gold p-3 order-submitted-card">
-    <p class="text-gold-70 mb-0">Thank you for your order! We'll contact you shortly with pricing & availability.</p>
+    {% if email_sent %}
+    <p class="text-gold-70 mb-0">Inquiry submitted successfully. Our sales team will be reaching out to you to complete your order.</p>
+    {% if order_id %}
+    <p class="text-gold mt-3 mb-0">Order ID: {{ order_id }}</p>
+    {% endif %}
+    {% if fallback_used %}
+    <p class="text-gold-70 mb-0">Inquiry submitted successfully. Our sales team will be reaching out to you to complete your order.</p>
+    {% endif %}
+    {% else %}
+    <p class="text-gold-70 mb-0">We couldn't deliver the order email. Please share the csv/pdf of your order with our team{% if order_id %}. Reference order ID: {{ order_id }}{% endif %}.</p>
+    {% endif %}
     <p class="text-gold-70 small mt-3 mb-0">
       If you have any questions, feel free to <a href="{{ url_for('contact') }}"
         class="text-gold-70 text-decoration-none"><u>contact us</u></a>.
     </p>
 
+    {% if token %}
     <hr class="border-gold my-4">
 
     <h2 class="h6 text-gold mb-2">Download a copy of your order below:</h2>
@@ -28,10 +39,11 @@ copy and contact us with any follow-up details.{% endblock %}
       <a class="btn btn-outline-gold" href="{{ url_for('download_order_csv', token=token) }}">Download CSV</a>
       <a class="btn btn-outline-gold" href="{{ url_for('download_order_pdf', token=token) }}">Download PDF</a>
     </div>
+    {% endif %}
 
     {% if client_email %}
     <p class="text-gold-70 small mt-3 mb-0">
-      Email recipients: {{ client_email }}.
+      Customer Email: {{ client_email }}.
     </p>
     {% endif %}
   </div>

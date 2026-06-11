@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import base64
+
 import app as webapp
 from tests.common import BaseWebTest
 
@@ -50,7 +52,11 @@ class TeamRouteTests(BaseWebTest):
         self.assertNotIn("TITLE:", vcard_body)
         self.assertIn(f"TEL;TYPE=CELL:{self.first_member['phone_digits']}", vcard_body)
         self.assertIn(f"EMAIL;TYPE=INTERNET:{self.first_member['email']}", vcard_body)
-        self.assertNotIn("PHOTO;VALUE=URI:", vcard_body)
+        member_photo = self.first_member.get("photo")
+        if member_photo:
+            self.assertIn("PHOTO;ENCODING=b;TYPE=JPEG:", vcard_body)
+        else:
+            self.assertNotIn("PHOTO;ENCODING=b;TYPE=", vcard_body)
 
     def test_build_member_vcard_includes_photo_only_when_present(self) -> None:
         member = {
@@ -64,12 +70,13 @@ class TeamRouteTests(BaseWebTest):
         with_photo = webapp.build_member_vcard(
             member,
             {"company": "California Earrings"},
-            photo_url="https://example.com/static/team/jane.jpg",
+            photo_bytes=b"test-photo-bytes",
+            photo_type="JPEG",
         )
         without_photo = webapp.build_member_vcard(member, {"company": "California Earrings"})
 
         self.assertIn("FN:Jane Smith", with_photo)
         self.assertIn("N:Smith;Jane;;;", with_photo)
         self.assertNotIn("TITLE:", with_photo)
-        self.assertIn("PHOTO;VALUE=URI:https://example.com/static/team/jane.jpg", with_photo)
-        self.assertNotIn("PHOTO;VALUE=URI:", without_photo)
+        self.assertIn(f"PHOTO;ENCODING=b;TYPE=JPEG:{base64.b64encode(b'test-photo-bytes').decode('ascii')}", with_photo)
+        self.assertNotIn("PHOTO;ENCODING=b;TYPE=", without_photo)
