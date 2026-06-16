@@ -256,6 +256,6 @@ class EmailingTests(unittest.TestCase):
         self.assertIn(b"multipart/related", mime_bytes)
         self.assertIn(b"Content-ID:", mime_bytes)
         self.assertIn(b"Content-Disposition: inline", mime_bytes)
-        self.assertIn(b"ce_logo_gold.png", mime_bytes)
+        self.assertIn(b"ce_logo_full_gold.png", mime_bytes)
         self.assertIn(b"ce_email_signature.jpg", mime_bytes)
         self.assertIn(b"cid:", mime_bytes)

@@ -206,7 +206,7 @@ main {
       background-image:
       radial-gradient(120% 92% at 50% 4%, rgb(var(--gold-rgb) / 0.16), transparent 58%),
       radial-gradient(100% 66% at 50% 96%, rgb(var(--gold-rgb) / 0.13), transparent 74%),
-      linear-gradient(180deg, rgba(8, 8, 8, 0.56) 0%, rgba(13, 13, 13, 0.62) 100%),
+      linear-gradient(180deg, rgba(8, 8, 8, 0.40) 0%, rgba(13, 13, 13, 0.48) 100%),
         url("/static/assets/hero_bg.png");
         background-size: auto, auto, auto, cover;
         background-position: center, center, center, center;
@@ -234,7 +234,7 @@ main {
     right: 0;
     bottom: 0;
     height: clamp(62px, 9vw, 108px);
-    background: linear-gradient(180deg, rgba(13, 13, 13, 0) 0%, rgba(13, 13, 13, 0.62) 55%, #0d0d0d 100%);
+    background: linear-gradient(180deg, rgba(13, 13, 13, 0) 0%, rgba(13, 13, 13, 0.46) 55%, #0d0d0d 100%);
     pointer-events: none;
     z-index: 2;
   }
@@ -408,7 +408,7 @@ main {
 
     .hero::after {
       height: clamp(46px, 9vw, 68px);
-      background: linear-gradient(180deg, rgba(13, 13, 13, 0) 0%, rgba(13, 13, 13, 0.56) 50%, #0d0d0d 100%);
+      background: linear-gradient(180deg, rgba(13, 13, 13, 0) 0%, rgba(13, 13, 13, 0.42) 50%, #0d0d0d 100%);
     }
 
     header.hero+section.py-5 {
