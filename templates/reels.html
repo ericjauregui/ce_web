@@ -1,5 +1,5 @@
-{% extends "base.html" %} {% block title %}California Earrings Inventory Videos{%
-endblock %} {% block meta_description %}Browse California Earrings inventory reels to see luxury, authentic 14K gold earrings and body jewelry in motion before you order.{% endblock %} {% block page_css %}
+{% extends "base.html" %} {% block title %}Jewelry Reels | California Earrings{% endblock %}
+{% block meta_description %}Browse California Earrings product reels to see luxury, authentic 14K gold earrings and body jewelry in motion before you order.{% endblock %} {% block page_css %}
 <link href="{{ asset_url('css/styles/inline_reels.css') }}" rel="stylesheet">
 <link href="{{ asset_url('css/styles/reels.css') }}" rel="stylesheet">
 {% endblock %} {% block content %}
@@ -10,7 +10,7 @@ endblock %} {% block meta_description %}Browse California Earrings inventory ree
       href="{{ url_for('index') }}"
       >← Catalog</a
     >
-    <h1 class="text-gold">Inventory Reels</h1>
+    <h1 class="text-gold">Jewelry Reels</h1>
     <span class="page-title-spacer btn btn-outline-gold" aria-hidden="true"
       >← Catalog</span
     >
@@ -83,9 +83,9 @@ endblock %} {% block meta_description %}Browse California Earrings inventory ree
 {
   "@context": "https://schema.org",
   "@type": "CollectionPage",
-  "name": "California Earrings Inventory Reels",
+  "name": "Jewelry Reels | California Earrings",
   "url": {{ canonical_url|tojson }},
-  "description": "Short-form inventory videos showcasing 14K gold earrings and body jewelry.",
+  "description": "Short-form jewelry videos showcasing 14K gold earrings and body jewelry.",
   "mainEntity": {
     "@type": "ItemList",
     "itemListElement": [
@@ -93,7 +93,7 @@ endblock %} {% block meta_description %}Browse California Earrings inventory ree
       {
         "@type": "ListItem",
         "position": {{ loop.index }},
-        "name": {{ ('California Earrings inventory reel ' ~ loop.index)|tojson }},
+        "name": {{ ('California Earrings jewelry reel ' ~ loop.index)|tojson }},
         "url": {{ (base_url ~ reel.url)|tojson }}
       }{% if not loop.last %},{% endif %}
       {% endfor %}

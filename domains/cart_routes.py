@@ -281,6 +281,7 @@ def register_cart_routes(
                 fallback_used=False,
                 client_email=client_email,
                 order_id=exc.order_id,
+                order_rows=order_rows,
             )
         except Exception:
             return render_checkout_page(
@@ -303,6 +304,7 @@ def register_cart_routes(
             fallback_used=bool(result.get("fallback_used")),
             client_email=client_email,
             order_id=str(result.get("order_id") or ""),
+            order_rows=order_rows,
         )
 
     @app.route("/download/order/<token>.csv")

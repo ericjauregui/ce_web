@@ -4,7 +4,7 @@
 copy and contact us with any follow-up details.{% endblock %}
 {% block robots_meta %}noindex,nofollow{% endblock %}
 {% block content %}
-<section class="container-fluid py-5 order-submitted-page">
+<section class="container-fluid py-5 checkout-page order-submitted-page">
   <div class="container">
     <div class="page-title-row mb-3">
       <a class="btn btn-outline-gold page-title-back" href="{{ url_for('index') }}#section-studs">← Full Catalog</a>
@@ -20,11 +20,17 @@ copy and contact us with any follow-up details.{% endblock %}
     {% if order_id %}
     <p class="text-gold mt-3 mb-0">Order ID: {{ order_id }}</p>
     {% endif %}
+    {% if client_email %}
+    <p class="text-gold-70 small mt-1 mb-0">Customer Email: {{ client_email }}.</p>
+    {% endif %}
     {% if fallback_used %}
     <p class="text-gold-70 mb-0">Inquiry submitted successfully. Our sales team will be reaching out to you to complete your order.</p>
     {% endif %}
     {% else %}
     <p class="text-gold-70 mb-0">We couldn't deliver the order email. Please share the csv/pdf of your order with our team{% if order_id %}. Reference order ID: {{ order_id }}{% endif %}.</p>
+    {% if client_email %}
+    <p class="text-gold-70 small mt-1 mb-0">Customer Email: {{ client_email }}.</p>
+    {% endif %}
     {% endif %}
     <p class="text-gold-70 small mt-3 mb-0">
       If you have any questions, feel free to <a href="{{ url_for('contact') }}"
@@ -39,12 +45,49 @@ copy and contact us with any follow-up details.{% endblock %}
       <a class="btn btn-outline-gold" href="{{ url_for('download_order_csv', token=token) }}">Download CSV</a>
       <a class="btn btn-outline-gold" href="{{ url_for('download_order_pdf', token=token) }}">Download PDF</a>
     </div>
-    {% endif %}
 
-    {% if client_email %}
-    <p class="text-gold-70 small mt-3 mb-0">
-      Customer Email: {{ client_email }}.
-    </p>
+    {% if order_rows %}
+    <hr class="border-gold my-4">
+
+    <h2 class="h6 text-gold mb-2">Order Summary</h2>
+    <div class="table-responsive">
+      <table class="table table-dark align-middle mb-0 minimal-items-table checkout-items-table order-submitted-items-table">
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Code</th>
+            <th>Quantity</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in order_rows %}
+          <tr>
+            <td class="cell-item" data-label="Item">
+              <a class="checkout-product-link checkout-product-thumb-link" href="{{ url_for('product_detail', product_code=row.code) }}" aria-label="View {{ row.code }} product details">
+                <img src="{{ url_for('static', filename='product_images/' ~ row.image) }}" class="cart-thumb" alt="" loading="lazy" decoding="async" width="56" height="56">
+              </a>
+            </td>
+            <td class="cell-code" data-label="Code"><a class="code-badge checkout-product-link checkout-product-code-link" href="{{ url_for('product_detail', product_code=row.code) }}">{{ row.code }}</a></td>
+            <td class="cell-qty" data-label="Quantity">{{ row.quantity }}</td>
+            <td class="cell-notes" data-label="Notes">{{ row.notes or "—" }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="checkout-summary-bar order-submitted-summary-bar mt-3">
+      <div class="checkout-summary-bar__left"></div>
+      <div class="checkout-summary-bar__center">
+        <div class="d-flex align-items-center flex-wrap gap-2 checkout-summary-metrics">
+          <div class="text-gold-70 small">Total Items:<span class="text-gold">{{ order_rows|length }}</span></div>
+          <div class="text-gold-70 small">Total Quantity:<span class="text-gold">{{ order_rows|sum(attribute='quantity') }}</span></div>
+        </div>
+      </div>
+      <div class="checkout-summary-bar__right"></div>
+    </div>
+    {% endif %}
     {% endif %}
   </div>
   </div>

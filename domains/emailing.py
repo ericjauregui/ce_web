@@ -35,7 +35,7 @@ ORDER_DB_PATH = ORDER_LOG_DIR / "orders.db"
 ORDER_EVENT_LOG_DIR = ORDER_LOG_DIR / ".logs"
 _LEGACY_ORDER_CSV_DIR = ORDER_LOG_DIR / "orders_csv"
 ORDER_CSV_DIR = _LEGACY_ORDER_CSV_DIR if _LEGACY_ORDER_CSV_DIR.exists() else ORDER_LOG_DIR / "order_csv"
-EMAIL_LOGO_IMAGE_PATH = BASE_DIR / "static" / "assets" / "ce_logo_full.png"
+EMAIL_LOGO_IMAGE_PATH = BASE_DIR / "static" / "assets" / "ce_logo_gold.png"
 EMAIL_SIGNATURE_IMAGE_PATH = BASE_DIR / "static" / "assets" / "ce_email_signature.jpg"
 _CURRENT_LOG_PATH: Path | None = None
 

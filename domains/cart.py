@@ -77,6 +77,32 @@ def order_rows_from_items(items: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return rows
 
 
+def _build_pdf_image(image_path: Path, *, width: int = 40, height: int = 40, max_image_size: tuple[int, int] = (96, 96), jpeg_quality: int = 68) -> Any:
+    from PIL import Image as PillowImage
+    from reportlab.platypus import Image
+
+    buffer = io.BytesIO()
+    with PillowImage.open(image_path) as source_image:
+        normalized_image = source_image.convert("RGB")
+        try:
+            resample_filter = PillowImage.Resampling.LANCZOS
+        except AttributeError:  # pragma: no cover - older Pillow fallback
+            resample_filter = PillowImage.LANCZOS
+        normalized_image.thumbnail(max_image_size, resample_filter)
+        normalized_image.save(
+            buffer,
+            format="JPEG",
+            quality=jpeg_quality,
+            optimize=True,
+            progressive=True,
+        )
+
+    buffer.seek(0)
+    pdf_image = Image(buffer, width=width, height=height)
+    pdf_image.hAlign = "CENTER"
+    return pdf_image
+
+
 def cart_to_csv_bytes(order_rows: list[dict[str, Any]]) -> bytes:
     buffer = io.StringIO()
     writer = csv.writer(buffer)
@@ -170,8 +196,7 @@ def cart_to_pdf_bytes(order_rows: list[dict[str, Any]], product_images_dir: Path
         image_path = product_images_dir / image_name if image_name else None
         if image_path and image_path.exists():
             try:
-                image_cell = Image(str(image_path), width=40, height=40)
-                image_cell.hAlign = "CENTER"
+                image_cell = _build_pdf_image(image_path)
             except Exception:
                 image_cell = ""
 

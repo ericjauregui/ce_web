@@ -2061,6 +2061,9 @@
   }
 
   .cart-page .minimal-items-table .cell-notes .item-note-shell::before {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-size: .74rem;
     padding: .32rem .34rem;
   }

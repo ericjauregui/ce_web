@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import re
 import sys
+import tempfile
 import types
 from unittest.mock import patch
 
@@ -497,6 +498,38 @@ class CartEndpointTests(BaseWebTest):
         self.assertIn(("ALIGN", (0, totals_row_idx), (2, totals_row_idx), "CENTER"), order_table.styles)
         self.assertIn(("ALIGN", (3, totals_row_idx), (4, totals_row_idx), "CENTER"), order_table.styles)
 
+    def test_cart_to_pdf_bytes_keeps_image_heavy_orders_compact(self) -> None:
+        product_images_dir = webapp.BASE_DIR / "static" / "product_images"
+        image_name = "102SB.jpg"
+        order_rows = [
+            {
+                "code": f"IMG{i:03d}",
+                "name": f"Image Item {i}",
+                "quantity": 1,
+                "notes": "",
+                "image": image_name,
+            }
+            for i in range(80)
+        ]
+
+        pdf_bytes = cart_domain.cart_to_pdf_bytes(order_rows, product_images_dir)
+
+        self.assertTrue(pdf_bytes.startswith(b"%PDF"))
+        self.assertLess(len(pdf_bytes), 2_000_000)
+
+    def test_build_pdf_image_downsizes_source_image(self) -> None:
+        from PIL import Image
+        from pathlib import Path
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            source_path = Path(temp_dir) / "source.jpg"
+            with Image.new("RGB", (1200, 1200), color=(210, 180, 80)) as img:
+                img.save(source_path, format="JPEG", quality=95)
+
+            pdf_image = cart_domain._build_pdf_image(source_path)
+
+        self.assertEqual(pdf_image.drawWidth, 40)
+        self.assertEqual(pdf_image.drawHeight, 40)
     def test_default_catalog_state_has_more_cards_than_filtered_query(self) -> None:
         full_response = self.client.get("/")
         self.assertEqual(full_response.status_code, 200)
