@@ -1914,7 +1914,10 @@
 
   .cart-page .minimal-items-table .cell-notes .item-note-shell {
     position: relative;
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
     width: 3rem;
     max-width: 100%;
     transition: width .18s ease, transform .18s ease;
