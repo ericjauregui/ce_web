@@ -543,7 +543,7 @@ def make_message(
     subject = (
         f"URGENT: Order Email Retry Failed {order_id} - {company}"
         if fallback
-        else f"{company} | Wholesale Inquiry: {order_id}"
+        else f"{company.capitalize()} | Wholesale Inquiry"
     )
 
     inline_images = _inline_image_attachments()

@@ -643,7 +643,7 @@
 .checkout-page .summary-submit-btn--highlight {
   color: #101010 !important;
   border-color: transparent !important;
-  border-radius: 999px !important;
+  border-radius: 16px !important;
   font-weight: 700;
   font-size: clamp(1.02rem, 1.75vw, 1.22rem);
   letter-spacing: .01em;
