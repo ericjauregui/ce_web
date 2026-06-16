@@ -534,17 +534,12 @@ def make_message(
     csv_path: Path,
     settings: EmailSettings,
     *,
-    fallback: bool,
     base_dir: Path | None = None,
 ) -> EmailMessage:
     if base_dir is None:
         base_dir = BASE_DIR
-    company = customer.get("company") or "Unknown Company"
-    subject = (
-        f"URGENT: Order Email Retry Failed {order_id} - {company}"
-        if fallback
-        else f"{company.capitalize()} | Wholesale Inquiry"
-    )
+    company = "California Earrings"
+    subject = f"{company} | Wholesale Inquiry"
 
     inline_images = _inline_image_attachments()
     logo_cid = inline_images["logo"][3] if "logo" in inline_images else None

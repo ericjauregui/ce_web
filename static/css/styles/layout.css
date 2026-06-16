@@ -677,6 +677,7 @@
 .checkout-page .checkout-summary-submit-btn.summary-submit-btn--highlight {
   font-size: var(--bs-btn-font-size);
   padding: var(--bs-btn-padding-y) var(--bs-btn-padding-x);
+  border-radius: 14px !important;
 }
 
 @media (max-width: 767.98px) {
@@ -727,6 +728,10 @@
   .checkout-page .checkout-summary-bar__right .btn {
     width: auto;
     min-width: clamp(9.25rem, 34vw, 12rem);
+  }
+
+  .checkout-page .checkout-summary-bar__right .checkout-summary-submit-btn.summary-submit-btn--highlight {
+    min-width: 0;
   }
 
   .cart-page .cart-summary-metrics,
@@ -1345,6 +1350,36 @@
   border-color: var(--gold-outline-strong) !important;
   color: #fff !important;
   box-shadow: none;
+}
+
+.order-submitted-page .order-submitted-summary-bar {
+  position: sticky;
+  bottom: max(.75rem, env(safe-area-inset-bottom, 0px));
+  z-index: 30;
+}
+
+@media (max-width: 767.98px) {
+  .order-submitted-page .order-submitted-summary-bar {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "metrics";
+  }
+
+  .order-submitted-page .order-submitted-summary-bar .checkout-summary-bar__left,
+  .order-submitted-page .order-submitted-summary-bar .checkout-summary-bar__right {
+    display: none;
+  }
+
+  .order-submitted-page .order-submitted-summary-bar .checkout-summary-bar__center {
+    grid-area: metrics;
+    border-bottom: 0;
+    padding-bottom: 0;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .order-submitted-page .order-submitted-summary-bar {
+    bottom: max(.55rem, env(safe-area-inset-bottom, 0px));
+  }
 }
 
 .faqs-page .faqs-intro-card {
