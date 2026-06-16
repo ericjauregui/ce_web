@@ -548,7 +548,8 @@
   width: 100%;
 }
 
-.cart-page .cart-summary-bar {
+.cart-page .cart-summary-bar,
+.checkout-page .checkout-summary-bar {
   position: sticky;
   bottom: max(.75rem, env(safe-area-inset-bottom, 0px));
   z-index: 30;
@@ -679,46 +680,7 @@
 }
 
 @media (max-width: 767.98px) {
-  .cart-page .cart-summary-bar {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    grid-template-areas:
-      "metrics metrics"
-      "left right";
-    gap: .6rem;
-  }
-
-  .cart-page .cart-summary-bar__center {
-    grid-area: metrics;
-    justify-self: stretch;
-    padding-bottom: .45rem;
-    border-bottom: 1px solid rgba(215, 192, 122, 0.22);
-  }
-
-  .cart-page .cart-summary-bar__left,
-  .cart-page .cart-summary-bar__right {
-    min-width: 0;
-  }
-
-  .cart-page .cart-summary-bar__left {
-    justify-self: start;
-    min-width: 0;
-  }
-
-  .cart-page .cart-summary-bar__left {
-    grid-area: left;
-  }
-
-  .cart-page .cart-summary-bar__right {
-    grid-area: right;
-    justify-self: end;
-  }
-
-  .cart-page .cart-summary-bar__left .btn,
-  .cart-page .cart-summary-bar__right .btn {
-    width: auto;
-    min-width: clamp(9.25rem, 34vw, 12rem);
-  }
-
+  .cart-page .cart-summary-bar,
   .checkout-page .checkout-summary-bar {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     grid-template-areas:
@@ -727,33 +689,44 @@
     gap: .6rem;
   }
 
-  .checkout-page .checkout-summary-bar__left {
-    display: block;
-    grid-area: left;
-    justify-self: start;
-  }
-
-  .checkout-page .checkout-summary-bar__center,
-  .checkout-page .checkout-summary-bar__right {
-    justify-self: stretch;
-    min-width: 0;
-  }
-
+  .cart-page .cart-summary-bar__center,
   .checkout-page .checkout-summary-bar__center {
     grid-area: metrics;
+    justify-self: stretch;
     padding-bottom: .45rem;
     border-bottom: 1px solid rgba(215, 192, 122, 0.22);
   }
 
+  .cart-page .cart-summary-bar__left,
+  .cart-page .cart-summary-bar__right,
+  .checkout-page .checkout-summary-bar__left,
+  .checkout-page .checkout-summary-bar__right {
+    min-width: 0;
+  }
+
+  .cart-page .cart-summary-bar__left,
+  .checkout-page .checkout-summary-bar__left {
+    justify-self: start;
+    min-width: 0;
+  }
+
+  .cart-page .cart-summary-bar__left,
+  .checkout-page .checkout-summary-bar__left {
+    grid-area: left;
+  }
+
+  .cart-page .cart-summary-bar__right,
   .checkout-page .checkout-summary-bar__right {
     grid-area: right;
     justify-self: end;
   }
 
+  .cart-page .cart-summary-bar__left .btn,
+  .cart-page .cart-summary-bar__right .btn,
   .checkout-page .checkout-summary-bar__left .btn,
   .checkout-page .checkout-summary-bar__right .btn {
     width: auto;
-    min-width: 0;
+    min-width: clamp(9.25rem, 34vw, 12rem);
   }
 
   .cart-page .cart-summary-metrics,
@@ -811,7 +784,8 @@
     gap: .45rem;
   }
 
-  .cart-page .cart-summary-bar {
+  .cart-page .cart-summary-bar,
+  .checkout-page .checkout-summary-bar {
     padding: .72rem .78rem;
     bottom: max(.55rem, env(safe-area-inset-bottom, 0px));
   }
