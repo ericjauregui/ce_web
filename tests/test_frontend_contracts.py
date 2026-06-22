@@ -229,6 +229,7 @@ class FrontendContractTests(BaseWebTest):
             data={
                 "name": "Test Buyer",
                 "company": "Sample Co",
+                "email": "buyer@example.com",
                 "phone_country": "United States (+1)",
                 "phone_country_code": "us",
                 "phone": "555-0101",
@@ -312,7 +313,7 @@ class FrontendContractTests(BaseWebTest):
         self.assertIn("href=\"/cart\"", checkout_body)
         self.assertIn("class=\"btn btn-outline-gold page-title-back\"", checkout_body)
         self.assertIn("class=\"page-title-spacer btn btn-outline-gold\" aria-hidden=\"true\"", checkout_body)
-        self.assertIn(">Submit Inquiry</h1>", checkout_body)
+        self.assertIn(">Submit Order</h1>", checkout_body)
         self.assertIn("class=\"checkout-summary-bar mt-3\"", checkout_body)
         self.assertIn("name=\"phone_country_code\"", checkout_body)
         self.assertIn("id=\"checkoutPhoneCountryCombobox\"", checkout_body)
@@ -348,12 +349,12 @@ class FrontendContractTests(BaseWebTest):
         self.assertIn("class=\"checkout-summary-bar__center\"", checkout_body)
         self.assertIn("class=\"d-flex align-items-center flex-wrap gap-2 checkout-summary-metrics\"", checkout_body)
         self.assertIn("class=\"checkout-summary-bar__right\"", checkout_body)
-        self.assertIn("type=\"submit\">Submit Inquiry</button>", checkout_body)
+        self.assertIn("type=\"submit\">Submit Order</button>", checkout_body)
         self.assertIn("class=\"page-title-row mb-3\"", order_submitted_body)
         self.assertIn("href=\"/#section-studs\"", order_submitted_body)
         self.assertIn(">Order Submitted</h1>", order_submitted_body)
         self.assertIn("Order ID:", order_submitted_body)
-        self.assertIn("Customer Email:", order_submitted_body)
+        self.assertIn("Your Email:", order_submitted_body)
         self.assertIn("Order Summary", order_submitted_body)
         self.assertIn("class=\"table table-dark align-middle mb-0 minimal-items-table checkout-items-table order-submitted-items-table\"", order_submitted_body)
         self.assertIn("class=\"checkout-summary-bar order-submitted-summary-bar mt-3\"", order_submitted_body)

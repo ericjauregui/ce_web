@@ -169,7 +169,7 @@ class CartEndpointTests(BaseWebTest):
         self.assertIn("checkout-product-thumb-link", checkout_body)
         self.assertIn("checkout-product-code-link", checkout_body)
         self.assertIn("Your items", checkout_body)
-        self.assertIn(">Submit Inquiry</button>", checkout_body)
+        self.assertIn(">Submit Order</button>", checkout_body)
         self.assertNotIn("<th>Name</th>", checkout_body)
         self.assertEqual(checkout_body.count("<th class=\"checkout-col-"), 4)
 

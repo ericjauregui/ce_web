@@ -114,10 +114,10 @@ class EmailingTests(unittest.TestCase):
 
         self.assertEqual(len(sent_messages), 1)
         raw_message = sent_messages[0]
-        self.assertIn("Subject: Sample Co | Wholesale Inquiry: #00001", raw_message)
+        self.assertIn("Subject: California Earrings | Wholesale Order", raw_message)
         self.assertIn("To: buyer@example.com", raw_message)
         self.assertIn("Bcc: orders@californiaearrings.com, sales@example.com, merch@example.com", raw_message)
-        self.assertIn("ce_email_signature.jpg", raw_message)
+        self.assertIn("ce_email_signature_light.jpg", raw_message)
         self.assertIn("Content-ID:", raw_message)
         self.assertIn("cid:", raw_message)
 
@@ -137,8 +137,8 @@ class EmailingTests(unittest.TestCase):
         self.assertEqual(
             subjects,
             [
-                "Sample Co | Wholesale Inquiry: #00001",
-                "URGENT: Order Email Retry Failed #00001 - Sample Co",
+                "California Earrings | Wholesale Order",
+                "California Earrings | Wholesale Order",
             ],
         )
 
@@ -195,7 +195,7 @@ class EmailingTests(unittest.TestCase):
 
         self.assertTrue(result["ok"])
         self.assertFalse(result["fallback_used"])
-        self.assertEqual(sent_messages, ["Sample Co | Wholesale Inquiry: #00001"])
+        self.assertEqual(sent_messages, ["California Earrings | Wholesale Order"])
 
     def test_graph_send_posts_mime_message_with_inline_images(self) -> None:
         captured_request: dict[str, object] = {}
@@ -236,7 +236,6 @@ class EmailingTests(unittest.TestCase):
             "order_id,#00001\n",
             self.order_csv_dir / "ce_order_00001_20260611.csv",
             settings,
-            fallback=False,
         )
 
         with patch("domains.emailing._fetch_graph_access_token", return_value="graph-token"):
@@ -257,5 +256,5 @@ class EmailingTests(unittest.TestCase):
         self.assertIn(b"Content-ID:", mime_bytes)
         self.assertIn(b"Content-Disposition: inline", mime_bytes)
         self.assertIn(b"ce_logo_full_gold.png", mime_bytes)
-        self.assertIn(b"ce_email_signature.jpg", mime_bytes)
+        self.assertIn(b"ce_email_signature_light.jpg", mime_bytes)
         self.assertIn(b"cid:", mime_bytes)

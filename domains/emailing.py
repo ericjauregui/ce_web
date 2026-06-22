@@ -36,7 +36,7 @@ ORDER_EVENT_LOG_DIR = ORDER_LOG_DIR / ".logs"
 _LEGACY_ORDER_CSV_DIR = ORDER_LOG_DIR / "orders_csv"
 ORDER_CSV_DIR = _LEGACY_ORDER_CSV_DIR if _LEGACY_ORDER_CSV_DIR.exists() else ORDER_LOG_DIR / "order_csv"
 EMAIL_LOGO_IMAGE_PATH = BASE_DIR / "static" / "assets" / "ce_logo_full_gold.png"
-EMAIL_SIGNATURE_IMAGE_PATH = BASE_DIR / "static" / "assets" / "ce_email_signature.jpg"
+EMAIL_SIGNATURE_IMAGE_PATH = BASE_DIR / "static" / "assets" / "ce_email_signature_light.jpg"
 _CURRENT_LOG_PATH: Path | None = None
 
 
@@ -259,7 +259,7 @@ def build_order_csv(order_id: str, customer: dict[str, str], items: list[dict[st
     buffer = io.StringIO()
     writer = csv.writer(buffer)
 
-    writer.writerow(["California Earrings Wholesale Inquiry"])
+    writer.writerow(["California Earrings Wholesale Order"])
     writer.writerow(["order_id", order_id])
     writer.writerow(["submitted_at", datetime.now().strftime("%Y-%m-%d %H:%M:%S")])
     writer.writerow([])
@@ -307,7 +307,7 @@ def build_order_plain_text(order_id: str, customer: dict[str, str], items: list[
         "Wholesaler of 14K Gold Earrings & Piercings",
         "Over 30 Years in Business",
         "",
-        "Wholesale inquiry submitted from californiaearrings.com",
+        "Wholesale order submitted from californiaearrings.com",
         "",
         "ORDER ID",
         order_id,
@@ -442,7 +442,7 @@ def build_order_html(
           </div>
 
           <div style="padding:28px 32px;">
-            <h1 style="margin:0 0 18px;color:#ffffff;font-size:24px;">Wholesale Inquiry {escape(order_id)}</h1>
+            <h1 style="margin:0 0 18px;color:#ffffff;font-size:24px;">Wholesale Order {escape(order_id)}</h1>
 
             <div style="background:#0d0d0d;border:1px solid #333;padding:18px;margin-bottom:22px;">
               <h2 style="margin:0 0 12px;color:#d7c07a;font-size:16px;">Customer Details</h2>
@@ -539,7 +539,7 @@ def make_message(
     if base_dir is None:
         base_dir = BASE_DIR
     company = "California Earrings"
-    subject = f"{company} | Wholesale Inquiry"
+    subject = f"{company} | Wholesale Order"
 
     inline_images = _inline_image_attachments()
     logo_cid = inline_images["logo"][3] if "logo" in inline_images else None
@@ -753,7 +753,6 @@ def send_order_email(customer: dict[str, Any], items: list[dict[str, Any]]) -> d
         csv_text,
         csv_path,
         settings,
-        fallback=False,
     )
     if send_with_retry(normal_message, order_id, normalized_customer, settings, mode="order_email"):
         return {
@@ -780,7 +779,6 @@ def send_order_email(customer: dict[str, Any], items: list[dict[str, Any]]) -> d
         csv_text,
         csv_path,
         settings,
-        fallback=True,
     )
     if send_with_retry(fallback_message, order_id, normalized_customer, settings, mode="fallback_email"):
         return {

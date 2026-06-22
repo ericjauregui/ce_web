@@ -5,6 +5,7 @@
   }
 
   const STORAGE_KEY = "ce-whatsapp-float-position";
+  const MOBILE_BREAKPOINT_MAX_PX = 767.98;
   const HOLD_DELAY_MS = 170;
   const MOVE_THRESHOLD_PX = 8;
   let dragPointerId = null;
@@ -12,6 +13,7 @@
   let suppressClick = false;
   let dragReady = false;
   let dragging = false;
+  let hasBeenMoved = false;
   let pointerStartX = 0;
   let pointerStartY = 0;
   let bubbleWidth = 0;
@@ -54,9 +56,24 @@
     return clamped;
   }
 
-  function persistPosition(position) {
+  function clearSavedPosition() {
     try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(position));
+      window.localStorage.removeItem(STORAGE_KEY);
+    } catch (_err) {
+      // Ignore storage failures.
+    }
+  }
+
+  function persistManualPosition(position) {
+    try {
+      window.localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({
+          left: position.left,
+          top: position.top,
+          manual: true,
+        }),
+      );
     } catch (_err) {
       // Ignore storage failures.
     }
@@ -70,6 +87,11 @@
   }
 
   function loadSavedPosition() {
+    // On mobile, always start from the default corner to avoid stale saved coords.
+    if (window.innerWidth <= MOBILE_BREAKPOINT_MAX_PX) {
+      return false;
+    }
+
     try {
       const rawValue = window.localStorage.getItem(STORAGE_KEY);
       if (!rawValue) {
@@ -79,12 +101,15 @@
       const parsed = JSON.parse(rawValue);
       if (
         !parsed ||
+        parsed.manual !== true ||
         !Number.isFinite(parsed.left) ||
         !Number.isFinite(parsed.top)
       ) {
+        clearSavedPosition();
         return false;
       }
 
+      hasBeenMoved = true;
       applyPosition(parsed.left, parsed.top);
       return true;
     } catch (_err) {
@@ -93,12 +118,15 @@
   }
 
   function normalizeInitialPosition() {
-    const rect = syncBubbleMetrics();
+    syncBubbleMetrics();
     if (loadSavedPosition()) {
       return;
     }
 
-    applyPosition(rect.left, rect.top);
+    // Snap to bottom-right corner on initial load
+    const bottomRightLeft = window.innerWidth - bubbleWidth - 20;
+    const bottomRightTop = window.innerHeight - bubbleHeight - 20;
+    applyPosition(bottomRightLeft, bottomRightTop);
   }
 
   function beginDrag(event) {
@@ -110,6 +138,7 @@
     dragging = true;
     dragReady = false;
     suppressClick = true;
+    hasBeenMoved = true;
     bubble.classList.add("is-dragging");
     pointerOffsetX = event.clientX - rect.left;
     pointerOffsetY = event.clientY - rect.top;
@@ -128,7 +157,7 @@
     dragging = false;
     bubble.classList.remove("is-dragging");
     if (pendingPosition) {
-      persistPosition(pendingPosition);
+      persistManualPosition(pendingPosition);
     }
   }
 
@@ -225,10 +254,22 @@
   window.addEventListener(
     "resize",
     () => {
-      const rect = syncBubbleMetrics();
-      const position = pendingPosition || { left: rect.left, top: rect.top };
-      const clamped = applyPosition(position.left, position.top);
-      persistPosition(clamped);
+      syncBubbleMetrics();
+
+      if (hasBeenMoved) {
+        // If manually moved, preserve the saved position (clamped to new viewport)
+        const position = pendingPosition;
+        if (position) {
+          const clamped = applyPosition(position.left, position.top);
+          persistManualPosition(clamped);
+        }
+      } else {
+        // If not manually moved, always snap to bottom-right and do not persist.
+        const bottomRightLeft = window.innerWidth - bubbleWidth - 20;
+        const bottomRightTop = window.innerHeight - bubbleHeight - 20;
+        applyPosition(bottomRightLeft, bottomRightTop);
+        clearSavedPosition();
+      }
     },
     { passive: true },
   );

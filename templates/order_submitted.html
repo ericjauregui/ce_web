@@ -16,23 +16,24 @@ copy and contact us with any follow-up details.{% endblock %}
   <div class="container" style="max-width: 900px;">
   <div class="card bg-dark border-gold p-3 order-submitted-card">
     {% if email_sent %}
-    <p class="text-gold-70 mb-0">Inquiry submitted successfully. Our sales team will be reaching out to you to complete your order.</p>
+    <p class="text-gold-70 mb-0" style="font-size: 1.1rem;">Order submitted successfully. Our sales team will be reaching out to you to complete your order.</p>
+    <p class="text-gold-70 mt-2" style="font-size: 0.95rem;">📧 If you don't see our email, please check your spam or junk folder.</p>
     {% if order_id %}
-    <p class="text-gold mt-3 mb-0">Order ID: {{ order_id }}</p>
+    <p class="text-gold mt-3 mb-0" style="font-size: 1rem;"><strong>Order ID: {{ order_id }}</strong></p>
     {% endif %}
     {% if client_email %}
-    <p class="text-gold-70 small mt-1 mb-0">Customer Email: {{ client_email }}.</p>
+    <p class="text-gold-70 mt-2 mb-0" style="font-size: 0.95rem;">Your Email: {{ client_email }}</p>
     {% endif %}
     {% if fallback_used %}
-    <p class="text-gold-70 mb-0">Inquiry submitted successfully. Our sales team will be reaching out to you to complete your order.</p>
+    <p class="text-gold-70 mt-3" style="font-size: 0.95rem;">Order submitted successfully. Our sales team will be reaching out to you to complete your order.</p>
     {% endif %}
     {% else %}
-    <p class="text-gold-70 mb-0">We couldn't deliver the order email. Please share the csv/pdf of your order with our team{% if order_id %}. Reference order ID: {{ order_id }}{% endif %}.</p>
+    <p class="text-gold-70 mb-0" style="font-size: 1.1rem;">We couldn't deliver the order email. Please download the PDF below and <a href="{{ url_for('contact') }}" class="text-gold-70 text-decoration-none"><u>contact us</u></a> to send it to our team{% if order_id %}. Reference order ID: {{ order_id }}{% endif %}.</p>
     {% if client_email %}
-    <p class="text-gold-70 small mt-1 mb-0">Customer Email: {{ client_email }}.</p>
+    <p class="text-gold-70 mt-2 mb-0" style="font-size: 0.95rem;">Your Email: {{ client_email }}</p>
     {% endif %}
     {% endif %}
-    <p class="text-gold-70 small mt-3 mb-0">
+    <p class="text-gold-70 mt-3 mb-0" style="font-size: 0.95rem;">
       If you have any questions, feel free to <a href="{{ url_for('contact') }}"
         class="text-gold-70 text-decoration-none"><u>contact us</u></a>.
     </p>
@@ -40,7 +41,11 @@ copy and contact us with any follow-up details.{% endblock %}
     {% if token %}
     <hr class="border-gold my-4">
 
-    <h2 class="h6 text-gold mb-2">Download a copy of your order below:</h2>
+    {% if email_sent %}
+    <h2 class="h5 text-gold mb-3">Download a copy of your order below:</h2>
+    {% else %}
+    <h2 class="h5 text-gold mb-3">Download your order PDF and send it to us:</h2>
+    {% endif %}
     <div class="d-flex flex-wrap gap-2 align-items-center justify-content-center mt-2 order-submitted-download-actions">
       <a class="btn btn-outline-gold" href="{{ url_for('download_order_csv', token=token) }}">Download CSV</a>
       <a class="btn btn-outline-gold" href="{{ url_for('download_order_pdf', token=token) }}">Download PDF</a>
@@ -49,15 +54,15 @@ copy and contact us with any follow-up details.{% endblock %}
     {% if order_rows %}
     <hr class="border-gold my-4">
 
-    <h2 class="h6 text-gold mb-2">Order Summary</h2>
+    <h2 class="h5 text-gold mb-3">Order Summary</h2>
     <div class="table-responsive">
-      <table class="table table-dark align-middle mb-0 minimal-items-table checkout-items-table order-submitted-items-table">
+      <table class="table table-dark align-middle mb-0 minimal-items-table checkout-items-table order-submitted-items-table" style="font-size: 1rem;">
         <thead>
           <tr>
-            <th>Item</th>
-            <th>Code</th>
-            <th>Quantity</th>
-            <th>Notes</th>
+            <th style="font-size: 1.05rem;">Item</th>
+            <th style="font-size: 1.05rem;">Code</th>
+            <th style="font-size: 1.05rem;">Quantity</th>
+            <th style="font-size: 1.05rem;">Notes</th>
           </tr>
         </thead>
         <tbody>
@@ -81,8 +86,8 @@ copy and contact us with any follow-up details.{% endblock %}
       <div class="checkout-summary-bar__left"></div>
       <div class="checkout-summary-bar__center">
         <div class="d-flex align-items-center flex-wrap gap-2 checkout-summary-metrics">
-          <div class="text-gold-70 small">Total Items:<span class="text-gold">{{ order_rows|length }}</span></div>
-          <div class="text-gold-70 small">Total Quantity:<span class="text-gold">{{ order_rows|sum(attribute='quantity') }}</span></div>
+          <div class="text-gold-70" style="font-size: 1rem;">Total Items:<span class="text-gold" style="font-size: 1.1rem; font-weight: bold;">{{ order_rows|length }}</span></div>
+          <div class="text-gold-70" style="font-size: 1rem;">Total Quantity:<span class="text-gold" style="font-size: 1.1rem; font-weight: bold;">{{ order_rows|sum(attribute='quantity') }}</span></div>
         </div>
       </div>
       <div class="checkout-summary-bar__right"></div>

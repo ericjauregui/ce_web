@@ -404,6 +404,14 @@ main {
         font-size: clamp(.9rem, 3.2cqw, 1.06rem);
         line-height: 1;
         padding-block: max(clamp(.34rem, 1.5cqw, .56rem), calc((var(--cta-btn-min-height) - 1em) / 2));
+        background: rgba(13, 13, 13, 0.95) !important;
+    }
+
+    .hero-action-btn--highlight {
+      background: linear-gradient(90deg,
+          rgb(var(--gold-rgb) / 0.84),
+          rgb(var(--gold-rgb) / 0.96),
+          rgb(var(--gold-rgb) / 0.84)) !important;
     }
 
     .hero::after {

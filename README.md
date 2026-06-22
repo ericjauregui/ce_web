@@ -7,7 +7,7 @@ Flask-based wholesale jewelry site for California Earrings. The app serves a ser
 - Renders the wholesale catalog at `/` with in-page collection sections and query-driven inventory search.
 - Serves product detail pages at `/product/<product_code>` with canonical redirects, product schema, and share-friendly metadata.
 - Surfaces the latest short-form inventory videos on the homepage and the full reels experience at `/reels`.
-- Supports a session-backed cart and inquiry checkout flow with CSV/PDF order exports.
+- Supports a session-backed cart and order checkout flow with CSV/PDF order exports.
 - Publishes crawlable marketing/support pages at `/about`, `/contact`, `/faqs`, `/team`, and `/team/<member_slug>`.
 - Exposes SEO infrastructure at `/robots.txt`, `/sitemap.xml`, and `/sitemaps.xml`.
 
