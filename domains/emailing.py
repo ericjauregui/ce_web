@@ -726,12 +726,6 @@ def make_message(
         subtype="pdf",
         filename=pdf_filename,
     )
-    message.add_attachment(
-        csv_text.encode("utf-8"),
-        maintype="text",
-        subtype="csv",
-        filename=csv_path.name,
-    )
     return message
 
 

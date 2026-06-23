@@ -128,6 +128,7 @@ class EmailingTests(unittest.TestCase):
         self.assertIn("ce_email_signature.png", raw_message)
         self.assertIn("Content-ID:", raw_message)
         self.assertIn("cid:", raw_message)
+        self.assertNotIn("text/csv", raw_message)  # CSV is saved but not attached to email
 
     def test_build_order_html_uses_cleaner_layout_and_social_cta(self) -> None:
         html = emailing.build_order_html(
