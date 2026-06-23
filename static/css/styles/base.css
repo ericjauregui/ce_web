@@ -342,13 +342,13 @@ main {
   line-height: 1;
   gap: .56rem;
   padding: clamp(.68rem, 1.18vw, .92rem) clamp(1.08rem, 2.3vw, 1.64rem);
-  min-height: clamp(44px, 4.5vw, 52px);
+  min-height: clamp(50px, 5vw, 60px);
   box-sizing: border-box;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   text-align: center;
-  border-radius: 14px;
+  border-radius: 20px;
   border: 1px solid rgb(var(--gold-rgb) / 0.62) !important;
   background: rgba(9, 9, 9, 0.86) !important;
   color: var(--gold) !important;
@@ -459,11 +459,11 @@ main {
   }
 
   .hero-action-btn {
-    min-height: 44px;
+    min-height: 52px;
     font-size: clamp(.9rem, 3.3cqw, 1.04rem);
     line-height: 1;
     padding: .72rem .98rem;
-    border-radius: 12px;
+    border-radius: 18px;
     gap: .46rem;
     background: rgba(9, 9, 9, 0.92) !important;
   }
