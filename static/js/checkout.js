@@ -18,6 +18,9 @@
   const phoneError = document.getElementById("checkoutPhoneError");
   const emailInput = document.getElementById("checkoutEmail");
   const emailError = document.getElementById("checkoutEmailError");
+  const addressLine1Input = document.getElementById("checkoutAddressLine1");
+  const addressLine2Input = document.getElementById("checkoutAddressLine2");
+  const postalCodeInput = document.getElementById("checkoutPostalCode");
   const cityInput = document.getElementById("checkoutCity");
   const cityError = document.getElementById("checkoutCityError");
   const stateInput = document.getElementById("checkoutState");
@@ -39,6 +42,9 @@
     !phoneError ||
     !emailInput ||
     !emailError ||
+    !addressLine1Input ||
+    !addressLine2Input ||
+    !postalCodeInput ||
     !cityInput ||
     !cityError ||
     !stateInput ||
@@ -590,6 +596,152 @@
     return true;
   }
 
+  function getAddressComponent(components, type, property) {
+    const component = (components || []).find(function (entry) {
+      return Array.isArray(entry.types) && entry.types.includes(type);
+    });
+    if (!component) {
+      return "";
+    }
+    return String(component[property || "long_name"] || "").trim();
+  }
+
+  function getFirstAddressComponent(components, types, property) {
+    for (let index = 0; index < types.length; index += 1) {
+      const value = getAddressComponent(components, types[index], property);
+      if (value) {
+        return value;
+      }
+    }
+    return "";
+  }
+
+  function applyAutocompletePlace(place) {
+    const components =
+      place && Array.isArray(place.address_components)
+        ? place.address_components
+        : [];
+    if (!components.length) {
+      return;
+    }
+
+    const streetNumber = getAddressComponent(
+      components,
+      "street_number",
+      "long_name",
+    );
+    const route = getAddressComponent(components, "route", "long_name");
+    const premise = getAddressComponent(components, "premise", "long_name");
+    const subpremise = getAddressComponent(
+      components,
+      "subpremise",
+      "long_name",
+    );
+    const floor = getAddressComponent(components, "floor", "long_name");
+    const city = getFirstAddressComponent(components, [
+      "locality",
+      "postal_town",
+      "sublocality_level_1",
+      "administrative_area_level_2",
+    ]);
+    const state = getAddressComponent(
+      components,
+      "administrative_area_level_1",
+      "long_name",
+    );
+    const postalCode = getAddressComponent(
+      components,
+      "postal_code",
+      "long_name",
+    );
+    const countryKey = getAddressComponent(
+      components,
+      "country",
+      "short_name",
+    ).toLowerCase();
+    const countryLabel = getAddressComponent(
+      components,
+      "country",
+      "long_name",
+    );
+
+    const addressLine1 =
+      [streetNumber, route].filter(Boolean).join(" ") ||
+      premise ||
+      String(place.name || "").trim() ||
+      addressLine1Input.value.trim();
+    const addressLine2 = [subpremise, floor].filter(Boolean).join(", ");
+
+    if (addressLine1) {
+      addressLine1Input.value = addressLine1;
+    }
+
+    if (addressLine2 && !addressLine2Input.value.trim()) {
+      addressLine2Input.value = addressLine2;
+    }
+
+    if (city) {
+      cityInput.value = city;
+    }
+
+    if (state) {
+      stateInput.value = state;
+    }
+
+    if (postalCode) {
+      postalCodeInput.value = postalCode;
+    }
+
+    if (countryKey) {
+      setCountrySelectionByKey(countryKey);
+      if (!countryKeyInput.value && countryLabel) {
+        countryInput.value = countryLabel;
+        syncCountryKey();
+      }
+    } else if (countryLabel) {
+      countryInput.value = countryLabel;
+      syncCountryKey();
+    }
+
+    validateCityField();
+    validateStateField();
+    validateCountryField();
+  }
+
+  let addressAutocompleteInitialized = false;
+
+  function initializeCheckoutAddressAutocomplete() {
+    if (addressAutocompleteInitialized) {
+      return;
+    }
+
+    if (
+      !window.google ||
+      !window.google.maps ||
+      !window.google.maps.places ||
+      typeof window.google.maps.places.Autocomplete !== "function"
+    ) {
+      return;
+    }
+
+    const autocomplete = new window.google.maps.places.Autocomplete(
+      addressLine1Input,
+      {
+        types: ["address"],
+        fields: ["address_components", "name"],
+      },
+    );
+
+    autocomplete.addListener("place_changed", function () {
+      applyAutocompletePlace(autocomplete.getPlace());
+    });
+
+    addressAutocompleteInitialized = true;
+  }
+
+  window.initializeCheckoutAddressAutocomplete =
+    initializeCheckoutAddressAutocomplete;
+
   const phoneCountryComboboxController = createCombobox({
     wrapper: phoneCountryCombobox,
     input: phoneCountryInput,
@@ -711,6 +863,7 @@
 
   syncPhoneCountryKey();
   syncCountryKey();
+  initializeCheckoutAddressAutocomplete();
 
   form.addEventListener("submit", function (event) {
     const requiredFields = form.querySelectorAll("input[required]");

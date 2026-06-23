@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import csv
+from html import escape
 import io
 from pathlib import Path
 from typing import Any
@@ -133,7 +134,76 @@ def cart_to_csv_bytes(order_rows: list[dict[str, Any]]) -> bytes:
     return buffer.getvalue().encode("utf-8")
 
 
-def cart_to_pdf_bytes(order_rows: list[dict[str, Any]], product_images_dir: Path) -> bytes:
+def _customer_shipping_address_lines(customer: dict[str, Any] | None) -> list[str]:
+    if not isinstance(customer, dict):
+        return []
+
+    lines: list[str] = []
+    for key in ("address_line_1", "address_line_2"):
+        value = str(customer.get(key) or "").strip()
+        if value:
+            lines.append(value)
+
+    city = str(customer.get("city") or "").strip()
+    state = str(customer.get("state") or "").strip()
+    postal_code = str(customer.get("postal_code") or "").strip()
+    country = str(customer.get("country") or "").strip()
+
+    location_prefix = ", ".join(part for part in [city, state] if part)
+    if postal_code:
+        location_prefix = f"{location_prefix} {postal_code}".strip() if location_prefix else postal_code
+
+    location_line = ", ".join(part for part in [location_prefix, country] if part)
+    if location_line:
+        lines.append(location_line)
+
+    return lines
+
+
+def _customer_invoice_summary_html(customer: dict[str, Any] | None, order_id: str) -> str:
+    if not isinstance(customer, dict):
+        customer = {}
+
+    detail_lines: list[str] = []
+    normalized_order_id = str(order_id or "").strip()
+    if normalized_order_id:
+        detail_lines.append(f"<b>Order ID:</b> {escape(normalized_order_id)}")
+
+    for label, key in (
+        ("Company", "company"),
+        ("Customer", "name"),
+        ("Phone", "phone"),
+        ("Email", "email"),
+    ):
+        value = str(customer.get(key) or "").strip()
+        if value:
+            detail_lines.append(f"<b>{label}:</b> {escape(value)}")
+
+    shipping_lines = _customer_shipping_address_lines(customer)
+    if shipping_lines:
+        first_line = escape(shipping_lines[0])
+        remaining_lines = shipping_lines[1:]
+        ship_to_html = f"<b>Ship To:</b> {first_line}"
+        if remaining_lines:
+            ship_to_html = f"{ship_to_html}<br/>" + "<br/>".join(
+                escape(line) for line in remaining_lines
+            )
+        detail_lines.append(ship_to_html)
+
+    notes = str(customer.get("notes") or "").strip()
+    if notes:
+        detail_lines.append(f"<b>Notes:</b> {escape(notes)}")
+
+    return "<br/>".join(detail_lines)
+
+
+def cart_to_pdf_bytes(
+    order_rows: list[dict[str, Any]],
+    product_images_dir: Path,
+    *,
+    customer: dict[str, Any] | None = None,
+    order_id: str = "",
+) -> bytes:
     from reportlab.lib import colors
     from reportlab.lib.pagesizes import letter
     from reportlab.lib.styles import getSampleStyleSheet
@@ -154,6 +224,10 @@ def cart_to_pdf_bytes(order_rows: list[dict[str, Any]], product_images_dir: Path
     title_style = styles["Title"].clone("OrderSummaryTitle")
     title_style.alignment = 1
     title_cell = Paragraph("Order Summary", title_style)
+    detail_style = styles["Title"].clone("OrderSummaryDetails")
+    detail_style.alignment = 2
+    detail_style.fontSize = 8.5
+    detail_style.leading = 10.5
     logo_cell: Any = ""
     if logo_path.exists():
         try:
@@ -162,9 +236,12 @@ def cart_to_pdf_bytes(order_rows: list[dict[str, Any]], product_images_dir: Path
         except Exception:
             logo_cell = ""
 
+    detail_html = _customer_invoice_summary_html(customer, order_id)
+    detail_cell: Any = Paragraph(detail_html, detail_style) if detail_html else ""
+
     header_side_width = 180
     header_table = Table(
-        [[logo_cell, title_cell, ""]],
+        [[logo_cell, title_cell, detail_cell]],
         colWidths=[header_side_width, doc.width - (header_side_width * 2), header_side_width],
     )
     header_table.setStyle(

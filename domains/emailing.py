@@ -117,11 +117,37 @@ def _normalize_customer(customer: dict[str, Any]) -> dict[str, str]:
         "company": str(customer.get("company") or "").strip(),
         "phone": str(customer.get("phone") or "").strip(),
         "email": _normalized_email(str(customer.get("email") or "")),
+        "address_line_1": str(customer.get("address_line_1") or "").strip(),
+        "address_line_2": str(customer.get("address_line_2") or "").strip(),
+        "postal_code": str(customer.get("postal_code") or "").strip(),
         "city": str(customer.get("city") or "").strip(),
         "state": str(customer.get("state") or "").strip(),
         "country": str(customer.get("country") or "").strip(),
         "notes": str(customer.get("notes") or "").strip(),
     }
+
+
+def _customer_shipping_address_lines(customer: dict[str, str]) -> list[str]:
+    lines: list[str] = []
+    for key in ("address_line_1", "address_line_2"):
+        value = str(customer.get(key) or "").strip()
+        if value:
+            lines.append(value)
+
+    city = str(customer.get("city") or "").strip()
+    state = str(customer.get("state") or "").strip()
+    postal_code = str(customer.get("postal_code") or "").strip()
+    country = str(customer.get("country") or "").strip()
+
+    location_prefix = ", ".join(part for part in [city, state] if part)
+    if postal_code:
+                location_prefix = f"{location_prefix} {postal_code}".strip() if location_prefix else postal_code
+
+    location_line = ", ".join(part for part in [location_prefix, country] if part)
+    if location_line:
+        lines.append(location_line)
+
+    return lines
 
 
 def _load_order_email_social_links() -> dict[str, str]:
@@ -311,19 +337,20 @@ def build_order_csv(order_id: str, customer: dict[str, str], items: list[dict[st
     writer.writerow(["company_name", customer.get("company", "")])
     writer.writerow(["phone", customer.get("phone", "")])
     writer.writerow(["email", customer.get("email", "")])
+    writer.writerow(["address_line_1", customer.get("address_line_1", "")])
+    writer.writerow(["address_line_2", customer.get("address_line_2", "")])
     writer.writerow(["city", customer.get("city", "")])
     writer.writerow(["state", customer.get("state", "")])
+    writer.writerow(["postal_code", customer.get("postal_code", "")])
     writer.writerow(["country", customer.get("country", "")])
     writer.writerow(["order_notes", customer.get("notes", "")])
     writer.writerow([])
-    writer.writerow(["code", "name", "collection", "quantity", "item_notes"])
+    writer.writerow(["code", "quantity", "item_notes"])
 
     for item in items:
         writer.writerow(
             [
                 item.get("code", ""),
-                item.get("name", ""),
-                item.get("collection", ""),
                 item.get("quantity", 0),
                 item.get("notes", ""),
             ]
@@ -344,12 +371,12 @@ def save_order_csv(order_id: str, customer: dict[str, str], csv_text: str) -> Pa
 def build_order_plain_text(order_id: str, customer: dict[str, str], items: list[dict[str, Any]]) -> str:
     total_unique_items = len(items)
     total_quantity = sum(int(item.get("quantity", 0)) for item in items)
-    location = ", ".join(part for part in [customer.get("city"), customer.get("state"), customer.get("country")] if part)
     social_links = _load_order_email_social_links()
     instagram_url = social_links["instagram_url"]
     tiktok_url = social_links["tiktok_url"]
     instagram_handle = _social_handle_from_url(instagram_url)
     tiktok_handle = _social_handle_from_url(tiktok_url)
+    shipping_address_lines = _customer_shipping_address_lines(customer)
 
     lines = [
         "CALIFORNIA EARRINGS",
@@ -364,8 +391,13 @@ def build_order_plain_text(order_id: str, customer: dict[str, str], items: list[
         f"Company: {customer.get('company', '')}",
         f"Phone: {customer.get('phone', '')}",
         f"Email: {customer.get('email', '') or 'Not provided'}",
-        f"Location: {location or 'Not provided'}",
     ]
+
+    if shipping_address_lines:
+        lines.append("Shipping Address:")
+        lines.extend(shipping_address_lines)
+    else:
+        lines.append("Shipping Address: Not provided")
 
     if customer.get("notes"):
         lines.append(f"Order notes: {customer['notes']}")
@@ -382,10 +414,7 @@ def build_order_plain_text(order_id: str, customer: dict[str, str], items: list[
     )
 
     for index, item in enumerate(items, start=1):
-        line = (
-            f"{index}. {item.get('code', '')} | "
-            f"{item.get('collection', '')} | Qty: {item.get('quantity', 0)}"
-        )
+        line = f"{index}. {item.get('code', '')} | Qty: {item.get('quantity', 0)}"
         if item.get("notes"):
             line = f"{line} | Notes: {item['notes']}"
         lines.append(line)
@@ -424,13 +453,13 @@ def build_order_html(
 ) -> str:
     total_unique_items = len(items)
     total_quantity = sum(int(item.get("quantity", 0)) for item in items)
-    location = ", ".join(part for part in [customer.get("city"), customer.get("state"), customer.get("country")] if part)
     customer_notes = escape(customer.get("notes", ""))
     social_links = _load_order_email_social_links()
     instagram_url = social_links["instagram_url"]
     tiktok_url = social_links["tiktok_url"]
     instagram_handle = _social_handle_from_url(instagram_url) or "Instagram"
     tiktok_handle = _social_handle_from_url(tiktok_url) or "TikTok"
+    shipping_address_lines = _customer_shipping_address_lines(customer)
 
     item_rows: list[str] = []
     for index, item in enumerate(items, start=1):
@@ -439,14 +468,12 @@ def build_order_html(
         <tr>
                     <td style="padding:14px 16px;border-bottom:1px solid #5d543f;color:#cdb175;font-weight:600;vertical-align:top;">{index}</td>
                     <td style="padding:14px 16px;border-bottom:1px solid #5d543f;color:#f7f2e9;font-weight:700;vertical-align:top;">{code}</td>
-                    <td style="padding:14px 16px;border-bottom:1px solid #5d543f;color:#ddd1bd;vertical-align:top;">{collection}</td>
                     <td style="padding:14px 16px;border-bottom:1px solid #5d543f;color:#ddd1bd;vertical-align:top;">{notes}</td>
                     <td style="padding:14px 16px;border-bottom:1px solid #5d543f;color:#f7f2e9;text-align:right;font-weight:700;vertical-align:top;">{quantity}</td>
         </tr>
         """.format(
                 index=index,
                 code=escape(str(item.get("code", ""))),
-                collection=escape(str(item.get("collection", ""))),
                 notes=escape(str(item.get("notes", ""))) or "-",
                 quantity=int(item.get("quantity", 0)),
             )
@@ -479,7 +506,7 @@ def build_order_html(
         </div>
         """
 
-    location_value = escape(location) if location else "Not provided"
+    shipping_address_html = "<br>".join(escape(line) for line in shipping_address_lines) or "Not provided"
     customer_name = escape(customer.get("name", "") or "Customer")
     customer_company = escape(customer.get("company", "") or "Company not provided")
     customer_phone = escape(customer.get("phone", "") or "Not provided")
@@ -491,7 +518,7 @@ def build_order_html(
     order_notes_block = ""
     if customer_notes:
         order_notes_block = f"""
-                        <tr><td style="padding:8px 0;color:#8f7b54;vertical-align:top;">Notes</td><td style="padding:8px 0;color:#241c12;">{customer_notes}</td></tr>
+                        <tr><td style="padding:8px 0;color:#b7a57b;vertical-align:top;">Notes</td><td style="padding:8px 0;color:#f4efe6;">{customer_notes}</td></tr>
         """
 
     return f"""
@@ -514,7 +541,7 @@ def build_order_html(
                                 <tr><td style="padding:8px 0;color:#b7a57b;vertical-align:top;">Company</td><td style="padding:8px 0;color:#f4efe6;">{customer_company}</td></tr>
                                 <tr><td style="padding:8px 0;color:#b7a57b;vertical-align:top;">Phone</td><td style="padding:8px 0;color:#f4efe6;">{customer_phone}</td></tr>
                                 <tr><td style="padding:8px 0;color:#b7a57b;vertical-align:top;">Email</td><td style="padding:8px 0;color:#f4efe6;">{customer_email}</td></tr>
-                                <tr><td style="padding:8px 0;color:#b7a57b;vertical-align:top;">Location</td><td style="padding:8px 0;color:#f4efe6;">{location_value}</td></tr>
+                                                                <tr><td style="padding:8px 0;color:#b7a57b;vertical-align:top;">Shipping Address</td><td style="padding:8px 0;color:#f4efe6;">{shipping_address_html}</td></tr>
                 {order_notes_block}
               </table>
             </div>
@@ -541,7 +568,6 @@ def build_order_html(
                                 <tr style="background:#4a4438;">
                                     <th style="padding:14px 16px;text-align:left;color:#cdb175;font-size:12px;letter-spacing:1px;text-transform:uppercase;">#</th>
                                     <th style="padding:14px 16px;text-align:left;color:#cdb175;font-size:12px;letter-spacing:1px;text-transform:uppercase;">Code</th>
-                                    <th style="padding:14px 16px;text-align:left;color:#cdb175;font-size:12px;letter-spacing:1px;text-transform:uppercase;">Collection</th>
                                     <th style="padding:14px 16px;text-align:left;color:#cdb175;font-size:12px;letter-spacing:1px;text-transform:uppercase;">Notes</th>
                                     <th style="padding:14px 16px;text-align:right;color:#cdb175;font-size:12px;letter-spacing:1px;text-transform:uppercase;">Qty</th>
                 </tr>
@@ -686,7 +712,12 @@ def make_message(
         for item in items
     ]
     product_images_dir = base_dir / "static" / "product_images"
-    pdf_bytes = cart_to_pdf_bytes(pdf_order_rows, product_images_dir)
+    pdf_bytes = cart_to_pdf_bytes(
+        pdf_order_rows,
+        product_images_dir,
+        customer=customer,
+        order_id=order_id,
+    )
     pdf_filename = csv_path.name.replace(".csv", ".pdf")
 
     message.add_attachment(

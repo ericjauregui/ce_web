@@ -100,20 +100,42 @@
             >
             <div id="checkoutEmailError" class="checkout-field-error" aria-live="polite"></div>
           </div>
-          <div class="col-12 col-md-4">
+          <div class="col-12">
+            <label class="form-label text-gold-70">Address Line 1</label>
+            <input
+              name="address_line_1"
+              class="form-control bg-black text-light border-gold"
+              id="checkoutAddressLine1"
+              autocomplete="shipping address-line1"
+              placeholder="Street address"
+              value="{{ form_values.address_line_1 }}"
+            >
+          </div>
+          <div class="col-12">
+            <label class="form-label text-gold-70">Address Line 2</label>
+            <input
+              name="address_line_2"
+              class="form-control bg-black text-light border-gold"
+              id="checkoutAddressLine2"
+              autocomplete="shipping address-line2"
+              placeholder="Suite, unit, building, etc."
+              value="{{ form_values.address_line_2 }}"
+            >
+          </div>
+          <div class="col-12 col-md-3">
             <label class="form-label text-gold-70">City*</label>
             <input
               name="city"
               class="form-control bg-black text-light border-gold"
               id="checkoutCity"
-              autocomplete="address-level2"
+              autocomplete="shipping address-level2"
               required
               value="{{ form_values.city }}"
               aria-describedby="checkoutCityError"
             >
             <div id="checkoutCityError" class="checkout-field-error" aria-live="polite"></div>
           </div>
-          <div class="col-12 col-md-4">
+          <div class="col-12 col-md-3">
             <label class="form-label text-gold-70">State*</label>
             <div class="checkout-combobox" id="checkoutStateCombobox">
               <div class="checkout-combobox__field">
@@ -144,7 +166,19 @@
             </div>
             <div id="checkoutStateError" class="checkout-field-error" aria-live="polite"></div>
           </div>
-          <div class="col-12 col-md-4">
+          <div class="col-12 col-md-3">
+            <label class="form-label text-gold-70">Postal Code</label>
+            <input
+              name="postal_code"
+              class="form-control bg-black text-light border-gold"
+              id="checkoutPostalCode"
+              autocomplete="shipping postal-code"
+              inputmode="text"
+              placeholder="ZIP / postal code"
+              value="{{ form_values.postal_code }}"
+            >
+          </div>
+          <div class="col-12 col-md-3">
             <label class="form-label text-gold-70">Country*</label>
             <input type="hidden" name="country_key" id="checkoutCountryKey" value="{{ form_values.country_key }}">
             <div class="checkout-combobox" id="checkoutCountryCombobox">
@@ -249,4 +283,7 @@
     }|tojson }}
 </script>
 <script defer src="{{ asset_url('js/checkout.js') }}"></script>
+  {% if google_maps_places_api_key %}
+  <script defer src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_places_api_key }}&libraries=places&callback=initializeCheckoutAddressAutocomplete"></script>
+  {% endif %}
 {% endblock %}

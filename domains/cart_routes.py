@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import io
+import os
 import re
 import secrets
 from pathlib import Path
@@ -93,6 +94,14 @@ def register_cart_routes(
     send_order_email: SendOrderEmail,
     canonical_base_url: CanonicalBaseUrl,
 ) -> None:
+    checkout_google_maps_places_api_key = str(
+        app.config.get("GOOGLE_MAPS_PLACES_API_KEY")
+        or app.config.get("GOOGLE_MAPS_API_KEY")
+        or os.getenv("GOOGLE_MAPS_PLACES_API_KEY")
+        or os.getenv("GOOGLE_MAPS_API_KEY")
+        or ""
+    ).strip()
+
     def _build_order_customer(form_values: dict[str, str]) -> dict[str, str]:
         return {
             "name": form_values.get("name", ""),
@@ -102,6 +111,9 @@ def register_cart_routes(
                 form_values.get("phone", ""),
             ),
             "email": form_values.get("email", ""),
+            "address_line_1": form_values.get("address_line_1", ""),
+            "address_line_2": form_values.get("address_line_2", ""),
+            "postal_code": form_values.get("postal_code", ""),
             "city": form_values.get("city", ""),
             "state": form_values.get("state", ""),
             "country": form_values.get("country", ""),
@@ -171,6 +183,9 @@ def register_cart_routes(
                 "phone_country_code": "",
                 "phone_country": "",
                 "email": "",
+                "address_line_1": "",
+                "address_line_2": "",
+                "postal_code": "",
                 "city": "",
                 "state": "",
                 "country_key": "",
@@ -208,6 +223,7 @@ def register_cart_routes(
                 subdivisions_by_country_key=CHECKOUT_SUBDIVISION_OPTIONS_BY_COUNTRY_KEY,
                 form_values=values,
                 submission_error=submission_error,
+                google_maps_places_api_key=checkout_google_maps_places_api_key,
             ), status_code
 
         if request.method == "GET":
@@ -222,6 +238,9 @@ def register_cart_routes(
         )
         phone = normalize_checkout_phone(phone_country_key, request.form.get("phone") or "")
         client_email = (request.form.get("email") or "").strip()
+        address_line_1 = (request.form.get("address_line_1") or "").strip()
+        address_line_2 = (request.form.get("address_line_2") or "").strip()
+        postal_code = (request.form.get("postal_code") or "").strip()
         city = (request.form.get("city") or "").strip()
         state = (request.form.get("state") or "").strip()
         country = (request.form.get("country") or "").strip()
@@ -236,6 +255,9 @@ def register_cart_routes(
             "phone_country": phone_country_display,
             "phone_country_code": phone_country_key,
             "email": client_email,
+            "address_line_1": address_line_1,
+            "address_line_2": address_line_2,
+            "postal_code": postal_code,
             "city": city,
             "state": state,
             "country": country,
@@ -261,19 +283,25 @@ def register_cart_routes(
         customer = _build_order_customer(form_values)
         order_rows = order_rows_from_items(items)
 
-        def store_order_session(csv_text: str, order_id: str, csv_filename: str) -> str:
+        def store_order_session(
+            csv_text: str,
+            order_id: str,
+            csv_filename: str,
+            customer_details: dict[str, str],
+        ) -> str:
             token = secrets.token_urlsafe(24)
             session["last_order_csv"] = csv_text
             session["last_order_rows"] = order_rows
             session["last_order_token"] = token
             session["last_order_id"] = order_id
             session["last_order_csv_filename"] = csv_filename
+            session["last_order_customer"] = customer_details
             return token
 
         try:
             result = send_order_email(customer, validated_items)
         except OrderEmailDeliveryError as exc:
-            token = store_order_session(exc.csv_text, exc.order_id, exc.csv_path.name)
+            token = store_order_session(exc.csv_text, exc.order_id, exc.csv_path.name, customer)
             return render_template(
                 "order_submitted.html",
                 token=token,
@@ -294,6 +322,7 @@ def register_cart_routes(
             str(result.get("csv_text") or ""),
             str(result.get("order_id") or ""),
             str(result.get("csv_filename") or "order.csv"),
+            customer,
         )
         session["cart"] = {}
         session["cart_notes"] = {}
@@ -340,8 +369,18 @@ def register_cart_routes(
         if not isinstance(rows, list) or not rows:
             abort(404)
 
-        pdf_bytes = cart_to_pdf_bytes(rows, base_dir / "static" / "product_images")
-        order_id = str(session.get("last_order_id") or "").replace("#", "")
+        customer = session.get("last_order_customer")
+        if not isinstance(customer, dict):
+            customer = None
+
+        raw_order_id = str(session.get("last_order_id") or "")
+        pdf_bytes = cart_to_pdf_bytes(
+            rows,
+            base_dir / "static" / "product_images",
+            customer=customer,
+            order_id=raw_order_id,
+        )
+        order_id = raw_order_id.replace("#", "")
         return send_file(
             io.BytesIO(pdf_bytes),
             mimetype="application/pdf",

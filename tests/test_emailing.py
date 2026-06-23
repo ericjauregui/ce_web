@@ -63,6 +63,9 @@ class EmailingTests(unittest.TestCase):
             "company": "Sample Co",
             "phone": "+1 555-0101",
             "email": "buyer@example.com",
+            "address_line_1": "650 S Hill St Suite 518",
+            "address_line_2": "Building A",
+            "postal_code": "90014",
             "city": "Los Angeles",
             "state": "California",
             "country": "United States",
@@ -109,7 +112,11 @@ class EmailingTests(unittest.TestCase):
         self.assertTrue(csv_path.exists())
         csv_text = csv_path.read_text(encoding="utf-8")
         self.assertIn("order_id,#00001", csv_text)
-        self.assertIn("code,name,collection,quantity,item_notes", csv_text.lower())
+        self.assertIn("address_line_1,650 S Hill St Suite 518", csv_text)
+        self.assertIn("address_line_2,Building A", csv_text)
+        self.assertIn("postal_code,90014", csv_text)
+        self.assertIn("code,quantity,item_notes", csv_text.lower())
+        self.assertNotIn("collection", csv_text.lower())
         self.assertIn("Need matching pair", csv_text)
 
         self.assertEqual(len(sent_messages), 1)
@@ -135,8 +142,13 @@ class EmailingTests(unittest.TestCase):
         self.assertNotIn("Wholesale Order #00001", html)
         self.assertNotIn("Order ID", html)
         self.assertNotIn(">Item<", html)
+        self.assertNotIn(">Collection<", html)
         self.assertIn("width=\"420\"", html)
         self.assertIn("max-width:540px", html)
+        self.assertIn("Shipping Address", html)
+        self.assertIn("650 S Hill St Suite 518", html)
+        self.assertIn("Building A", html)
+        self.assertIn("Los Angeles, California 90014, United States", html)
         self.assertIn("Keep up with us on Instagram and TikTok", html)
         self.assertIn("Instagram @california_earrings", html)
         self.assertIn("TikTok @californiaearrings", html)

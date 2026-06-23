@@ -163,6 +163,12 @@ class CartEndpointTests(BaseWebTest):
         checkout_body = checkout_response.get_data(as_text=True)
         self.assertIn('class="checkout-col-notes">Item Notes</th>', checkout_body)
         self.assertIn('data-label="Item Notes"', checkout_body)
+        self.assertIn('name="address_line_1"', checkout_body)
+        self.assertIn('id="checkoutAddressLine1"', checkout_body)
+        self.assertIn('name="address_line_2"', checkout_body)
+        self.assertIn('id="checkoutAddressLine2"', checkout_body)
+        self.assertIn('name="postal_code"', checkout_body)
+        self.assertIn('id="checkoutPostalCode"', checkout_body)
         self.assertIn('class="checkout-items-header mb-3">', checkout_body)
         self.assertIn('class="d-flex align-items-center flex-wrap gap-2 checkout-summary-metrics"', checkout_body)
         self.assertIn(f'href="/product/{self.valid_code}"', checkout_body)
@@ -203,6 +209,9 @@ class CartEndpointTests(BaseWebTest):
                 "phone_country": "United States (+1)",
                 "phone_country_code": "us",
                 "phone": "555-0101",
+                "address_line_1": "650 S Hill St Suite 518",
+                "address_line_2": "Suite A",
+                "postal_code": "90014",
                 "city": "Los Angeles",
                 "state": "California",
                 "country": "United States",
@@ -222,7 +231,11 @@ class CartEndpointTests(BaseWebTest):
 
         self.assertIn("Need matching pair", csv_text)
         self.assertIn("order_id,#00001", csv_text)
-        self.assertIn("code,name,collection,quantity,item_notes", csv_text.lower())
+        self.assertIn("address_line_1,650 S Hill St Suite 518", csv_text)
+        self.assertIn("address_line_2,Suite A", csv_text)
+        self.assertIn("postal_code,90014", csv_text)
+        self.assertIn("code,quantity,item_notes", csv_text.lower())
+        self.assertNotIn("collection", csv_text.lower())
         self.assertNotIn("material", csv_text)
         self.assertNotIn("size_mm", csv_text)
 
@@ -289,8 +302,15 @@ class CartEndpointTests(BaseWebTest):
     def test_checkout_email_pdf_rows_preserve_product_images(self) -> None:
         captured_rows: list[dict[str, object]] = []
 
-        def fake_cart_to_pdf_bytes(order_rows, product_images_dir):
+        captured_customer: dict[str, object] = {}
+        captured_order_id = ""
+
+        def fake_cart_to_pdf_bytes(order_rows, product_images_dir, *, customer=None, order_id=""):
+            nonlocal captured_order_id
             captured_rows.extend(order_rows)
+            if isinstance(customer, dict):
+                captured_customer.update(customer)
+            captured_order_id = order_id
             return b"%PDF-test%"
 
         self.client.post(
@@ -306,6 +326,9 @@ class CartEndpointTests(BaseWebTest):
                         "phone_country": "United States (+1)",
                         "phone_country_code": "us",
                         "phone": "555-0101",
+                        "address_line_1": "650 S Hill St Suite 518",
+                        "address_line_2": "Suite A",
+                        "postal_code": "90014",
                         "city": "Los Angeles",
                         "state": "California",
                         "country": "United States",
@@ -318,6 +341,10 @@ class CartEndpointTests(BaseWebTest):
         self.assertEqual(len(captured_rows), 1)
         self.assertEqual(captured_rows[0]["code"], self.valid_code)
         self.assertTrue(captured_rows[0]["image"])
+        self.assertEqual(captured_customer.get("address_line_1"), "650 S Hill St Suite 518")
+        self.assertEqual(captured_customer.get("address_line_2"), "Suite A")
+        self.assertEqual(captured_customer.get("postal_code"), "90014")
+        self.assertEqual(captured_order_id, "#00001")
 
     def test_checkout_view_renders_searchable_checkout_comboboxes_without_prefill(self) -> None:
         self.client.post(
@@ -332,6 +359,9 @@ class CartEndpointTests(BaseWebTest):
         self.assertIn('id="checkoutPhoneCountry"', checkout_body)
         self.assertIn('aria-controls="checkoutPhoneCountryListbox"', checkout_body)
         self.assertIn('class="checkout-phone-group"', checkout_body)
+        self.assertIn('autocomplete="shipping address-line1"', checkout_body)
+        self.assertIn('autocomplete="shipping address-line2"', checkout_body)
+        self.assertIn('autocomplete="shipping postal-code"', checkout_body)
         self.assertIn('name="city"', checkout_body)
         self.assertIn('id="checkoutStateCombobox"', checkout_body)
         self.assertIn('name="state"', checkout_body)
@@ -497,6 +527,137 @@ class CartEndpointTests(BaseWebTest):
         self.assertIn(("SPAN", (3, totals_row_idx), (4, totals_row_idx)), order_table.styles)
         self.assertIn(("ALIGN", (0, totals_row_idx), (2, totals_row_idx), "CENTER"), order_table.styles)
         self.assertIn(("ALIGN", (3, totals_row_idx), (4, totals_row_idx), "CENTER"), order_table.styles)
+
+    def test_cart_pdf_layout_includes_invoice_style_customer_summary(self) -> None:
+        class FakeStyle:
+            def __init__(self, name: str) -> None:
+                self.name = name
+                self.alignment: int | None = None
+
+            def clone(self, name: str) -> "FakeStyle":
+                cloned = FakeStyle(name)
+                cloned.alignment = self.alignment
+                return cloned
+
+        class FakeParagraph:
+            def __init__(self, text: str, style: FakeStyle) -> None:
+                self.text = text
+                self.style = style
+
+        class FakeImage:
+            def __init__(self, path: str, width: int, height: int) -> None:
+                self.path = path
+                self.width = width
+                self.height = height
+                self.hAlign: str | None = None
+
+        class FakeTableStyle:
+            def __init__(self, commands: list[tuple[object, ...]]) -> None:
+                self.commands = commands
+
+        class FakeTable:
+            instances: list["FakeTable"] = []
+
+            def __init__(self, data: list[list[object]], colWidths: list[float] | None = None, repeatRows: int = 0) -> None:
+                self.data = data
+                self.colWidths = colWidths
+                self.repeatRows = repeatRows
+                self.styles: list[tuple[object, ...]] = []
+                FakeTable.instances.append(self)
+
+            def setStyle(self, style: FakeTableStyle) -> None:
+                self.styles.extend(style.commands)
+
+        class FakeSimpleDocTemplate:
+            def __init__(
+                self,
+                buffer: object,
+                pagesize: tuple[int, int],
+                leftMargin: int,
+                rightMargin: int,
+                topMargin: int,
+                bottomMargin: int,
+            ) -> None:
+                self.buffer = buffer
+                self.width = pagesize[0] - leftMargin - rightMargin
+
+            def build(self, elements: list[object]) -> None:
+                self.buffer.write(b"%PDF-test")
+
+        def fake_styles() -> dict[str, FakeStyle]:
+            return {"Title": FakeStyle("Title")}
+
+        fake_colors = types.ModuleType("reportlab.lib.colors")
+        fake_colors.white = "white"
+        fake_colors.HexColor = lambda value: value
+
+        fake_pagesizes = types.ModuleType("reportlab.lib.pagesizes")
+        fake_pagesizes.letter = (612, 792)
+
+        fake_styles_module = types.ModuleType("reportlab.lib.styles")
+        fake_styles_module.getSampleStyleSheet = fake_styles
+
+        fake_platypus = types.ModuleType("reportlab.platypus")
+        fake_platypus.Image = FakeImage
+        fake_platypus.Paragraph = FakeParagraph
+        fake_platypus.SimpleDocTemplate = FakeSimpleDocTemplate
+        fake_platypus.Spacer = lambda width, height: (width, height)
+        fake_platypus.Table = FakeTable
+        fake_platypus.TableStyle = FakeTableStyle
+
+        fake_reportlab = types.ModuleType("reportlab")
+        fake_reportlab_lib = types.ModuleType("reportlab.lib")
+        fake_reportlab_lib.colors = fake_colors
+        fake_reportlab_lib.pagesizes = fake_pagesizes
+        fake_reportlab_lib.styles = fake_styles_module
+
+        FakeTable.instances.clear()
+        order_rows = [{"code": "102SB", "name": "Classic Gold Diamond Studs", "quantity": 4, "notes": "", "image": ""}]
+        customer = {
+            "name": "Test Buyer",
+            "company": "Sample Co",
+            "phone": "+1 555-0101",
+            "email": "buyer@example.com",
+            "address_line_1": "650 S Hill St Suite 518",
+            "address_line_2": "Suite A",
+            "postal_code": "90014",
+            "city": "Los Angeles",
+            "state": "California",
+            "country": "United States",
+            "notes": "Please confirm availability.",
+        }
+        product_images_dir = webapp.BASE_DIR / "static" / "product_images"
+
+        with patch.dict(
+            sys.modules,
+            {
+                "reportlab": fake_reportlab,
+                "reportlab.lib": fake_reportlab_lib,
+                "reportlab.lib.colors": fake_colors,
+                "reportlab.lib.pagesizes": fake_pagesizes,
+                "reportlab.lib.styles": fake_styles_module,
+                "reportlab.platypus": fake_platypus,
+            },
+        ):
+            pdf_bytes = cart_domain.cart_to_pdf_bytes(
+                order_rows,
+                product_images_dir,
+                customer=customer,
+                order_id="#00001",
+            )
+
+        self.assertEqual(pdf_bytes, b"%PDF-test")
+        self.assertEqual(len(FakeTable.instances), 2)
+
+        header_table = FakeTable.instances[0]
+        detail_cell = header_table.data[0][2]
+        self.assertEqual(detail_cell.style.alignment, 2)
+        self.assertIn("<b>Order ID:</b> #00001", detail_cell.text)
+        self.assertIn("<b>Company:</b> Sample Co", detail_cell.text)
+        self.assertIn("<b>Customer:</b> Test Buyer", detail_cell.text)
+        self.assertIn("650 S Hill St Suite 518", detail_cell.text)
+        self.assertIn("<b>Ship To:</b> 650 S Hill St Suite 518", detail_cell.text)
+        self.assertIn("Los Angeles, California 90014, United States", detail_cell.text)
 
     def test_cart_to_pdf_bytes_keeps_image_heavy_orders_compact(self) -> None:
         product_images_dir = webapp.BASE_DIR / "static" / "product_images"
