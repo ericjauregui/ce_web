@@ -583,6 +583,8 @@
   justify-self: start;
 }
 
+
+
 .cart-page .cart-summary-metrics {
   justify-content: center;
   flex-wrap: nowrap;
@@ -645,11 +647,10 @@
   color: #101010 !important;
   border-color: transparent !important;
   border-radius: 16px !important;
-  font-weight: 700;
-  font-size: clamp(1.02rem, 1.75vw, 1.22rem);
-  letter-spacing: .01em;
-  line-height: 1.02;
-  padding: .62rem 1.24rem;
+  font-weight: var(--bs-btn-font-weight);
+  font-size: var(--bs-btn-font-size);
+  line-height: var(--bs-btn-line-height);
+  padding: var(--bs-btn-padding-y) var(--bs-btn-padding-x);
   background: linear-gradient(
     90deg,
     rgb(var(--gold-rgb) / 0.72),
@@ -675,8 +676,6 @@
 }
 
 .checkout-page .checkout-summary-submit-btn.summary-submit-btn--highlight {
-  font-size: var(--bs-btn-font-size);
-  padding: var(--bs-btn-padding-y) var(--bs-btn-padding-x);
   border-radius: 14px !important;
 }
 
@@ -707,13 +706,8 @@
 
   .cart-page .cart-summary-bar__left,
   .checkout-page .checkout-summary-bar__left {
-    justify-self: start;
-    min-width: 0;
-  }
-
-  .cart-page .cart-summary-bar__left,
-  .checkout-page .checkout-summary-bar__left {
     grid-area: left;
+    justify-self: start;
   }
 
   .cart-page .cart-summary-bar__right,
@@ -726,12 +720,7 @@
   .cart-page .cart-summary-bar__right .btn,
   .checkout-page .checkout-summary-bar__left .btn,
   .checkout-page .checkout-summary-bar__right .btn {
-    width: auto;
     min-width: clamp(9.25rem, 34vw, 12rem);
-  }
-
-  .checkout-page .checkout-summary-bar__right .checkout-summary-submit-btn.summary-submit-btn--highlight {
-    min-width: 0;
   }
 
   .cart-page .cart-summary-metrics,
@@ -798,6 +787,7 @@
   .cart-page .cart-summary-bar__left .btn,
   .cart-page .cart-summary-bar__right .btn,
   .checkout-page .checkout-items-header .btn,
+  .checkout-page .checkout-summary-bar__left .btn,
   .checkout-page .checkout-summary-bar__right .btn {
     font-size: .91rem;
     padding: .38rem .58rem;
@@ -810,13 +800,8 @@
 
   .cart-page .summary-submit-btn--highlight,
   .checkout-page .summary-submit-btn--highlight {
-    font-size: 1.02rem !important;
-    padding: .54rem 1rem !important;
-  }
-
-  .checkout-page .checkout-summary-submit-btn.summary-submit-btn--highlight {
-    font-size: .91rem !important;
-    padding: .38rem .58rem !important;
+    font-size: var(--bs-btn-font-size);
+    padding: var(--bs-btn-padding-y) var(--bs-btn-padding-x);
   }
 
   .cart-page .cart-summary-metrics {
@@ -1052,6 +1037,8 @@
 .checkout-page .btn-outline-gold.summary-submit-btn--highlight {
   color: #101010 !important;
   border-color: transparent !important;
+  font-weight: var(--bs-btn-font-weight);
+  font-size: var(--bs-btn-font-size);
   background: linear-gradient(
     90deg,
     rgb(var(--gold-rgb) / 0.72),

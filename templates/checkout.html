@@ -204,7 +204,7 @@
               <tr>
                 <td class="cell-item" data-label="Item">
                   <a class="checkout-product-link checkout-product-thumb-link" href="{{ url_for('product_detail', product_code=row.product.code) }}" aria-label="View {{ row.product.code }} product details">
-                    <img src="{{ url_for('static', filename='product_images/' ~ row.product.image) }}" class="cart-thumb" alt="{{ row.product.name }}" loading="lazy" decoding="async" width="56" height="56">
+                    <img src="{{ asset_url('product_images/' ~ row.product.image) }}" class="cart-thumb" alt="{{ row.product.name }}" loading="lazy" decoding="async" width="56" height="56">
                   </a>
                 </td>
                 <td class="cell-code" data-label="Code"><a class="code-badge checkout-product-link checkout-product-code-link" href="{{ url_for('product_detail', product_code=row.product.code) }}">{{ row.product.code }}</a></td>

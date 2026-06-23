@@ -35,8 +35,11 @@ ORDER_DB_PATH = ORDER_LOG_DIR / "orders.db"
 ORDER_EVENT_LOG_DIR = ORDER_LOG_DIR / ".logs"
 _LEGACY_ORDER_CSV_DIR = ORDER_LOG_DIR / "orders_csv"
 ORDER_CSV_DIR = _LEGACY_ORDER_CSV_DIR if _LEGACY_ORDER_CSV_DIR.exists() else ORDER_LOG_DIR / "order_csv"
-EMAIL_LOGO_IMAGE_PATH = BASE_DIR / "static" / "assets" / "ce_logo_full_gold.png"
-EMAIL_SIGNATURE_IMAGE_PATH = BASE_DIR / "static" / "assets" / "ce_email_signature_light.jpg"
+EMAIL_LOGO_IMAGE_PATH = BASE_DIR / "static" / "assets" / "ce_logo_full.png"
+EMAIL_SIGNATURE_IMAGE_PATH = BASE_DIR / "static" / "assets" / "ce_email_signature.png"
+EMAIL_SOCIAL_CONFIG_PATH = BASE_DIR / "catalog" / "social.json"
+DEFAULT_EMAIL_INSTAGRAM_URL = "https://www.instagram.com/california_earrings/"
+DEFAULT_EMAIL_TIKTOK_URL = "https://www.tiktok.com/@californiaearrings"
 _CURRENT_LOG_PATH: Path | None = None
 
 
@@ -119,6 +122,47 @@ def _normalize_customer(customer: dict[str, Any]) -> dict[str, str]:
         "country": str(customer.get("country") or "").strip(),
         "notes": str(customer.get("notes") or "").strip(),
     }
+
+
+def _load_order_email_social_links() -> dict[str, str]:
+    social_links = {
+        "instagram_url": DEFAULT_EMAIL_INSTAGRAM_URL,
+        "tiktok_url": DEFAULT_EMAIL_TIKTOK_URL,
+    }
+
+    if not EMAIL_SOCIAL_CONFIG_PATH.exists():
+        return social_links
+
+    try:
+        payload = json.loads(EMAIL_SOCIAL_CONFIG_PATH.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return social_links
+
+    if not isinstance(payload, dict):
+        return social_links
+
+    instagram = payload.get("instagram")
+    if isinstance(instagram, dict):
+        instagram_url = str(instagram.get("profile_url") or "").strip()
+        if instagram_url:
+            social_links["instagram_url"] = instagram_url
+
+    tiktok = payload.get("tiktok")
+    if isinstance(tiktok, dict):
+        tiktok_url = str(tiktok.get("profile_url") or "").strip()
+        if tiktok_url:
+            social_links["tiktok_url"] = tiktok_url
+
+    return social_links
+
+
+def _social_handle_from_url(profile_url: str) -> str:
+    normalized = str(profile_url or "").strip().rstrip("/")
+    if not normalized:
+        return ""
+
+    handle = normalized.rsplit("/", 1)[-1].replace("@", "").strip()
+    return f"@{handle}" if handle else ""
 
 
 def _normalize_items(items: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -301,16 +345,19 @@ def build_order_plain_text(order_id: str, customer: dict[str, str], items: list[
     total_unique_items = len(items)
     total_quantity = sum(int(item.get("quantity", 0)) for item in items)
     location = ", ".join(part for part in [customer.get("city"), customer.get("state"), customer.get("country")] if part)
+    social_links = _load_order_email_social_links()
+    instagram_url = social_links["instagram_url"]
+    tiktok_url = social_links["tiktok_url"]
+    instagram_handle = _social_handle_from_url(instagram_url)
+    tiktok_handle = _social_handle_from_url(tiktok_url)
 
     lines = [
         "CALIFORNIA EARRINGS",
         "Wholesaler of 14K Gold Earrings & Piercings",
         "Over 30 Years in Business",
         "",
-        "Wholesale order submitted from californiaearrings.com",
-        "",
-        "ORDER ID",
-        order_id,
+        "Wholesale Order",
+        "Review the customer details and order summary below.",
         "",
         "CUSTOMER DETAILS",
         f"Name: {customer.get('name', '')}",
@@ -336,7 +383,7 @@ def build_order_plain_text(order_id: str, customer: dict[str, str], items: list[
 
     for index, item in enumerate(items, start=1):
         line = (
-            f"{index}. {item.get('code', '')} | {item.get('name', '')} | "
+            f"{index}. {item.get('code', '')} | "
             f"{item.get('collection', '')} | Qty: {item.get('quantity', 0)}"
         )
         if item.get("notes"):
@@ -350,6 +397,10 @@ def build_order_plain_text(order_id: str, customer: dict[str, str], items: list[
             "",
             "Next step:",
             "Contact customer to confirm availability, pricing, and fulfillment details.",
+            "",
+            "Keep up with our latest product releases:",
+            f"Instagram: {instagram_handle or instagram_url} - {instagram_url}",
+            f"TikTok: {tiktok_handle or tiktok_url} - {tiktok_url}",
             "",
             "California Earrings",
             "650 S Hill St Suite 518",
@@ -375,23 +426,26 @@ def build_order_html(
     total_quantity = sum(int(item.get("quantity", 0)) for item in items)
     location = ", ".join(part for part in [customer.get("city"), customer.get("state"), customer.get("country")] if part)
     customer_notes = escape(customer.get("notes", ""))
+    social_links = _load_order_email_social_links()
+    instagram_url = social_links["instagram_url"]
+    tiktok_url = social_links["tiktok_url"]
+    instagram_handle = _social_handle_from_url(instagram_url) or "Instagram"
+    tiktok_handle = _social_handle_from_url(tiktok_url) or "TikTok"
 
     item_rows: list[str] = []
     for index, item in enumerate(items, start=1):
         item_rows.append(
             """
         <tr>
-          <td style="padding:10px;border-bottom:1px solid #333;color:#d7c07a;">{index}</td>
-          <td style="padding:10px;border-bottom:1px solid #333;color:#ffffff;font-weight:bold;">{code}</td>
-          <td style="padding:10px;border-bottom:1px solid #333;color:#eeeeee;">{name}</td>
-          <td style="padding:10px;border-bottom:1px solid #333;color:#cccccc;">{collection}</td>
-          <td style="padding:10px;border-bottom:1px solid #333;color:#cccccc;">{notes}</td>
-          <td style="padding:10px;border-bottom:1px solid #333;color:#ffffff;text-align:right;font-weight:bold;">{quantity}</td>
+                    <td style="padding:14px 16px;border-bottom:1px solid #5d543f;color:#cdb175;font-weight:600;vertical-align:top;">{index}</td>
+                    <td style="padding:14px 16px;border-bottom:1px solid #5d543f;color:#f7f2e9;font-weight:700;vertical-align:top;">{code}</td>
+                    <td style="padding:14px 16px;border-bottom:1px solid #5d543f;color:#ddd1bd;vertical-align:top;">{collection}</td>
+                    <td style="padding:14px 16px;border-bottom:1px solid #5d543f;color:#ddd1bd;vertical-align:top;">{notes}</td>
+                    <td style="padding:14px 16px;border-bottom:1px solid #5d543f;color:#f7f2e9;text-align:right;font-weight:700;vertical-align:top;">{quantity}</td>
         </tr>
         """.format(
                 index=index,
                 code=escape(str(item.get("code", ""))),
-                name=escape(str(item.get("name", ""))),
                 collection=escape(str(item.get("collection", ""))),
                 notes=escape(str(item.get("notes", ""))) or "-",
                 quantity=int(item.get("quantity", 0)),
@@ -400,22 +454,22 @@ def build_order_html(
 
     if logo_cid:
         brand_html = f"""
-            <img src="cid:{logo_cid}" alt="California Earrings" style="max-width:280px;width:100%;height:auto;display:block;">
+            <img src="cid:{logo_cid}" width="420" alt="California Earrings" style="display:block;width:420px;max-width:100%;height:auto;margin:0 auto;">
         """
     else:
         brand_html = """
-            <div style="font-size:26px;letter-spacing:1px;color:#d7c07a;font-weight:bold;">California Earrings</div>
+            <div style="font-size:28px;letter-spacing:0.4px;color:#241c12;font-weight:700;">California Earrings</div>
         """
 
     if signature_cid:
         signature_html = f"""
-        <div style="padding:18px 32px;border-top:1px solid #333;background:#ffffff;text-align:center;">
-          <img src="cid:{signature_cid}" alt="California Earrings" style="max-width:650px;width:100%;height:auto;display:block;margin:0 auto;">
+        <div style="padding:24px 32px;border-top:1px solid #e6dcc7;text-align:center;">
+                    <img src="cid:{signature_cid}" alt="California Earrings" style="max-width:540px;width:100%;height:auto;display:block;margin:0 auto;">
         </div>
         """
     else:
         signature_html = """
-        <div style="padding:18px 32px;border-top:1px solid #333;color:#999;font-size:13px;background:#0d0d0d;line-height:1.5;">
+        <div style="padding:24px 32px;border-top:1px solid #e6dcc7;color:#756648;font-size:13px;line-height:1.6;text-align:center;">
           California Earrings<br>
           650 S Hill St Suite 518, Los Angeles, CA 90014<br>
           Office: +1 (213) 935-7272<br>
@@ -426,59 +480,84 @@ def build_order_html(
         """
 
     location_value = escape(location) if location else "Not provided"
+    customer_name = escape(customer.get("name", "") or "Customer")
+    customer_company = escape(customer.get("company", "") or "Company not provided")
+    customer_phone = escape(customer.get("phone", "") or "Not provided")
+    customer_email = escape(customer.get("email", "") or "Not provided")
+    instagram_link = escape(instagram_url)
+    tiktok_link = escape(tiktok_url)
+    instagram_label = escape(instagram_handle)
+    tiktok_label = escape(tiktok_handle)
     order_notes_block = ""
     if customer_notes:
         order_notes_block = f"""
-            <tr><td style="padding:6px 0;color:#999;vertical-align:top;">Notes</td><td style="padding:6px 0;color:#fff;">{customer_notes}</td></tr>
+                        <tr><td style="padding:8px 0;color:#8f7b54;vertical-align:top;">Notes</td><td style="padding:8px 0;color:#241c12;">{customer_notes}</td></tr>
         """
 
     return f"""
     <html>
-      <body style="margin:0;padding:0;background:#0d0d0d;color:#eeeeee;font-family:Arial,Helvetica,sans-serif;">
-        <div style="max-width:760px;margin:0 auto;background:#111111;border:1px solid #4a3a16;">
-          <div style="padding:28px 32px;border-bottom:1px solid #d7c07a;background:#0d0d0d;">
+            <body style="margin:0;padding:24px 12px;background:#433d32;color:#f4efe6;font-family:Arial,Helvetica,sans-serif;">
+                <div style="max-width:760px;margin:0 auto;background:#353129;border:1px solid #5d543f;border-radius:24px;overflow:hidden;">
+                    <div style="padding:28px 32px 24px;border-bottom:1px solid #5d543f;background:#4a4438;text-align:center;">
                         {brand_html}
-                        <div style="margin-top:6px;color:#c9b36a;font-size:15px;font-weight:bold;text-align:center;">Wholesaler of 14K Gold Earrings &amp; Piercings · Over 30 Years in Business</div>
+                        <p style="margin:16px auto 0;max-width:560px;color:#e3d9c5;font-size:15px;line-height:1.6;">A new wholesale order request has been submitted through californiaearrings.com. Review the customer details and order summary below.</p>
           </div>
 
-          <div style="padding:28px 32px;">
-            <h1 style="margin:0 0 18px;color:#ffffff;font-size:24px;">Wholesale Order {escape(order_id)}</h1>
+                    <div style="padding:32px;">
+                        <h1 style="margin:0 0 10px;color:#f7f2e9;font-size:30px;line-height:1.2;">Wholesale Order</h1>
+                        <p style="margin:0 0 24px;color:#ddd1bd;font-size:15px;line-height:1.6;">Submitted by <strong>{customer_name}</strong> for <strong>{customer_company}</strong>.</p>
 
-            <div style="background:#0d0d0d;border:1px solid #333;padding:18px;margin-bottom:22px;">
-              <h2 style="margin:0 0 12px;color:#d7c07a;font-size:16px;">Customer Details</h2>
-              <table style="width:100%;border-collapse:collapse;font-size:14px;">
-                <tr><td style="padding:6px 0;color:#999;">Order ID</td><td style="padding:6px 0;color:#fff;font-weight:bold;">{escape(order_id)}</td></tr>
-                <tr><td style="padding:6px 0;color:#999;">Name</td><td style="padding:6px 0;color:#fff;">{escape(customer.get('name', ''))}</td></tr>
-                <tr><td style="padding:6px 0;color:#999;">Company</td><td style="padding:6px 0;color:#fff;">{escape(customer.get('company', ''))}</td></tr>
-                <tr><td style="padding:6px 0;color:#999;">Phone</td><td style="padding:6px 0;color:#fff;">{escape(customer.get('phone', ''))}</td></tr>
-                <tr><td style="padding:6px 0;color:#999;">Email</td><td style="padding:6px 0;color:#fff;">{escape(customer.get('email', '') or 'Not provided')}</td></tr>
-                <tr><td style="padding:6px 0;color:#999;">Location</td><td style="padding:6px 0;color:#fff;">{location_value}</td></tr>
+                        <div style="background:#403a30;border:1px solid #5d543f;border-radius:18px;padding:22px;margin-bottom:22px;">
+                            <h2 style="margin:0 0 14px;color:#f7f2e9;font-size:17px;">Customer Details</h2>
+                            <table style="width:100%;border-collapse:collapse;font-size:14px;line-height:1.55;">
+                                <tr><td style="padding:8px 0;color:#b7a57b;width:120px;vertical-align:top;">Name</td><td style="padding:8px 0;color:#f4efe6;">{customer_name}</td></tr>
+                                <tr><td style="padding:8px 0;color:#b7a57b;vertical-align:top;">Company</td><td style="padding:8px 0;color:#f4efe6;">{customer_company}</td></tr>
+                                <tr><td style="padding:8px 0;color:#b7a57b;vertical-align:top;">Phone</td><td style="padding:8px 0;color:#f4efe6;">{customer_phone}</td></tr>
+                                <tr><td style="padding:8px 0;color:#b7a57b;vertical-align:top;">Email</td><td style="padding:8px 0;color:#f4efe6;">{customer_email}</td></tr>
+                                <tr><td style="padding:8px 0;color:#b7a57b;vertical-align:top;">Location</td><td style="padding:8px 0;color:#f4efe6;">{location_value}</td></tr>
                 {order_notes_block}
               </table>
             </div>
 
-            <div style="background:#0d0d0d;border:1px solid #333;padding:18px;margin-bottom:22px;">
-              <h2 style="margin:0 0 12px;color:#d7c07a;font-size:16px;">Order Summary</h2>
-              <p style="margin:0;color:#eeeeee;">Total unique items: <strong>{total_unique_items}</strong></p>
-              <p style="margin:6px 0 0;color:#eeeeee;">Total quantity: <strong>{total_quantity}</strong></p>
-            </div>
+                        <table role="presentation" style="width:100%;border-collapse:separate;border-spacing:0 0;margin:0 0 22px;">
+                            <tr>
+                                <td style="width:50%;padding:0 8px 0 0;">
+                                    <div style="background:#403a30;border:1px solid #5d543f;border-radius:18px;padding:18px 20px;">
+                                        <div style="color:#b7a57b;font-size:12px;letter-spacing:1.2px;text-transform:uppercase;font-weight:700;">Unique Items</div>
+                                        <div style="margin-top:8px;color:#f7f2e9;font-size:28px;font-weight:700;">{total_unique_items}</div>
+                                    </div>
+                                </td>
+                                <td style="width:50%;padding:0 0 0 8px;">
+                                    <div style="background:#403a30;border:1px solid #5d543f;border-radius:18px;padding:18px 20px;">
+                                        <div style="color:#b7a57b;font-size:12px;letter-spacing:1.2px;text-transform:uppercase;font-weight:700;">Total Quantity</div>
+                                        <div style="margin-top:8px;color:#f7f2e9;font-size:28px;font-weight:700;">{total_quantity}</div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
 
-            <table style="width:100%;border-collapse:collapse;font-size:14px;background:#0d0d0d;border:1px solid #333;">
+                        <table style="width:100%;border-collapse:collapse;font-size:14px;background:#403a30;border:1px solid #5d543f;border-radius:18px;overflow:hidden;">
               <thead>
-                <tr style="background:#1a1a1a;">
-                  <th style="padding:10px;text-align:left;color:#d7c07a;">#</th>
-                  <th style="padding:10px;text-align:left;color:#d7c07a;">Code</th>
-                  <th style="padding:10px;text-align:left;color:#d7c07a;">Item</th>
-                  <th style="padding:10px;text-align:left;color:#d7c07a;">Collection</th>
-                  <th style="padding:10px;text-align:left;color:#d7c07a;">Notes</th>
-                  <th style="padding:10px;text-align:right;color:#d7c07a;">Qty</th>
+                                <tr style="background:#4a4438;">
+                                    <th style="padding:14px 16px;text-align:left;color:#cdb175;font-size:12px;letter-spacing:1px;text-transform:uppercase;">#</th>
+                                    <th style="padding:14px 16px;text-align:left;color:#cdb175;font-size:12px;letter-spacing:1px;text-transform:uppercase;">Code</th>
+                                    <th style="padding:14px 16px;text-align:left;color:#cdb175;font-size:12px;letter-spacing:1px;text-transform:uppercase;">Collection</th>
+                                    <th style="padding:14px 16px;text-align:left;color:#cdb175;font-size:12px;letter-spacing:1px;text-transform:uppercase;">Notes</th>
+                                    <th style="padding:14px 16px;text-align:right;color:#cdb175;font-size:12px;letter-spacing:1px;text-transform:uppercase;">Qty</th>
                 </tr>
               </thead>
               <tbody>{''.join(item_rows)}</tbody>
             </table>
 
-            <div style="margin-top:24px;padding:16px;border-left:3px solid #d7c07a;background:#161616;">
-              <p style="margin:0;color:#eeeeee;line-height:1.5;">Next step: contact the customer to confirm availability, pricing, and fulfillment details.</p>
+                        <div style="margin-top:24px;padding:22px;background:#403a30;border:1px solid #5d543f;border-radius:18px;">
+                            <h2 style="margin:0 0 8px;color:#f7f2e9;font-size:18px;">Keep up with our latest releases</h2>
+                            <p style="margin:0 0 16px;color:#ddd1bd;line-height:1.6;">Keep up with us on Instagram and TikTok to see our latest product releases, new arrivals, and product videos.</p>
+                            <a href="{instagram_link}" style="display:inline-block;margin:0 10px 10px 0;padding:12px 18px;border:1px solid #8d7750;border-radius:999px;background:#4a4438;color:#f4efe6;font-size:14px;font-weight:700;line-height:1.2;text-decoration:none;">Instagram {instagram_label}</a>
+                            <a href="{tiktok_link}" style="display:inline-block;margin:0 0 10px;padding:12px 18px;border:1px solid #8d7750;border-radius:999px;background:#4a4438;color:#f4efe6;font-size:14px;font-weight:700;line-height:1.2;text-decoration:none;">TikTok {tiktok_label}</a>
+                        </div>
+
+                        <div style="margin-top:22px;padding:18px 20px;border-left:4px solid #caa65c;background:#403a30;color:#e7dcc8;border-radius:0 14px 14px 0;">
+                            <p style="margin:0;line-height:1.6;">Next step: contact the customer to confirm availability, pricing, and fulfillment details.</p>
             </div>
           </div>
 

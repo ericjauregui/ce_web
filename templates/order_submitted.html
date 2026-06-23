@@ -5,15 +5,12 @@ copy and contact us with any follow-up details.{% endblock %}
 {% block robots_meta %}noindex,nofollow{% endblock %}
 {% block content %}
 <section class="container-fluid py-5 checkout-page order-submitted-page">
-  <div class="container">
+  <div class="container checkout-shell">
     <div class="page-title-row mb-3">
       <a class="btn btn-outline-gold page-title-back" href="{{ url_for('index') }}#section-studs">← Full Catalog</a>
       <h1 class="text-gold mb-0">Order Submitted</h1>
       <span class="page-title-spacer btn btn-outline-gold" aria-hidden="true">← Full Catalog</span>
     </div>
-  </div>
-
-  <div class="container" style="max-width: 900px;">
   <div class="card bg-dark border-gold p-3 order-submitted-card">
     {% if email_sent %}
     <p class="text-gold-70 mb-0" style="font-size: 1.1rem;">Order submitted successfully. Our sales team will be reaching out to you to complete your order.</p>
@@ -70,7 +67,7 @@ copy and contact us with any follow-up details.{% endblock %}
           <tr>
             <td class="cell-item" data-label="Item">
               <a class="checkout-product-link checkout-product-thumb-link" href="{{ url_for('product_detail', product_code=row.code) }}" aria-label="View {{ row.code }} product details">
-                <img src="{{ url_for('static', filename='product_images/' ~ row.image) }}" class="cart-thumb" alt="" loading="lazy" decoding="async" width="56" height="56">
+                <img src="{{ asset_url('product_images/' ~ row.image) }}" class="cart-thumb" alt="" loading="lazy" decoding="async" width="56" height="56">
               </a>
             </td>
             <td class="cell-code" data-label="Code"><a class="code-badge checkout-product-link checkout-product-code-link" href="{{ url_for('product_detail', product_code=row.code) }}">{{ row.code }}</a></td>

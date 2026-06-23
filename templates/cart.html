@@ -35,7 +35,7 @@
               <td class="cell-item" data-label="Item">
                 <div class="d-flex align-items-center">
                   <a class="cart-product-link cart-product-thumb-link" href="{{ url_for('product_detail', product_code=row.product.code) }}" aria-label="View {{ row.product.code }} product details">
-                    <img src="{{ url_for('static', filename='product_images/' ~ row.product.image) }}" class="cart-thumb" alt="" loading="lazy" decoding="async" width="56" height="56">
+                    <img src="{{ asset_url('product_images/' ~ row.product.image) }}" class="cart-thumb" alt="" loading="lazy" decoding="async" width="56" height="56">
                   </a>
                 </div>
               </td>

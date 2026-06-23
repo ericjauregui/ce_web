@@ -6,7 +6,7 @@
 
   {% set base_url = (site_base_url or request.url_root).rstrip('/') %}
   {% set canonical_url = base_url ~ request.path %}
-  {% set default_og_image = base_url ~ url_for('static', filename='assets/social_preview.png') %}
+  {% set default_og_image = base_url ~ asset_url('assets/social_preview.png') %}
 
   <title>{% block title %}California Earrings | Wholesaler of 14K Gold Earrings & Body Jewelry{% endblock %}</title>
   <meta name="description"
@@ -56,7 +56,7 @@
             "name": site_name,
             "url": base_url,
             "description": "Wholesaler of 10K/14K gold earrings and body jewelry from Los Angeles for jewelry stores, retailers, and resellers globally.",
-            "logo": base_url ~ url_for('static', filename='assets/ce_logo_shape.png'),
+            "logo": base_url ~ asset_url('assets/ce_logo_shape.png'),
             "email": "californiaearrings@gmail.com",
             "telephone": "+1-213-935-7272",
             "areaServed": "Worldwide",
@@ -103,7 +103,7 @@
   <nav class="navbar navbar-dark bg-black border-bottom border-gold fixed-top">
     <div class="container-fluid position-relative px-2 px-md-3">
       <a href="{{ url_for('index') }}" class="navbar-brand brand-lockup" aria-label="{{ site_name }}">
-        <img src="{{ url_for('static', filename='assets/ce_logo_shape.png') }}" alt="{{ site_name }}" class="brand-logo"
+        <img src="{{ asset_url('assets/ce_logo_shape.png') }}" alt="{{ site_name }}" class="brand-logo"
           loading="eager" decoding="async" fetchpriority="high" width="450" height="433" />
       </a>
 {% set current_q = request.args.get('q', '') %}

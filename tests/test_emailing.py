@@ -117,9 +117,49 @@ class EmailingTests(unittest.TestCase):
         self.assertIn("Subject: California Earrings | Wholesale Order", raw_message)
         self.assertIn("To: buyer@example.com", raw_message)
         self.assertIn("Bcc: orders@californiaearrings.com, sales@example.com, merch@example.com", raw_message)
-        self.assertIn("ce_email_signature_light.jpg", raw_message)
+        self.assertIn("ce_logo_full.png", raw_message)
+        self.assertIn("ce_email_signature.png", raw_message)
         self.assertIn("Content-ID:", raw_message)
         self.assertIn("cid:", raw_message)
+
+    def test_build_order_html_uses_cleaner_layout_and_social_cta(self) -> None:
+        html = emailing.build_order_html(
+            "#00001",
+            self._customer(),
+            self._items(),
+            logo_cid="logo-cid",
+            signature_cid="signature-cid",
+        )
+
+        self.assertIn("Wholesale Order</h1>", html)
+        self.assertNotIn("Wholesale Order #00001", html)
+        self.assertNotIn("Order ID", html)
+        self.assertNotIn(">Item<", html)
+        self.assertIn("width=\"420\"", html)
+        self.assertIn("max-width:540px", html)
+        self.assertIn("Keep up with us on Instagram and TikTok", html)
+        self.assertIn("Instagram @california_earrings", html)
+        self.assertIn("TikTok @californiaearrings", html)
+        self.assertIn("href=\"https://www.instagram.com/california_earrings/\"", html)
+        self.assertIn("href=\"https://www.tiktok.com/@californiaearrings\"", html)
+        self.assertNotIn("background:#0d0d0d", html)
+        self.assertNotIn("background:#ffffff;text-align:center;", html)
+
+    def test_build_order_html_renders_without_customer_notes(self) -> None:
+        customer = self._customer()
+        customer["notes"] = ""
+
+        html = emailing.build_order_html(
+            "#00001",
+            customer,
+            self._items(),
+            logo_cid="logo-cid",
+            signature_cid="signature-cid",
+        )
+
+        self.assertIn("Submitted by <strong>Test Buyer</strong>", html)
+        self.assertIn("Instagram @california_earrings", html)
+        self.assertNotIn("<td style=\"padding:8px 0;color:#8f7b54;vertical-align:top;\">Notes</td>", html)
 
     def test_send_order_email_uses_fallback_after_normal_retries(self) -> None:
         subjects: list[str] = []
@@ -255,6 +295,6 @@ class EmailingTests(unittest.TestCase):
         self.assertIn(b"multipart/related", mime_bytes)
         self.assertIn(b"Content-ID:", mime_bytes)
         self.assertIn(b"Content-Disposition: inline", mime_bytes)
-        self.assertIn(b"ce_logo_full_gold.png", mime_bytes)
-        self.assertIn(b"ce_email_signature_light.jpg", mime_bytes)
+        self.assertIn(b"ce_logo_full.png", mime_bytes)
+        self.assertIn(b"ce_email_signature.png", mime_bytes)
         self.assertIn(b"cid:", mime_bytes)

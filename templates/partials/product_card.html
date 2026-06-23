@@ -9,7 +9,7 @@
        aria-expanded="false"
        aria-controls="{{ drawer_id }}">
     <div class="product-img-wrap">
-      <img class="card-img-top product-img" src="{{ url_for('static', filename='product_images/' ~ p.image) }}"
+      <img class="card-img-top product-img" src="{{ asset_url('product_images/' ~ p.image) }}"
         alt="{{ p.name }}" loading="lazy" decoding="async" fetchpriority="low">
     </div>
     <div class="card-body text-center d-flex flex-column">

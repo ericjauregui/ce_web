@@ -22,7 +22,7 @@ account assistance.{% endblock %}
     <div class="d-flex flex-column flex-md-row gap-4 align-items-center align-items-md-start">
       <div class="team-avatar team-avatar-luxe">
         {% if member.photo %}
-          <img src="{{ url_for('static', filename='team/' ~ member.photo) }}" alt="{{ member.name }}" loading="eager" decoding="async" fetchpriority="high" width="126" height="126">
+          <img src="{{ asset_url('team/' ~ member.photo) }}" alt="{{ member.name }}" loading="eager" decoding="async" fetchpriority="high" width="126" height="126">
         {% else %}
           <div class="team-initials">{{ (member.name or 'CE')[:2]|upper }}</div>
         {% endif %}

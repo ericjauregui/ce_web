@@ -23,6 +23,10 @@
   --inline-reel-mobile-active-width: clamp(234px, 62vw, 272px);
 }
 
+.latest-videos-shell.scroll-cue-shell--reels::after {
+  content: none;
+}
+
 @media (max-width: 767.98px) {
   .latest-videos-track {
     padding-inline: 0;

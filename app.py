@@ -33,7 +33,7 @@ from domains.team import (
 )
 
 app = Flask(__name__)
-app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 60 * 60 * 24 * 30
+app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 60 * 60 * 24 * 365
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=30)
 app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
@@ -47,13 +47,22 @@ def keep_session_permanent() -> None:
     # Persist cart state across visits until the configured session TTL is reached.
     session.permanent = True
 
+
 @app.after_request
-def add_no_cache_for_html(response):
+def add_cache_headers(response):
+    if request.path.startswith("/static/"):
+        if request.args.get("v"):
+            response.headers["Cache-Control"] = "public, max-age=31536000, immutable"
+        else:
+            response.headers["Cache-Control"] = "public, max-age=3600"
+        return response
+
     if response.mimetype == "text/html":
-        response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
-        response.headers["Pragma"] = "no-cache"
-        response.headers["Expires"] = "0"
+        # Revalidate document responses while still allowing browser cache reuse.
+        response.headers["Cache-Control"] = "no-cache, must-revalidate"
     return response
+
+
 if not app.secret_key:
     raise RuntimeError("SECRET_KEY env var not set")
 
