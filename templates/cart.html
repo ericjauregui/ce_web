@@ -1,22 +1,30 @@
 {% extends "base.html" %}
-{% block title %}Shopping Cart | California Earrings{% endblock %}
+{% block title %}Order Summary | California Earrings{% endblock %}
 {% block robots_meta %}noindex,nofollow{% endblock %}
+{% block page_css %}
+{% if items|length == 0 and latest_reels %}
+  <link href="{{ asset_url('css/styles/inline_reels.css') }}" rel="stylesheet">
+  <link href="{{ asset_url('css/styles/home_reels.css') }}" rel="stylesheet">
+{% endif %}
+{% endblock %}
 {% block content %}
 <section class="container py-5 cart-page" style="max-width: 1100px;">
   <div class="page-title-row mb-3">
     <a class="btn btn-outline-gold cart-back-btn page-title-back" href="{{ url_for('index') }}#section-studs">Catalog</a>
-    <h1 class="text-gold mb-0">Shopping Cart</h1>
+    <h1 class="text-gold mb-0">Order Summary</h1>
     <a class="btn btn-outline-gold page-title-action" href="{{ url_for('contact') }}">Contact Us</a>
   </div>
 
   <div class="card bg-dark border-gold p-3 cart-intro-card" id="cartIntroCard">
       <p class="text-gold-70 mb-0">Checkout your order and we'll follow up with wholesale pricing & availability. No payment
-        required.</p>
+        required to submit an order.</p>
   </div>
 
   <div class="mt-3 card bg-dark border-gold p-3" id="cartContentCard">
     {% if items|length == 0 %}
-      <p class="text-gold-70 mb-0">Your shopping cart is empty.</p>
+      <div id="cartEmptyState" class="cart-empty-state">
+        <p class="text-gold-70 mb-0 cart-empty-message">Your showcase is waiting. Browse the catalog and start building your next order.</p>
+      </div>
     {% else %}
       <div class="table-responsive" id="cartTableWrap">
         <table class="table table-dark align-middle mb-0 minimal-items-table cart-items-table">
@@ -80,6 +88,11 @@
     {% endif %}
   </div>
 </section>
+{% if items|length == 0 and latest_reels %}
+<div id="cartEmptyReelsSection">
+  {% include "partials/latest_videos_strip.html" %}
+</div>
+{% endif %}
 {% endblock %}
 
 {% block body_end %}
@@ -181,12 +194,19 @@ function setCartIntroVisibility(hasItems) {
     setCartIntroVisibility(false);
 
     const card = document.getElementById("cartContentCard");
-    if (!card || card.querySelector(".cart-empty-message")) return;
+    if (!card || card.querySelector("#cartEmptyState")) return;
+
+    const emptyState = document.createElement("div");
+    emptyState.id = "cartEmptyState";
+    emptyState.className = "cart-empty-state";
 
     const empty = document.createElement("p");
     empty.className = "text-gold-70 mb-0 cart-empty-message";
-    empty.textContent = "Your shopping cart is empty.";
-    card.appendChild(empty);
+    empty.textContent = "Your showcase is waiting. Browse the catalog and start building your next order.";
+    emptyState.appendChild(empty);
+    card.appendChild(emptyState);
+
+    window.location.assign("{{ url_for('cart') }}");
   }
 
   function removeRowAndUpdateEmptyState(row) {
@@ -341,4 +361,8 @@ document.addEventListener("change", async (e) => {
     await persistItemNote(input);
   }, true);
 </script>
+{% if items|length == 0 and latest_reels %}
+<script src="{{ asset_url('js/inline_reels.js') }}"></script>
+<script src="{{ asset_url('js/home_reels.js') }}"></script>
+{% endif %}
 {% endblock %}

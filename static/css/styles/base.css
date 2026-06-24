@@ -267,6 +267,15 @@ main {
   margin-bottom: 0;
 }
 
+.hero-content-shell {
+  width: max-content;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  margin-inline: auto;
+}
+
 .hero-copy {
   display: flex;
   flex-direction: column;
@@ -295,6 +304,8 @@ main {
   line-height: .95;
   letter-spacing: .01em;
   text-wrap: balance;
+  font-variant-numeric: lining-nums tabular-nums;
+  font-feature-settings: "lnum" 1, "tnum" 1;
 }
 
 .hero-subtitle {
@@ -325,6 +336,7 @@ main {
 .hero-actions {
   display: flex;
   container-type: inline-size;
+  width: 100%;
   flex-wrap: nowrap;
   justify-content: center;
   align-items: center;
@@ -335,14 +347,14 @@ main {
 }
 
 .hero-action-btn {
-  flex: 0 1 clamp(10.8rem, 49vw, 15.5rem);
+  flex: 1 1 0;
   white-space: nowrap;
-  font-size: clamp(.92rem, 2.8cqw, 1.14rem);
+  font-size: clamp(1rem, 3.35cqw, 1.36rem);
   font-weight: 700;
   line-height: 1;
   gap: .56rem;
-  padding: clamp(.68rem, 1.18vw, .92rem) clamp(1.08rem, 2.3vw, 1.64rem);
-  min-height: clamp(50px, 5vw, 60px);
+  padding: clamp(.72rem, 1.35vw, 1.06rem) clamp(1.05rem, 2.4vw, 1.72rem);
+  min-height: clamp(52px, 6cqw, 72px);
   box-sizing: border-box;
   display: inline-flex;
   align-items: center;
@@ -452,17 +464,18 @@ main {
   }
 
   .hero-actions {
-    margin-top: clamp(.94rem, 4vw, 1.36rem) !important;
+    width: 100%;
+    margin-top: clamp(.78rem, 2.8vw, 1.2rem) !important;
     margin-bottom: 0 !important;
-    padding-bottom: clamp(.24rem, 1.7vw, .56rem);
+    padding-bottom: clamp(.2rem, 1.4vw, .42rem);
     gap: clamp(.4rem, 2vw, .72rem);
   }
 
   .hero-action-btn {
-    min-height: 52px;
-    font-size: clamp(.9rem, 3.3cqw, 1.04rem);
+    min-height: clamp(50px, 6.6cqw, 64px);
+    font-size: clamp(.96rem, 3.8cqw, 1.18rem);
     line-height: 1;
-    padding: .72rem .98rem;
+    padding: clamp(.66rem, 2.1cqw, .96rem) clamp(.86rem, 2.6cqw, 1.22rem);
     border-radius: 18px;
     gap: .46rem;
     background: rgba(9, 9, 9, 0.92) !important;
@@ -492,12 +505,13 @@ main {
 
 @media (max-width: 420px) {
   .hero-actions {
+    width: 100%;
     margin-top: clamp(.88rem, 3.8vw, 1.2rem) !important;
     padding-bottom: clamp(.28rem, 2.2vw, .56rem);
   }
 
   .hero-action-btn {
-    font-size: clamp(.82rem, 2.8cqw, .92rem);
+    font-size: clamp(.9rem, 4.2cqw, 1.05rem);
   }
 }
 

@@ -19,6 +19,7 @@ from domains.cart import (
 )
 from domains.catalog import products_by_code
 from domains.emailing import OrderEmailDeliveryError
+from domains.homepage import load_latest_reels
 from domains.location_options import (
     CHECKOUT_COUNTRY_KEY_BY_LABEL,
     CHECKOUT_COUNTRY_LABELS_BY_KEY,
@@ -161,7 +162,14 @@ def register_cart_routes(
         cart_data = get_cart()
         notes_by_code = get_cart_notes(session, cart_data)
         items = cart_items(pmap, cart_data, notes_by_code)
-        return render_template("cart.html", items=items, total_items=cart_total_items(cart_data))
+        reels_path = base_dir / "static" / "reels"
+        latest_reels = load_latest_reels(reels_path)
+        return render_template(
+            "cart.html",
+            items=items,
+            total_items=cart_total_items(cart_data),
+            latest_reels=latest_reels,
+        )
 
     @app.route("/checkout", methods=["GET", "POST"])
     def checkout():

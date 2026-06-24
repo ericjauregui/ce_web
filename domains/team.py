@@ -159,6 +159,7 @@ def build_member_vcard(
     company = (team.get("company") or "California Earrings").strip() or "California Earrings"
     full_name = str(member.get("name") or "").strip()
     family_name, given_name = _split_vcard_name(full_name)
+    title = str(member.get("title") or "").strip()
     lines = [
         "BEGIN:VCARD",
         "VERSION:3.0",
@@ -167,13 +168,40 @@ def build_member_vcard(
         f"ORG:{vcard_escape(company)}",
     ]
 
+    if title:
+        lines.append(f"TITLE:{vcard_escape(title)}")
+
     phone_digits = member.get("phone_digits") or ""
     if phone_digits:
         lines.append(f"TEL;TYPE=CELL:{vcard_escape(phone_digits)}")
 
+    office_phone_raw = str(team.get("office_phone") or "+1-213-935-7272").strip()
+    office_phone_digits = re.sub(r"\D+", "", office_phone_raw)
+    if office_phone_digits and office_phone_digits != phone_digits:
+        lines.append(f"TEL;TYPE=WORK,VOICE:{vcard_escape(office_phone_digits)}")
+
     email = member.get("email") or ""
     if email:
         lines.append(f"EMAIL;TYPE=INTERNET:{vcard_escape(email)}")
+
+    website = str(team.get("website") or "https://californiaearrings.com").strip()
+    if website:
+        lines.append(f"URL:{vcard_escape(website)}")
+
+    street = str(team.get("street_address") or "650 S Hill St Suite 518").strip()
+    city = str(team.get("address_locality") or "Los Angeles").strip()
+    region = str(team.get("address_region") or "CA").strip()
+    postal = str(team.get("postal_code") or "90014").strip()
+    country = str(team.get("address_country") or "US").strip()
+    if street or city or region or postal or country:
+        lines.append(
+            "ADR;TYPE=WORK:;;"
+            f"{vcard_escape(street)};"
+            f"{vcard_escape(city)};"
+            f"{vcard_escape(region)};"
+            f"{vcard_escape(postal)};"
+            f"{vcard_escape(country)}"
+        )
 
     if photo_bytes and photo_type:
         encoded_photo = base64.b64encode(photo_bytes).decode("ascii")

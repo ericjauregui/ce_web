@@ -43,20 +43,33 @@ class TeamRouteTests(BaseWebTest):
         self.assertEqual(member_page.status_code, 200)
         page_body = member_page.get_data(as_text=True)
         self.assertIn(f"/team/{member_slug}/contact.vcf", page_body)
+        self.assertIn(f"/team/{member_slug}/contact-qr.svg", page_body)
 
         vcard = self.client.get(f"/team/{member_slug}/contact.vcf")
         self.assertEqual(vcard.status_code, 200)
         vcard_body = vcard.get_data(as_text=True)
         self.assertIn("BEGIN:VCARD", vcard_body)
         self.assertIn(f"FN:{member_name}", vcard_body)
-        self.assertNotIn("TITLE:", vcard_body)
+        self.assertIn(f"TITLE:{self.first_member['title']}", vcard_body)
         self.assertIn(f"TEL;TYPE=CELL:{self.first_member['phone_digits']}", vcard_body)
+        self.assertIn("TEL;TYPE=WORK,VOICE:12139357272", vcard_body)
         self.assertIn(f"EMAIL;TYPE=INTERNET:{self.first_member['email']}", vcard_body)
+        self.assertIn("URL:https://californiaearrings.com", vcard_body)
+        self.assertIn("ADR;TYPE=WORK:;;650 S Hill St Suite 518;Los Angeles;CA;90014;US", vcard_body)
         member_photo = self.first_member.get("photo")
         if member_photo:
             self.assertIn("PHOTO;ENCODING=b;TYPE=JPEG:", vcard_body)
         else:
             self.assertNotIn("PHOTO;ENCODING=b;TYPE=", vcard_body)
+
+        qr_response = self.client.get(f"/team/{member_slug}/contact-qr.svg")
+        self.assertEqual(qr_response.status_code, 200)
+        self.assertIn("image/svg+xml", qr_response.content_type)
+        qr_svg = qr_response.get_data(as_text=True)
+        self.assertIn("<svg", qr_svg)
+        self.assertIn('fill="#050505"', qr_svg)
+        self.assertIn("<image", qr_svg)
+        self.assertIn("data:image/png;base64,", qr_svg)
 
     def test_build_member_vcard_includes_photo_only_when_present(self) -> None:
         member = {
@@ -77,6 +90,9 @@ class TeamRouteTests(BaseWebTest):
 
         self.assertIn("FN:Jane Smith", with_photo)
         self.assertIn("N:Smith;Jane;;;", with_photo)
-        self.assertNotIn("TITLE:", with_photo)
+        self.assertIn("TITLE:Ignored Title", with_photo)
+        self.assertIn("TEL;TYPE=WORK,VOICE:12139357272", with_photo)
+        self.assertIn("URL:https://californiaearrings.com", with_photo)
+        self.assertIn("ADR;TYPE=WORK:;;650 S Hill St Suite 518;Los Angeles;CA;90014;US", with_photo)
         self.assertIn(f"PHOTO;ENCODING=b;TYPE=JPEG:{base64.b64encode(b'test-photo-bytes').decode('ascii')}", with_photo)
         self.assertNotIn("PHOTO;ENCODING=b;TYPE=", without_photo)

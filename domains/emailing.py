@@ -527,7 +527,7 @@ def build_order_html(
                 <div style="max-width:760px;margin:0 auto;background:#353129;border:1px solid #5d543f;border-radius:24px;overflow:hidden;">
                     <div style="padding:28px 32px 24px;border-bottom:1px solid #5d543f;background:#4a4438;text-align:center;">
                         {brand_html}
-                        <p style="margin:16px auto 0;max-width:560px;color:#e3d9c5;font-size:15px;line-height:1.6;">A new wholesale order request has been submitted through californiaearrings.com. Review the customer details and order summary below.</p>
+                        <p style="margin:16px auto 0;max-width:560px;color:#e3d9c5;font-size:15px;line-height:1.6;">A new wholesale order request was submitted through californiaearrings.com. Review order details and summary below.</p>
           </div>
 
                     <div style="padding:32px;">
@@ -556,7 +556,7 @@ def build_order_html(
                                 </td>
                                 <td style="width:50%;padding:0 0 0 8px;">
                                     <div style="background:#403a30;border:1px solid #5d543f;border-radius:18px;padding:18px 20px;">
-                                        <div style="color:#b7a57b;font-size:12px;letter-spacing:1.2px;text-transform:uppercase;font-weight:700;">Total Quantity</div>
+                                        <div style="color:#b7a57b;font-size:11px;letter-spacing:0.8px;text-transform:uppercase;font-weight:700;white-space:nowrap;display:inline-block;">Total Quantity</div>
                                         <div style="margin-top:8px;color:#f7f2e9;font-size:28px;font-weight:700;">{total_quantity}</div>
                                     </div>
                                 </td>
@@ -576,14 +576,14 @@ def build_order_html(
             </table>
 
                         <div style="margin-top:24px;padding:22px;background:#403a30;border:1px solid #5d543f;border-radius:18px;">
-                            <h2 style="margin:0 0 8px;color:#f7f2e9;font-size:18px;">Keep up with our latest releases</h2>
-                            <p style="margin:0 0 16px;color:#ddd1bd;line-height:1.6;">Keep up with us on Instagram and TikTok to see our latest product releases, new arrivals, and product videos.</p>
+                            <h2 style="margin:0 0 8px;color:#f7f2e9;font-size:18px;">Follow us on Instagram and TikTok</h2>
+                            <p style="margin:0 0 16px;color:#ddd1bd;line-height:1.6;">See new arrivals and product videos.</p>
                             <a href="{instagram_link}" style="display:inline-block;margin:0 10px 10px 0;padding:12px 18px;border:1px solid #8d7750;border-radius:999px;background:#4a4438;color:#f4efe6;font-size:14px;font-weight:700;line-height:1.2;text-decoration:none;">Instagram {instagram_label}</a>
                             <a href="{tiktok_link}" style="display:inline-block;margin:0 0 10px;padding:12px 18px;border:1px solid #8d7750;border-radius:999px;background:#4a4438;color:#f4efe6;font-size:14px;font-weight:700;line-height:1.2;text-decoration:none;">TikTok {tiktok_label}</a>
                         </div>
 
                         <div style="margin-top:22px;padding:18px 20px;border-left:4px solid #caa65c;background:#403a30;color:#e7dcc8;border-radius:0 14px 14px 0;">
-                            <p style="margin:0;line-height:1.6;">Next step: contact the customer to confirm availability, pricing, and fulfillment details.</p>
+                            <p style="margin:0;line-height:1.6;">Next step: contact the customer to confirm pricing, availability, fulfillment, and shipping.</p>
             </div>
           </div>
 

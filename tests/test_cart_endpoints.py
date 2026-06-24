@@ -154,6 +154,23 @@ class CartEndpointTests(BaseWebTest):
         self.assertIn('if (!nextValue) {', cart_body)
         self.assertNotIn(product_name, cart_body)
 
+    def test_empty_cart_shows_contact_cta_and_home_reels_strip(self) -> None:
+        with patch(
+            "domains.cart_routes.load_latest_reels",
+            return_value=[{"url": "/static/reels/sample.mp4"}],
+        ):
+            cart_response = self.client.get("/cart")
+
+        self.assertEqual(cart_response.status_code, 200)
+        cart_body = cart_response.get_data(as_text=True)
+        self.assertIn("Your showcase is waiting.", cart_body)
+        self.assertIn('href="/contact"', cart_body)
+        self.assertIn(">Contact Us</a>", cart_body)
+        self.assertIn("latest-videos-section", cart_body)
+        self.assertIn('id="latestVideosTrack"', cart_body)
+        self.assertIn('/static/js/inline_reels.js', cart_body)
+        self.assertIn('/static/js/home_reels.js', cart_body)
+
     def test_checkout_view_uses_capitalized_item_notes_label(self) -> None:
         self.client.post(
             "/api/cart/add", json={"code": self.valid_code, "qty": 1})

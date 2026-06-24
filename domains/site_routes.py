@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import base64
 import io
 from pathlib import Path
 from typing import Any, Callable
@@ -7,7 +8,7 @@ from typing import Any, Callable
 from flask import Flask, abort, redirect, render_template, request, send_file, url_for
 
 from domains.catalog import build_sections, find_product_by_code
-from domains.homepage import build_homepage_context
+from domains.homepage import build_homepage_context, load_latest_reels
 from domains.reels import load_random_reels
 from domains.team import build_member_vcard, build_team_members
 
@@ -92,7 +93,80 @@ def register_site_routes(
         team, _, member = get_team_member_by_slug(member_slug)
         if not member:
             abort(404)
-        return render_template("team_member.html", team=team, member=member)
+        latest_reels = load_latest_reels(get_reels_path())
+        return render_template("team_member.html", team=team, member=member, latest_reels=latest_reels)
+
+    @app.route("/team/<member_slug>/contact-qr.svg")
+    def team_member_vcard_qr(member_slug: str):
+        _, _, member = get_team_member_by_slug(member_slug)
+        if not member:
+            abort(404)
+
+        # Keep QR target aligned with the member-specific .vcf download endpoint.
+        vcard_url = url_for("team_member_vcard", member_slug=member_slug, _external=True)
+
+        from reportlab.graphics import renderSVG
+        from reportlab.graphics.barcode.qr import QrCodeWidget
+        from reportlab.lib import colors
+        from reportlab.graphics.shapes import Drawing
+
+        qr_widget = QrCodeWidget(vcard_url)
+        qr_widget.barLevel = "M"
+        qr_widget.barFillColor = colors.white
+        qr_widget.barStrokeColor = colors.white
+
+        bounds = qr_widget.getBounds()
+        size = 220
+        width = max(bounds[2] - bounds[0], 1)
+        height = max(bounds[3] - bounds[1], 1)
+
+        drawing = Drawing(size, size, transform=[size / width, 0, 0, size / height, 0, 0])
+        drawing.add(qr_widget)
+        svg = renderSVG.drawToString(drawing)
+
+        logo_path = base_dir / "static" / "assets" / "ce_logo_shape.png"
+        logo_data_uri = ""
+        if logo_path.exists() and logo_path.is_file():
+            logo_data_uri = f"data:image/png;base64,{base64.b64encode(logo_path.read_bytes()).decode('ascii')}"
+
+        logo_size = 48
+        logo_x = (size - logo_size) / 2
+        logo_y = (size - logo_size) / 2
+
+        # Keep a white quiet zone under the logo so QR scanners remain reliable.
+        backdrop_size = 60
+        backdrop_x = (size - backdrop_size) / 2
+        backdrop_y = (size - backdrop_size) / 2
+        if "xmlns:xlink" not in svg:
+            svg = svg.replace(
+                "<svg ",
+                '<svg xmlns:xlink="http://www.w3.org/1999/xlink" ',
+                1,
+            )
+
+        # Paint an explicit black QR background to keep white modules crisp in all browsers.
+        svg_tag_start = svg.find("<svg")
+        svg_tag_end = svg.find(">", svg_tag_start) if svg_tag_start != -1 else -1
+        if svg_tag_end != -1:
+            background_rect = f'<rect x="0" y="0" width="{size}" height="{size}" fill="#050505" />'
+            svg = f"{svg[:svg_tag_end + 1]}{background_rect}{svg[svg_tag_end + 1:]}"
+
+        overlay = (
+            f'<rect x="{backdrop_x:.2f}" y="{backdrop_y:.2f}" '
+            f'width="{backdrop_size:.2f}" height="{backdrop_size:.2f}" '
+            'rx="12" ry="12" fill="#050505" />'
+        )
+        if logo_data_uri:
+            overlay += (
+                f'<image href="{logo_data_uri}" xlink:href="{logo_data_uri}" x="{logo_x:.2f}" y="{logo_y:.2f}" '
+                f'width="{logo_size:.2f}" height="{logo_size:.2f}" '
+                'preserveAspectRatio="xMidYMid meet" />'
+            )
+        svg = svg.replace("</svg>", f"{overlay}</svg>", 1)
+
+        response = app.response_class(svg, mimetype="image/svg+xml")
+        response.headers["Cache-Control"] = "no-cache, must-revalidate"
+        return response
 
     @app.route("/team/<member_slug>/contact.vcf")
     def team_member_vcard(member_slug: str):

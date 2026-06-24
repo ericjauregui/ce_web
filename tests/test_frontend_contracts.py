@@ -364,7 +364,7 @@ class FrontendContractTests(BaseWebTest):
         self.assertIn(self.valid_code, order_submitted_body)
         self.assertIn("href=\"/contact\"", cart_body)
         self.assertIn(">Contact Us</a>", cart_body)
-        self.assertIn(">Shopping Cart</h1>", cart_body)
+        self.assertIn(">Order Summary</h1>", cart_body)
 
     def test_faqs_page_and_nav_drawer_keep_gold_accordion_contract(self) -> None:
         css = self.load_site_css()
