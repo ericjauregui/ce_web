@@ -43,8 +43,8 @@
 {% endblock %}
 
 {% block content %}
-<div class="trade-show-page">
-  <section class="trade-show-hero" style="--trade-show-hero: url('{{ asset_url(show.hero_image) }}'); --trade-show-mobile-hero: url('{{ asset_url(show.mobile_hero_image|default(show.hero_image, true)) }}');">
+<div class="trade-show-page" style="--trade-show-hero: url('{{ asset_url(show.hero_image) }}'); --trade-show-mobile-hero: url('{{ asset_url(show.mobile_hero_image|default(show.hero_image, true)) }}');">
+  <section class="trade-show-hero">
     <div class="container-xl trade-show-hero__inner">
       <div class="trade-show-hero__copy">
         <p class="trade-show-eyebrow">Wholesale jewelry · Our next trade show</p>

@@ -4,8 +4,9 @@
   --show-border: rgb(var(--gold-rgb) / .28);
   --show-ivory: #fff1cf;
   color: #f7f0df;
+  position: relative;
+  isolation: isolate;
   overflow: clip;
-  background: #0b0b0a;
 }
 
 #booth-details { scroll-margin-top: 90px; }
@@ -35,23 +36,27 @@
   display: grid;
   align-items: center;
   border-bottom: 1px solid var(--show-border);
-  background: #050505;
 }
 
-.trade-show-hero::before {
+.trade-show-page::before {
   content: "";
-  position: absolute;
+  position: fixed;
   inset: 0;
+  top: var(--nav-actual-height, var(--nav-height));
+  pointer-events: none;
   z-index: -2;
+  background-color: #050505;
   background-image: var(--trade-show-hero);
   background-size: cover;
   background-position: center;
 }
 
-.trade-show-hero::after {
+.trade-show-page::after {
   content: "";
-  position: absolute;
+  position: fixed;
   inset: 0;
+  top: var(--nav-actual-height, var(--nav-height));
+  pointer-events: none;
   z-index: -1;
   background:
     linear-gradient(90deg, rgba(2, 2, 2, .97) 0%, rgba(2, 2, 2, .9) 36%, rgba(3, 3, 3, .35) 72%, rgba(3, 3, 3, .64) 100%),
@@ -431,14 +436,14 @@
     min-height: auto;
   }
 
-  .trade-show-hero::before {
+  .trade-show-page::before {
     background-image: var(--trade-show-mobile-hero, var(--trade-show-hero));
     background-position: center top;
     background-size: 100% auto;
     background-repeat: no-repeat;
   }
 
-  .trade-show-hero::after {
+  .trade-show-page::after {
     background:
       linear-gradient(180deg, rgba(1, 1, 1, .18), rgba(1, 1, 1, .36) 35%, rgba(1, 1, 1, .1) 55%, #050505 80%);
   }
