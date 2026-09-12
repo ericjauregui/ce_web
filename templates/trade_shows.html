@@ -44,12 +44,12 @@
 
 {% block content %}
 <div class="trade-show-page">
-  <section class="trade-show-hero" style="--trade-show-hero: url('{{ asset_url(show.hero_image) }}');">
+  <section class="trade-show-hero" style="--trade-show-hero: url('{{ asset_url(show.hero_image) }}'); --trade-show-mobile-hero: url('{{ asset_url(show.mobile_hero_image|default(show.hero_image, true)) }}');">
     <div class="container-xl trade-show-hero__inner">
       <div class="trade-show-hero__copy">
         <p class="trade-show-eyebrow">Wholesale jewelry · Our next trade show</p>
-        <h1>Visit California Earrings <span>at {{ show.name }}</span></h1>
-        <p class="trade-show-hero__lead">14K gold earrings and piercing jewelry for wholesale retailers.</p>
+        <h1>Visit <span class="trade-show-brand">California Earrings</span> <span class="trade-show-heading-event">at {{ show.name }}</span></h1>
+        <p class="trade-show-hero__lead">14K gold earrings and piercing jewelry for retailers.</p>
 
         <div class="trade-show-proof" aria-label="Why shop with California Earrings">
           <span>
@@ -66,15 +66,12 @@
           </span>
         </div>
 
-        <p class="trade-show-booth-highlight">{{ show.booth }}</p>
         <div class="trade-show-actions">
-          <a class="trade-show-btn trade-show-btn--primary" href="{{ show.attendance_url }}" target="_blank" rel="noopener noreferrer">
-            Let Us Know You're Coming
-            <span aria-hidden="true">→</span>
+          <a class="btn btn-outline-gold page-back-btn trade-show-action--primary" href="{{ show.attendance_url }}" target="_blank" rel="noopener noreferrer">
+            I'm Attending
           </a>
-          <a class="trade-show-btn trade-show-btn--secondary" href="#booth-details">
-            Get Booth Details
-            <span aria-hidden="true">↓</span>
+          <a class="btn btn-outline-gold page-back-btn" href="#booth-details">
+            Booth Details
           </a>
         </div>
       </div>
@@ -94,7 +91,7 @@
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6.1 7-12a7 7 0 10-14 0c0 5.9 7 12 7 12z"/><circle cx="12" cy="9" r="2"/></svg>
               Venue
             </dt>
-            <dd>{{ show.venue }}<br><span>{{ show.city }}</span></dd>
+            <dd><a class="trade-show-venue-link" href="{{ show.maps_url }}" target="_blank" rel="noopener noreferrer">{{ show.venue }}<br><span>{{ show.city }}</span></a></dd>
           </div>
           <div>
             <dt>
@@ -105,10 +102,9 @@
           </div>
         </dl>
         <div class="trade-show-detail-actions">
-          <a class="trade-show-btn trade-show-btn--secondary" href="{{ show.maps_url }}" target="_blank" rel="noopener noreferrer">Venue Map <span aria-hidden="true">↗</span></a>
-          <button type="button" class="trade-show-btn trade-show-btn--secondary" id="saveShowCalendar">Add to Calendar</button>
+          <a class="btn btn-outline-gold page-back-btn" href="{{ show.official_url }}" target="_blank" rel="noopener noreferrer">Show Details</a>
+          <button type="button" class="btn btn-outline-gold page-back-btn" id="saveShowCalendar">Add to Calendar</button>
         </div>
-        <a class="trade-show-official-link" href="{{ show.official_url }}" target="_blank" rel="noopener noreferrer">Official show website <span aria-hidden="true">↗</span></a>
       </aside>
     </div>
   </section>
@@ -123,9 +119,7 @@
         </video>
       </div>
       <div class="trade-show-video-copy">
-        <p class="trade-show-eyebrow">{{ show.video.eyebrow }}</p>
         <h2 id="trade-show-video-title">{{ show.video.title }}</h2>
-        <button type="button" class="trade-show-text-link" id="ownerSoundButton" aria-controls="ownerVideo">Turn sound on</button>
         <p>{{ show.video.description }}</p>
       </div>
     </section>
@@ -138,7 +132,7 @@
           <h2 id="show-collection-title">Explore the Collection</h2>
           <p>Find your next best sellers. See these styles and more at the booth.</p>
         </div>
-        <a class="trade-show-text-link" href="{{ url_for('catalog_start') }}">View full inventory <span aria-hidden="true">→</span></a>
+        <a class="btn btn-outline-gold page-back-btn" href="{{ url_for('catalog_start') }}">Browse Catalog</a>
       </div>
 
       <div class="trade-show-product-grid">
@@ -151,10 +145,13 @@
       </div>
     </section>
 
+  </div>
+
     {% if latest_reels %}
     {% include "partials/latest_videos_strip.html" %}
     {% endif %}
 
+  <div class="container-xl trade-show-content trade-show-content--after-reels">
     <section class="trade-show-section trade-show-how" aria-labelledby="show-how-title">
       <div class="trade-show-section-heading">
         <div>
@@ -193,23 +190,21 @@
         <p>Questions about {{ show.name }}? Message our team for booth details and show updates.</p>
       </div>
       <div class="trade-show-contact-actions">
-        <a class="trade-show-btn trade-show-btn--primary" href="{{ show.updates_url }}" target="_blank" rel="noopener noreferrer">
-          Message Us on WhatsApp
-          <span aria-hidden="true">→</span>
+        <a class="btn btn-outline-gold page-back-btn trade-show-action--primary" href="{{ show.updates_url }}" target="_blank" rel="noopener noreferrer">
+          WhatsApp
         </a>
-        <button type="button" class="trade-show-btn trade-show-btn--secondary" id="saveShowContact">Save Our Contact</button>
+        <a class="btn btn-outline-gold page-back-btn" href="{{ url_for('contact') }}">Contact Us</a>
+        <a class="btn btn-outline-gold page-back-btn" href="{{ url_for('team_page') }}">Meet our Team</a>
       </div>
-      <div class="trade-show-contact-details">
-        <a href="tel:2139357272">(213) 935-7272</a>
-        <a href="mailto:californiaearrings@gmail.com">californiaearrings@gmail.com</a>
-        <span>{{ show.booth }}</span>
+      <div class="trade-show-contact-card contact-page">
+        {% include "partials/contact_details_card.html" %}
       </div>
     </section>
   </div>
 </div>
 <div class="trade-show-mobile-bar" id="showMobileBar" hidden>
   <a class="trade-show-mobile-booth" href="#booth-details"><small>Find us</small>{{ show.booth }}</a>
-  <a class="trade-show-btn trade-show-btn--primary" href="{{ show.updates_url }}" target="_blank" rel="noopener noreferrer">Message Us</a>
+  <a class="btn btn-outline-gold page-back-btn trade-show-action--primary" href="{{ show.updates_url }}" target="_blank" rel="noopener noreferrer">Message Us</a>
 </div>
 <script type="application/json" id="showDownloadData">{{ {"name": show.name, "start": show.start_date, "end": show.end_date, "venue": show.venue, "address": show.address, "city": show.city, "booth": show.booth}|tojson }}</script>
 {% endblock %}

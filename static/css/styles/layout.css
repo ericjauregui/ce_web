@@ -3308,6 +3308,27 @@
   transition: none;
 }
 
+/* Shared typography and sizing for the reels and catalog row actions. */
+.sticky-section-header .catalog-row-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: .35rem .7rem;
+  font-family: inherit;
+  font-size: .95rem;
+  font-weight: 400;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+@media (max-width: 767.98px) {
+  .sticky-section-header .catalog-row-action {
+    padding: .5rem .58rem;
+    font-size: clamp(.68rem, 2.8vw, .86rem);
+  }
+}
+
 /* Reflow the catalog controls before the centered desktop layout gets crowded. */
 @media (max-width: 1199.98px) {
   .catalog-explorer-row {

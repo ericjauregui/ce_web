@@ -9,9 +9,6 @@
     link.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
-  document.getElementById("saveShowContact").addEventListener("click", () => {
-    download(["BEGIN:VCARD", "VERSION:3.0", "FN:California Earrings", "ORG:California Earrings", "TEL;TYPE=WORK,VOICE:+12139357272", "EMAIL:californiaearrings@gmail.com", "URL:" + location.origin, "END:VCARD"], "text/vcard", "california-earrings.vcf");
-  });
   document.getElementById("saveShowCalendar").addEventListener("click", () => {
     const end = new Date(show.end + "T00:00:00Z");
     end.setUTCDate(end.getUTCDate() + 1);
@@ -45,8 +42,7 @@
     });
   }, true);
   const video = document.getElementById("ownerVideo");
-  const soundButton = document.getElementById("ownerSoundButton");
-  if (!video || !soundButton) return;
+  if (!video) return;
 
   let visible = false;
   let pausedByViewer = false;
@@ -67,13 +63,6 @@
     automaticPause = false;
   });
   video.addEventListener("play", () => { pausedByViewer = false; });
-  video.addEventListener("volumechange", () => {
-    soundButton.textContent = video.muted ? "Turn sound on" : "Mute video";
-  });
-  soundButton.addEventListener("click", () => {
-    video.muted = !video.muted;
-    if (video.paused) video.play().catch(() => {});
-  });
   if (typeof IntersectionObserver === "function") {
     new IntersectionObserver(([entry]) => {
       visible = entry.isIntersecting && entry.intersectionRatio >= 0.35;

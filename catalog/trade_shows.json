@@ -14,6 +14,7 @@
       "official_url": "https://www.jisshow.com/fall/en-us.html",
       "logo_asset": "assets/trade-shows/jis-fall-logo.png",
       "hero_image": "assets/trade-shows/miami-night.webp",
+      "mobile_hero_image": "assets/trade-shows/miami-mobile-v2.webp",
       "video": {
         "asset": "assets/trade-shows/owner-welcome.mp4",
         "eyebrow": "A message from our owner",
@@ -42,6 +43,7 @@
       "official_url": "https://www.jisshow.com/spring/en-us.html",
       "logo_asset": "assets/trade-shows/jis-spring-logo.png",
       "hero_image": "assets/trade-shows/miami-night.webp",
+      "mobile_hero_image": "assets/trade-shows/miami-mobile-v2.webp",
       "video": {"asset": "assets/trade-shows/owner-welcome.mp4"},
       "curated_products": [
         {"code": "254SB", "label": "Classic Studs", "image": "assets/trade-shows/product-254SB.webp"},
