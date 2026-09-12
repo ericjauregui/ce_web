@@ -1,12 +1,21 @@
 from __future__ import annotations
 
 import base64
+import hashlib
+import io
+import json
+import os
 import re
 from pathlib import Path
+from threading import Lock
 from typing import Any
 from urllib.parse import quote_plus
 
 from domains.file_cache import load_json_cached
+
+
+_qr_assets_lock = Lock()
+_QR_GENERATOR_VERSION = "4"
 
 
 def load_team(team_path: Path) -> dict[str, Any]:
@@ -48,6 +57,8 @@ def build_team_members(team: dict[str, Any]) -> list[dict[str, Any]]:
     member_names: list[str] = []
     first_name_counts: dict[str, int] = {}
     company = (team.get("company") or "California Earrings").strip() or "California Earrings"
+    office_phone = str(team.get("office_phone") or "+1 (213) 935-7272").strip()
+    office_phone_digits = re.sub(r"\D+", "", office_phone)
     whatsapp_intro_template = team.get("whatsapp_intro") or "Hi {name}, I found your contact on {company}."
 
     for raw in raw_members:
@@ -95,7 +106,12 @@ def build_team_members(team: dict[str, Any]) -> list[dict[str, Any]]:
                 "title": title,
                 "bio": bio,
                 "photo": photo,
+                "photo_scale": source.get("photo_scale") or 1,
+                "photo_position": str(source.get("photo_position") or "50% 50%"),
+                "social_image": str(source.get("social_image") or "assets/social_preview.png"),
                 "phone": phone,
+                "office_phone": office_phone,
+                "office_call_url": f"tel:+{office_phone_digits}" if office_phone_digits else "",
                 "email": email,
                 "slug": slug,
                 "phone_digits": phone_digits,
@@ -208,7 +224,114 @@ def build_member_vcard(
         lines.append(_fold_vcard_line(f"PHOTO;ENCODING=b;TYPE={photo_type}:{encoded_photo}"))
 
     lines.extend(["END:VCARD", ""])
-    return "\n".join(lines)
+    return "\r\n".join(lines)
+
+
+def _render_vcard_qr_svg(vcard_text: str, logo_bytes: bytes | None = None) -> str:
+    """Render a branded, scanner-friendly QR containing the vCard itself."""
+    from reportlab.graphics import renderSVG
+    from reportlab.graphics.barcode.qr import QrCodeWidget
+    from reportlab.graphics.shapes import Drawing
+    from reportlab.lib import colors
+
+    qr_widget = QrCodeWidget(vcard_text)
+    qr_widget.barLevel = "M"
+    qr_widget.barFillColor = colors.white
+    qr_widget.barStrokeColor = colors.white
+
+    size = 240
+    quiet_zone = 12
+    usable_size = size - (quiet_zone * 2)
+    qr_widget.x = quiet_zone
+    qr_widget.y = quiet_zone
+    qr_widget.barWidth = usable_size
+    qr_widget.barHeight = usable_size
+    drawing = Drawing(size, size)
+    drawing.add(qr_widget)
+
+    svg = renderSVG.drawToString(drawing)
+    svg_start = svg.find("<svg")
+    svg_tag_end = svg.find(">", svg_start) if svg_start != -1 else -1
+    if svg_tag_end != -1:
+        background = f'<rect x="0" y="0" width="{size}" height="{size}" fill="#050505" />'
+        svg = f"{svg[:svg_tag_end + 1]}{background}{svg[svg_tag_end + 1:]}"
+
+    if logo_bytes:
+        logo_data = base64.b64encode(logo_bytes).decode("ascii")
+        backdrop_size = 38
+        logo_size = 28
+        backdrop_position = (size - backdrop_size) / 2
+        logo_position = (size - logo_size) / 2
+        overlay = (
+            f'<rect x="{backdrop_position:.1f}" y="{backdrop_position:.1f}" '
+            f'width="{backdrop_size}" height="{backdrop_size}" rx="8" ry="8" fill="#050505" />'
+            f'<image href="data:image/png;base64,{logo_data}" '
+            f'x="{logo_position:.1f}" y="{logo_position:.1f}" '
+            f'width="{logo_size}" height="{logo_size}" preserveAspectRatio="xMidYMid meet" />'
+        )
+        svg = svg.replace("</svg>", f"{overlay}</svg>", 1)
+    return svg
+
+
+def _compact_qr_logo(logo_path: Path) -> bytes | None:
+    if not logo_path.is_file():
+        return None
+    try:
+        from PIL import Image
+
+        with Image.open(logo_path) as image:
+            image.thumbnail((56, 56), Image.Resampling.LANCZOS)
+            output = io.BytesIO()
+            image.save(output, format="PNG", optimize=True)
+            return output.getvalue()
+    except (OSError, ValueError):
+        return logo_path.read_bytes()
+
+
+def ensure_team_qr_assets(team: dict[str, Any], team_path: Path, static_dir: Path) -> dict[str, str]:
+    """Create static vCard QR assets, regenerating only when team.json changes."""
+    output_dir = static_dir / "assets" / "team-qr"
+    manifest_path = output_dir / "manifest.json"
+    source_bytes = team_path.read_bytes() if team_path.exists() else json.dumps(team, sort_keys=True).encode("utf-8")
+    fingerprint = hashlib.sha256(_QR_GENERATOR_VERSION.encode("ascii") + b"\0" + source_bytes).hexdigest()
+    members = build_team_members(team)
+    asset_paths = {member["slug"]: f"assets/team-qr/{member['slug']}.svg" for member in members}
+
+    with _qr_assets_lock:
+        try:
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        except (FileNotFoundError, json.JSONDecodeError, OSError):
+            manifest = {}
+
+        assets_exist = all((static_dir / relative_path).is_file() for relative_path in asset_paths.values())
+        if manifest.get("team_fingerprint") == fingerprint and assets_exist:
+            return asset_paths
+
+        output_dir.mkdir(parents=True, exist_ok=True)
+        logo_path = static_dir / "assets" / "ce_logo_shape.png"
+        logo_bytes = _compact_qr_logo(logo_path)
+        expected_names = {f"{slug}.svg" for slug in asset_paths}
+        for member in members:
+            # Photos are intentionally omitted: embedding them makes the QR much
+            # denser and substantially harder for phone cameras to scan.
+            vcard_text = build_member_vcard(member, team)
+            target = output_dir / f"{member['slug']}.svg"
+            temporary = output_dir / f".{member['slug']}.svg.tmp"
+            temporary.write_text(_render_vcard_qr_svg(vcard_text, logo_bytes), encoding="utf-8")
+            os.replace(temporary, target)
+
+        for stale_asset in output_dir.glob("*.svg"):
+            if stale_asset.name not in expected_names:
+                stale_asset.unlink()
+
+        temporary_manifest = output_dir / ".manifest.json.tmp"
+        temporary_manifest.write_text(
+            json.dumps({"team_fingerprint": fingerprint, "generator_version": _QR_GENERATOR_VERSION}, indent=2) + "\n",
+            encoding="utf-8",
+        )
+        os.replace(temporary_manifest, manifest_path)
+
+    return asset_paths
 
 
 def slugify(value: str) -> str:

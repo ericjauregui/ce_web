@@ -30,15 +30,16 @@
   {% else %}
     <div class="card bg-dark border-gold p-3 mt-4">
       <form method="post" action="{{ url_for('checkout') }}" id="checkoutForm" novalidate>
+        <input type="hidden" name="idempotency_key" value="{{ idempotency_key }}">
         <p class="text-gold-70 small mb-3"><i>*Required Fields</i></p>
         <div class="row g-3">
           <div class="col-12 col-md-6">
             <label class="form-label text-gold-70">Name*</label>
-            <input name="name" class="form-control bg-black text-light border-gold" required value="{{ form_values.name }}">
+            <input name="name" class="form-control bg-black text-light border-gold" maxlength="160" required value="{{ form_values.name }}">
           </div>
           <div class="col-12 col-md-6">
             <label class="form-label text-gold-70">Company Name*</label>
-            <input name="company" class="form-control bg-black text-light border-gold" required value="{{ form_values.company }}">
+            <input name="company" class="form-control bg-black text-light border-gold" maxlength="200" required value="{{ form_values.company }}">
           </div>
           <div class="col-12 col-md-6">
             <label class="form-label text-gold-70">Phone Number*</label>
@@ -73,6 +74,7 @@
               </div>
               <input
                 name="phone"
+                maxlength="64"
                 class="form-control bg-black text-light border-gold"
                 required
                 placeholder="555 123 4567"
@@ -89,6 +91,7 @@
             <label class="form-label text-gold-70">Email</label>
             <input
               name="email"
+              maxlength="254"
               type="text"
               inputmode="email"
               autocomplete="email"
@@ -104,6 +107,7 @@
             <label class="form-label text-gold-70">Address Line 1</label>
             <input
               name="address_line_1"
+              maxlength="250"
               class="form-control bg-black text-light border-gold"
               id="checkoutAddressLine1"
               autocomplete="shipping address-line1"
@@ -115,6 +119,7 @@
             <label class="form-label text-gold-70">Address Line 2</label>
             <input
               name="address_line_2"
+              maxlength="250"
               class="form-control bg-black text-light border-gold"
               id="checkoutAddressLine2"
               autocomplete="shipping address-line2"
@@ -126,6 +131,7 @@
             <label class="form-label text-gold-70">City*</label>
             <input
               name="city"
+              maxlength="120"
               class="form-control bg-black text-light border-gold"
               id="checkoutCity"
               autocomplete="shipping address-level2"
@@ -141,6 +147,7 @@
               <div class="checkout-combobox__field">
                 <input
                   name="state"
+                  maxlength="120"
                   class="form-control bg-black text-light border-gold checkout-combobox__input"
                   id="checkoutState"
                   type="text"
@@ -170,6 +177,7 @@
             <label class="form-label text-gold-70">Postal Code</label>
             <input
               name="postal_code"
+              maxlength="32"
               class="form-control bg-black text-light border-gold"
               id="checkoutPostalCode"
               autocomplete="shipping postal-code"
@@ -185,6 +193,7 @@
               <div class="checkout-combobox__field">
                 <input
                   name="country"
+                  maxlength="120"
                   class="form-control bg-black text-light border-gold checkout-combobox__input"
                   id="checkoutCountry"
                   type="text"
@@ -212,7 +221,7 @@
           </div>
           <div class="col-12">
             <label class="form-label text-gold-70">Notes</label>
-            <input name="notes" class="form-control bg-black text-light border-gold"
+            <input name="notes" maxlength="2000" class="form-control bg-black text-light border-gold"
               placeholder="Preferred stones, shipping notes, or anything else we should know."
               value="{{ form_values.notes }}">
           </div>

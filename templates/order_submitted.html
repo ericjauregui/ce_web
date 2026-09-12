@@ -12,7 +12,7 @@ copy and contact us with any follow-up details.{% endblock %}
       <span class="page-title-spacer btn btn-outline-gold" aria-hidden="true">← Full Catalog</span>
     </div>
   <div class="card bg-dark border-gold p-3 order-submitted-card">
-    {% if email_sent %}
+    {% if email_sent is sameas true %}
     <p class="text-gold-70 mb-0" style="font-size: 1.1rem;">Order submitted successfully. Our sales team will be reaching out to you to complete your order.</p>
     <p class="text-gold-70 mt-2" style="font-size: 0.95rem;">📧 If you don't see our email, please check your spam or junk folder.</p>
     {% if order_id %}
@@ -24,11 +24,13 @@ copy and contact us with any follow-up details.{% endblock %}
     {% if fallback_used %}
     <p class="text-gold-70 mt-3" style="font-size: 0.95rem;">Order submitted successfully. Our sales team will be reaching out to you to complete your order.</p>
     {% endif %}
-    {% else %}
-    <p class="text-gold-70 mb-0" style="font-size: 1.1rem;">We couldn't deliver the order email. Please download the PDF below and <a href="{{ url_for('contact') }}" class="text-gold-70 text-decoration-none"><u>contact us</u></a> to send it to our team{% if order_id %}. Reference order ID: {{ order_id }}{% endif %}.</p>
+    {% elif email_sent is sameas false %}
+    <p class="text-gold-70 mb-0" style="font-size: 1.1rem;">We couldn't deliver the order email, but your order was saved. Please download the PDF below and <a href="{{ url_for('contact') }}" class="text-gold-70 text-decoration-none"><u>contact us</u></a> to send it to our team{% if order_id %}. Reference order ID: {{ order_id }}{% endif %}.</p>
     {% if client_email %}
     <p class="text-gold-70 mt-2 mb-0" style="font-size: 0.95rem;">Your Email: {{ client_email }}</p>
     {% endif %}
+    {% else %}
+    <p class="text-gold-70 mb-0" style="font-size: 1.1rem;">Your order was saved successfully{% if order_id %}. Reference order ID: {{ order_id }}{% endif %}. Email delivery is still being confirmed.</p>
     {% endif %}
     <p class="text-gold-70 mt-3 mb-0" style="font-size: 0.95rem;">
       If you have any questions, feel free to <a href="{{ url_for('contact') }}"

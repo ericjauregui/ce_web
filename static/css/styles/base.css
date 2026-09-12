@@ -199,15 +199,18 @@ main {
 }
 
 .hero {
+  --hero-bg-url: var(--hero-bg-original);
   position: relative;
   isolation: isolate;
   overflow: visible;
-  min-height: clamp(300px, 44vh, 520px);
+  min-height: max(300px, 66.6667vw);
   background-image:
     radial-gradient(118% 84% at 50% 6%, rgb(var(--gold-rgb) / 0.11), transparent 62%),
     radial-gradient(104% 76% at 50% 97%, rgb(var(--gold-rgb) / 0.1), transparent 74%),
     linear-gradient(180deg, rgba(6, 6, 6, 0.63) 0%, rgba(10, 10, 10, 0.71) 56%, rgba(13, 13, 13, 0.79) 100%),
     var(--hero-bg-url, url("/static/assets/hero_bg.png"));
+  /* Fill the hero; responsive artwork keeps jewelry inside the visible frame. */
+  background-color: #0d0d0d;
   background-size: auto, auto, auto, cover;
   background-position: center, center, center, center;
   background-repeat: no-repeat;
@@ -433,12 +436,7 @@ main {
     }
 
   .hero {
-    min-height: clamp(300px, 50vh, 460px);
-    background-image:
-      radial-gradient(126% 88% at 50% 4%, rgb(var(--gold-rgb) / 0.09), transparent 60%),
-      radial-gradient(100% 72% at 50% 96%, rgb(var(--gold-rgb) / 0.08), transparent 74%),
-      linear-gradient(180deg, rgba(7, 7, 7, 0.68) 0%, rgba(11, 11, 11, 0.74) 56%, rgba(13, 13, 13, 0.82) 100%),
-      var(--hero-bg-url, url("/static/assets/hero_bg.png"));
+    min-height: clamp(340px, 44svh, 420px);
   }
 
   .hero-logo {
@@ -500,6 +498,21 @@ main {
 
   header.hero+section.py-5 {
     padding-top: 0 !important;
+  }
+}
+
+/* Wide screens follow the artwork proportions. Phones use a compact height;
+   content can still grow the hero when text wraps or the visitor zooms in. */
+@media (min-width: 1200px) {
+  .hero {
+    --hero-bg-url: var(--hero-bg-wide);
+    min-height: max(300px, 33.3333vw);
+  }
+}
+
+@media (max-width: 575.98px) {
+  .hero {
+    --hero-bg-url: var(--hero-bg-mobile);
   }
 }
 
@@ -777,6 +790,13 @@ main {
   border-radius: 999px;
 }
 
+@media (min-width: 992px) {
+  .product-detail-page {
+    width: min(94vw, 1440px);
+    max-width: none;
+  }
+}
+
 .product-detail-page .product-detail-top-actions {
   position: sticky;
   top: var(--nav-actual-height, var(--nav-height, 50px));
@@ -873,7 +893,7 @@ main {
 
 .product-detail-image-wrap {
   width: 100%;
-  max-width: min(100%, 560px);
+  max-width: 100%;
   margin: 0 auto;
   border-radius: 14px;
   padding: clamp(.45rem, 1vw, .75rem);
@@ -886,7 +906,7 @@ main {
 
 .product-detail-image {
   width: 100%;
-  max-height: min(62vh, 520px);
+  max-height: min(72vh, 760px);
   object-fit: contain;
   object-position: center;
   border-radius: 10px;
@@ -982,6 +1002,19 @@ footer {
   }
 }
 /* Buttons */
+:root {
+  --action-border-radius: .375rem;
+}
+
+/* Keep action shapes consistent, including Bootstrap rounded-pill utilities. */
+body .btn,
+body .chip,
+body .product-detail-link,
+body .trade-show-btn,
+body .dbc-button {
+  border-radius: var(--action-border-radius) !important;
+}
+
 .btn-outline-gold {
   --bs-btn-color: var(--gold);
   --bs-btn-border-color: var(--gold-outline);

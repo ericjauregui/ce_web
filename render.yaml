@@ -4,5 +4,12 @@ services:
     runtime: python
     plan: free
     buildCommand: curl -Ls https://astral.sh/uv/install.sh | sh && ~/.local/bin/uv sync --frozen
-    startCommand: .venv/bin/gunicorn --bind 0.0.0.0:$PORT app:app
+    startCommand: sh scripts/start_render.sh
     autoDeploy: true
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: SECRET_KEY
+        sync: false
+      - key: SESSION_COOKIE_SECURE
+        value: "true"

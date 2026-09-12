@@ -142,7 +142,6 @@
     bubble.classList.add("is-dragging");
     pointerOffsetX = event.clientX - rect.left;
     pointerOffsetY = event.clientY - rect.top;
-    bubble.setPointerCapture(event.pointerId);
     applyPosition(
       event.clientX - pointerOffsetX,
       event.clientY - pointerOffsetY,
@@ -173,11 +172,20 @@
     pointerStartX = event.clientX;
     pointerStartY = event.clientY;
 
+    // Capture immediately so Chromium/Edge keeps sending pointer events even
+    // when the pointer leaves the small anchor before the drag threshold.
+    // The dragstart guard below also prevents the browser's native link drag.
+    bubble.setPointerCapture(event.pointerId);
+
     clearHoldTimer();
     holdTimer = window.setTimeout(() => {
       holdTimer = 0;
       dragReady = true;
     }, HOLD_DELAY_MS);
+  });
+
+  bubble.addEventListener("dragstart", (event) => {
+    event.preventDefault();
   });
 
   bubble.addEventListener("pointermove", (event) => {

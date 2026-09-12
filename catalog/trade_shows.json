@@ -1,0 +1,79 @@
+{
+  "active_event": "jis-fall-2026",
+  "events": {
+    "jis-fall-2026": {
+      "name": "JIS Fall 2026",
+      "season": "Fall 2026",
+      "dates_display": "October 16–19, 2026",
+      "start_date": "2026-10-16",
+      "end_date": "2026-10-19",
+      "venue": "Miami Beach Convention Center",
+      "address": "1901 Convention Center Drive",
+      "city": "Miami Beach, Florida",
+      "booth": "Booth #117",
+      "official_url": "https://www.jisshow.com/fall/en-us.html",
+      "logo_asset": "assets/trade-shows/jis-fall-logo.png",
+      "hero_image": "assets/trade-shows/miami-night.webp",
+      "video": {
+        "asset": "assets/trade-shows/owner-welcome.mp4",
+        "eyebrow": "A message from our owner",
+        "title": "Meet the Owner",
+        "description": "A quick welcome from the owner and a look at what retailers can expect when they visit California Earrings at the show."
+      },
+      "curated_products": [
+        {"code": "254SB", "label": "Classic Studs", "image": "assets/trade-shows/product-254SB.webp"},
+        {"code": "106BSB", "label": "Bezel Studs", "image": "assets/trade-shows/product-106BSB.webp"},
+        {"code": "1601SB", "label": "Heart Studs", "image": "assets/trade-shows/product-1601SB.webp"},
+        {"code": "1818SB", "label": "Religious", "image": "assets/trade-shows/product-1818SB.webp"},
+        {"code": "508WB", "label": "Drop Earrings", "image": "assets/trade-shows/product-508WB.webp"},
+        {"code": "1545WBSET", "label": "Jewelry Sets", "image": "assets/trade-shows/product-1545WBSET.webp"}
+      ]
+    },
+    "jis-spring-2027": {
+      "name": "JIS Spring 2027",
+      "season": "Spring 2027",
+      "dates_display": "March 7–9, 2027",
+      "start_date": "2027-03-07",
+      "end_date": "2027-03-09",
+      "venue": "Miami Beach Convention Center",
+      "address": "1901 Convention Center Drive",
+      "city": "Miami Beach, Florida",
+      "booth": "Booth details coming soon",
+      "official_url": "https://www.jisshow.com/spring/en-us.html",
+      "logo_asset": "assets/trade-shows/jis-spring-logo.png",
+      "hero_image": "assets/trade-shows/miami-night.webp",
+      "video": {"asset": "assets/trade-shows/owner-welcome.mp4"},
+      "curated_products": [
+        {"code": "254SB", "label": "Classic Studs", "image": "assets/trade-shows/product-254SB.webp"},
+        {"code": "106BSB", "label": "Bezel Studs", "image": "assets/trade-shows/product-106BSB.webp"},
+        {"code": "1601SB", "label": "Heart Studs", "image": "assets/trade-shows/product-1601SB.webp"},
+        {"code": "1818SB", "label": "Religious", "image": "assets/trade-shows/product-1818SB.webp"},
+        {"code": "508WB", "label": "Drop Earrings", "image": "assets/trade-shows/product-508WB.webp"},
+        {"code": "1545WBSET", "label": "Jewelry Sets", "image": "assets/trade-shows/product-1545WBSET.webp"}
+      ]
+    },
+    "jck-2027": {
+      "name": "JCK 2027",
+      "season": "2027",
+      "dates_display": "June 4–7, 2027",
+      "start_date": "2027-06-04",
+      "end_date": "2027-06-07",
+      "venue": "The Venetian Expo",
+      "address": "201 Sands Avenue",
+      "city": "Las Vegas, Nevada",
+      "booth": "Booth details coming soon",
+      "official_url": "https://lasvegas.jckonline.com/en-us/attendee-resources.html",
+      "logo_asset": "assets/trade-shows/jck-logo-white.png",
+      "hero_image": "assets/trade-shows/las-vegas-night.webp",
+      "video": {"asset": "assets/trade-shows/owner-welcome.mp4"},
+      "curated_products": [
+        {"code": "254SB", "label": "Classic Studs", "image": "assets/trade-shows/product-254SB.webp"},
+        {"code": "106BSB", "label": "Bezel Studs", "image": "assets/trade-shows/product-106BSB.webp"},
+        {"code": "1601SB", "label": "Heart Studs", "image": "assets/trade-shows/product-1601SB.webp"},
+        {"code": "1818SB", "label": "Religious", "image": "assets/trade-shows/product-1818SB.webp"},
+        {"code": "508WB", "label": "Drop Earrings", "image": "assets/trade-shows/product-508WB.webp"},
+        {"code": "1545WBSET", "label": "Jewelry Sets", "image": "assets/trade-shows/product-1545WBSET.webp"}
+      ]
+    }
+  }
+}

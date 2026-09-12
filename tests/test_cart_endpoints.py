@@ -9,10 +9,29 @@ from unittest.mock import patch
 
 import app as webapp
 from domains import cart as cart_domain
+from domains.orders import OrderPersistenceError
 from tests.common import BaseWebTest
 
 
 class CartEndpointTests(BaseWebTest):
+    def _valid_checkout_data(self, **overrides: str) -> dict[str, str]:
+        data = {
+            "idempotency_key": self.checkout_idempotency_key(),
+            "name": "Test Buyer",
+            "company": "Sample Co",
+            "email": "buyer@example.com",
+            "phone_country": "United States (+1)",
+            "phone_country_code": "us",
+            "phone": "555-0101",
+            "city": "Los Angeles",
+            "state": "California",
+            "country": "United States",
+            "country_key": "us",
+            "notes": "test order",
+        }
+        data.update(overrides)
+        return data
+
     def test_cart_session_cookie_is_permanent_with_30_day_ttl(self) -> None:
         response = self.client.post("/api/cart/add", json={"code": self.valid_code, "qty": 1})
         self.assertEqual(response.status_code, 200)
@@ -168,6 +187,7 @@ class CartEndpointTests(BaseWebTest):
         self.assertIn(">Contact Us</a>", cart_body)
         self.assertIn("latest-videos-section", cart_body)
         self.assertIn('id="latestVideosTrack"', cart_body)
+        self.assertIn("reels-view-all-btn", cart_body)
         self.assertIn('/static/js/inline_reels.js', cart_body)
         self.assertIn('/static/js/home_reels.js', cart_body)
 
@@ -195,6 +215,67 @@ class CartEndpointTests(BaseWebTest):
         self.assertIn(">Submit Order</button>", checkout_body)
         self.assertNotIn("<th>Name</th>", checkout_body)
         self.assertEqual(checkout_body.count("<th class=\"checkout-col-"), 4)
+        self.assertIn('name="idempotency_key"', checkout_body)
+
+    def test_checkout_requires_session_bound_idempotency_key(self) -> None:
+        self.client.post("/api/cart/add", json={"code": self.valid_code, "qty": 1})
+        response = self.client.post("/checkout", data={"name": "Test Buyer"})
+        self.assertEqual(response.status_code, 400)
+
+    def test_checkout_persists_and_retrieves_saved_order(self) -> None:
+        self.client.post("/api/cart/add", json={"code": self.valid_code, "qty": 2})
+        response = self.client.post("/checkout", data=self._valid_checkout_data())
+        self.assertEqual(response.status_code, 200)
+
+        with self.client.session_transaction() as sess:
+            order_id = str(sess["last_order_id"])
+        order = webapp.app.extensions["order_repository"].get_order(order_id)
+
+        self.assertIsNotNone(order)
+        self.assertEqual(order.total_quantity, 2)
+        self.assertEqual(order.customer["company"], "Sample Co")
+        self.assertEqual(len(order.items), 1)
+        self.assertEqual(order.items[0].description, webapp.load_products()[0]["description"])
+
+    def test_duplicate_checkout_after_cart_clear_returns_same_order_without_resending(self) -> None:
+        self.client.post("/api/cart/add", json={"code": self.valid_code, "qty": 1})
+        data = self._valid_checkout_data()
+        with patch("domains.emailing.graph_send", return_value=None) as graph_send:
+            first = self.client.post("/checkout", data=data)
+            second = self.client.post("/checkout", data=data)
+
+        self.assertEqual(first.status_code, 200)
+        self.assertEqual(second.status_code, 200)
+        self.assertEqual(graph_send.call_count, 1)
+
+    def test_duplicate_checkout_rejects_changed_customer_payload(self) -> None:
+        self.client.post("/api/cart/add", json={"code": self.valid_code, "qty": 1})
+        data = self._valid_checkout_data()
+        self.assertEqual(self.client.post("/checkout", data=data).status_code, 200)
+
+        changed = {**data, "company": "Different Company"}
+        response = self.client.post("/checkout", data=changed)
+        self.assertEqual(response.status_code, 409)
+
+    def test_new_checkout_after_completion_gets_a_fresh_submission_key(self) -> None:
+        self.client.post("/api/cart/add", json={"code": self.valid_code, "qty": 1})
+        first_data = self._valid_checkout_data()
+        self.assertEqual(self.client.post("/checkout", data=first_data).status_code, 200)
+
+        self.client.post("/api/cart/add", json={"code": self.valid_code, "qty": 1})
+        second_key = self.checkout_idempotency_key()
+        self.assertNotEqual(second_key, first_data["idempotency_key"])
+
+    def test_checkout_database_failure_does_not_confirm_or_clear_cart(self) -> None:
+        self.client.post("/api/cart/add", json={"code": self.valid_code, "qty": 1})
+        repository = webapp.app.extensions["order_repository"]
+        with patch.object(repository, "create_order", side_effect=OrderPersistenceError("private db detail")):
+            response = self.client.post("/checkout", data=self._valid_checkout_data())
+
+        self.assertEqual(response.status_code, 503)
+        self.assertNotIn("private db detail", response.get_data(as_text=True))
+        with self.client.session_transaction() as sess:
+            self.assertEqual(sess["cart"], {self.valid_code: 1})
 
     def test_item_note_requires_item_in_cart(self) -> None:
         self.client.post(
@@ -221,6 +302,7 @@ class CartEndpointTests(BaseWebTest):
         checkout_response = self.client.post(
             "/checkout",
             data={
+                "idempotency_key": self.checkout_idempotency_key(),
                 "name": "Test Buyer",
                 "company": "Sample Co",
                 "phone_country": "United States (+1)",
@@ -247,7 +329,7 @@ class CartEndpointTests(BaseWebTest):
         csv_text = csv_response.get_data(as_text=True)
 
         self.assertIn("Need matching pair", csv_text)
-        self.assertIn("order_id,#00001", csv_text)
+        self.assertIn("order_id,#CE00000001", csv_text)
         self.assertIn("address_line_1,650 S Hill St Suite 518", csv_text)
         self.assertIn("address_line_2,Suite A", csv_text)
         self.assertIn("postal_code,90014", csv_text)
@@ -256,7 +338,7 @@ class CartEndpointTests(BaseWebTest):
         self.assertNotIn("material", csv_text)
         self.assertNotIn("size_mm", csv_text)
 
-    def test_checkout_keeps_cart_when_email_delivery_fails(self) -> None:
+    def test_checkout_clears_cart_after_saved_order_when_email_delivery_fails(self) -> None:
         self.client.post(
             "/api/cart/add", json={"code": self.valid_code, "qty": 1})
 
@@ -264,6 +346,7 @@ class CartEndpointTests(BaseWebTest):
             checkout_response = self.client.post(
                 "/checkout",
                 data={
+                    "idempotency_key": self.checkout_idempotency_key(),
                     "name": "Test Buyer",
                     "company": "Sample Co",
                     "phone_country": "United States (+1)",
@@ -279,12 +362,15 @@ class CartEndpointTests(BaseWebTest):
 
         self.assertEqual(checkout_response.status_code, 200)
         checkout_body = checkout_response.get_data(as_text=True)
-        self.assertIn("We couldn't deliver the order email", checkout_body)
-        self.assertIn("Reference order ID: #00001", checkout_body)
+        self.assertIn("couldn't deliver the order email", checkout_body)
+        self.assertIn("order was saved", checkout_body)
+        self.assertIn("Reference order ID: #CE00000001", checkout_body)
 
         with self.client.session_transaction() as sess:
-            self.assertEqual(sess["cart"], {self.valid_code: 1})
-            self.assertEqual(sess.get("last_order_id"), "#00001")
+            self.assertEqual(sess["cart"], {})
+            self.assertTrue(sess.get("last_order_id"))
+            self.assertNotIn("last_order_customer", sess)
+            self.assertNotIn("last_order_csv", sess)
 
     def test_checkout_pdf_download_endpoint_returns_pdf(self) -> None:
         self.client.post(
@@ -293,6 +379,7 @@ class CartEndpointTests(BaseWebTest):
         checkout_response = self.client.post(
             "/checkout",
             data={
+                "idempotency_key": self.checkout_idempotency_key(),
                 "name": "Test Buyer",
                 "company": "Sample Co",
                 "phone_country": "United States (+1)",
@@ -316,6 +403,19 @@ class CartEndpointTests(BaseWebTest):
         self.assertEqual(pdf_response.mimetype, "application/pdf")
         self.assertTrue(pdf_response.get_data().startswith(b"%PDF"))
 
+    def test_order_download_link_is_bound_to_submitting_browser_session(self) -> None:
+        self.client.post("/api/cart/add", json={"code": self.valid_code, "qty": 1})
+        self.assertEqual(
+            self.client.post("/checkout", data=self._valid_checkout_data()).status_code,
+            200,
+        )
+        with self.client.session_transaction() as sess:
+            token = str(sess["last_order_token"])
+
+        with webapp.app.test_client() as other_client:
+            response = other_client.get(f"/download/order/{token}.csv")
+        self.assertEqual(response.status_code, 404)
+
     def test_checkout_email_pdf_rows_preserve_product_images(self) -> None:
         captured_rows: list[dict[str, object]] = []
 
@@ -338,6 +438,7 @@ class CartEndpointTests(BaseWebTest):
                 checkout_response = self.client.post(
                     "/checkout",
                     data={
+                        "idempotency_key": self.checkout_idempotency_key(),
                         "name": "Test Buyer",
                         "company": "Sample Co",
                         "phone_country": "United States (+1)",
@@ -361,7 +462,7 @@ class CartEndpointTests(BaseWebTest):
         self.assertEqual(captured_customer.get("address_line_1"), "650 S Hill St Suite 518")
         self.assertEqual(captured_customer.get("address_line_2"), "Suite A")
         self.assertEqual(captured_customer.get("postal_code"), "90014")
-        self.assertEqual(captured_order_id, "#00001")
+        self.assertEqual(captured_order_id, "#CE00000001")
 
     def test_checkout_view_renders_searchable_checkout_comboboxes_without_prefill(self) -> None:
         self.client.post(
@@ -641,6 +742,7 @@ class CartEndpointTests(BaseWebTest):
             "city": "Los Angeles",
             "state": "California",
             "country": "United States",
+            "country_key": "us",
             "notes": "Please confirm availability.",
         }
         product_images_dir = webapp.BASE_DIR / "static" / "product_images"
@@ -674,7 +776,15 @@ class CartEndpointTests(BaseWebTest):
         self.assertIn("<b>Customer:</b> Test Buyer", detail_cell.text)
         self.assertIn("650 S Hill St Suite 518", detail_cell.text)
         self.assertIn("<b>Ship To:</b> 650 S Hill St Suite 518", detail_cell.text)
-        self.assertIn("Los Angeles, California 90014, United States", detail_cell.text)
+        self.assertIn("Los Angeles, California 90014, USA", detail_cell.text)
+
+    def test_pdf_export_uses_iso_alpha_3_country_codes(self) -> None:
+        self.assertEqual(
+            cart_domain._customer_shipping_address_lines(
+                {"city": "Guadalajara", "country": "Mexico", "country_key": "mx"}
+            ),
+            ["Guadalajara, MEX"],
+        )
 
     def test_cart_to_pdf_bytes_keeps_image_heavy_orders_compact(self) -> None:
         product_images_dir = webapp.BASE_DIR / "static" / "product_images"

@@ -12,6 +12,7 @@ os.environ.setdefault("SECRET_KEY", "test-secret-key")
 
 import app as webapp
 from domains import emailing as emailing_domain
+from domains.orders import OrderRepository
 
 
 class BaseWebTest(unittest.TestCase):
@@ -29,6 +30,12 @@ class BaseWebTest(unittest.TestCase):
         order_log_dir = temp_root / "logs"
         order_csv_dir = order_log_dir / "orders_csv"
         order_event_log_dir = order_log_dir / ".logs"
+        order_repository = OrderRepository(
+            f"sqlite+pysqlite:///{temp_root / 'orders.sqlite3'}",
+            allow_sqlite_for_tests=True,
+        )
+        order_repository.create_schema_for_tests()
+        webapp.app.extensions["order_repository"] = order_repository
 
         self._emailing_patchers = [
             patch.dict(
@@ -57,6 +64,7 @@ class BaseWebTest(unittest.TestCase):
 
         self.addCleanup(self._cleanup_order_email_logger)
         self.addCleanup(self._emailing_tempdir.cleanup)
+        self.addCleanup(order_repository.engine.dispose)
         self._cleanup_order_email_logger()
 
         with self.client.session_transaction() as sess:
@@ -67,6 +75,10 @@ class BaseWebTest(unittest.TestCase):
             sess.pop("last_order_token", None)
             sess.pop("last_order_id", None)
             sess.pop("last_order_csv_filename", None)
+            sess.pop("last_order_customer", None)
+            sess.pop("last_order_idempotency_key", None)
+            sess.pop("checkout_idempotency_key", None)
+            sess.pop("checkout_cart_fingerprint", None)
 
     @staticmethod
     def _cleanup_order_email_logger() -> None:
@@ -97,3 +109,9 @@ class BaseWebTest(unittest.TestCase):
             return import_pattern.sub(repl, content)
 
         return read_with_imports(root_css, set())
+
+    def checkout_idempotency_key(self) -> str:
+        response = self.client.get("/checkout")
+        self.assertEqual(response.status_code, 200)
+        with self.client.session_transaction() as sess:
+            return str(sess["checkout_idempotency_key"])

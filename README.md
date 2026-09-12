@@ -23,7 +23,9 @@ The codebase is kept modular so content and feature logic do not accumulate in `
 - `domains/team.py`: team normalization, slugs, WhatsApp/call links, and vCard generation.
 - `domains/faqs.py`: FAQ loading.
 - `domains/seo.py`: canonical base URL handling plus sitemap `lastmod` generation.
-- `domains/emailing.py`: optional SMTP order email delivery.
+- `domains/emailing.py`: Microsoft Graph order email delivery and CSV attachments.
+- `domains/orders.py`: durable PostgreSQL order snapshots, idempotency, retrieval, and delivery state.
+- `domains/cache_control.py`: explicit public asset and private response caching policies.
 
 ## Content model
 
@@ -76,6 +78,7 @@ uv run python -m playwright install chromium webkit
 Required:
 
 - `SECRET_KEY`: Flask session secret. The app fails fast if it is missing or empty.
+- `DATABASE_URL`: Render Postgres **internal** URL, configured only on the web service. Required for checkout and migrations; there is no production local-file fallback. Never put the URL in source control or browser code.
 
 Optional:
 
@@ -84,14 +87,15 @@ Optional:
 - `SITE_BASE_URL`: public canonical base URL used for sitemap entries, canonical URLs, and absolute OG image links.
 - `PLAUSIBLE_DOMAIN`: enables Plausible analytics injection in the base template.
 
-Optional SMTP settings for order emails:
+Order email settings (preserve the existing Render values):
 
-- `SMTP_HOST`
-- `SMTP_PORT` with default `587`
-- `SMTP_USER`
-- `SMTP_PASS`
-- `EMAIL_TO`
-- `EMAIL_FROM` with fallback to `SMTP_USER`
+- `EMAIL_TRANSPORT=graph`
+- `AZURE_TENANT_ID`, `AZURE_CLIENT_ID`, `AZURE_CLIENT_SECRET` (existing `TENANT_ID`, `CLIENT_ID`, `CLIENT_SECRET` aliases also work)
+- `GRAPH_SENDER_UPN`: mailbox used to send and receive order notifications; `SMTP_USER` is a legacy fallback for this mailbox only.
+- `ORDER_BCC_EMAILS`: optional comma-separated staff recipients.
+- `ORDER_EMAIL_MAX_RETRIES`, `ORDER_EMAIL_RETRY_DELAY_SECONDS`, `ORDER_EMAIL_REQUEST_TIMEOUT_SECONDS`: optional transport tuning; existing defaults are conservative.
+
+See [PostgreSQL deployment](docs/postgres-deployment.md) for exact Render settings, migrations, verification, and failure recovery, and [persistence audit](docs/persistence-audit.md) for ranked follow-up work.
 
 ## Running locally
 
@@ -210,13 +214,15 @@ The test suite covers route contracts, metadata endpoints, reels/homepage fronte
 
 - If startup fails with `SECRET_KEY env var not set`, define `SECRET_KEY` in your shell or `.env`.
 - If canonical URLs or sitemap entries point to localhost in production, set `SITE_BASE_URL` to the public domain.
-- If order submission succeeds but no email is sent, confirm the SMTP variables are fully configured.
+- If a saved order has no email notification, confirm the Graph settings and inspect its delivery status. Do not resubmit the order: PostgreSQL retains it even if notification fails.
 - If Playwright-based tests are skipped or fail due to missing browsers, run `uv sync --extra dev` and install Chromium/WebKit with Playwright.
 
 ## Deployment
 
-`render.yaml` runs the site as a Python web service using `uv sync --frozen` and starts Gunicorn with:
+`render.yaml` installs with `uv sync --frozen` and starts the migration-gated web service with:
 
 ```bash
-.venv/bin/gunicorn --bind 0.0.0.0:$PORT app:app
+sh scripts/start_render.sh
 ```
+
+Configure `DATABASE_URL` from the existing Render database's internal URL before deploying. The start script applies Alembic migrations and starts one Gunicorn worker with two threads. See [deployment and production verification](docs/postgres-deployment.md) for the complete runbook and Cache-Control table.

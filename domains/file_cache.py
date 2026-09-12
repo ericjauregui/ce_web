@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 from threading import Lock
@@ -8,7 +9,7 @@ from typing import Any
 # Lightweight in-process cache keyed by absolute file path.
 _cache_lock = Lock()
 _json_cache: dict[str, tuple[int, int, Any]] = {}
-_path_version_cache: dict[str, tuple[int, int, int]] = {}
+_path_version_cache: dict[str, tuple[int, int, str]] = {}
 
 
 def load_json_cached(path: Path, default: Any) -> Any:
@@ -34,7 +35,7 @@ def load_json_cached(path: Path, default: Any) -> Any:
     return data
 
 
-def get_path_version(path: Path) -> int | None:
+def get_path_version(path: Path) -> str | None:
     if not path.exists() or not path.is_file():
         return None
 
@@ -47,5 +48,9 @@ def get_path_version(path: Path) -> int | None:
         if cached and cached[0] == stamp[0] and cached[1] == stamp[1]:
             return cached[2]
 
-        _path_version_cache[resolved] = (stamp[0], stamp[1], stat.st_mtime_ns)
-        return stat.st_mtime_ns
+        # A content fingerprint stays stable across deploys when the file is
+        # unchanged and changes whenever its bytes change. This makes URLs
+        # produced by asset_url safe for immutable edge caching.
+        version = hashlib.sha256(path.read_bytes()).hexdigest()[:16]
+        _path_version_cache[resolved] = (stamp[0], stamp[1], version)
+        return version

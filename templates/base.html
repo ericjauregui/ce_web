@@ -106,8 +106,9 @@
   {% endblock %}
 
 </head>
-<body class="bg-black text-light" id="top">
+<body class="bg-black text-light {% block body_class %}{% endblock %}" id="top">
 <div class="page-shell">
+  {% block site_header %}
   <nav class="navbar navbar-dark bg-black border-bottom border-gold fixed-top">
     <div class="container-fluid position-relative px-2 px-md-3">
       <a href="{{ url_for('index') }}" class="navbar-brand brand-lockup" aria-label="{{ site_name }}">
@@ -134,12 +135,8 @@
 <div class="nav-actions ms-auto d-flex align-items-center">
   <a id="cartLink" class="nav-link cart-link position-relative text-gold-70 me-2 ms-2" href="/cart" aria-label="Cart" {%
     if request.path=='/cart' %}aria-current="page" {% endif %}>
-    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-          stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <circle cx="9" cy="21" r="1"></circle>
-          <circle cx="20" cy="21" r="1"></circle>
-          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-        </svg>
+    {% set cart_icon_class = 'nav-cart-icon' %}
+    {% include "partials/cart_icon.html" %}
         <span id="cartCountBadge"
           class="position-absolute top-0 start-100 translate-middle badge rounded-pill text-bg-dark border border-gold"
           {% if cart_item_count <= 0 %}style="display:none;"{% endif %}>{{ cart_item_count }}</span>
@@ -153,6 +150,7 @@
           <li class="nav-item"><a class="nav-link" href="{{ url_for('catalog_start') }}">Our Catalog</a></li>
           <li class="nav-item"><a class="nav-link" href="/team">Meet the Team</a></li>
           <li class="nav-item"><a class="nav-link" href="{{ url_for('reels_page') }}">Jewelry Reels</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('trade_shows_page') }}" {% if request.endpoint == 'trade_shows_page' %}aria-current="page"{% endif %}>Trade Shows</a></li>
           <li class="nav-item"><a class="nav-link" href="/about">About Us</a></li>
           <li class="nav-item"><a class="nav-link" href="/contact">Contact Us</a></li>
           <li class="nav-item"><a class="nav-link" href="{{ url_for('faqs_page') }}">FAQs</a></li>
@@ -160,9 +158,11 @@
           </div>
           </div>
           </nav>
+  {% endblock %}
 
   <main>{% block content %}{% endblock %}</main>
 
+  {% block site_footer %}
   <footer class="text-center py-4 border-top border-gold mt-5 text-gold-70">
     <div class="footer-social mb-2" aria-label="Follow us on our socials">
       <div class="d-inline-flex flex-wrap align-items-center justify-content-center gap-2">
@@ -219,6 +219,7 @@
     </div>
     © {{ current_year }} California Earrings · Los Angeles, CA, USA
   </footer>
+  {% endblock %}
 
   <script defer src="{{ asset_url('vendor/bootstrap/bootstrap.bundle.min.js') }}"></script>
   {% block body_end %}{% endblock %}
@@ -460,15 +461,6 @@
               window.addEventListener("resize", queueSyncNavMetrics, { passive: true });
               window.addEventListener("orientationchange", queueSyncNavMetrics, { passive: true });
 
-              const navCollapse = nav.querySelector("#nav");
-              if (navCollapse) {
-                ["show.bs.collapse", "shown.bs.collapse", "hide.bs.collapse", "hidden.bs.collapse"].forEach((eventName) => {
-                  navCollapse.addEventListener(eventName, () => {
-                    queueSyncNavMetrics();
-                    window.requestAnimationFrame(queueSyncNavMetrics);
-                  });
-                });
-              }
             })();
 
 </script>

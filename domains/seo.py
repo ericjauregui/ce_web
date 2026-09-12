@@ -32,6 +32,7 @@ def build_sitemap_urls(
     team_path: Path,
     team_members: list[dict],
     product_codes: list[str] | None = None,
+    trade_shows_path: Path | None = None,
 ) -> list[dict[str, str | float | None]]:
     pages = [
         {
@@ -63,6 +64,15 @@ def build_sitemap_urls(
             "changefreq": "weekly",
             "priority": 0.8,
             "lastmod": iso_lastmod(reels_path, base_dir / "templates" / "reels.html"),
+        },
+        {
+            "path": "/trade-shows",
+            "changefreq": "weekly",
+            "priority": 0.8,
+            "lastmod": iso_lastmod(
+                trade_shows_path or base_dir / "catalog" / "trade_shows.json",
+                base_dir / "templates" / "trade_shows.html",
+            ),
         },
         {
             "path": "/team",

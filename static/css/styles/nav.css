@@ -124,6 +124,43 @@
   justify-content: flex-end;
 }
 
+/* Expand below the fixed top row without resizing the page underneath. */
+.navbar .navbar-collapse {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: #0d0d0d;
+  border-bottom: 1px solid var(--gold-outline);
+  box-shadow: 0 14px 24px rgba(0, 0, 0, .25);
+  max-height: calc(100dvh - var(--nav-actual-height, var(--nav-height)));
+  overflow-y: auto;
+}
+
+.navbar .navbar-collapse .navbar-nav {
+  padding-inline: clamp(1rem, 2vw, 1.5rem);
+}
+
+.navbar .navbar-collapse.collapsing {
+  overflow: hidden;
+  transition: height 220ms cubic-bezier(.2, .75, .3, 1);
+  contain: layout paint;
+}
+
+.navbar .navbar-toggler-icon {
+  transition: transform 180ms ease, opacity 140ms ease;
+}
+
+.navbar .navbar-toggler[aria-expanded="true"] .navbar-toggler-icon {
+  transform: rotate(90deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .navbar .navbar-collapse.collapsing,
+  .navbar .navbar-toggler-icon {
+    transition: none;
+  }
+}
+
 .nav-search {
   display: flex;
   align-items: center;

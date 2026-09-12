@@ -18,6 +18,7 @@ from domains.catalog import (
     load_social as load_social_from_path,
 )
 from domains.cart_routes import register_cart_routes
+from domains.cache_control import PUBLIC_ENDPOINT_POLICIES, install_cache_control
 from domains.emailing import send_order_email
 from domains.faqs import load_faqs as load_faqs_from_path
 from domains.file_cache import get_path_version
@@ -27,40 +28,30 @@ from domains.seo import canonical_base_url
 from domains.team import (
     build_member_vcard,
     build_team_members,
+    ensure_team_qr_assets,
     get_team_member_by_slug as get_team_member_by_slug_in_team,
     load_team as load_team_from_path,
     slugify,
 )
+from domains.trade_shows import load_trade_show as load_trade_show_from_path
 
 app = Flask(__name__)
 app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 60 * 60 * 24 * 365
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=30)
 app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+app.config["SESSION_REFRESH_EACH_REQUEST"] = False
+app.config["MAX_CONTENT_LENGTH"] = 128 * 1024
 
 load_dotenv()
+app.config["SESSION_COOKIE_SECURE"] = (
+    os.getenv("RENDER", "").strip().lower() == "true"
+    or os.getenv("SESSION_COOKIE_SECURE", "").strip().lower() in {"1", "true", "yes"}
+)
 app.secret_key = os.environ["SECRET_KEY"]
 
 
-@app.before_request
-def keep_session_permanent() -> None:
-    # Persist cart state across visits until the configured session TTL is reached.
-    session.permanent = True
-
-
-@app.after_request
-def add_cache_headers(response):
-    if request.path.startswith("/static/"):
-        if request.args.get("v"):
-            response.headers["Cache-Control"] = "public, max-age=31536000, immutable"
-        else:
-            response.headers["Cache-Control"] = "public, max-age=3600"
-        return response
-
-    if response.mimetype == "text/html":
-        # Revalidate document responses while still allowing browser cache reuse.
-        response.headers["Cache-Control"] = "no-cache, must-revalidate"
-    return response
+install_cache_control(app)
 
 
 if not app.secret_key:
@@ -72,6 +63,7 @@ COLLECTIONS_PATH = BASE_DIR / "catalog" / "collections.json"
 SOCIAL_PATH = BASE_DIR / "catalog" / "social.json"
 TEAM_PATH = BASE_DIR / "catalog" / "team.json"
 FAQS_PATH = BASE_DIR / "catalog" / "faqs.json"
+TRADE_SHOWS_PATH = BASE_DIR / "catalog" / "trade_shows.json"
 REELS_PATH = BASE_DIR / "static" / "reels"
 
 
@@ -116,6 +108,10 @@ def load_collections_cfg() -> dict[str, Any]:
     return load_collections_cfg_from_path(COLLECTIONS_PATH)
 
 
+def load_trade_show() -> dict[str, Any]:
+    return load_trade_show_from_path(TRADE_SHOWS_PATH, load_products(), BASE_DIR / "static")
+
+
 def warm_runtime_caches() -> None:
     # Warm catalog and search caches once per process so initial customer
     # requests avoid cold-path indexing work.
@@ -153,14 +149,18 @@ def build_sitemap_urls(base_url: str) -> list[dict[str, str | float | None]]:
         team_path=TEAM_PATH,
         team_members=members,
         product_codes=product_codes,
+        trade_shows_path=TRADE_SHOWS_PATH,
     )
 
 
 @app.context_processor
 def inject_site_config():
-    cart = get_cart()
+    # Public metadata endpoints do not render cart state. Avoid opening the
+    # customer session so their responses remain cookie-free and edge-cacheable.
+    cart = {} if request.endpoint in PUBLIC_ENDPOINT_POLICIES else get_cart()
     return {
         "asset_url": asset_url,
+        "cart_distinct_item_count": len(cart),
         "cart_item_count": cart_total_items(cart),
         "current_year": date.today().year,
         "plausible_domain": os.getenv("PLAUSIBLE_DOMAIN", "").strip(),
@@ -177,6 +177,7 @@ register_site_routes(
     load_collections_cfg=load_collections_cfg,
     load_team=load_team,
     load_faqs=load_faqs,
+    load_trade_show=load_trade_show,
     get_cart=get_cart,
     get_team_member_by_slug=get_team_member_by_slug,
     build_sitemap_urls=build_sitemap_urls,

@@ -2,7 +2,9 @@
 {% block title %}California Earrings | Wholesale 14K Gold Earrings & Body Jewelry{% endblock %}
 {% block meta_description %}Wholesaler of authentic 14K gold earrings, piercing jewelry, hoops, studs, hearts, and body jewelry from California Earrings in Los Angeles. Built for boutiques, jewelry stores, and resellers.{% endblock %}
 {% block page_preloads %}
-  <link rel="preload" as="image" href="{{ asset_url('assets/hero_bg.png') }}" fetchpriority="high">
+  <link rel="preload" as="image" href="{{ asset_url('assets/hero_bg_mobile_compact.png') }}" media="(max-width: 575.98px)" fetchpriority="high">
+  <link rel="preload" as="image" href="{{ asset_url('assets/hero_bg.png') }}" media="(min-width: 576px) and (max-width: 1199.98px)" fetchpriority="high">
+  <link rel="preload" as="image" href="{{ asset_url('assets/hero_bg_wide.png') }}" media="(min-width: 1200px)" fetchpriority="high">
   <link rel="preload" as="image" href="{{ asset_url('assets/ce_logo_full.png') }}" fetchpriority="high">
 {% endblock %}
 {% block page_css %}
@@ -13,7 +15,7 @@
 {% endblock %}
 {% block content %}
 {% set show_reels_after_results = q|default('', true)|trim != '' %}
-<header class="hero d-flex align-items-center text-center" style="--hero-bg-url: url('{{ asset_url('assets/hero_bg.png') }}');">
+<header class="hero d-flex align-items-center text-center" style="--hero-bg-original: url('{{ asset_url('assets/hero_bg.png') }}'); --hero-bg-wide: url('{{ asset_url('assets/hero_bg_wide.png') }}'); --hero-bg-mobile: url('{{ asset_url('assets/hero_bg_mobile_compact.png') }}');">
   <div class="container">
     <h1 class="visually-hidden">California Earrings</h1>
     <img class="hero-logo" src="{{ asset_url('assets/ce_logo_full.png') }}" alt="California Earrings" loading="eager" decoding="sync" fetchpriority="high" width="339" height="88">
@@ -49,39 +51,93 @@
 {% endif %}
 
 <section class="{% if latest_reels and not show_reels_after_results %}pt-0 pb-5{% else %}py-5{% endif %}">
+  {% if sections|length > 1 %}
+  <div class="sticky-section-header catalog-explorer-header border-top border-bottom border-gold mb-3">
+    <div class="container catalog-explorer-row py-3">
+      <div class="catalog-explorer-heading">
+        <div class="catalog-explorer-title-row">
+          <h2 class="m-0 section-title catalog-section-title">
+            <span class="catalog-section-title-text">Our Catalog</span>
+          </h2>
+          <span class="catalog-current-collection" data-catalog-current-collection aria-live="polite">
+            Viewing {{ sections[0].title }} Collection
+          </span>
+        </div>
+        <p class="catalog-explorer-hint" data-catalog-collection-helper aria-live="polite">Browse by collection · All items shown</p>
+      </div>
+      <details class="catalog-collection-picker" id="catalogCollectionPicker" data-pristine="true"
+        data-active-target="all-collections">
+        <summary class="catalog-collection-picker__summary">
+          <img class="catalog-collection-picker__thumbnail"
+            src="{{ asset_url('assets/ce_logo_shape.png') }}"
+            alt="" loading="lazy" decoding="async" data-catalog-collection-thumbnail>
+          <span data-catalog-collection-label>All Collections</span>
+          <span class="catalog-collection-picker__chevron" aria-hidden="true"></span>
+        </summary>
+        <div class="catalog-collection-picker__menu" aria-label="Browse collections">
+          <p class="catalog-collection-picker__heading">Browse collections</p>
+          <div class="catalog-collection-picker__options">
+            <a href="#section-studs"
+              class="catalog-collection-picker__option catalog-collection-picker__option--all section-chip-btn"
+              data-target="all-collections"
+              data-collection-title="All Collections"
+              aria-label="Show all collections"
+              aria-current="true"
+              data-selected="true">
+              <img src="{{ asset_url('assets/ce_logo_shape.png') }}" alt="" loading="lazy" decoding="async">
+              <span>All Collections</span>
+            </a>
+            {% for other in sections %}
+            <a href="#section-{{ other.key }}"
+              class="catalog-collection-picker__option section-chip-btn"
+              data-target="section-{{ other.key }}"
+              data-collection-title="{{ other.title }}"
+              aria-label="Show {{ other.title }}"
+              data-selected="false">
+              <img src="{{ asset_url('product_images/' ~ other.items[0].image) }}"
+                alt="" loading="lazy" decoding="async">
+              <span>{{ other.title }}</span>
+            </a>
+            {% endfor %}
+          </div>
+        </div>
+      </details>
+      <a class="chip catalog-explorer-jump" href="#top">Jump to Top</a>
+    </div>
+  </div>
+  {% endif %}
   {% for section in sections %}
-  <div id="section-{{ section.key }}" class="section-anchor" aria-hidden="true"></div>
-  <div class="sticky-section-header border-top border-bottom border-gold mb-3">
-    <div class="container section-header-row py-3">
+  <div id="section-{{ section.key }}" class="section-anchor catalog-collection-section"
+    data-collection-title="{{ section.title }}">
+    {% if sections|length == 1 %}
+    <div class="sticky-section-header border-top border-bottom border-gold mb-3">
+      <div class="container section-header-row py-3">
+        <h2 class="m-0 section-title catalog-section-title">
+          <span class="catalog-section-title-text">{{ section.title }}</span>
+          <span class="catalog-section-title-rule" aria-hidden="true"></span>
+        </h2>
+        <div class="section-header-cats" aria-hidden="true"></div>
+        <div class="section-header-jump d-flex gap-3 align-items-center">
+          <a class="chip" href="{{ url_for('index') }}#section-studs">← Full Catalog</a>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <div class="catalog-collection-heading{% if loop.first %} catalog-collection-heading--first{% else %} border-top border-bottom border-gold{% endif %} mb-3">
+      <div class="container catalog-collection-heading__inner py-3">
       <h2 class="m-0 section-title catalog-section-title">
         <span class="catalog-section-title-text">{{ section.title }}</span>
         <span class="catalog-section-title-rule" aria-hidden="true"></span>
       </h2>
-      {% if sections|length > 1 %}
-      <div class="section-header-cats scroll-cue-shell scroll-cue-shell--chips" aria-label="Other categories">
-        <div class="section-header-cats-scroll scroll-cue-track">
-          {% for other in sections %}
-          {% if other.key != section.key %}
-          <button type="button" class="chip section-chip-btn" data-target="section-{{ other.key }}">{{ other.title }}</button>
-          {% endif %}
-          {% endfor %}
-        </div>
       </div>
-      {% endif %}
-      <div class="section-header-jump d-flex gap-3 align-items-center">
-        {% if section.key == 'search-results' %}
-        <a class="chip" href="{{ url_for('index') }}#section-studs">← Full Catalog</a>
-        {% else %}
-        <a class="chip" href="#top">Jump to Top</a>
-        {% endif %}
-      </div>
-      </div>
-  </div>
-  <div class="container{% if not loop.last %} mb-3{% endif %}">
+    </div>
+    {% endif %}
+    <div class="container{% if not loop.last %} mb-3{% endif %}">
     <div class="row row-cols-2 row-cols-md-3 row-cols-xl-4 g-4 product-grid-row">
       {% for p in section.items %}
       {% include "partials/product_card.html" %}
       {% endfor %}
+    </div>
     </div>
   </div>
   {% endfor %}
@@ -91,9 +147,34 @@
 {% include "partials/latest_videos_strip.html" %}
 {% endif %}
 
+  <aside id="catalogMiniCart"
+    class="catalog-mini-cart is-expanded"
+    data-total-items="{{ cart_item_count }}"
+    data-distinct-items="{{ cart_distinct_item_count }}"
+    aria-label="Current order"
+    {% if cart_item_count <= 0 %}hidden{% endif %}>
+    <a class="catalog-mini-cart__toggle" href="{{ url_for('cart') }}" aria-label="View your cart">
+      <span class="catalog-mini-cart__icon-wrap" aria-hidden="true">
+        {% set cart_icon_class = 'catalog-mini-cart__cart-icon' %}
+        {% include "partials/cart_icon.html" %}
+        <span class="catalog-mini-cart__count">{{ cart_item_count }}</span>
+      </span>
+      <span class="catalog-mini-cart__summary">
+        <span class="catalog-mini-cart__title"><span data-mini-cart-total>{{ cart_item_count }}</span>
+          <span data-mini-cart-piece-label>{% if cart_item_count == 1 %}piece{% else %}pieces{% endif %}</span> in your order</span>
+        <span class="catalog-mini-cart__detail"><span data-mini-cart-distinct>{{ cart_distinct_item_count }}</span>
+          <span data-mini-cart-style-label>{% if cart_distinct_item_count == 1 %}style{% else %}styles{% endif %}</span> · Saved as you shop</span>
+      </span>
+    </a>
+    <div class="catalog-mini-cart__actions" id="catalogMiniCartActions">
+      <a class="btn btn-outline-gold catalog-mini-cart__review" href="{{ url_for('cart') }}">Review order</a>
+      <a class="btn btn-gold catalog-mini-cart__submit" href="{{ url_for('checkout') }}">Submit order</a>
+    </div>
+  </aside>
+
   <a class="whatsapp-float"
     href="https://wa.me/18183319292?text=Hello%20I%27d%20like%20more%20information"
-    target="_blank" rel="noopener" aria-label="Chat on WhatsApp">
+    target="_blank" rel="noopener" aria-label="Chat on WhatsApp" draggable="false">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" aria-hidden="true">
       <path
         d="M380.9 97.1C339 55.2 283.2 32 223.9 32 100.5 32 0 132.5 0 256c0 45.4 11.9 89.5 34.5 128.4L0 480l98.8-32.5C136.9 469 179.7 480 223.9 480c123.4 0 224-100.5 224-224 0-59.2-23.2-115-65-156.9zM223.9 438.7c-38.8 0-76.8-10.4-110.1-30.1l-7.9-4.7-58.6 19.3 19.1-57.1-5.1-8.2C41.6 323.6 30.3 290.1 30.3 256 30.3 149.3 117.1 62.5 223.9 62.5c51.8 0 100.5 20.2 137.1 56.8 36.6 36.6 56.8 85.3 56.8 137.1 0 106.8-86.8 193.6-193.9 193.6zm101.7-145.5c-5.6-2.8-33.1-16.3-38.2-18.1-5.1-1.9-8.9-2.8-12.6 2.8-3.7 5.6-14.5 18.1-17.7 21.8-3.3 3.7-6.5 4.2-12.1 1.4-32.9-16.5-54.4-29.5-76.2-66.9-5.8-9.9 5.8-9.2 16.5-30.7 1.8-3.7.9-6.8-.5-9.6-1.4-2.8-12.6-30.3-17.3-41.5-4.6-11.1-9.3-9.6-12.6-9.8-3.3-.2-7.1-.2-10.8-.2-3.7 0-9.6 1.4-14.6 6.8-5.1 5.6-19.1 18.7-19.1 45.6 0 26.8 19.6 52.8 22.3 56.5 2.8 3.7 38.4 58.6 93.1 82.1 34.5 14.9 48 16.1 65.1 13.5 10.4-1.6 33.1-13.5 37.7-26.6 4.7-13.1 4.7-24.3 3.3-26.6-1.3-2.4-5.1-3.8-10.7-6.6z" />

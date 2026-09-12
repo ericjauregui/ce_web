@@ -39,43 +39,28 @@ class NavLayoutE2ETests(BaseE2ETest):
         nav_center_after = nav_rect_after["y"] + (nav_rect_after["height"] / 2)
         self.assertLessEqual(abs(nav_center_after - trigger_center_after), 6)
 
-    def test_chips_and_cta_buttons_are_vertically_centered(self) -> None:
+    def test_catalog_picker_and_cta_buttons_are_vertically_centered(self) -> None:
         self.page.goto(f"{self.base_url}/", wait_until="domcontentloaded")
         self.page.wait_for_timeout(180)
 
-        chip_alignment = self.page.evaluate(
+        picker_alignment = self.page.evaluate(
             """
             () => {
-          const rows = Array.from(document.querySelectorAll('.section-header-cats'))
-            .map((cats) => {
-              const scrollRail = cats.querySelector('.section-header-cats-scroll');
-              const chip = scrollRail?.querySelector('.chip');
-              if (!scrollRail || !chip) return null;
-
-              const catsRect = cats.getBoundingClientRect();
-              const scrollRailRect = scrollRail.getBoundingClientRect();
-              const chipRect = chip.getBoundingClientRect();
-              const isVisible = catsRect.height > 0 && catsRect.bottom > 0 && catsRect.top < window.innerHeight;
-              if (!isVisible) return null;
-
-              const centerDelta = Math.abs((catsRect.top + catsRect.height / 2) - (chipRect.top + chipRect.height / 2));
-              const railCenterDelta = Math.abs((catsRect.left + catsRect.width / 2) - (scrollRailRect.left + scrollRailRect.width / 2));
-              const firstChipVisible = chipRect.left >= scrollRailRect.left - 1;
-              return { centerDelta, railCenterDelta, firstChipVisible, scrollLeft: scrollRail.scrollLeft };
-            })
-            .filter(Boolean);
-
-          if (!rows.length) return null;
-          rows.sort((left, right) => left.centerDelta - right.centerDelta);
-          return rows[0];
+              const row = document.querySelector('.catalog-explorer-row');
+              const summary = row?.querySelector('.catalog-collection-picker__summary');
+              if (!row || !summary) return null;
+              const rowRect = row.getBoundingClientRect();
+              const summaryRect = summary.getBoundingClientRect();
+              return {
+                centerDelta: Math.abs((rowRect.top + rowRect.height / 2) - (summaryRect.top + summaryRect.height / 2)),
+                summaryVisible: summaryRect.width > 0 && summaryRect.height >= 40,
+              };
             }
             """
         )
-        self.assertIsNotNone(chip_alignment)
-        self.assertLessEqual(chip_alignment["centerDelta"], 6)
-        self.assertLessEqual(chip_alignment["railCenterDelta"], 2)
-        self.assertTrue(chip_alignment["firstChipVisible"])
-        self.assertEqual(chip_alignment["scrollLeft"], 0)
+        self.assertIsNotNone(picker_alignment)
+        self.assertLessEqual(picker_alignment["centerDelta"], 6)
+        self.assertTrue(picker_alignment["summaryVisible"])
 
         cta_styles = self.page.evaluate(
             """
@@ -96,54 +81,61 @@ class NavLayoutE2ETests(BaseE2ETest):
         self.assertEqual(cta_styles["alignItems"], "center")
         self.assertEqual(cta_styles["justifyContent"], "center")
 
-    def test_horizontal_scroll_rows_show_right_hint_until_scrolled_to_end(self) -> None:
+    def test_mobile_catalog_picker_and_reel_scroll_hint(self) -> None:
         self.page.set_viewport_size({"width": 390, "height": 900})
         self.page.goto(f"{self.base_url}/", wait_until="domcontentloaded")
         self.page.wait_for_timeout(180)
 
-        chip_state = self.page.evaluate(
+        summary = self.page.locator(".catalog-collection-picker__summary")
+        self.assertIn("Choose a collection", summary.inner_text())
+        summary.click()
+        self.assertIn("All Collections", summary.inner_text())
+
+        picker_state = self.page.evaluate(
             """
-            async () => {
-              const shells = Array.from(document.querySelectorAll('.section-header-cats.scroll-cue-shell'));
-              for (const shell of shells) {
-                const track = shell.querySelector('.scroll-cue-track');
-                const lastChip = track?.querySelector('.chip:last-of-type');
-                if (!track || !lastChip) continue;
-
-                const maxScrollLeft = Math.max(0, track.scrollWidth - track.clientWidth);
-                if (maxScrollLeft <= 0) continue;
-
-                const before = {
-                  maxScrollLeft,
-                  canScrollRight: shell.classList.contains('can-scroll-right'),
-                };
-
-                track.scrollLeft = maxScrollLeft;
-                track.dispatchEvent(new Event('scroll'));
-                await new Promise((resolve) => requestAnimationFrame(resolve));
-
-                const trackRect = track.getBoundingClientRect();
-                const lastChipRect = lastChip.getBoundingClientRect();
-                const lastChipVisibleAtEnd = lastChipRect.right <= trackRect.right + 1;
-
-                return {
-                  before,
-                  after: {
-                    canScrollRight: shell.classList.contains('can-scroll-right'),
-                    lastChipVisibleAtEnd,
-                  },
-                };
-              }
-
-              return null;
+            () => {
+              const picker = document.querySelector('#catalogCollectionPicker');
+              const summary = picker?.querySelector('.catalog-collection-picker__summary');
+              const menu = picker?.querySelector('.catalog-collection-picker__menu');
+              const options = picker?.querySelector('.catalog-collection-picker__options');
+              if (!picker || !summary || !menu || !options) return null;
+              picker.open = true;
+              const summaryRect = summary.getBoundingClientRect();
+              const menuRect = menu.getBoundingClientRect();
+              return {
+                summaryHeight: summaryRect.height,
+                menuLeft: menuRect.left,
+                menuRight: menuRect.right,
+                columns: getComputedStyle(options).gridTemplateColumns.split(' ').length,
+                viewportWidth: window.innerWidth,
+              };
             }
             """
         )
-        self.assertIsNotNone(chip_state)
-        self.assertGreater(chip_state["before"]["maxScrollLeft"], 0)
-        self.assertTrue(chip_state["before"]["canScrollRight"])
-        self.assertFalse(chip_state["after"]["canScrollRight"])
-        self.assertTrue(chip_state["after"]["lastChipVisibleAtEnd"])
+        self.assertIsNotNone(picker_state)
+        self.assertGreaterEqual(picker_state["summaryHeight"], 40)
+        self.assertGreaterEqual(picker_state["menuLeft"], 0)
+        self.assertLessEqual(picker_state["menuRight"], picker_state["viewportWidth"])
+        self.assertEqual(picker_state["columns"], 2)
+
+        self.page.locator('[data-target="section-hearts"]').click()
+        self.assertEqual(
+            self.page.locator(".catalog-collection-section:visible").count(),
+            1,
+        )
+        self.assertEqual(
+            self.page.locator(".catalog-collection-heading:visible").count(),
+            0,
+        )
+
+        self.page.locator(".catalog-collection-picker__summary").click()
+        self.page.locator('[data-target="all-collections"]').click()
+        visible_sections = self.page.locator(".catalog-collection-section:visible").count()
+        self.assertGreater(visible_sections, 1)
+        self.assertEqual(
+            self.page.locator(".catalog-collection-heading:visible").count(),
+            visible_sections,
+        )
 
         reel_state = self.page.evaluate(
             """

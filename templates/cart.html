@@ -90,6 +90,7 @@
 </section>
 {% if items|length == 0 and latest_reels %}
 <div id="cartEmptyReelsSection">
+  {% set reels_view_all_button = true %}
   {% include "partials/latest_videos_strip.html" %}
 </div>
 {% endif %}

@@ -1,13 +1,17 @@
 from __future__ import annotations
 
 import io
+import hashlib
+import json
 import os
 import re
 import secrets
+import threading
 from pathlib import Path
 from typing import Any, Callable
 
 from flask import Flask, abort, jsonify, render_template, request, send_file, session, url_for
+from itsdangerous import BadSignature, SignatureExpired, URLSafeTimedSerializer
 
 from domains.cart import (
     cart_items,
@@ -15,10 +19,17 @@ from domains.cart import (
     cart_total_items,
     get_cart_notes,
     normalize_item_note,
-    order_rows_from_items,
 )
 from domains.catalog import products_by_code
 from domains.emailing import OrderEmailDeliveryError
+from domains.emailing import build_order_csv
+from domains.orders import (
+    DatabaseConfigurationError,
+    IdempotencyConflictError,
+    OrderPersistenceError,
+    OrderRepository,
+    OrderValidationError,
+)
 from domains.homepage import load_latest_reels
 from domains.location_options import (
     CHECKOUT_COUNTRY_KEY_BY_LABEL,
@@ -40,6 +51,21 @@ GetCart = Callable[[], dict[str, int]]
 SendOrderEmail = Callable[..., dict[str, Any]]
 CanonicalBaseUrl = Callable[[], str]
 MAX_VALIDATED_ORDER_QUANTITY = 999
+MAX_ORDER_DOWNLOAD_AGE_SECONDS = 60 * 60 * 24 * 30
+CHECKOUT_FIELD_LIMITS = {
+    "name": 160,
+    "company": 200,
+    "phone": 64,
+    "email": 254,
+    "address_line_1": 250,
+    "address_line_2": 250,
+    "postal_code": 32,
+    "city": 120,
+    "state": 120,
+    "country": 120,
+    "notes": 2000,
+}
+EMAIL_PATTERN = re.compile(r"^[^\s@]+@[^\s@]+\.[^\s@]+$")
 
 
 def normalize_checkout_phone(country_key: str, phone: str) -> str:
@@ -102,6 +128,98 @@ def register_cart_routes(
         or os.getenv("GOOGLE_MAPS_API_KEY")
         or ""
     ).strip()
+    repository_lock = threading.Lock()
+
+    def _order_repository() -> OrderRepository:
+        configured = app.extensions.get("order_repository")
+        if isinstance(configured, OrderRepository):
+            return configured
+
+        with repository_lock:
+            configured = app.extensions.get("order_repository")
+            if isinstance(configured, OrderRepository):
+                return configured
+            database_url = str(app.config.get("DATABASE_URL") or os.getenv("DATABASE_URL") or "").strip()
+            repository = OrderRepository(database_url)
+            app.extensions["order_repository"] = repository
+            return repository
+
+    def _cart_fingerprint(cart_data: dict[str, int], notes_by_code: dict[str, str]) -> str:
+        serialized = json.dumps(
+            {"cart": cart_data, "notes": notes_by_code},
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
+        return hashlib.sha256(serialized).hexdigest()
+
+    def _checkout_idempotency_key(cart_data: dict[str, int], notes_by_code: dict[str, str]) -> str:
+        fingerprint = _cart_fingerprint(cart_data, notes_by_code)
+        prior_key_was_submitted = (
+            bool(cart_data)
+            and session.get("checkout_idempotency_key") == session.get("last_order_idempotency_key")
+        )
+        if session.get("checkout_cart_fingerprint") != fingerprint or prior_key_was_submitted:
+            session["checkout_idempotency_key"] = secrets.token_urlsafe(32)
+            session["checkout_cart_fingerprint"] = fingerprint
+        key = str(session.get("checkout_idempotency_key") or "")
+        if not key:
+            key = secrets.token_urlsafe(32)
+            session["checkout_idempotency_key"] = key
+            session["checkout_cart_fingerprint"] = fingerprint
+        return key
+
+    def _download_serializer() -> URLSafeTimedSerializer:
+        return URLSafeTimedSerializer(app.secret_key, salt="order-download-v1")
+
+    def _signed_download_token(order: Any) -> str:
+        return _download_serializer().dumps(
+            {"order_id": order.id, "access_token": order.access_token}
+        )
+
+    def _load_download_order(token: str) -> Any:
+        max_age = int(app.config.get("ORDER_DOWNLOAD_MAX_AGE_SECONDS", MAX_ORDER_DOWNLOAD_AGE_SECONDS))
+        try:
+            payload = _download_serializer().loads(token, max_age=max_age)
+        except (BadSignature, SignatureExpired):
+            abort(404)
+        if not isinstance(payload, dict):
+            abort(404)
+        raw_access_token = str(payload.get("access_token") or "")
+        order_id = str(payload.get("order_id") or "")
+        if not raw_access_token or not order_id:
+            abort(404)
+        if session.get("last_order_token") != token or session.get("last_order_id") != order_id:
+            abort(404)
+        try:
+            order = _order_repository().get_order_by_access_token(raw_access_token)
+        except (DatabaseConfigurationError, OrderPersistenceError):
+            abort(503)
+        if order is None or not secrets.compare_digest(str(order.id), order_id):
+            abort(404)
+        return order
+
+    def _saved_order_rows(order: Any) -> list[dict[str, Any]]:
+        return [item.as_order_row() for item in order.items]
+
+    def _render_saved_order(order: Any, *, email_sent: bool | None, fallback_used: bool = False):
+        session["last_order_id"] = order.id
+        session["last_order_token"] = _signed_download_token(order)
+        for legacy_key in (
+            "last_order_csv",
+            "last_order_rows",
+            "last_order_csv_filename",
+            "last_order_customer",
+        ):
+            session.pop(legacy_key, None)
+        return render_template(
+            "order_submitted.html",
+            token=session["last_order_token"],
+            email_sent=email_sent,
+            fallback_used=fallback_used,
+            client_email=str(order.customer.get("email") or ""),
+            order_id=order.order_number,
+            order_rows=_saved_order_rows(order),
+        )
 
     def _build_order_customer(form_values: dict[str, str]) -> dict[str, str]:
         return {
@@ -118,6 +236,7 @@ def register_cart_routes(
             "city": form_values.get("city", ""),
             "state": form_values.get("state", ""),
             "country": form_values.get("country", ""),
+            "country_key": form_values.get("country_key", ""),
             "notes": form_values.get("notes", ""),
         }
 
@@ -144,6 +263,7 @@ def register_cart_routes(
                 {
                     "code": str(product.get("code") or code),
                     "name": str(product.get("name") or code),
+                    "description": str(product.get("description") or ""),
                     "collection": str(product.get("collection") or ""),
                     "quantity": quantity,
                     "notes": notes_by_code.get(code, ""),
@@ -231,11 +351,33 @@ def register_cart_routes(
                 subdivisions_by_country_key=CHECKOUT_SUBDIVISION_OPTIONS_BY_COUNTRY_KEY,
                 form_values=values,
                 submission_error=submission_error,
+                idempotency_key=_checkout_idempotency_key(cart_data, notes_by_code),
                 google_maps_places_api_key=checkout_google_maps_places_api_key,
             ), status_code
 
         if request.method == "GET":
             return render_checkout_page()
+
+        submitted_key = (request.form.get("idempotency_key") or "").strip()
+        expected_key = str(session.get("checkout_idempotency_key") or "")
+        if not submitted_key or not expected_key or not secrets.compare_digest(submitted_key, expected_key):
+            return render_checkout_page(
+                status_code=400,
+                submission_error="This order form expired. Please review your cart and submit it again.",
+            )
+
+        existing_retry_order = None
+        # A browser retry can arrive after the first request committed and cleared
+        # the cart. Load its durable snapshot and compare the submitted customer
+        # details below before returning it.
+        if not items and session.get("last_order_id") and session.get("last_order_idempotency_key") == submitted_key:
+            try:
+                existing_retry_order = _order_repository().get_order(str(session["last_order_id"]))
+            except (DatabaseConfigurationError, OrderPersistenceError):
+                return render_checkout_page(
+                    status_code=503,
+                    submission_error="We couldn't retrieve your saved order right now. Please try again shortly.",
+                )
 
         name = (request.form.get("name") or "").strip()
         company = (request.form.get("company") or "").strip()
@@ -253,7 +395,7 @@ def register_cart_routes(
         state = (request.form.get("state") or "").strip()
         country = (request.form.get("country") or "").strip()
         country_key = resolve_checkout_country_key(request.form.get("country_key") or "", country)
-        if country_key and not country:
+        if country_key:
             country = CHECKOUT_COUNTRY_LABELS_BY_KEY[country_key]
 
         form_values = {
@@ -273,10 +415,48 @@ def register_cart_routes(
             "notes": (request.form.get("notes") or "").strip(),
         }
 
-        if not (name and company and phone_country_key and phone and city and state and country and country_key) or len(items) == 0:
+        invalid_length = any(
+            len(str(form_values.get(field) or "")) > limit
+            for field, limit in CHECKOUT_FIELD_LIMITS.items()
+        )
+        invalid_email = bool(client_email and not EMAIL_PATTERN.fullmatch(client_email))
+
+        if existing_retry_order is not None:
+            submitted_customer = _build_order_customer(form_values)
+            stored_customer = dict(existing_retry_order.customer)
+            customer_keys = tuple(CHECKOUT_FIELD_LIMITS) + ("country_key",)
+            if any(
+                str(submitted_customer.get(key) or "") != str(stored_customer.get(key) or "")
+                for key in customer_keys
+            ):
+                return render_checkout_page(
+                    status_code=409,
+                    form_values=form_values,
+                    submission_error="This order form was already used for different details. Please reload checkout and try again.",
+                )
+            delivery_state = (
+                True
+                if existing_retry_order.email_status == "sent"
+                else False
+                if existing_retry_order.email_status == "failed"
+                else None
+            )
+            return _render_saved_order(existing_retry_order, email_sent=delivery_state)
+
+        if (
+            invalid_length
+            or invalid_email
+            or not (name and company and phone_country_key and phone and city and state and country and country_key)
+            or len(items) == 0
+        ):
             return render_checkout_page(
                 status_code=400,
                 form_values=form_values,
+                submission_error=(
+                    "Please enter a valid email address."
+                    if invalid_email
+                    else "Please check the required fields and their lengths."
+                ),
             )
 
         try:
@@ -289,76 +469,106 @@ def register_cart_routes(
             )
 
         customer = _build_order_customer(form_values)
-        order_rows = order_rows_from_items(items)
-
-        def store_order_session(
-            csv_text: str,
-            order_id: str,
-            csv_filename: str,
-            customer_details: dict[str, str],
-        ) -> str:
-            token = secrets.token_urlsafe(24)
-            session["last_order_csv"] = csv_text
-            session["last_order_rows"] = order_rows
-            session["last_order_token"] = token
-            session["last_order_id"] = order_id
-            session["last_order_csv_filename"] = csv_filename
-            session["last_order_customer"] = customer_details
-            return token
-
         try:
-            result = send_order_email(customer, validated_items)
-        except OrderEmailDeliveryError as exc:
-            token = store_order_session(exc.csv_text, exc.order_id, exc.csv_path.name, customer)
-            return render_template(
-                "order_submitted.html",
-                token=token,
-                email_sent=False,
-                fallback_used=False,
-                client_email=client_email,
-                order_id=exc.order_id,
-                order_rows=order_rows,
+            repository = _order_repository()
+            created = repository.create_order(
+                idempotency_key=submitted_key,
+                customer=customer,
+                items=validated_items,
+                metadata={"source": "web_checkout"},
             )
-        except Exception:
+        except IdempotencyConflictError:
             return render_checkout_page(
-                status_code=500,
+                status_code=409,
                 form_values=form_values,
-                submission_error="Order could not be submitted automatically. Please contact us directly.",
+                submission_error="This order form was already used for different details. Please reload checkout and try again.",
+            )
+        except OrderValidationError:
+            return render_checkout_page(
+                status_code=400,
+                form_values=form_values,
+                submission_error="We couldn't validate this order. Please review the form and try again.",
+            )
+        except (DatabaseConfigurationError, OrderPersistenceError):
+            return render_checkout_page(
+                status_code=503,
+                form_values=form_values,
+                submission_error="We couldn't save your order right now. Please try again shortly.",
             )
 
-        token = store_order_session(
-            str(result.get("csv_text") or ""),
-            str(result.get("order_id") or ""),
-            str(result.get("csv_filename") or "order.csv"),
+        order = created.order
+        session["last_order_id"] = order.id
+        session["last_order_idempotency_key"] = submitted_key
+        csv_text = build_order_csv(
+            order.order_number,
             customer,
+            validated_items,
+            submitted_at=order.created_at,
         )
+        csv_filename = f"ce_order_{order.order_number.lstrip('#')}.csv"
+        if created.created:
+            try:
+                repository.store_order_csv(order.id, csv_text, csv_filename)
+            except OrderPersistenceError:
+                # The order itself is durable. A download can be rebuilt from the
+                # stored snapshots if this secondary update briefly fails.
+                pass
+
+        if not created.created:
+            session["cart"] = {}
+            session["cart_notes"] = {}
+            delivery_state = True if order.email_status == "sent" else False if order.email_status == "failed" else None
+            return _render_saved_order(order, email_sent=delivery_state)
+
+        email_sent = False
+        fallback_used = False
+        try:
+            result = send_order_email(
+                customer,
+                validated_items,
+                order_id=order.order_number,
+                submitted_at=order.created_at,
+            )
+        except OrderEmailDeliveryError as exc:
+            try:
+                repository.record_email_delivery(order.id, "failed", error_message=str(exc))
+            except OrderPersistenceError:
+                pass
+        except Exception:
+            try:
+                repository.record_email_delivery(order.id, "failed", error_message="email delivery failed")
+            except OrderPersistenceError:
+                pass
+        else:
+            email_sent = bool(result.get("ok"))
+            fallback_used = bool(result.get("fallback_used"))
+            try:
+                repository.record_email_delivery(order.id, "sent" if email_sent else "failed")
+            except OrderPersistenceError:
+                pass
+
         session["cart"] = {}
         session["cart_notes"] = {}
-        return render_template(
-            "order_submitted.html",
-            token=token,
-            email_sent=bool(result.get("ok")),
-            fallback_used=bool(result.get("fallback_used")),
-            client_email=client_email,
-            order_id=str(result.get("order_id") or ""),
-            order_rows=order_rows,
+        return _render_saved_order(
+            order,
+            email_sent=email_sent,
+            fallback_used=fallback_used,
         )
 
     @app.route("/download/order/<token>.csv")
     def download_order_csv(token: str):
-        from datetime import date
-
-        if session.get("last_order_token") != token:
-            abort(404)
-        csv_text = session.get("last_order_csv")
-        if not csv_text:
-            abort(404)
+        order = _load_download_order(token)
+        csv_text = order.csv_text or build_order_csv(
+            order.order_number,
+            order.customer,
+            _saved_order_rows(order),
+            submitted_at=order.created_at,
+        )
 
         data = csv_text.encode("utf-8")
-        filename = session.get("last_order_csv_filename")
+        filename = order.csv_filename
         if not isinstance(filename, str) or not filename:
-            order_id = str(session.get("last_order_id") or "").replace("#", "")
-            filename = f"order_{order_id or date.today().strftime('%Y%m%d')}.csv"
+            filename = f"ce_order_{order.order_number.lstrip('#')}.csv"
         return send_file(
             io.BytesIO(data),
             mimetype="text/csv",
@@ -368,27 +578,17 @@ def register_cart_routes(
 
     @app.route("/download/order/<token>.pdf")
     def download_order_pdf(token: str):
-        from datetime import date
-
-        if session.get("last_order_token") != token:
+        order = _load_download_order(token)
+        rows = _saved_order_rows(order)
+        if not rows:
             abort(404)
-
-        rows = session.get("last_order_rows")
-        if not isinstance(rows, list) or not rows:
-            abort(404)
-
-        customer = session.get("last_order_customer")
-        if not isinstance(customer, dict):
-            customer = None
-
-        raw_order_id = str(session.get("last_order_id") or "")
         pdf_bytes = cart_to_pdf_bytes(
             rows,
             base_dir / "static" / "product_images",
-            customer=customer,
-            order_id=raw_order_id,
+            customer=order.customer,
+            order_id=order.order_number,
         )
-        order_id = raw_order_id.replace("#", "")
+        order_id = order.order_number.replace("#", "")
         return send_file(
             io.BytesIO(pdf_bytes),
             mimetype="application/pdf",
@@ -396,7 +596,7 @@ def register_cart_routes(
             download_name=(
                 f"ce_order_{order_id}.pdf"
                 if order_id
-                else f"ce_order_{date.today().strftime('%m%d%y')}_{token[:4].lower()}.pdf"
+                else "ce_order.pdf"
             ),
         )
 
@@ -409,7 +609,10 @@ def register_cart_routes(
     def api_cart_add():
         payload = request.get_json(force=True, silent=True) or {}
         code = payload.get("code")
-        qty = int(payload.get("qty") or 1)
+        try:
+            qty = int(payload.get("qty") or 1)
+        except (TypeError, ValueError):
+            return jsonify({"ok": False, "error": "invalid_quantity"}), 400
         qty = max(1, min(999, qty))
 
         pmap = products_by_code(load_products())
@@ -425,7 +628,10 @@ def register_cart_routes(
     def api_cart_set():
         payload = request.get_json(force=True, silent=True) or {}
         code = payload.get("code")
-        qty = int(payload.get("qty") or 0)
+        try:
+            qty = int(payload.get("qty") or 0)
+        except (TypeError, ValueError):
+            return jsonify({"ok": False, "error": "invalid_quantity"}), 400
         qty = max(0, min(999, qty))
 
         pmap = products_by_code(load_products())

@@ -5,11 +5,14 @@ description = "California Earrings Flask catalog web app"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "alembic>=1.17,<2",
     "flask==3.1.2",
     "gunicorn==23.0.0",
+    "psycopg[binary]>=3.2,<4",
     "pycountry>=26.2.16",
     "python-dotenv==1.2.1",
     "reportlab>=4.2.0,<5",
+    "sqlalchemy>=2.0,<3",
 ]
 
 [project.optional-dependencies]

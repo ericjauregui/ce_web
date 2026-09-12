@@ -1,0 +1,223 @@
+{% extends "base.html" %}
+
+{% block title %}Visit California Earrings at {{ show.name }}{% endblock %}
+{% block meta_description %}Meet California Earrings at {{ show.name }} in {{ show.city }}. Explore 14K gold earrings and piercing jewelry, get booth details, and tell us you're coming.{% endblock %}
+
+{% block page_preloads %}
+<link rel="preload" as="image" href="{{ asset_url(show.hero_image) }}" fetchpriority="high">
+<link rel="preload" as="image" href="{{ asset_url(show.logo_asset) }}">
+{% endblock %}
+
+{% block page_css %}
+<link href="{{ asset_url('css/styles/inline_reels.css') }}" rel="stylesheet">
+<link href="{{ asset_url('css/styles/home_reels.css') }}" rel="stylesheet">
+<link href="{{ asset_url('css/styles/trade_shows.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block schema_json_ld %}
+{{ super() }}
+<script type="application/ld+json">
+{{ {
+  "@context": "https://schema.org",
+  "@type": "Event",
+  "name": "California Earrings at " ~ show.name,
+  "startDate": show.start_date,
+  "endDate": show.end_date,
+  "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+  "eventStatus": "https://schema.org/EventScheduled",
+  "location": {
+    "@type": "Place",
+    "name": show.venue,
+    "address": show.address ~ ", " ~ show.city
+  },
+  "organizer": {
+    "@type": "Organization",
+    "name": site_name,
+    "url": base_url
+  },
+  "url": canonical_url,
+  "image": base_url ~ asset_url(show.hero_image),
+  "description": "Meet California Earrings and explore wholesale 14K gold earrings and piercing jewelry at " ~ show.name ~ "."
+}|tojson }}
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="trade-show-page">
+  <section class="trade-show-hero" style="--trade-show-hero: url('{{ asset_url(show.hero_image) }}');">
+    <div class="container-xl trade-show-hero__inner">
+      <div class="trade-show-hero__copy">
+        <p class="trade-show-eyebrow">Wholesale jewelry · Our next trade show</p>
+        <h1>Visit California Earrings <span>at {{ show.name }}</span></h1>
+        <p class="trade-show-hero__lead">14K gold earrings and piercing jewelry for wholesale retailers.</p>
+
+        <div class="trade-show-proof" aria-label="Why shop with California Earrings">
+          <span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l8 4v5c0 5-3.4 8-8 9-4.6-1-8-4-8-9V7zM8.5 12l2.2 2.2 4.8-5"/></svg>
+            Wholesale only
+          </span>
+          <span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V9l8-5 8 5v11M8 20v-5h8v5M8 10h.01M12 10h.01M16 10h.01"/></svg>
+            Since 1992
+          </span>
+          <span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.3 3 14.7 0 18M12 3c-3 3.3-3 14.7 0 18"/></svg>
+            Ships globally
+          </span>
+        </div>
+
+        <p class="trade-show-booth-highlight">{{ show.booth }}</p>
+        <div class="trade-show-actions">
+          <a class="trade-show-btn trade-show-btn--primary" href="{{ show.attendance_url }}" target="_blank" rel="noopener noreferrer">
+            Let Us Know You're Coming
+            <span aria-hidden="true">→</span>
+          </a>
+          <a class="trade-show-btn trade-show-btn--secondary" href="#booth-details">
+            Get Booth Details
+            <span aria-hidden="true">↓</span>
+          </a>
+        </div>
+      </div>
+
+      <aside id="booth-details" class="trade-show-event-card" aria-label="{{ show.name }} details" tabindex="-1">
+        <img src="{{ asset_url(show.logo_asset) }}" alt="{{ show.name }} official logo" width="720" height="364">
+        <dl>
+          <div>
+            <dt>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3v3M18 3v3M4 8h16v12H4zM7 12h3M12 12h5M7 16h4"/></svg>
+              Dates
+            </dt>
+            <dd><time datetime="{{ show.start_date }}">{{ show.dates_display }}</time></dd>
+          </div>
+          <div>
+            <dt>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6.1 7-12a7 7 0 10-14 0c0 5.9 7 12 7 12z"/><circle cx="12" cy="9" r="2"/></svg>
+              Venue
+            </dt>
+            <dd>{{ show.venue }}<br><span>{{ show.city }}</span></dd>
+          </div>
+          <div>
+            <dt>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4zM8 8h8M8 12h8M8 16h5"/></svg>
+              Find us
+            </dt>
+            <dd>{{ show.booth }}</dd>
+          </div>
+        </dl>
+        <div class="trade-show-detail-actions">
+          <a class="trade-show-btn trade-show-btn--secondary" href="{{ show.maps_url }}" target="_blank" rel="noopener noreferrer">Venue Map <span aria-hidden="true">↗</span></a>
+          <button type="button" class="trade-show-btn trade-show-btn--secondary" id="saveShowCalendar">Add to Calendar</button>
+        </div>
+        <a class="trade-show-official-link" href="{{ show.official_url }}" target="_blank" rel="noopener noreferrer">Official show website <span aria-hidden="true">↗</span></a>
+      </aside>
+    </div>
+  </section>
+
+  <div class="container-xl trade-show-content">
+    {% if show.video %}
+    <section class="trade-show-video-panel" aria-labelledby="trade-show-video-title">
+      <div class="trade-show-video-frame">
+        <video id="ownerVideo" controls muted loop playsinline preload="metadata" poster="{{ asset_url('assets/trade-shows/owner-poster.jpg') }}" aria-label="A welcome from the owner of California Earrings">
+          <source src="{{ asset_url(show.video.asset) }}" type="video/mp4">
+          Your browser does not support embedded video.
+        </video>
+      </div>
+      <div class="trade-show-video-copy">
+        <p class="trade-show-eyebrow">{{ show.video.eyebrow }}</p>
+        <h2 id="trade-show-video-title">{{ show.video.title }}</h2>
+        <button type="button" class="trade-show-text-link" id="ownerSoundButton" aria-controls="ownerVideo">Turn sound on</button>
+        <p>{{ show.video.description }}</p>
+      </div>
+    </section>
+    {% endif %}
+
+    <section class="trade-show-section" aria-labelledby="show-collection-title">
+      <div class="trade-show-section-heading">
+        <div>
+          <p class="trade-show-eyebrow">Curated for the show</p>
+          <h2 id="show-collection-title">Explore the Collection</h2>
+          <p>Find your next best sellers. See these styles and more at the booth.</p>
+        </div>
+        <a class="trade-show-text-link" href="{{ url_for('catalog_start') }}">View full inventory <span aria-hidden="true">→</span></a>
+      </div>
+
+      <div class="trade-show-product-grid">
+        {% for product in show.curated_products %}
+        <a class="trade-show-product-card" href="{{ url_for('index') }}#section-{{ product.collection }}">
+          <img src="{{ asset_url(product.image) }}" alt="{{ product.name }}" width="720" height="720" loading="lazy" decoding="async">
+          <span>{{ product.name }} <span aria-hidden="true">→</span></span>
+        </a>
+        {% endfor %}
+      </div>
+    </section>
+
+    {% if latest_reels %}
+    {% include "partials/latest_videos_strip.html" %}
+    {% endif %}
+
+    <section class="trade-show-section trade-show-how" aria-labelledby="show-how-title">
+      <div class="trade-show-section-heading">
+        <div>
+          <p class="trade-show-eyebrow">Simple, flexible, built for retailers</p>
+          <h2 id="show-how-title">How the Show Works</h2>
+        </div>
+      </div>
+      <div class="trade-show-benefit-grid">
+        <article>
+          <span class="trade-show-benefit-icon" aria-hidden="true">%</span>
+          <h3>Bulk Buy Discounts</h3>
+          <p>Special show pricing is available on qualifying wholesale orders.</p>
+        </article>
+        <article>
+          <span class="trade-show-benefit-icon" aria-hidden="true">✓</span>
+          <h3>See & Buy at the Booth</h3>
+          <p>Explore inventory in person and take available styles with you.</p>
+        </article>
+        <article>
+          <span class="trade-show-benefit-icon" aria-hidden="true">→</span>
+          <h3>Ship After the Show</h3>
+          <p>Place a larger order at the booth and we'll arrange delivery.</p>
+        </article>
+        <article>
+          <span class="trade-show-benefit-icon" aria-hidden="true">1</span>
+          <h3>No Minimums</h3>
+          <p>Order what your store needs without a minimum purchase requirement.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="show-updates" class="trade-show-contact-panel" aria-labelledby="show-updates-title">
+      <div class="trade-show-contact-copy">
+        <p class="trade-show-eyebrow">Stay connected</p>
+        <h2 id="show-updates-title">See You at the Show</h2>
+        <p>Questions about {{ show.name }}? Message our team for booth details and show updates.</p>
+      </div>
+      <div class="trade-show-contact-actions">
+        <a class="trade-show-btn trade-show-btn--primary" href="{{ show.updates_url }}" target="_blank" rel="noopener noreferrer">
+          Message Us on WhatsApp
+          <span aria-hidden="true">→</span>
+        </a>
+        <button type="button" class="trade-show-btn trade-show-btn--secondary" id="saveShowContact">Save Our Contact</button>
+      </div>
+      <div class="trade-show-contact-details">
+        <a href="tel:2139357272">(213) 935-7272</a>
+        <a href="mailto:californiaearrings@gmail.com">californiaearrings@gmail.com</a>
+        <span>{{ show.booth }}</span>
+      </div>
+    </section>
+  </div>
+</div>
+<div class="trade-show-mobile-bar" id="showMobileBar" hidden>
+  <a class="trade-show-mobile-booth" href="#booth-details"><small>Find us</small>{{ show.booth }}</a>
+  <a class="trade-show-btn trade-show-btn--primary" href="{{ show.updates_url }}" target="_blank" rel="noopener noreferrer">Message Us</a>
+</div>
+<script type="application/json" id="showDownloadData">{{ {"name": show.name, "start": show.start_date, "end": show.end_date, "venue": show.venue, "address": show.address, "city": show.city, "booth": show.booth}|tojson }}</script>
+{% endblock %}
+
+{% block body_end %}
+{{ super() }}
+<script src="{{ asset_url('js/scroll_cue.js') }}"></script>
+<script src="{{ asset_url('js/inline_reels.js') }}"></script>
+<script src="{{ asset_url('js/home_reels.js') }}"></script>
+<script src="{{ asset_url('js/trade_shows.js') }}"></script>
+{% endblock %}

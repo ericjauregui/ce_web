@@ -527,6 +527,8 @@ class ProductRouteTests(BaseWebTest):
         self.assertIn(f'data-code="{self.valid_code}"', body)
         self.assertNotIn("Item in order", body)
         self.assertIn("product-detail-meta-card", body)
+        self.assertIn('class="container py-5 product-detail-page"', body)
+        self.assertNotIn('style="max-width: 1060px;"', body)
         self.assertIn('"@type": "Product"', body)
         self.assertIn(self.valid_code, body)
         self.assertNotIn("Tags:", body)

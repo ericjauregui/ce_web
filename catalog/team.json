@@ -1,5 +1,6 @@
 {
   "company": "California Earrings",
+  "office_phone": "+1 (213) 935-7272",
   "headline": "Meet the Team",
   "whatsapp_intro": "Hi {name}, I'm interested in learning more about your earrings.",
   "members": [
@@ -8,21 +9,33 @@
       "title": "President",
       "photo": "miguel_j.jpg",
       "phone": "+1 (818) 331-9595",
-      "email": "californiaearrings@gmail.com"
+      "email": "californiaearrings@gmail.com",
+      "bio": "Contact me for wholesale partnerships and business inquiries.",
+      "photo_position": "50% 82%",
+      "social_image": "assets/team-social/miguel.jpg",
+      "photo_scale": 1.65
     },
     {
       "name": "Giancarlo Jauregui",
       "title": "SVP, Operations",
       "photo": "giancarlo_j.jpg",
       "phone": "+1 (818) 331-9292",
-      "email": "giancarloj7@gmail.com"
+      "email": "giancarloj7@gmail.com",
+      "bio": "Contact me for order coordination and account assistance.",
+      "photo_position": "50% 45%",
+      "social_image": "assets/team-social/giancarlo.jpg",
+      "photo_scale": 1.2
     },
     {
       "name": "Ari Guel",
       "title": "Sales Representative",
       "photo": "ari_g.jpg",
       "phone": "+1 (213) 440-5005",
-      "email": "aricaliforniaearrings@gmail.com"
+      "email": "aricaliforniaearrings@gmail.com",
+      "bio": "Contact me for product recommendations, wholesale orders, and restocking.",
+      "photo_position": "50% 28%",
+      "social_image": "assets/team-social/ari.jpg",
+      "photo_scale": 1.1
     }
   ]
 }

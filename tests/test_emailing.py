@@ -130,6 +130,30 @@ class EmailingTests(unittest.TestCase):
         self.assertIn("cid:", raw_message)
         self.assertNotIn("text/csv", raw_message)  # CSV is saved but not attached to email
 
+    def test_send_order_email_uses_persisted_order_number_without_sqlite_sequence(self) -> None:
+        with patch("domains.emailing.next_order_number") as next_number:
+            with patch("domains.emailing.graph_send", return_value=None):
+                result = emailing.send_order_email(
+                    self._customer(),
+                    self._items(),
+                    order_id="#CE00000042",
+                )
+
+        next_number.assert_not_called()
+        self.assertEqual(result["order_id"], "#CE00000042")
+        self.assertFalse(emailing.ORDER_DB_PATH.exists())
+
+    def test_order_csv_neutralizes_spreadsheet_formulas(self) -> None:
+        customer = self._customer()
+        customer["company"] = "=HYPERLINK(\"https://bad.example\")"
+        items = self._items()
+        items[0]["notes"] = "+cmd|' /C calc'!A0"
+
+        csv_text = emailing.build_order_csv("#CE00000001", customer, items)
+
+        self.assertIn("'=HYPERLINK", csv_text)
+        self.assertIn("'+cmd", csv_text)
+
     def test_build_order_html_uses_cleaner_layout_and_social_cta(self) -> None:
         html = emailing.build_order_html(
             "#00001",

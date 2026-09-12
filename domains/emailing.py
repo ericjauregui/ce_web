@@ -8,8 +8,9 @@ import logging
 import os
 import sqlite3
 import time
+from contextlib import closing
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from email.message import EmailMessage
 from email.policy import SMTP
 from email.utils import formataddr, make_msgid, parseaddr
@@ -20,7 +21,7 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import quote, urlencode
 from urllib.request import Request, urlopen
 
-from domains.cart import cart_to_pdf_bytes
+from domains.cart import cart_to_pdf_bytes, country_export_code
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -123,6 +124,7 @@ def _normalize_customer(customer: dict[str, Any]) -> dict[str, str]:
         "city": str(customer.get("city") or "").strip(),
         "state": str(customer.get("state") or "").strip(),
         "country": str(customer.get("country") or "").strip(),
+        "country_key": str(customer.get("country_key") or "").strip(),
         "notes": str(customer.get("notes") or "").strip(),
     }
 
@@ -227,12 +229,15 @@ def _normalize_items(items: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return normalized_items
 
 
-def ensure_storage() -> None:
+def ensure_storage(*, include_legacy_sequence: bool = True) -> None:
     ORDER_LOG_DIR.mkdir(parents=True, exist_ok=True)
     ORDER_CSV_DIR.mkdir(parents=True, exist_ok=True)
     ORDER_EVENT_LOG_DIR.mkdir(parents=True, exist_ok=True)
 
-    with sqlite3.connect(ORDER_DB_PATH, timeout=30) as conn:
+    if not include_legacy_sequence:
+        return
+
+    with closing(sqlite3.connect(ORDER_DB_PATH, timeout=30)) as conn:
         conn.execute(
             """
             CREATE TABLE IF NOT EXISTS order_sequence (
@@ -248,7 +253,7 @@ def next_order_number() -> tuple[int, str]:
     ensure_storage()
     created_at = datetime.now().isoformat(timespec="seconds")
 
-    with sqlite3.connect(ORDER_DB_PATH, timeout=30) as conn:
+    with closing(sqlite3.connect(ORDER_DB_PATH, timeout=30)) as conn:
         conn.execute("BEGIN IMMEDIATE")
         cursor = conn.execute(
             "INSERT INTO order_sequence (created_at) VALUES (?)",
@@ -269,7 +274,7 @@ def current_week_log_path() -> Path:
 def setup_order_logger() -> logging.Logger:
     global _CURRENT_LOG_PATH
 
-    ensure_storage()
+    ensure_storage(include_legacy_sequence=False)
     logger = logging.getLogger("order_email_events")
     logger.setLevel(logging.INFO)
     logger.propagate = False
@@ -325,34 +330,55 @@ def safe_company_name(company: str) -> str:
     return (sanitized or "Unknown_Company").replace(" ", "_")
 
 
-def build_order_csv(order_id: str, customer: dict[str, str], items: list[dict[str, Any]]) -> str:
+def _csv_safe(value: Any) -> Any:
+    """Prevent spreadsheet programs from evaluating user-controlled CSV cells."""
+    if not isinstance(value, str):
+        return value
+    if value.lstrip().startswith(("=", "+", "-", "@", "\t", "\r")):
+        return f"'{value}"
+    return value
+
+
+def build_order_csv(
+    order_id: str,
+    customer: dict[str, str],
+    items: list[dict[str, Any]],
+    *,
+    submitted_at: datetime | str | None = None,
+) -> str:
     buffer = io.StringIO()
     writer = csv.writer(buffer)
 
     writer.writerow(["California Earrings Wholesale Order"])
     writer.writerow(["order_id", order_id])
-    writer.writerow(["submitted_at", datetime.now().strftime("%Y-%m-%d %H:%M:%S")])
+    if isinstance(submitted_at, datetime):
+        submitted_at_text = submitted_at.astimezone(UTC).isoformat(timespec="seconds")
+    elif submitted_at:
+        submitted_at_text = str(submitted_at)
+    else:
+        submitted_at_text = datetime.now(UTC).isoformat(timespec="seconds")
+    writer.writerow(["submitted_at", submitted_at_text])
     writer.writerow([])
-    writer.writerow(["customer_name", customer.get("name", "")])
-    writer.writerow(["company_name", customer.get("company", "")])
-    writer.writerow(["phone", customer.get("phone", "")])
-    writer.writerow(["email", customer.get("email", "")])
-    writer.writerow(["address_line_1", customer.get("address_line_1", "")])
-    writer.writerow(["address_line_2", customer.get("address_line_2", "")])
-    writer.writerow(["city", customer.get("city", "")])
-    writer.writerow(["state", customer.get("state", "")])
-    writer.writerow(["postal_code", customer.get("postal_code", "")])
-    writer.writerow(["country", customer.get("country", "")])
-    writer.writerow(["order_notes", customer.get("notes", "")])
+    writer.writerow(["customer_name", _csv_safe(customer.get("name", ""))])
+    writer.writerow(["company_name", _csv_safe(customer.get("company", ""))])
+    writer.writerow(["phone", _csv_safe(customer.get("phone", ""))])
+    writer.writerow(["email", _csv_safe(customer.get("email", ""))])
+    writer.writerow(["address_line_1", _csv_safe(customer.get("address_line_1", ""))])
+    writer.writerow(["address_line_2", _csv_safe(customer.get("address_line_2", ""))])
+    writer.writerow(["city", _csv_safe(customer.get("city", ""))])
+    writer.writerow(["state", _csv_safe(customer.get("state", ""))])
+    writer.writerow(["postal_code", _csv_safe(customer.get("postal_code", ""))])
+    writer.writerow(["country", _csv_safe(country_export_code(customer))])
+    writer.writerow(["order_notes", _csv_safe(customer.get("notes", ""))])
     writer.writerow([])
     writer.writerow(["code", "quantity", "item_notes"])
 
     for item in items:
         writer.writerow(
             [
-                item.get("code", ""),
+                _csv_safe(item.get("code", "")),
                 item.get("quantity", 0),
-                item.get("notes", ""),
+                _csv_safe(item.get("notes", "")),
             ]
         )
 
@@ -360,7 +386,7 @@ def build_order_csv(order_id: str, customer: dict[str, str], items: list[dict[st
 
 
 def save_order_csv(order_id: str, customer: dict[str, str], csv_text: str) -> Path:
-    ensure_storage()
+    ensure_storage(include_legacy_sequence=False)
     timestamp = datetime.now().strftime("%Y%m%d")
     clean_order_id = order_id.replace("#", "")
     csv_path = ORDER_CSV_DIR / f"ce_order_{clean_order_id}_{timestamp}.csv"
@@ -818,13 +844,31 @@ def send_with_retry(
     return False
 
 
-def send_order_email(customer: dict[str, Any], items: list[dict[str, Any]]) -> dict[str, Any]:
-    ensure_storage()
+def send_order_email(
+    customer: dict[str, Any],
+    items: list[dict[str, Any]],
+    *,
+    order_id: str | None = None,
+    submitted_at: datetime | str | None = None,
+) -> dict[str, Any]:
+    # Checkout supplies the durable PostgreSQL order number. The optional legacy
+    # path remains for direct callers while they migrate to persistence.
+    ensure_storage(include_legacy_sequence=order_id is None)
     normalized_customer = _normalize_customer(customer)
     normalized_items = _normalize_items(items)
-    _, order_id = next_order_number()
+    if order_id is None:
+        _, order_id = next_order_number()
+    else:
+        order_id = str(order_id).strip()
+        if not order_id:
+            raise ValueError("A persisted order ID is required.")
 
-    csv_text = build_order_csv(order_id, normalized_customer, normalized_items)
+    csv_text = build_order_csv(
+        order_id,
+        normalized_customer,
+        normalized_items,
+        submitted_at=submitted_at,
+    )
     csv_path = save_order_csv(order_id, normalized_customer, csv_text)
     log_event(
         "order_csv_saved",

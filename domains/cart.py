@@ -10,6 +10,27 @@ from typing import Any
 MAX_ITEM_NOTE_LENGTH = 500
 
 
+def country_export_code(customer: dict[str, Any] | None) -> str:
+    """Return an ISO alpha-3 country code for compact exported addresses."""
+    if not isinstance(customer, dict):
+        return ""
+
+    country_key = str(customer.get("country_key") or "").strip().upper()
+    country_name = str(customer.get("country") or "").strip()
+    try:
+        import pycountry
+
+        country = pycountry.countries.get(alpha_2=country_key) if len(country_key) == 2 else None
+        if country is None and country_name:
+            country = pycountry.countries.lookup(country_name)
+        if country is not None:
+            return str(country.alpha_3)
+    except (LookupError, AttributeError):
+        pass
+
+    return country_key or country_name
+
+
 def get_cart(session_obj: Any) -> dict[str, int]:
     cart = session_obj.get("cart", {})
     if not isinstance(cart, dict):
@@ -147,7 +168,7 @@ def _customer_shipping_address_lines(customer: dict[str, Any] | None) -> list[st
     city = str(customer.get("city") or "").strip()
     state = str(customer.get("state") or "").strip()
     postal_code = str(customer.get("postal_code") or "").strip()
-    country = str(customer.get("country") or "").strip()
+    country = country_export_code(customer)
 
     location_prefix = ", ".join(part for part in [city, state] if part)
     if postal_code:

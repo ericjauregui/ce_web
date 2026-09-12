@@ -10,6 +10,73 @@ from tests.common import BaseWebTest
 
 
 class FrontendContractTests(BaseWebTest):
+    def test_catalog_mini_cart_tracks_counts_and_mobile_scroll_state(self) -> None:
+        self.client.post("/api/cart/add", json={"code": self.valid_code, "qty": 2})
+
+        body = self.client.get("/").get_data(as_text=True)
+        css = self.load_site_css()
+        script = (webapp.BASE_DIR / "static" / "js" / "catalog.js").read_text(
+            encoding="utf-8"
+        )
+
+        self.assertIn('id="catalogMiniCart"', body)
+        self.assertIn('data-total-items="2"', body)
+        self.assertIn('data-distinct-items="1"', body)
+        self.assertIn('href="/cart">Review order</a>', body)
+        self.assertIn('href="/checkout">Submit order</a>', body)
+        self.assertIn('href="/cart" aria-label="View your cart"', body)
+        self.assertNotIn('aria-label="Show or hide order summary"', body)
+        self.assertEqual(body.count('data-cart-icon="true"'), 2)
+        self.assertIn(".catalog-mini-cart.is-expanded", css)
+        self.assertIn('window.matchMedia("(min-width: 768px)")', script)
+        self.assertIn("scrollDelta < -6", script)
+        self.assertIn("scrollDelta > 8", script)
+        self.assertIn("setCatalogMiniCartExpanded(true);", script)
+        self.assertIn("response.distinct_items || 0", script)
+
+    def test_empty_catalog_cart_keeps_mini_cart_hidden(self) -> None:
+        body = self.client.get("/").get_data(as_text=True)
+
+        self.assertRegex(
+            body,
+            r'id="catalogMiniCart"[\s\S]*?data-total-items="0"[\s\S]*?hidden',
+        )
+
+    def test_mobile_nav_cart_badges_and_cart_reels_cta_have_resilient_sizing(self) -> None:
+        layout_css = self.load_site_css()
+        nav_css = (webapp.BASE_DIR / "static" / "css" / "styles" / "nav.css").read_text(
+            encoding="utf-8"
+        )
+
+        self.assertIn(".navbar .navbar-collapse.collapsing {", nav_css)
+        self.assertIn("transition: height 220ms", nav_css)
+        self.assertIn(".cart-page .minimal-items-table .cell-code .code-badge {", layout_css)
+        self.assertIn(".checkout-page .checkout-items-table .cell-code .code-badge {", layout_css)
+        self.assertIn("#cartEmptyReelsSection .reels-view-all-btn {", layout_css)
+
+    def test_mobile_catalog_picker_fills_existing_header_height(self) -> None:
+        css = self.load_site_css()
+        condensed = re.sub(r"\s+", " ", css)
+
+        self.assertIn("@media (max-width: 767.98px)", css)
+        self.assertIn(
+            ".catalog-explorer-row { grid-template-columns: auto minmax(0, 1fr) auto;",
+            condensed,
+        )
+        self.assertIn(".catalog-collection-picker__summary {", css)
+        self.assertIn("grid-template-columns: repeat(2, minmax(0, 1fr));", css)
+        self.assertIn("min-height: 40px;", condensed)
+
+    def test_whatsapp_float_prevents_native_link_drag_and_captures_pointer_early(self) -> None:
+        body = self.client.get("/").get_data(as_text=True)
+        script = (webapp.BASE_DIR / "static" / "js" / "whatsapp_float.js").read_text(
+            encoding="utf-8"
+        )
+
+        self.assertIn('aria-label="Chat on WhatsApp" draggable="false"', body)
+        self.assertIn('bubble.addEventListener("dragstart"', script)
+        self.assertIn("bubble.setPointerCapture(event.pointerId);", script)
+
     def test_404_page_has_branded_recovery_actions(self) -> None:
         css = self.load_site_css()
         response = self.client.get("/does-not-exist")
@@ -50,6 +117,9 @@ class FrontendContractTests(BaseWebTest):
         self.assertIn("latest-videos-shell scroll-cue-shell", body)
         self.assertIn("latest-videos-track inline-reel-track scroll-cue-track", body)
         self.assertIn("Product Reels", body)
+        self.assertLess(
+            body.index("Product Reels"), body.index('id="catalogCollectionPicker"')
+        )
         self.assertEqual(body.count("class=\"latest-video-card inline-reel-card\""), 15)
         self.assertIn("sticky-section-header", body)
         self.assertIn(">View All</a>", body)
@@ -161,43 +231,47 @@ class FrontendContractTests(BaseWebTest):
         self.assertNotIn(
             "window.addEventListener(\"scroll\", syncSearchCenter", body)
 
-    def test_section_chip_row_and_cta_button_stay_vertically_centered(self) -> None:
+    def test_catalog_collection_picker_contracts(self) -> None:
         css = self.load_site_css()
-        condensed = re.sub(r"\s+", " ", css)
         body = self.client.get("/").get_data(as_text=True)
+        script = (webapp.BASE_DIR / "static" / "js" / "catalog.js").read_text(
+            encoding="utf-8"
+        )
 
-        self.assertIn(".scroll-cue-shell {", css)
-        self.assertIn(".scroll-cue-shell::after {", css)
-        self.assertIn("pointer-events: none;", css)
-        self.assertIn(".scroll-cue-shell.is-overflowing.can-scroll-right::after {", css)
-        self.assertIn(".section-header-cats {", css)
-        self.assertIn("width: 100%;", css)
-        self.assertIn("align-items: center;", css)
-        self.assertIn("min-height: 2.15rem;", css)
-        self.assertIn(".section-header-cats-scroll {", css)
-        self.assertIn("justify-content: flex-start;", css)
-        self.assertIn("overflow-x: auto;", css)
-        self.assertIn(".section-header-jump {", css)
-        self.assertIn("align-self: center;", css)
-        self.assertIn(".hero-actions {", css)
+        self.assertIn('id="catalogCollectionPicker"', body)
+        self.assertIn('data-pristine="true"', body)
+        self.assertIn('data-active-target="all-collections"', body)
+        self.assertIn(">All Collections</span>", body)
+        self.assertNotIn(">Choose a collection</span>", body)
+        self.assertIn("Browse by collection · All items shown", body)
+        self.assertIn("data-catalog-current-collection", body)
+        self.assertIn('data-collection-title="Studs"', body)
+        self.assertIn("All Collections", body)
+        self.assertIn('data-target="all-collections"', body)
+        self.assertIn('data-target="section-studs"', body)
+        self.assertIn("catalog-collection-picker__option", body)
+        self.assertIn("catalog-collection-heading border-top border-bottom", body)
+        self.assertIn("catalog-collection-heading--first", body)
+        self.assertIn(".catalog-collection-heading--first {", css)
+        self.assertNotRegex(
+            body,
+            r'class="catalog-explorer-row[^>]*"[\s\S]{0,5000}Search Inventory',
+        )
+        self.assertIn("width: min(760px, calc(100vw - 3rem));", css)
+        self.assertIn("grid-template-columns: repeat(3, minmax(0, 1fr));", css)
         self.assertIn(
-            "margin-top: clamp(1.35rem, 2.9vw, 2rem) !important;", css)
-        self.assertIn("padding-bottom: clamp(.18rem, .7vw, .42rem);", css)
-        self.assertIn(".hero-action-btn {", css)
-        self.assertIn("display: inline-flex;", css)
-        self.assertIn("align-items: center;", css)
-        self.assertIn("justify-content: center;", css)
-        self.assertIn("text-align: center;", css)
-        self.assertIn(
-            "padding-block: max(var(--cta-btn-pad-y), calc((var(--cta-btn-min-height) - 1em) / 2));",
+            ".catalog-collection-picker {\n  position: absolute;\n  grid-column: 1 / -1;\n  left: 50%;",
             css,
         )
-        self.assertIn("class=\"section-header-cats scroll-cue-shell scroll-cue-shell--chips\"", body)
-        self.assertIn("class=\"section-header-cats-scroll scroll-cue-track\"", body)
-        self.assertIn(".hero-action-btn__label {", css)
-        self.assertIn("line-height: 1;", css)
-        self.assertIn(".hero-action-btn { flex: 0 1", condensed)
-        self.assertIn("class=\"hero-action-btn__label\"", body)
+        self.assertIn("transform: translateX(-50%);", css)
+        self.assertIn('targetId === "all-collections"', script)
+        self.assertIn('picker.addEventListener("toggle"', script)
+        self.assertIn('picker.dataset.pristine = "false";', script)
+        self.assertIn('picker.dataset.activeTarget = option.dataset.target || "";', script)
+        self.assertIn("function updateCatalogCollectionContext()", script)
+        self.assertIn("Viewing ${collectionTitle} Collection", script)
+        self.assertIn("section.hidden = !showAll && section.id !== targetId;", script)
+        self.assertIn("if (heading) heading.hidden = !showAll;", script)
 
     def test_main_and_background_layers_follow_actual_nav_height(self) -> None:
         css = self.load_site_css()
@@ -227,6 +301,7 @@ class FrontendContractTests(BaseWebTest):
         order_submitted_response = self.client.post(
             "/checkout",
             data={
+                "idempotency_key": self.checkout_idempotency_key(),
                 "name": "Test Buyer",
                 "company": "Sample Co",
                 "email": "buyer@example.com",
