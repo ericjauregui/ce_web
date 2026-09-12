@@ -910,6 +910,32 @@
 }
 
 @media (max-width: 767.98px) {
+  .page-back-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: .55rem .85rem;
+    white-space: normal;
+  }
+
+  .page-title-row:has(.page-back-btn) {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .page-title-row:has(.page-back-btn):has(.page-title-action) {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+
+  .page-title-row:has(.page-back-btn) > h1 {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .page-title-row:has(.page-back-btn) .page-title-spacer {
+    display: none;
+  }
+
   .page-title-row {
     gap: clamp(.4rem, 1.8vw, .75rem);
   }

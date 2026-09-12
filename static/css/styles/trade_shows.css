@@ -380,6 +380,19 @@
   line-height: 1.5;
 }
 
+.trade-show-collection-intro,
+.trade-show-contact-panel {
+  border: 1px solid var(--show-border);
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at 12% 0%, rgb(var(--gold-rgb) / .16), transparent 38%),
+    var(--show-panel);
+}
+
+.trade-show-collection-intro {
+  padding: clamp(1.25rem, 3vw, 2rem);
+}
+
 .trade-show-contact-panel {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -387,11 +400,6 @@
   gap: 1.5rem 3rem;
   margin-top: clamp(2.5rem, 5vw, 4rem);
   padding: clamp(1.5rem, 4vw, 3.2rem);
-  border: 1px solid var(--show-border);
-  border-radius: 22px;
-  background:
-    radial-gradient(circle at 12% 0%, rgb(var(--gold-rgb) / .16), transparent 38%),
-    var(--show-panel);
 }
 
 .trade-show-contact-actions {

@@ -853,7 +853,7 @@
         }
 
         const volumeChangeRequestedWhileMuted =
-          preferredMutedState && video.muted && video.volume > 0;
+          video.volume !== preferredVolumeLevel && video.muted && video.volume > 0;
         if (volumeChangeRequestedWhileMuted) {
           video.muted = false;
         }

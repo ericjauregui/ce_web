@@ -44,6 +44,13 @@
   const video = document.getElementById("ownerVideo");
   if (!video) return;
 
+  let previousVolume = video.volume;
+  video.addEventListener("volumechange", () => {
+    const adjustedVolume = video.volume !== previousVolume;
+    previousVolume = video.volume;
+    if (adjustedVolume && video.volume > 0 && video.muted) video.muted = false;
+  });
+
   let visible = false;
   let pausedByViewer = false;
   let automaticPause = false;
