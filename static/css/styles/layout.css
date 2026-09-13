@@ -954,6 +954,19 @@
     letter-spacing: -.015em;
     line-height: 1.08;
   }
+
+  /* Center the title across the page, independently of unequal actions. */
+  :is(.team-page, .faqs-page) .page-title-row:has(.page-back-btn) {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    row-gap: 1rem;
+  }
+  :is(.team-page, .faqs-page) .page-title-row > h1 {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    width: 100%;
+  }
+  :is(.team-page, .faqs-page) .page-title-row .page-title-back { grid-column: 1; grid-row: 2; }
+  .faqs-page .page-title-row .page-title-action { grid-column: 2; grid-row: 2; }
 }
 
 .cart-page .cart-summary-metrics .text-gold-70,

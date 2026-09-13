@@ -43,6 +43,7 @@
   }, true);
   const video = document.getElementById("ownerVideo");
   if (!video) return;
+  window.initializeTouchVideoSound?.(video);
 
   let previousVolume = video.volume;
   video.addEventListener("volumechange", () => {

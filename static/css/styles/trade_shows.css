@@ -251,6 +251,7 @@
 }
 
 .trade-show-video-frame {
+  position: relative;
   min-height: 0;
   background: #020202;
 }
@@ -381,6 +382,7 @@
 }
 
 .trade-show-collection-intro,
+.trade-show-how .trade-show-section-heading,
 .trade-show-contact-panel {
   border: 1px solid var(--show-border);
   border-radius: 22px;
@@ -389,7 +391,8 @@
     var(--show-panel);
 }
 
-.trade-show-collection-intro {
+.trade-show-collection-intro,
+.trade-show-how .trade-show-section-heading {
   padding: clamp(1.25rem, 3vw, 2rem);
 }
 

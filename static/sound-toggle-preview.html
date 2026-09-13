@@ -1,0 +1,23 @@
+<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sound toggle preview</title><style>:root{--gold:#cdbf85;--gold-outline:#9f935f;--action-border-radius:.375rem}*{box-sizing:border-box}body{margin:0;background:#0b0b0a;color:#fff1cf;font:16px Arial,sans-serif}main{max-width:390px;margin:24px auto;padding:16px}h1{font:28px Georgia,serif;margin:0 0 16px}figure{position:relative;margin:0;border:1px solid #605637;border-radius:16px;overflow:hidden}video{display:block;width:100%;height:500px;object-fit:contain;background:black}p{color:#c6c0b4;font-size:14px;line-height:1.5}.touch-video-sound { display: none; }
+@media all {
+  .touch-video-sound {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: .6rem;
+    right: .6rem;
+    z-index: 3;
+    min-height: 44px;
+    padding: .4rem .75rem;
+    border: 1px solid var(--gold-outline);
+    border-radius: var(--action-border-radius);
+    background: rgba(7, 7, 7, .92);
+    color: var(--gold);
+    font: inherit;
+    cursor: pointer;
+  }
+  .inline-reel-card:not(.is-active) .touch-video-sound { display: none; }
+  .touch-video-sound:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+}
+</style></head><body><main><h1>Meet the Owner</h1><figure><video controls muted playsinline preload="none" poster="/static/assets/trade-shows/owner-poster.jpg" src="/static/assets/trade-shows/owner-welcome.mp4?v=native-sync-2"></video></figure><p>Touch-device control preview. Tap “Sound on” to enable audio; it then changes to “Mute”.</p></main><script src="/static/js/inline_reels.js"></script><script>initializeTouchVideoSound(document.querySelector('video'));</script></body></html>

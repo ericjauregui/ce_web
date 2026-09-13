@@ -1,4 +1,32 @@
 (() => {
+  // iOS hardware volume is separate from HTML media mute. Unmute directly
+  // within an explicit tap so Safari can authorize playback with audio.
+  function initializeTouchVideoSound(video) {
+    const host = video.parentElement;
+    if (!host || host.querySelector('.touch-video-sound')) return;
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'touch-video-sound';
+    const sync = () => {
+      const silent = video.muted || video.volume === 0;
+      button.textContent = silent ? 'Sound on' : 'Mute';
+      button.setAttribute('aria-label', silent ? 'Turn video sound on' : 'Mute video');
+    };
+    button.addEventListener('keydown', (event) => event.stopPropagation());
+    button.addEventListener('click', (event) => {
+      event.stopPropagation();
+      const silent = video.muted || video.volume === 0;
+      if (silent && video.volume === 0) video.volume = 1;
+      video.muted = !silent;
+      if (silent) video.play().catch(() => {});
+      sync();
+    });
+    video.addEventListener('volumechange', sync);
+    host.append(button);
+    sync();
+  }
+  window.initializeTouchVideoSound = initializeTouchVideoSound;
+
   function initializeInlineReelTrack(options) {
     const {
       trackId,
@@ -832,6 +860,7 @@
 
       // Native controls remain available, but looping is handled by advancing to the next card.
       video.loop = false;
+      initializeTouchVideoSound(video);
 
       video.addEventListener("ended", () => {
         if (card !== activeCard) {
