@@ -9,10 +9,12 @@ from typing import Any
 from domains.file_cache import get_path_version, load_json_cached
 
 MANIFEST = "assets/social/trade-shows/manifest.json"
-TEMPLATE = "templates/social/trade_show.html"
-RENDERER_VERSION = 1
+TEMPLATE = "catalog/trade_show_social.prompt.txt"
+REFERENCE_IMAGE = "assets/social/trade-shows-jis-fall-v3.jpg"
+RENDERER_VERSION = 3
+LOGO_SOURCES = "catalog/trade_show_logo_sources.json"
 FIELDS = ("name", "dates_display", "start_date", "end_date", "venue", "address", "city", "booth", "hero_image", "logo_asset")
-BRAND_ASSETS = ("assets/ce_logo_full.png", "vendor/fonts/lato-400-latin.woff2", "vendor/fonts/playfair-display-latin.woff2")
+BRAND_ASSETS = ("assets/ce_logo_full.png", REFERENCE_IMAGE)
 
 
 def static_path(static_dir: Path, relative: str) -> Path:
@@ -31,7 +33,7 @@ def input_fingerprint(event: dict[str, Any], static_dir: Path) -> str:
     template_version = get_path_version(static_dir.parent / TEMPLATE)
     if template_version is None:
         raise ValueError("Missing trade-show preview template")
-    source = {"details": details, "assets": versions, "template": template_version, "renderer": RENDERER_VERSION}
+    source = {"details": details, "assets": versions, "template": template_version, "renderer": RENDERER_VERSION, "logo_sources": get_path_version(static_dir.parent / LOGO_SOURCES)}
     return hashlib.sha256(json.dumps(source, sort_keys=True).encode()).hexdigest()
 
 
@@ -40,6 +42,8 @@ def current_image(event_key: str, event: dict[str, Any], static_dir: Path) -> st
     try:
         manifest = load_json_cached(static_dir / MANIFEST, {})
         record = manifest.get("events", {}).get(event_key, {})
+        if record.get("generator") != "gpt-images" or not record.get("official_logo_composited"):
+            return None
         if record.get("input_fingerprint") != input_fingerprint(event, static_dir):
             return None
         image = record.get("image", "")

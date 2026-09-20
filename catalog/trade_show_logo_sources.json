@@ -1,0 +1,20 @@
+{
+  "assets/trade-shows/jis-fall-logo.png": {
+    "download_url": "https://www.jisshow.com/content/dam/sitebuilder/rna/jis/2021/spring/JISFall.png/_jcr_content/renditions/original.image_file.720.364.file/367267082/JISFall.png",
+    "page_url": "https://www.jisshow.com/fall/en-us.html",
+    "sha256": "bd9b8bdd763f15fe1dd7c2540fa310917521cc384c1053f894d0f58dff04709e",
+    "verified_on": "2026-09-20"
+  },
+  "assets/trade-shows/jis-spring-logo.png": {
+    "download_url": "https://www.jisshow.com/content/dam/sitebuilder/rna/jis/2021/spring/JISspring-logo.png/_jcr_content/renditions/original.image_file.592.299.file/074174212/JISspring-logo.png",
+    "page_url": "https://www.jisshow.com/spring/en-us.html",
+    "sha256": "6a6468ab386e2104a373ec13a5be21be4cc89f448932a800d7cfb5ef9b29ca9f",
+    "verified_on": "2026-09-20"
+  },
+  "assets/trade-shows/jck-logo-white.png": {
+    "download_url": "https://lasvegas.jckonline.com/content/dam/sitebuilder/rna/jck/las-vegas/2024/img/White-JCK-Logo.png.coredownload.078271393.png",
+    "page_url": "https://lasvegas.jckonline.com/en-us/exhibit/exhibitor-resources.html",
+    "sha256": "ff7b8905474957bbcc32f7d2e420d10890976de2b0ac4d6db8463cd4a9bc25bb",
+    "verified_on": "2026-09-20"
+  }
+}

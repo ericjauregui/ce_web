@@ -9,8 +9,9 @@ logo, Lato copy and Playfair Display headings:
   `site-classic-logo.prompt.txt`, full-resolution output in
   `sources/site-classic-logo.png`. Exported as a 1200 x 630 JPEG.
   `site-v2.jpg` is the unused alternative design, retained for reference.
-- `trade-shows-jis-fall-v3.jpg`: approved current JIS Fall preview.
-- `trade-shows/`: generated JIS Spring/JCK previews and a freshness manifest.
+- `trade-shows-jis-fall-v3.jpg`: approved original design reference.
+- `trade-shows/`: GPT Images API previews for all three events and a freshness manifest.
+  Official website logo artwork is composited after generation.
   The route selects an image matching the active event and its details.
   `trade-shows-v2.jpg` is the unused earlier design, retained for reference.
 - `miguel-v2.jpg`, `giancarlo-v2.jpg`, `ari-v2.jpg`: member previews selected by
@@ -21,7 +22,7 @@ versions the image URLs. Product pages retain their product-specific previews.
 
 Each backdrop was generated separately with the built-in GPT Images tool on
 2026-09-20. Exact prompts are recorded in `prompts.json`; original generated
-backgrounds are in `backdrops/`. Final images composite the original company
+backgrounds are in `backdrops/`. Member images composite the original company
 logo and unmodified supplied portraits in Chrome, with exact typeset text.
 Portrait resolution is limited by the supplied photographs; faces are neither
 regenerated nor retouched.
@@ -40,6 +41,6 @@ JPEGs. `social_backdrop`, `photo_position` and `photo_scale` in the team catalog
 control each member's composition. Rebuild after changing names, roles or photos.
 No image generation runs during web requests. Prior preview assets remain intact.
 
-Trade-show updates use `uv run --extra dev python -m scripts.build_trade_show_social`.
+Trade-show updates use `uv run --extra dev --extra imagegen python -m scripts.build_trade_show_social`.
 See [the update guide](../../../../docs/trade-show-social-previews.md) for automatic
-pre-commit rebuilding, freshness checks, browser setup and changing shows.
+pre-commit rebuilding, freshness checks, API setup and changing shows.

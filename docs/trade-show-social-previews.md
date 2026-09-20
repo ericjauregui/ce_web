@@ -1,85 +1,78 @@
-# Trade-show sharing images
+# GPT Images trade-show previews
 
-The approved GPT Images JIS Fall design is the current `/trade-shows` preview.
-The page selects a separate prebuilt image for the event named by `active_event`
-in `catalog/trade_shows.json`. JIS Fall, JIS Spring and JCK all have images.
+All trade-show artwork is generated with the GPT Images API (`gpt-image-2`).
+The original official show logo is composited afterwards into a reserved area.
+There is no HTML/browser-renderer fallback and no AI-redrawn organizer logo.
 
-## Update a show
+## Normal workflow
 
-1. Update its entry in `catalog/trade_shows.json`: name, dates, venue, city, booth,
-   `hero_image` and `logo_asset`. Change `active_event` when switching shows.
-2. Build the previews (only changed events render):
+1. Edit the relevant event in `catalog/trade_shows.json`. Switch `active_event`
+   when moving to another show. Each event chooses its official logo and skyline.
+2. Run `git commit`. The installed pre-commit hook calls GPT Images for stale or
+   missing previews, exports 1200x630 JPEGs and updates the manifest. Unchanged
+   previews cause no API call.
+3. If generation changes files, the hook pauses the commit. Inspect the printed
+   image paths for correct dates, venue, booth and layout; stage the new JPEGs,
+   `.prompt.txt` files and manifest along with the JSON, then retry the commit.
 
-   ```sh
-   uv run --extra dev python -m scripts.build_trade_show_social
-   ```
-
-3. Inspect the JPEG paths printed by the command, then stage the event data,
-   generated images and `static/assets/social/trade-shows/manifest.json` together.
-4. Verify, commit and push:
-
-   ```sh
-   uv run python -m scripts.build_trade_show_social --check
-   uv run python -m unittest tests.test_trade_show_social tests.test_trade_show_routes
-   ```
-
-The builder uses the approved layout, the site's actual fonts and logos, and the
-configured Miami or Las Vegas background. It typesets exact event details locally;
-there is no API key, recurring AI charge or image generation during web requests.
-The current approved JIS Fall image remains intact until its inputs change.
-`--force --event EVENT_KEY` explicitly replaces even a current approved image with
-an image produced by the reusable template.
-
-## One-time developer setup
+To generate ahead of committing:
 
 ```sh
-uv sync --extra dev
-uv run --extra dev playwright install chromium
-uv run --extra dev pre-commit install
+uv run --extra dev --extra imagegen python -m scripts.build_trade_show_social
 ```
 
-The repository's pre-commit hook runs the builder automatically. If it changes
-tracked assets, pre-commit stops the commit for review. Newly generated JPEGs are
-untracked until you add them: always stage the printed output paths along with
-the manifest and JSON, then retry the commit. The ordinary unit suite also checks
-that every configured event has a current preview. Fresh clones must install the
-hook; the hook configuration is versioned but Git hooks are local.
+Generate just one event with `--event jis-fall-2026`. `--force` deliberately makes
+another billable request even if its image is current. Image generation may take
+several minutes. Review is still needed: generated typography can contain errors.
 
-An existing Chrome installation can be used instead of bundled Chromium by
-setting `CE_CHROME_PATH` to its executable, including when running the hook.
-For example, on macOS:
+## One-time setup
+
+Set `OPENAI_API_KEY` in your local environment or ignored `.env` file. Never commit
+or paste the key. API usage is billed to that key's account.
 
 ```sh
-export CE_CHROME_PATH='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+uv sync --extra dev --extra imagegen
+uv run --extra dev --extra imagegen pre-commit install
 ```
+
+The builder invokes the installed Codex ImageGen CLI at
+`$CODEX_HOME/skills/.system/imagegen/scripts/image_gen.py`, defaulting to
+`~/.codex/skills/.system/imagegen/scripts/image_gen.py`. Set `CE_IMAGE_GEN_CLI` if
+installed elsewhere. Fresh clones need this CLI, a configured API key, and local
+hook installation. No browser is required. API failure/missing credentials blocks
+the commit without replacing the existing image with a browser-rendered fallback.
+Each completed event is checkpointed so a later failure does not regenerate it.
+
+## Official logos
+
+`catalog/trade_show_logo_sources.json` records the exact official download URL,
+source page, verified date and SHA-256 for each logo. Existing JIS Fall, JIS Spring
+and white JCK files were re-downloaded from their official sites on 2026-09-20;
+the repository bytes matched exactly.
+
+GPT Images leaves a blank area in the right event card. The builder places the
+original logo there with alpha transparency and proportional scaling only. It
+checks the file hash against the source registry before any billable request.
+To add/change a show logo, download it from the official organizer's website,
+verify it, and update the source registry with its URL and hash. Do not substitute
+AI-generated marks or reinterpret the logo through the image model.
 
 ## Freshness and caching
 
-The manifest fingerprints displayed details plus dates/address, source image and
-logo bytes, font bytes, layout template and renderer version. Changed details,
-missing output, altered output, or changed assets require a new image. Unrelated
-video/product edits do not. Switching between prebuilt shows needs no render.
-Generated filenames include the input fingerprint; `asset_url` also versions the
-image URL by content. External social platforms may still require a re-scrape of
-an already-shared page.
-
-If someone bypasses checks and publishes stale or missing artwork, the route
-falls back to the current show's hero image, without old dates or booth text.
-It never serves another show's event card. Previews are generated ahead of
-committing, not on Render startup or in a request handler.
-
-## Optional future GPT Images redesign
-
-Keep generated text-free backgrounds reusable whenever possible. A manually
-reviewed full image can also be registered after checking every date, name and
-booth against the event data:
+The manifest fingerprints event details, source artwork, official-logo registry,
+company logo, approved style reference, prompt and pipeline version. Output hashes
+and `generator: gpt-images` / `official_logo_composited` identify the generated
+assets. These fields are an audit record, not cryptographic proof of AI provenance.
+Changing event details or assets invalidates the old preview. Video/product edits
+do not. `asset_url` fingerprints final bytes, and new files have unique names.
+Already-shared links may still need an external platform re-scrape.
 
 ```sh
-uv run python -m scripts.build_trade_show_social \
-  --event jis-fall-2026 \
-  --adopt-image assets/social/trade-shows-jis-fall-v3.jpg
+uv run python -m scripts.build_trade_show_social --check
+uv run python -m unittest tests.test_trade_show_social tests.test_trade_show_routes
 ```
 
-`--adopt-image` requires a 1200 x 630 JPEG and records its current source
-fingerprint. Do not use it to dismiss a stale-image warning without actually
-updating and visually checking the image. Preserve old images for existing shares.
+`--check` and normal site requests never call the API. If someone bypasses checks,
+the page uses the current show's text-free hero image rather than a stale card.
+Generation runs locally before committing, never on Render startup or requests.
+The removed HTML renderer and its old outputs are not used by this workflow.

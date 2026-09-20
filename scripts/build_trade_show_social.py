@@ -1,21 +1,24 @@
-"""Build/check static event previews: python -m scripts.build_trade_show_social."""
+"""Generate changed event previews with GPT Images, or check existing assets."""
 from __future__ import annotations
 
 import argparse
-import base64
+import hashlib
+import io
 import json
-import mimetypes
 import os
 from pathlib import Path
+import subprocess
+import sys
 import tempfile
 
-from jinja2 import Environment, FileSystemLoader, select_autoescape
-from PIL import Image
+from dotenv import load_dotenv
+from PIL import Image, ImageDraw, ImageOps
 
 from domains.file_cache import get_path_version
-from domains.trade_show_social import FIELDS, MANIFEST, current_image, input_fingerprint, static_path
+from domains.trade_show_social import FIELDS, LOGO_SOURCES, MANIFEST, REFERENCE_IMAGE, TEMPLATE, current_image, input_fingerprint, static_path
 
 ROOT = Path(__file__).resolve().parent.parent
+MODEL = "gpt-image-2"
 
 
 def atomic_write(path: Path, content: bytes) -> None:
@@ -36,85 +39,135 @@ def validate_image(path: Path) -> None:
         image.verify()
 
 
-def build(root: Path, *, check: bool = False, event_key: str | None = None, adopt: str | None = None, force: bool = False) -> int:
-    static_dir = root / "static"
-    config = json.loads((root / "catalog/trade_shows.json").read_text())
-    events = config["events"]
-    if config["active_event"] not in events:
-        raise ValueError("active_event does not name a configured show")
+def generation_prompt(root: Path, event: dict) -> str:
+    details = {key: str(event.get(key) or "").strip() for key in FIELDS}
+    if any(not details[key] for key in ('name', 'dates_display', 'venue', 'city', 'hero_image', 'logo_asset')):
+        raise ValueError("Missing required event details")
+    details['booth'] = details['booth'] or 'Booth details coming soon'
+    cta = 'Meet Us at the Show' if 'coming soon' in details['booth'].lower() else 'Meet Us at ' + details['booth']
+    return (root / TEMPLATE).read_text().format(**details, details_json=json.dumps(details, ensure_ascii=False), cta=cta)
+
+
+def official_logo(root: Path, event: dict) -> Image.Image:
+    records = json.loads((root / LOGO_SOURCES).read_text())
+    source = records.get(event['logo_asset'])
+    path = static_path(root / 'static', event['logo_asset'])
+    if not source or hashlib.sha256(path.read_bytes()).hexdigest() != source['sha256']:
+        raise ValueError('Event logo must match verified official website artwork; update catalog/trade_show_logo_sources.json')
+    with Image.open(path) as logo:
+        logo = logo.convert('RGBA')
+        bounds = logo.getchannel('A').getbbox()
+        return logo.crop(bounds) if bounds else logo
+
+
+def compose_official_logo(root: Path, event: dict, content: bytes) -> bytes:
+    # Only the logo is composited. All layout, copy and scenery come from GPT Images.
+    with Image.open(io.BytesIO(content)) as generated:
+        canvas = generated.convert('RGB').resize((1200, 630), Image.Resampling.LANCZOS)
+    # Inset within the requested blank region to allow small model layout shifts.
+    ImageDraw.Draw(canvas).rectangle((790, 75, 1045, 210), fill='#050505')
+    logo = ImageOps.contain(official_logo(root, event), (230, 110), Image.Resampling.LANCZOS)
+    canvas.paste(logo, (790 + (255-logo.width)//2, 75 + (135-logo.height)//2), logo)
+    encoded = io.BytesIO()
+    canvas.save(encoded, format='JPEG', quality=94)
+    return encoded.getvalue()
+
+
+def generate_with_api(root: Path, event: dict, prompt: str) -> bytes:
+    """Use the installed ImageGen CLI, never a browser/template fallback."""
+    load_dotenv(root / '.env', override=False)
+    key = os.environ.get('OPENAI_API_KEY')
+    if not key:
+        raise RuntimeError('OPENAI_API_KEY is required. Set it locally (never commit it) and retry.')
+    codex_home = Path(os.environ.get('CODEX_HOME', str(Path.home() / '.codex')))
+    cli = Path(os.environ.get('CE_IMAGE_GEN_CLI', str(codex_home / 'skills/.system/imagegen/scripts/image_gen.py')))
+    if not cli.is_file():
+        raise RuntimeError('GPT Images CLI missing. Set CE_IMAGE_GEN_CLI to the installed imagegen/scripts/image_gen.py.')
+    with tempfile.TemporaryDirectory(prefix='ce-gpt-images-') as directory:
+        temp = Path(directory)
+        prompt_path = temp / 'prompt.txt'
+        prompt_path.write_text(prompt)
+        output = temp / 'generated.png'
+        command = [sys.executable, str(cli), 'edit', '--model', MODEL,
+                   '--prompt-file', str(prompt_path), '--quality', 'high',
+                   '--size', '1536x800', '--output-format', 'png', '--out', str(output)]
+        for relative in (REFERENCE_IMAGE, event['hero_image'], 'assets/ce_logo_full.png'):
+            command.extend(['--image', str(static_path(root / 'static', relative))])
+        result = subprocess.run(command, capture_output=True, text=True, timeout=600, check=False)
+        if result.returncode:
+            detail = (result.stderr or result.stdout)[-2000:].replace(key, '[redacted]')
+            raise RuntimeError('GPT Images generation failed; existing previews were preserved.\n' + detail)
+        # Normalize the generated image, then place the verified official logo.
+        with Image.open(output) as image:
+            image.load()
+            if image.width < 1200 or image.height < 630:
+                raise ValueError('GPT Images returned an undersized image')
+            return compose_official_logo(root, event, output.read_bytes())
+
+
+def build(root: Path, *, check: bool = False, event_key: str | None = None, force: bool = False) -> int:
+    static_dir = root / 'static'
+    config = json.loads((root / 'catalog/trade_shows.json').read_text())
+    events = config['events']
+    if config['active_event'] not in events:
+        raise ValueError('active_event does not name a configured show')
     if event_key and event_key not in events:
-        raise ValueError(f"Unknown event: {event_key}")
-    if adopt and (not event_key or check or force):
-        raise ValueError("--adopt-image requires --event and cannot use --check/--force")
+        raise ValueError(f'Unknown event: {event_key}')
     selected = {event_key: events[event_key]} if event_key else events
-    stale = {key: event for key, event in selected.items() if force or adopt or not current_image(key, event, static_dir)}
+    stale = {key: event for key, event in selected.items() if force or not current_image(key, event, static_dir)}
     if check:
         if stale:
-            print("Stale/missing trade-show previews: " + ", ".join(stale))
-            print("Run: uv run --extra dev python -m scripts.build_trade_show_social")
+            print('Stale/missing GPT Images previews: ' + ', '.join(stale))
+            print('Run: uv run --extra dev --extra imagegen python -m scripts.build_trade_show_social')
             return 1
-        print("All selected trade-show previews are current.")
+        print('All selected GPT Images previews are current.')
         return 0
     if not stale:
-        print("Trade-show previews unchanged; no rendering needed.")
+        print('GPT Images previews unchanged; no API calls needed.')
         return 0
     manifest_path = static_dir / MANIFEST
-    manifest = json.loads(manifest_path.read_text()) if manifest_path.exists() else {"events": {}}
-
-    def record(key: str, event: dict, relative: str, expected_fingerprint: str | None = None) -> None:
-        validate_image(static_path(static_dir, relative))
+    manifest = json.loads(manifest_path.read_text()) if manifest_path.exists() else {'events': {}}
+    for event_id, event in stale.items():
         fingerprint = input_fingerprint(event, static_dir)
-        if expected_fingerprint is not None and fingerprint != expected_fingerprint:
-            raise ValueError("Preview sources changed during rendering; rerun the build")
-        manifest["events"][key] = {"input_fingerprint": fingerprint, "image": relative, "image_version": get_path_version(static_dir / relative)}
-
-    if adopt:
-        record(event_key, events[event_key], adopt)
-    else:
-        # Imported only when an image actually needs building. Runtime and --check
-        # do not require Playwright or a browser.
-        from playwright.sync_api import sync_playwright
-        env = Environment(loader=FileSystemLoader(root / "templates/social"), autoescape=select_autoescape(["html"]))
-        def asset_data(relative: str) -> str:
-            asset = static_path(static_dir, relative)
-            mime = mimetypes.guess_type(asset.name)[0] or "application/octet-stream"
-            return f"data:{mime};base64," + base64.b64encode(asset.read_bytes()).decode()
-        with sync_playwright() as playwright:
-            options = {"executable_path": os.environ["CE_CHROME_PATH"]} if os.environ.get("CE_CHROME_PATH") else {}
-            browser = playwright.chromium.launch(headless=True, **options)
-            try:
-                page = browser.new_page(viewport={"width": 1200, "height": 630}, device_scale_factor=1)
-                for key, event in stale.items():
-                    fingerprint = input_fingerprint(event, static_dir)
-                    show = {field: str(event.get(field) or "").strip() for field in FIELDS}
-                    if any(not show[field] for field in ("name", "dates_display", "venue", "city", "hero_image", "logo_asset")):
-                        raise ValueError(f"Missing required preview details for {key}")
-                    html = env.get_template("trade_show.html").render(show=show, asset_data=asset_data)
-                    page.set_content(html)
-                    page.evaluate("async () => { await document.fonts.ready; await Promise.all([...document.images].map(i => i.decode())); }")
-                    overflow = page.locator('h1, p, .pill, .proof, .card, .copy').evaluate_all("els => els.some(el => { const r=el.getBoundingClientRect(); return r.left<0 || r.right>1200 || r.top<0 || r.bottom>630 || el.scrollWidth>el.clientWidth+1; })")
-                    if overflow:
-                        raise ValueError(f"Preview text overflows for {key}; shorten copy or adjust templates/social/trade_show.html")
-                    # Key is data, not a filesystem path.
-                    safe_key = ''.join(c if c.isascii() and (c.isalnum() or c=='-') else '-' for c in key)
-                    relative = f"assets/social/trade-shows/{safe_key}-{fingerprint[:16]}.jpg"
-                    atomic_write(static_dir / relative, page.screenshot(type="jpeg", quality=92))
-                    record(key, event, relative, fingerprint)
-                    print(f"Built {relative}")
-            finally:
-                browser.close()
-    atomic_write(manifest_path, (json.dumps(manifest, indent=2) + "\n").encode())
+        prompt = generation_prompt(root, event)
+        official_logo(root, event)  # Validate provenance before any billable call.
+        print(f'Generating {event_id} with {MODEL} (may take a few minutes)...', flush=True)
+        content = generate_with_api(root, event, prompt)
+        if input_fingerprint(event, static_dir) != fingerprint:
+            raise ValueError('Source assets changed during generation; retry')
+        latest = json.loads((root / 'catalog/trade_shows.json').read_text())['events'].get(event_id, {})
+        if input_fingerprint(latest, static_dir) != fingerprint:
+            raise ValueError('Event details changed during generation; retry')
+        safe_key = ''.join(c if c.isascii() and (c.isalnum() or c == '-') else '-' for c in event_id)
+        relative = f'assets/social/trade-shows/{safe_key}-{fingerprint[:12]}-{hashlib.sha256(content).hexdigest()[:8]}.jpg'
+        atomic_write(static_dir / relative, content)
+        validate_image(static_dir / relative)
+        method = f'OpenAI API / {MODEL}'
+        prompt_relative = str(Path(relative).with_suffix('.prompt.txt'))
+        atomic_write(static_dir / prompt_relative, prompt.encode())
+        manifest['events'][event_id] = {
+            'input_fingerprint': fingerprint, 'image': relative,
+            'image_version': get_path_version(static_dir / relative),
+            'generator': 'gpt-images', 'method': method, 'prompt': prompt_relative,
+            'official_logo_composited': True, 'logo_source': event['logo_asset'],
+        }
+        # Checkpoint each successful event so a later API failure won't bill it again.
+        atomic_write(manifest_path, (json.dumps(manifest, indent=2) + '\n').encode())
+        print(f'Updated {relative}', flush=True)
     return 0
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--check', action='store_true', help='Fail if details/assets/template changed without rebuilding')
-    parser.add_argument('--event', help='Build/check one event; default is all configured shows')
-    parser.add_argument('--adopt-image', help='Register a visually reviewed 1200x630 JPEG under static/ for --event')
-    parser.add_argument('--force', action='store_true', help='Render even if a current approved image exists')
+    parser.add_argument('--check', action='store_true', help='Read-only freshness check; no API calls')
+    parser.add_argument('--event', help='Generate/check one event; default is all configured shows')
+    parser.add_argument('--force', action='store_true', help='Regenerate with GPT Images even if current (billable)')
     args = parser.parse_args()
-    return build(ROOT, check=args.check, event_key=args.event, adopt=args.adopt_image, force=args.force)
+    try:
+        return build(ROOT, check=args.check, event_key=args.event, force=args.force)
+    except (RuntimeError, ValueError, OSError, subprocess.TimeoutExpired) as error:
+        print(str(error), file=sys.stderr)
+        return 1
 
 
 if __name__ == '__main__':

@@ -11,3 +11,8 @@ Official event pages:
 - https://www.jisshow.com/fall/en-us.html
 - https://www.jisshow.com/spring/en-us.html
 - https://lasvegas.jckonline.com/en-us/exhibit/exhibitor-resources.html
+
+Verified again on 2026-09-20: all three local logo files matched the official
+website downloads byte-for-byte. Exact URLs and SHA-256 hashes are recorded in
+`catalog/trade_show_logo_sources.json`. Social previews composite these original
+files after GPT Images generation; the image model does not recreate the logos.

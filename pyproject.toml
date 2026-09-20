@@ -16,6 +16,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+imagegen = ["openai>=2,<3"]
 dev = [
     "playwright>=1.58,<2",
     "pre-commit>=4.0,<5",
