@@ -108,7 +108,7 @@ def build_team_members(team: dict[str, Any]) -> list[dict[str, Any]]:
                 "photo": photo,
                 "photo_scale": source.get("photo_scale") or 1,
                 "photo_position": str(source.get("photo_position") or "50% 50%"),
-                "social_image": str(source.get("social_image") or "assets/social_preview.png"),
+                "social_image": str(source.get("social_image") or "assets/social/site-classic-logo-v3.jpg"),
                 "phone": phone,
                 "office_phone": office_phone,
                 "office_call_url": f"tel:+{office_phone_digits}" if office_phone_digits else "",

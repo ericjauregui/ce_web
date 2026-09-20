@@ -6,7 +6,7 @@
 
   {% set base_url = (site_base_url or request.url_root).rstrip('/') %}
   {% set canonical_url = base_url ~ request.path %}
-  {% set default_og_image = base_url ~ asset_url('assets/social_preview.png') %}
+  {% set default_og_image = base_url ~ asset_url('assets/social/site-classic-logo-v3.jpg') %}
 
   <title>{% block title %}California Earrings | Wholesaler of 14K Gold Earrings & Body Jewelry{% endblock %}</title>
   <meta name="description"

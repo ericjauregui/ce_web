@@ -3,6 +3,9 @@
 {% block title %}Visit California Earrings at {{ show.name }}{% endblock %}
 {% block meta_description %}Meet California Earrings at {{ show.name }} in {{ show.city }}. Explore 14K gold earrings and piercing jewelry, get booth details, and tell us you're coming.{% endblock %}
 
+{% block og_image %}{{ base_url ~ asset_url(show.social_image) }}{% endblock %}
+{% block og_image_alt %}Visit California Earrings at {{ show.name }}. {{ show.dates_display }}. {{ show.venue }}, {{ show.city }}. {{ show.booth }}.{% endblock %}
+
 {% block page_preloads %}
 <link rel="preload" as="image" href="{{ asset_url(show.hero_image) }}" fetchpriority="high">
 <link rel="preload" as="image" href="{{ asset_url(show.logo_asset) }}">

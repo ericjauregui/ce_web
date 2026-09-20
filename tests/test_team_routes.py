@@ -143,7 +143,7 @@ class TeamRouteTests(BaseWebTest):
                 twitter = re.search(r'<meta name="twitter:image" content="([^"]+)"', body).group(1)
                 self.assertEqual(og, twitter)
                 self.assertTrue(og.startswith("http"))
-                self.assertIn(f"/team-social/{member['slug']}.jpg", og)
+                self.assertEqual(urlsplit(og).path, f"/static/{member['social_image']}")
                 asset = self.client.get(urlsplit(og).path)
                 self.assertEqual(asset.status_code, 200)
                 self.assertTrue(asset.data.startswith(b"\xff\xd8\xff"))

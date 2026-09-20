@@ -1,0 +1,14 @@
+Use case: ads-marketing.
+Create a polished landscape social link preview for California Earrings' trade-show page, 1.905:1 aspect ratio (1200x630 layout).
+Inputs: image 1 is a website layout/style reference; image 2 is the actual Miami night skyline hero background to use; image 3 is the official purple JIS FALL logo; image 4 is the actual California Earrings gold-symbol/white-letter logo.
+Primary goal: unmistakably match the existing page UX, distilling its hero section into a crisp readable social card. Use the provided Miami waterfront at night with silhouetted palms, warm golden building lights and water reflections, dark black gradient on the left. Do NOT substitute a generic exhibition hall. Near-black glass, thin subdued champagne-gold outlines, ivory Playfair-style serif heading, clean Lato-style supporting text. No invented jewelry or people.
+Composition: 56px safe margins on every edge. Left 62 percent: actual California Earrings logo at top, roughly 330px wide. Below it a small gold uppercase eyebrow "OUR NEXT TRADE SHOW". Large ivory elegant serif headline on two lines: "Visit Us at" then "JIS Fall 2026". Supporting line "14K gold earrings & piercing jewelry". Small simple gold icon/trust row: "Wholesale only" · "Since 1992" · "Ships globally". One subtle gold pill near bottom reading "Meet Us at Booth #117".
+Right 32 percent: the same rounded black translucent event details panel used on the page, a thin gold border, generous padding. Official purple JIS FALL logo centered at top, legible and faithful. Then thin gold separators and exactly these three detail groups:
+"DATES"
+"October 16–19, 2026"
+"VENUE"
+"Miami Beach Convention Center"
+"Miami Beach, Florida"
+"FIND US"
+"Booth #117"
+Prioritize readability at social thumbnail size. The booth number should be bold and clear. Keep the skyline recognisable in open background, especially along the lower band and between the two columns. Restrained, faithful to the website, no ornamental swirls, no stone pedestals, no extra copy. No browser chrome, navigation bar, footer, webpage screenshot frame, owner video, or lower page sections. This is a single composed social preview, not a full website screenshot. Spell all text exactly. Use existing logos faithfully, not invented marks.

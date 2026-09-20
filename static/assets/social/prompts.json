@@ -1,0 +1,25 @@
+{
+  "tool": "Built-in GPT Images",
+  "assets": [
+    {
+      "id": "site",
+      "prompt": "Use case: ads-marketing. Generate only a premium background for a California Earrings social link preview. Landscape 1.905:1 composition, ideally 1536x806. Match the site's near-black obsidian, champagne gold, subtle grain, restrained warm lighting, dark glass panels and elegant jewelry branding. No text, no letters, no logos, no people, no faces, no jewelry products, no watermark. Exact original company logo, real portraits and typography will be composited later. Keep all essential decoration inset and leave generous quiet dark negative space. An editorial black textured jewelry presentation surface. Very fine champagne gold dust along the far edges, softly illuminated dark mineral forms in the bottom corners, a subtle sweeping gold rim on the far right. Central 70% stays near-black and uncluttered for centered headline and logo. Sophisticated and luminous, not flashy."
+    },
+    {
+      "id": "trade-shows",
+      "prompt": "Use case: ads-marketing. Generate only a premium background for a California Earrings social link preview. Landscape 1.905:1 composition, ideally 1536x806. Match the site's near-black obsidian, champagne gold, subtle grain, restrained warm lighting, dark glass panels and elegant jewelry branding. No text, no letters, no logos, no people, no faces, no jewelry products, no watermark. Exact original company logo, real portraits and typography will be composited later. Keep all essential decoration inset and leave generous quiet dark negative space. Abstract architectural exhibition-hall atmosphere: thin champagne-gold ceiling light lines receding in perspective in the upper right, elegant dark reflective surfaces, subtle defocused golden lights on the lower right, nearly black left 65% for typography. No identifiable venue, no signage, no people or products. Cinematic invitation to meet a wholesale jewelry company in person."
+    },
+    {
+      "id": "miguel",
+      "prompt": "Use case: ads-marketing. Generate only a premium background for a California Earrings social link preview. Landscape 1.905:1 composition, ideally 1536x806. Match the site's near-black obsidian, champagne gold, subtle grain, restrained warm lighting, dark glass panels and elegant jewelry branding. No text, no letters, no logos, no people, no faces, no jewelry products, no watermark. Exact original company logo, real portraits and typography will be composited later. Keep all essential decoration inset and leave generous quiet dark negative space. Distinctive executive portrait-card backdrop: layered black stone with a thin sculptural champagne-gold angular diamond outline wrapping the far LEFT edge, warm halo behind the left third, very subtle fine gold grain. The right 65% stays near-black for typography. Minimal, architectural, assured, no satin folds."
+    },
+    {
+      "id": "giancarlo",
+      "prompt": "Use case: ads-marketing. Generate only a premium background for a California Earrings social link preview. Landscape 1.905:1 composition, ideally 1536x806. Match the site's near-black obsidian, champagne gold, subtle grain, restrained warm lighting, dark glass panels and elegant jewelry branding. No text, no letters, no logos, no people, no faces, no jewelry products, no watermark. Exact original company logo, real portraits and typography will be composited later. Keep all essential decoration inset and leave generous quiet dark negative space. Distinctive operations executive portrait-card backdrop: a precision arrangement of very fine champagne gold parallel diagonal lines along the far bottom LEFT and top RIGHT corners, polished obsidian glass depth, warm restrained halo in the left third for a portrait. The right 65% stays nearly black for typography. Geometric, balanced, clean."
+    },
+    {
+      "id": "ari",
+      "prompt": "Use case: ads-marketing. Generate only a premium background for a California Earrings social link preview. Landscape 1.905:1 composition, ideally 1536x806. Match the site's near-black obsidian, champagne gold, subtle grain, restrained warm lighting, dark glass panels and elegant jewelry branding. No text, no letters, no logos, no people, no faces, no jewelry products, no watermark. Exact original company logo, real portraits and typography will be composited later. Keep all essential decoration inset and leave generous quiet dark negative space. Distinctive sales contact portrait-card backdrop: a graceful sculptural champagne gold arc hugging the far LEFT and lower LEFT edges, soft warm amber glow in the left third for a portrait, faint black silk texture with subtle fine gold flecks only at the corners. The right 65% stays near-black for typography. Warm and welcoming yet restrained."
+    }
+  ]
+}

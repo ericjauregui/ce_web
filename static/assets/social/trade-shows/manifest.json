@@ -1,0 +1,19 @@
+{
+  "events": {
+    "jis-fall-2026": {
+      "input_fingerprint": "64e37f2eecf572a0417c0f00de0eb128a5da8d103fa88e5e2f9fa1e8b1d70894",
+      "image": "assets/social/trade-shows-jis-fall-v3.jpg",
+      "image_version": "2c1ec17127f26643"
+    },
+    "jis-spring-2027": {
+      "input_fingerprint": "6cff6c206b0efc7f1c815e62fea5d893f57cbc7916d569d0c4ab7e5aa2c3b8f7",
+      "image": "assets/social/trade-shows/jis-spring-2027-6cff6c206b0efc7f.jpg",
+      "image_version": "f1d2b694cbff9376"
+    },
+    "jck-2027": {
+      "input_fingerprint": "51e51e6e98248435c8d304b82b0807a539f9ffd0174749a73896148eb61fa97e",
+      "image": "assets/social/trade-shows/jck-2027-51e51e6e98248435.jpg",
+      "image_version": "dbc418f14412ea13"
+    }
+  }
+}

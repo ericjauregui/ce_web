@@ -1,0 +1,9 @@
+repos:
+  - repo: local
+    hooks:
+      - id: trade-show-social
+        name: Rebuild changed trade-show social previews
+        entry: uv run --extra dev python -m scripts.build_trade_show_social
+        language: system
+        pass_filenames: false
+        always_run: true

@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><style>
+@font-face{font-family:Lato;src:url('{{ asset_data("vendor/fonts/lato-400-latin.woff2") }}')}
+@font-face{font-family:Playfair;src:url('{{ asset_data("vendor/fonts/playfair-display-latin.woff2") }}')}
+*{box-sizing:border-box}body{margin:0;width:1200px;height:630px;background:#050505;color:#fff1cf;font-family:Lato,sans-serif}
+.backdrop{position:absolute;inset:0;width:1200px;height:630px;object-fit:cover}.shade{position:absolute;inset:0;background:linear-gradient(90deg,#000d, #0005 65%,#0004)}
+main{position:relative;display:grid;grid-template-columns:650px 330px;gap:40px;padding:50px 70px;height:630px}
+.copy{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;min-width:0}.brand{width:380px;height:98px;object-fit:contain;object-position:left center;margin-bottom:22px}
+.eyebrow{color:#dfc574;font-size:16px;letter-spacing:4px;margin:0 0 12px}h1{font:600 60px/1.06 Playfair,serif;letter-spacing:-2px;margin:0 0 14px;max-width:650px}h1 span{display:block}
+.lead{font-size:23px;line-height:1.35;color:#f1eadc;margin:0 0 22px}.proof{display:flex;gap:24px;font-size:16px;color:#eee9dc;margin-bottom:26px}.proof span{display:flex;align-items:center;gap:8px}
+svg{width:23px;height:23px;stroke:#d6b766;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.pill{background:linear-gradient(120deg,#f2d36e,#dcb74f);color:#100c04;border:1px solid #ffe298;border-radius:40px;padding:18px 25px;font-size:21px;line-height:1.25;max-width:100%}
+.card{border:1px solid #b79843;border-radius:22px;background:#050505e8;padding:27px;display:flex;flex-direction:column;justify-content:center;min-width:0}.show-logo{width:100%;height:95px;object-fit:contain;margin-bottom:19px}.detail{border-top:1px solid #a3853b;padding:15px 0}.label{display:flex;align-items:center;gap:13px;color:#dfc574;font-size:14px;letter-spacing:3px;margin:0 0 10px}.value{color:#fff;font-size:21px;line-height:1.25;margin:0;padding-left:36px;overflow-wrap:anywhere}.city{display:block;color:#c4c1ba;font-size:19px;margin-top:5px}.booth{font-size:22px}.detail:last-child{padding-bottom:0}
+</style></head><body>
+<img class="backdrop" src="{{ asset_data(show.hero_image) }}" alt=""><div class="shade"></div>
+<main><section class="copy">
+<img class="brand" src="{{ asset_data('assets/ce_logo_full.png') }}" alt="California Earrings">
+<p class="eyebrow">OUR NEXT TRADE SHOW</p><h1>Visit Us at<span>{{ show.name }}</span></h1>
+<p class="lead">14K gold earrings &amp; piercing jewelry</p>
+<div class="proof"><span><svg viewBox="0 0 24 24"><path d="M12 3l8 4v5c0 5-3 8-8 9-5-1-8-4-8-9V7zM8 12l3 3 5-6"/></svg>Wholesale only</span><span><svg viewBox="0 0 24 24"><path d="M4 10v11h16V10M3 10l3-7h12l3 7zM9 21v-7h6v7"/></svg>Since 1992</span><span><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c-5 5-5 13 0 18M12 3c5 5 5 13 0 18"/></svg>Ships globally</span></div>
+<div class="pill">{{ 'Meet Us at ' ~ show.booth if show.booth and 'coming soon' not in show.booth|lower else 'Meet Us at the Show' }} &nbsp; →</div>
+</section><aside class="card">
+<img class="show-logo" src="{{ asset_data(show.logo_asset) }}" alt="{{ show.name }}">
+<div class="detail"><p class="label"><svg viewBox="0 0 24 24"><path d="M5 5h14v16H5zM8 2v6M16 2v6M5 10h14"/></svg>DATES</p><p class="value">{{ show.dates_display }}</p></div>
+<div class="detail"><p class="label"><svg viewBox="0 0 24 24"><path d="M12 22s8-8 8-13a8 8 0 10-16 0c0 5 8 13 8 13z"/><circle cx="12" cy="9" r="3"/></svg>VENUE</p><p class="value">{{ show.venue }}<span class="city">{{ show.city }}</span></p></div>
+<div class="detail"><p class="label"><svg viewBox="0 0 24 24"><path d="M4 3h16v18H4zM8 7h8M8 12h8M8 17h5"/></svg>FIND US</p><p class="value booth">{{ show.booth or 'Booth details coming soon' }}</p></div>
+</aside></main></body></html>

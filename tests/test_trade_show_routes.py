@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 import tempfile
 from pathlib import Path
 from unittest.mock import patch
@@ -108,3 +109,31 @@ class TradeShowRouteTests(BaseWebTest):
         self.assertIn("@media (max-width: 767.98px)", css)
         self.assertIn(".trade-show-product-grid", css)
         self.assertIn("grid-template-columns: repeat(2, minmax(0, 1fr));", css)
+
+    def test_social_image_matches_active_show_and_twitter(self) -> None:
+        from domains.trade_show_social import current_image
+        config = json.loads(webapp.TRADE_SHOWS_PATH.read_text())
+        for key, event in config["events"].items():
+            config["active_event"] = key
+            with self.subTest(event=key), tempfile.TemporaryDirectory() as directory:
+                source = Path(directory) / "trade_shows.json"
+                source.write_text(json.dumps(config))
+                with patch.object(webapp, "TRADE_SHOWS_PATH", source):
+                    body = self.client.get("/trade-shows").get_data(as_text=True)
+                og = re.search(r'<meta property="og:image" content="([^"]+)"', body).group(1)
+                twitter = re.search(r'<meta name="twitter:image" content="([^"]+)"', body).group(1)
+                self.assertEqual(og, twitter)
+                self.assertIn(current_image(key, event, webapp.BASE_DIR / "static"), og)
+
+    def test_stale_social_image_falls_back_without_old_booth_details(self) -> None:
+        config = json.loads(webapp.TRADE_SHOWS_PATH.read_text())
+        event = config["events"][config["active_event"]]
+        event["booth"] = "Booth #999"
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "trade_shows.json"
+            source.write_text(json.dumps(config))
+            with patch.object(webapp, "TRADE_SHOWS_PATH", source):
+                body = self.client.get("/trade-shows").get_data(as_text=True)
+        og = re.search(r'<meta property="og:image" content="([^"]+)"', body).group(1)
+        self.assertIn(event["hero_image"], og)
+        self.assertNotIn("trade-shows-jis-fall-v3.jpg", og)

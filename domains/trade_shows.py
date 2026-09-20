@@ -5,6 +5,7 @@ from typing import Any
 from urllib.parse import quote_plus
 
 from domains.file_cache import load_json_cached
+from domains.trade_show_social import current_image
 
 
 def load_trade_show(
@@ -113,4 +114,5 @@ def load_trade_show(
     else:
         event["video"] = None
 
+    event["social_image"] = current_image(active_event, event, static_dir) or event["hero_image"]
     return event

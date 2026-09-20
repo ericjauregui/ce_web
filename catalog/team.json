@@ -12,8 +12,9 @@
       "email": "californiaearrings@gmail.com",
       "bio": "Contact me for wholesale partnerships and business inquiries.",
       "photo_position": "50% 82%",
-      "social_image": "assets/team-social/miguel.jpg",
-      "photo_scale": 1.65
+      "social_image": "assets/social/miguel-v2.jpg",
+      "photo_scale": 1.65,
+      "social_backdrop": "assets/social/backdrops/miguel.png"
     },
     {
       "name": "Giancarlo Jauregui",
@@ -23,8 +24,9 @@
       "email": "giancarloj7@gmail.com",
       "bio": "Contact me for order coordination and account assistance.",
       "photo_position": "50% 45%",
-      "social_image": "assets/team-social/giancarlo.jpg",
-      "photo_scale": 1.2
+      "social_image": "assets/social/giancarlo-v2.jpg",
+      "photo_scale": 1.2,
+      "social_backdrop": "assets/social/backdrops/giancarlo.png"
     },
     {
       "name": "Ari Guel",
@@ -34,8 +36,9 @@
       "email": "aricaliforniaearrings@gmail.com",
       "bio": "Contact me for product recommendations, wholesale orders, and restocking.",
       "photo_position": "50% 28%",
-      "social_image": "assets/team-social/ari.jpg",
-      "photo_scale": 1.1
+      "social_image": "assets/social/ari-v2.jpg",
+      "photo_scale": 1.1,
+      "social_backdrop": "assets/social/backdrops/ari.png"
     }
   ]
 }

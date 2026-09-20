@@ -1,5 +1,10 @@
 # Member link previews
 
+These are the previous preview assets. Current previews and distinct GPT Images
+backdrops live in `../social/`; see `../social/README.md`. The renderer below now
+rebuilds the member previews; destinations are in
+`catalog/team.json`. The main preview is a separate edit of the original artwork.
+
 The 1200 × 630 JPEGs are rendered from `catalog/team.json` and the original
 supplied files in `static/team/`. Faces are not AI-generated or retouched.
 Cropping and framing are controlled by `photo_position` and `photo_scale`.
