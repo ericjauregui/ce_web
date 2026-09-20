@@ -63,3 +63,13 @@
     padding-inline: 0.8rem !important;
   }
 }
+
+.reels-page .team-inline-icon {
+  width: 44px;
+  height: 44px;
+}
+
+.reels-page .team-inline-icon svg {
+  width: 22px;
+  height: 22px;
+}

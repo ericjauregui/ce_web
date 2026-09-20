@@ -111,7 +111,7 @@ function setCardExpanded(card, expanded) {
   const drawer = card.querySelector(".product-drawer");
   if (!drawer) return;
 
-  syncDrawerHeight(card);
+  if (expanded) syncDrawerHeight(card);
   card.classList.toggle("is-open", expanded);
   card.setAttribute("aria-expanded", expanded ? "true" : "false");
   drawer.setAttribute("aria-hidden", expanded ? "false" : "true");
@@ -125,10 +125,8 @@ function scrollToCatalogStart() {
   const navActual =
     parseFloat(styles.getPropertyValue("--nav-actual-height")) || 0;
   const navFallback = parseFloat(styles.getPropertyValue("--nav-height")) || 50;
-  const explorerHeaderHeight =
-    document.querySelector(".catalog-explorer-header")?.getBoundingClientRect()
-      .height || 0;
-  const topOffset = (navActual || navFallback) + explorerHeaderHeight;
+  const topOffset = (navActual || navFallback) +
+    (document.querySelector(".home-collections")?.getBoundingClientRect().height || 0);
   const targetTop = Math.max(
     0,
     firstAnchor.getBoundingClientRect().top + window.scrollY - topOffset,
@@ -151,15 +149,14 @@ function scrollSectionToTop(target, behavior = "smooth", updateHash = false) {
   const navActual =
     parseFloat(styles.getPropertyValue("--nav-actual-height")) || 0;
   const navFallback = parseFloat(styles.getPropertyValue("--nav-height")) || 50;
-  const explorerHeaderHeight =
-    document.querySelector(".catalog-explorer-header")?.getBoundingClientRect()
-      .height || 0;
-  const topOffset = (navActual || navFallback) + explorerHeaderHeight;
+  const topOffset = (navActual || navFallback) +
+    (document.querySelector(".home-collections")?.getBoundingClientRect().height || 0);
   const targetTop = Math.max(
     0,
     target.getBoundingClientRect().top + window.scrollY - topOffset,
   );
 
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) behavior = "instant";
   window.scrollTo({ top: targetTop, behavior });
 
   if (updateHash && target.id) {
@@ -300,7 +297,6 @@ window.addEventListener(
 
 function initializeCatalogCards(root = document) {
   root.querySelectorAll(".product-card").forEach((card) => {
-    syncDrawerHeight(card);
     setCardExpanded(card, false);
     const initialQty = Math.max(
       0,
@@ -311,130 +307,75 @@ function initializeCatalogCards(root = document) {
   });
 }
 
-function updateCatalogCollectionPicker(option) {
-  const picker = document.getElementById("catalogCollectionPicker");
-  if (!picker || !option) return;
+function initializeCatalogScrollTracking() {
+  const header = document.querySelector(".home-collections");
+  if (!header) return;
+  const toggle = header.querySelector(".home-collections-toggle");
+  const navigation = header.querySelector(".home-collection-navigation");
+  let nudged = false;
+  let previousScrollY = window.scrollY;
+  toggle.addEventListener("click", () => {
+    const expanded = toggle.getAttribute("aria-expanded") !== "true";
+    toggle.setAttribute("aria-expanded", String(expanded));
+    toggle.setAttribute("aria-label", `${expanded ? "Collapse" : "Expand"} catalog collections`);
+    navigation.hidden = !expanded;
+    toggle.classList.remove("is-nudging");
+    nudged = true;
+    scheduleUpdate();
+  });
+  toggle.addEventListener("animationend", () => toggle.classList.remove("is-nudging"));
+  const pinned = header.querySelector(".home-collection-current");
+  const track = header.querySelector(".home-collection-track");
+  const options = Array.from(track.querySelectorAll("[data-target]"));
+  const sections = options.map((option) => document.getElementById(option.dataset.target));
+  let activeIndex = -1;
+  let frame = 0;
 
-  const label = picker.querySelector("[data-catalog-collection-label]");
-  const thumbnail = picker.querySelector("[data-catalog-collection-thumbnail]");
-  const helper = document.querySelector("[data-catalog-collection-helper]");
-  const optionImage = option.querySelector("img");
-  const collectionTitle = option.dataset.collectionTitle || "Browse categories";
-  const showAll = option.dataset.target === "all-collections";
-
-  picker.dataset.pristine = "false";
-  picker.dataset.activeTarget = option.dataset.target || "";
-  if (label) label.textContent = collectionTitle;
-  if (thumbnail && optionImage)
-    thumbnail.src = optionImage.currentSrc || optionImage.src;
-  if (helper) {
-    helper.textContent = showAll
-      ? "Browse by collection · All items shown"
-      : "Browse by collection · One collection shown";
-  }
-
-  picker
-    .querySelectorAll(".catalog-collection-picker__option")
-    .forEach((item) => {
-      const isSelected = item === option;
-      item.dataset.selected = isSelected ? "true" : "false";
-      if (isSelected) {
-        item.setAttribute("aria-current", "true");
+  function update() {
+    frame = 0;
+    const styles = getComputedStyle(document.documentElement);
+    const navHeight = parseFloat(styles.getPropertyValue("--nav-actual-height")) ||
+      parseFloat(styles.getPropertyValue("--nav-height")) || 50;
+    if (!nudged && window.scrollY > previousScrollY + 4 &&
+        header.getBoundingClientRect().top <= navHeight + 2) {
+      toggle.classList.add("is-nudging");
+      nudged = true;
+    }
+    previousScrollY = window.scrollY;
+    const headerHeight = header.getBoundingClientRect().height;
+    document.documentElement.style.setProperty("--catalog-header-height", `${headerHeight}px`);
+    const readingLine = navHeight + headerHeight + 12;
+    let nextIndex = 0;
+    sections.forEach((section, index) => {
+      if (section && section.getBoundingClientRect().top <= readingLine) nextIndex = index;
+    });
+    if (nextIndex === activeIndex) return;
+    activeIndex = nextIndex;
+    const focused = header.contains(document.activeElement) ? document.activeElement : null;
+    options.forEach((option, index) => {
+      if (index === activeIndex) {
+        option.setAttribute("aria-current", "location");
+        pinned.appendChild(option);
       } else {
-        item.removeAttribute("aria-current");
+        option.removeAttribute("aria-current");
+        track.appendChild(option);
       }
     });
-}
+    if (focused) focused.focus({ preventScroll: true });
+  }
 
-let catalogContextRafId = 0;
-
-function updateCatalogCollectionContext() {
-  const indicator = document.querySelector(
-    "[data-catalog-current-collection]",
-  );
-  const explorer = document.querySelector(".catalog-explorer-header");
-  const sections = Array.from(
-    document.querySelectorAll(".catalog-collection-section:not([hidden])"),
-  );
-  if (!indicator || !explorer || sections.length === 0) return;
-
-  const styles = getComputedStyle(document.documentElement);
-  const navHeight =
-    parseFloat(styles.getPropertyValue("--nav-actual-height")) ||
-    parseFloat(styles.getPropertyValue("--nav-height")) ||
-    50;
-  const readingLine = navHeight + explorer.getBoundingClientRect().height + 8;
-  let activeSection = sections[0];
-
-  sections.forEach((section) => {
-    if (section.getBoundingClientRect().top <= readingLine) {
-      activeSection = section;
-    }
-  });
-
-  const collectionTitle = activeSection.dataset.collectionTitle || "Catalog";
-  indicator.textContent = `Viewing ${collectionTitle} Collection`;
-}
-
-function scheduleCatalogCollectionContextUpdate() {
-  if (catalogContextRafId) return;
-  catalogContextRafId = window.requestAnimationFrame(() => {
-    catalogContextRafId = 0;
-    updateCatalogCollectionContext();
-  });
-}
-
-function initializeCatalogCollectionContext() {
-  if (!document.querySelector("[data-catalog-current-collection]")) return;
-  updateCatalogCollectionContext();
-  window.addEventListener("scroll", scheduleCatalogCollectionContextUpdate, {
-    passive: true,
-  });
-  window.addEventListener("resize", scheduleCatalogCollectionContextUpdate, {
-    passive: true,
-  });
-}
-
-function filterCatalogCollections(targetId) {
-  const showAll = targetId === "all-collections";
-  document
-    .querySelectorAll(".catalog-collection-section")
-    .forEach((section) => {
-      section.hidden = !showAll && section.id !== targetId;
-      const heading = section.querySelector(".catalog-collection-heading");
-      if (heading) heading.hidden = !showAll;
-    });
-  scheduleCatalogCollectionContextUpdate();
-}
-
-function initializeCatalogCollectionPicker() {
-  const picker = document.getElementById("catalogCollectionPicker");
-  if (!picker) return;
-
-  picker.addEventListener("toggle", () => {
-    if (!picker.open || picker.dataset.pristine !== "true") return;
-    const allCollections = picker.querySelector(
-      '[data-target="all-collections"]',
-    );
-    updateCatalogCollectionPicker(allCollections);
-  });
-
-  document.addEventListener("click", (event) => {
-    if (!picker.open || picker.contains(event.target)) return;
-    picker.open = false;
-  });
-
-  picker.addEventListener("keydown", (event) => {
-    if (event.key !== "Escape") return;
-    picker.open = false;
-    picker.querySelector("summary")?.focus();
-  });
+  function scheduleUpdate() {
+    if (!frame) frame = window.requestAnimationFrame(update);
+  }
+  window.addEventListener("scroll", scheduleUpdate, { passive: true });
+  window.addEventListener("resize", scheduleUpdate, { passive: true });
+  new ResizeObserver(scheduleUpdate).observe(header);
+  update();
 }
 
 document.addEventListener("DOMContentLoaded", () => {
   initializeCatalogCards();
-  initializeCatalogCollectionPicker();
-  initializeCatalogCollectionContext();
+  initializeCatalogScrollTracking();
 
   const miniCart = document.getElementById("catalogMiniCart");
   if (miniCart) {
@@ -611,25 +552,10 @@ document.addEventListener("click", (event) => {
   if (!button) return;
 
   const targetId = button.getAttribute("data-target");
-  if (targetId === "all-collections") {
-    event.preventDefault();
-    filterCatalogCollections(targetId);
-    updateCatalogCollectionPicker(button);
-    const picker = button.closest(".catalog-collection-picker");
-    if (picker) picker.open = false;
-    scrollToCatalogStart();
-    button.blur();
-    return;
-  }
-
   const target = targetId ? document.getElementById(targetId) : null;
   if (!target) return;
 
   event.preventDefault();
-  filterCatalogCollections(targetId);
-  updateCatalogCollectionPicker(button);
-  const picker = button.closest(".catalog-collection-picker");
-  if (picker) picker.open = false;
   scrollSectionToTop(target, "smooth", true);
   button.blur();
 });
@@ -639,7 +565,7 @@ document.addEventListener("click", (event) => {
   if (!link) return;
 
   event.preventDefault();
-  window.scrollTo({ top: 0, behavior: "smooth" });
+  window.scrollTo({ top: 0, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" });
   window.history.replaceState(
     null,
     "",

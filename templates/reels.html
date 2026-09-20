@@ -18,6 +18,27 @@
 
   <div class="card bg-dark border-gold p-3 p-md-4 mb-4">
     <p class="text-gold-70 mb-0">Featuring our latest 14K gold earrings collection and body jewelry.</p>
+    <div class="d-flex align-items-center gap-3 mt-3" aria-label="Follow California Earrings">
+      <span class="text-gold-70">See more</span>
+        <a class="team-inline-icon" href="{{ social.tiktok.profile_url }}" target="_blank" rel="noopener"
+          aria-label="Open TikTok" title="TikTok">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M14.5 4v9.2a3.7 3.7 0 1 1-3.7-3.7" fill="none" stroke="currentColor" stroke-width="1.9"
+              stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M14.5 4c.6 1.7 2 3 3.7 3.7" fill="none" stroke="currentColor" stroke-width="1.9"
+              stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </a>
+        <a class="team-inline-icon" href="{{ social.instagram.profile_url }}" target="_blank" rel="noopener"
+          aria-label="Open Instagram" title="Instagram">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="3.5" y="3.5" width="17" height="17" rx="5" ry="5" fill="none" stroke="currentColor"
+              stroke-width="1.8" />
+            <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8" />
+            <circle cx="17.3" cy="6.8" r="1.1" fill="currentColor" />
+          </svg>
+        </a>
+    </div>
   </div>
 
   {% if reels %}
@@ -42,13 +63,9 @@
           <div class="reel-media inline-reel-media">
             <video
               class="reel-video inline-reel-video"
-              {%
-              if
-              loop.first
-              %}src="{{ reel.url }}"
-              {%
-              endif
-              %}
+              {% if reel.poster %}data-poster="{{ asset_url(reel.poster) }}"{% endif %}
+              {% if reel.poster_160 %}data-poster-small="{{ asset_url(reel.poster_160) }}"{% endif %}
+              {% if reel.poster_320 %}data-poster-medium="{{ asset_url(reel.poster_320) }}"{% endif %}
               data-src="{{ reel.url }}"
               muted
               loop

@@ -1,0 +1,4158 @@
+{
+  "method": "Paired before snapshot and current homepage served over local HTTP, identical seeded reels and local assets, fresh contexts and disabled cache, profile network and CPU throttling; capture at least 5 seconds after load and after the hero LCP is observed. Before/after ordering alternates per pair. Uncompressed local HTML/CSS; not production measurements.",
+  "browser": "145.0.7632.6",
+  "results": [
+    {
+      "profile": {
+        "name": "mobile",
+        "width": 390,
+        "height": 844,
+        "mbps": 1.6,
+        "latency": 150,
+        "cpu": 4
+      },
+      "run": 1,
+      "variant": "before",
+      "speed": {
+        "lcp": [
+          {
+            "time": 23736,
+            "url": "http://127.0.0.1:5001/static/optimized/assets/hero_bg_mobile_compact.png.webp?v=e74d6e4fb76f3967",
+            "tag": "HEADER"
+          }
+        ],
+        "cls": 0.021467886499399014,
+        "longTasks": [
+          76,
+          51,
+          57,
+          92
+        ]
+      },
+      "navigation": {
+        "name": "http://127.0.0.1:5001/",
+        "entryType": "navigation",
+        "startTime": 0,
+        "duration": 23613.29999999702,
+        "initiatorType": "navigation",
+        "deliveryType": "",
+        "nextHopProtocol": "http/1.1",
+        "renderBlockingStatus": "non-blocking",
+        "contentEncoding": "",
+        "workerStart": 0,
+        "workerRouterEvaluationStart": 0,
+        "workerCacheLookupStart": 0,
+        "workerMatchedSourceType": "",
+        "workerFinalSourceType": "",
+        "redirectStart": 0,
+        "redirectEnd": 0,
+        "fetchStart": 0.5999999940395355,
+        "domainLookupStart": 0.5999999940395355,
+        "domainLookupEnd": 0.5999999940395355,
+        "connectStart": 0.5999999940395355,
+        "secureConnectionStart": 0,
+        "connectEnd": 0.5999999940395355,
+        "requestStart": 1.0999999940395355,
+        "responseStart": 2,
+        "firstInterimResponseStart": 0,
+        "finalResponseHeadersStart": 2,
+        "responseEnd": 13632,
+        "transferSize": 1006564,
+        "encodedBodySize": 1006264,
+        "decodedBodySize": 1006264,
+        "responseStatus": 200,
+        "serverTiming": [],
+        "unloadEventStart": 0,
+        "unloadEventEnd": 0,
+        "domInteractive": 14529.199999988079,
+        "domContentLoadedEventStart": 15218.89999999106,
+        "domContentLoadedEventEnd": 15296.29999999702,
+        "domComplete": 23610.5,
+        "loadEventStart": 23610.5,
+        "loadEventEnd": 23613.29999999702,
+        "type": "navigate",
+        "redirectCount": 0,
+        "activationStart": 0,
+        "criticalCHRestart": 0,
+        "notRestoredReasons": null,
+        "confidence": {
+          "randomizedTriggerRate": 0.4994798,
+          "value": "low"
+        }
+      },
+      "paint": [
+        {
+          "name": "first-paint",
+          "time": 7600
+        },
+        {
+          "name": "first-contentful-paint",
+          "time": 7600
+        }
+      ],
+      "observedAt": 29657.59999999404,
+      "completedBytes": 5308492,
+      "observedBytes": 5308492,
+      "assets": [
+        {
+          "url": "http://127.0.0.1:5001/",
+          "type": "Document",
+          "status": 200,
+          "contentLength": 1006264,
+          "observedBodyBytes": 0,
+          "complete": true,
+          "wireBytes": 1006656
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/assets/hero_bg_mobile_compact.png.webp?v=e74d6e4fb76f3967",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 1847234,
+          "observedBodyBytes": 1847234,
+          "complete": true,
+          "wireBytes": 1847652
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/css/bootstrap.site.min.css?v=849a36fc34b197ab",
+          "type": "Stylesheet",
+          "status": 200,
+          "contentLength": 50966,
+          "observedBodyBytes": 50966,
+          "complete": true,
+          "wireBytes": 51384
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/css/styles/fonts.css?v=2d1b5c5fdba8e32d",
+          "type": "Stylesheet",
+          "status": 200,
+          "contentLength": 4059,
+          "observedBodyBytes": 4059,
+          "complete": true,
+          "wireBytes": 4462
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/css/styles/base.css?v=192fb0adc4e78ebd",
+          "type": "Stylesheet",
+          "status": 200,
+          "contentLength": 24299,
+          "observedBodyBytes": 24299,
+          "complete": true,
+          "wireBytes": 24703
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/vendor/fonts/lato-400-latin.woff2?v=d4ae5188a65370ec",
+          "type": "Font",
+          "status": 200,
+          "contentLength": 13980,
+          "observedBodyBytes": 13980,
+          "complete": true,
+          "wireBytes": 14383
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/css/styles/layout.css?v=3954370ff14a8445",
+          "type": "Stylesheet",
+          "status": 200,
+          "contentLength": 85929,
+          "observedBodyBytes": 85929,
+          "complete": true,
+          "wireBytes": 86335
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/vendor/fonts/playfair-display-latin.woff2?v=5d91eb5d522a0308",
+          "type": "Font",
+          "status": 200,
+          "contentLength": 38460,
+          "observedBodyBytes": 38460,
+          "complete": true,
+          "wireBytes": 38871
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/css/styles/nav.css?v=01bb38ff08049816",
+          "type": "Stylesheet",
+          "status": 200,
+          "contentLength": 9907,
+          "observedBodyBytes": 9907,
+          "complete": true,
+          "wireBytes": 10306
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/css/styles/home_catalog.css?v=db86df7681f555e7",
+          "type": "Stylesheet",
+          "status": 200,
+          "contentLength": 5363,
+          "observedBodyBytes": 5363,
+          "complete": true,
+          "wireBytes": 5773
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/css/styles/inline_reels.css?v=042d474f1bda5cfe",
+          "type": "Stylesheet",
+          "status": 200,
+          "contentLength": 3929,
+          "observedBodyBytes": 3929,
+          "complete": true,
+          "wireBytes": 4339
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/css/styles/home_reels.css?v=44b374e8fd93288e",
+          "type": "Stylesheet",
+          "status": 200,
+          "contentLength": 1089,
+          "observedBodyBytes": 1089,
+          "complete": true,
+          "wireBytes": 1495
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/assets/ce_logo_full.png?v=30e13349e9bbaf27",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 46319,
+          "observedBodyBytes": 46319,
+          "complete": true,
+          "wireBytes": 46716
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/assets/ce_logo_shape.png?v=1f5c69370e675783",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 123588,
+          "observedBodyBytes": 123588,
+          "complete": true,
+          "wireBytes": 123989
+        },
+        {
+          "url": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='.34'/%3E%3C/svg%3E",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 0,
+          "observedBodyBytes": 0,
+          "complete": true,
+          "wireBytes": 0
+        },
+        {
+          "url": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M6 6l8 8M14 6l-8 8' stroke='%23d7c07a' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 0,
+          "observedBodyBytes": 0,
+          "complete": true,
+          "wireBytes": 0
+        },
+        {
+          "url": "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(215, 192, 122, 0.95)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 0,
+          "observedBodyBytes": 0,
+          "complete": true,
+          "wireBytes": 0
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/101SB.jpg/160.webp?v=dece151ab3e71c3b",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 4438,
+          "observedBodyBytes": 4438,
+          "complete": true,
+          "wireBytes": 4826
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/233SB.jpg/160.webp?v=88ac62034e38f7ba",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 4848,
+          "observedBodyBytes": 4848,
+          "complete": true,
+          "wireBytes": 5235
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/vendor/fonts/lato-700-latin.woff2?v=7a7ce1a34f3e9944",
+          "type": "Font",
+          "status": 200,
+          "contentLength": 14168,
+          "observedBodyBytes": 14168,
+          "complete": true,
+          "wireBytes": 14571
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/1462LSB.jpg/160.webp?v=8cbcf8bc0cc262e8",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 9630,
+          "observedBodyBytes": 9630,
+          "complete": true,
+          "wireBytes": 10019
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/164SB.jpg/160.webp?v=52bf1be55a34827a",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 6410,
+          "observedBodyBytes": 6410,
+          "complete": true,
+          "wireBytes": 6798
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/1126SB.jpg/160.webp?v=41113ca7db0b502b",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 11368,
+          "observedBodyBytes": 11368,
+          "complete": true,
+          "wireBytes": 11758
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/1092LSB.jpg/160.webp?v=d108541ce71f59a6",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 12540,
+          "observedBodyBytes": 12540,
+          "complete": true,
+          "wireBytes": 12931
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/1665SB.jpg/160.webp?v=98cac0bd080e0480",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 10094,
+          "observedBodyBytes": 10094,
+          "complete": true,
+          "wireBytes": 10483
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/1036WB.jpg/160.webp?v=2b5948413c20883b",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 12126,
+          "observedBodyBytes": 12126,
+          "complete": true,
+          "wireBytes": 12516
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/1114NR.jpg/160.webp?v=d0967cb365809b08",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 7548,
+          "observedBodyBytes": 7548,
+          "complete": true,
+          "wireBytes": 7936
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/1541WBSET.jpg/160.webp?v=23b2933a3b098c21",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 21096,
+          "observedBodyBytes": 21096,
+          "complete": true,
+          "wireBytes": 21486
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/101SB.jpg/320.webp?v=748165b7c765dc1f",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 11116,
+          "observedBodyBytes": 11116,
+          "complete": true,
+          "wireBytes": 11506
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/102SB.jpg/320.webp?v=21c1d8a19aa473e5",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 10844,
+          "observedBodyBytes": 10844,
+          "complete": true,
+          "wireBytes": 11234
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/103SB.jpg/320.webp?v=c0cd792cd4c1642a",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 11964,
+          "observedBodyBytes": 11964,
+          "complete": true,
+          "wireBytes": 12353
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/104SB.jpg/320.webp?v=b446223ef2a581c5",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 17096,
+          "observedBodyBytes": 17096,
+          "complete": true,
+          "wireBytes": 17485
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/105SB.jpg/320.webp?v=c434cc46b5fb02e3",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 21410,
+          "observedBodyBytes": 21410,
+          "complete": true,
+          "wireBytes": 21800
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/106SB.jpg/320.webp?v=65e5dd5606545b3a",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 24126,
+          "observedBodyBytes": 24126,
+          "complete": true,
+          "wireBytes": 24515
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/107SB.jpg/320.webp?v=ca67069c4c832056",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 28178,
+          "observedBodyBytes": 28178,
+          "complete": true,
+          "wireBytes": 28568
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/108SB.jpg/320.webp?v=cdd7afa9b025cab0",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 37030,
+          "observedBodyBytes": 37030,
+          "complete": true,
+          "wireBytes": 37420
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/js/whatsapp_float.js?v=0b09fe3a859d6c86",
+          "type": "Script",
+          "status": 200,
+          "contentLength": 6838,
+          "observedBodyBytes": 6838,
+          "complete": true,
+          "wireBytes": 7256
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/js/scroll_cue.js?v=425cfee0cac3d496",
+          "type": "Script",
+          "status": 200,
+          "contentLength": 7847,
+          "observedBodyBytes": 7847,
+          "complete": true,
+          "wireBytes": 8259
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/js/home_reels.js?v=3269c62a345464ba",
+          "type": "Script",
+          "status": 200,
+          "contentLength": 202,
+          "observedBodyBytes": 202,
+          "complete": true,
+          "wireBytes": 611
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/js/catalog.js?v=739c9dd21b67f2bf",
+          "type": "Script",
+          "status": 200,
+          "contentLength": 17258,
+          "observedBodyBytes": 17258,
+          "complete": true,
+          "wireBytes": 17671
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/js/inline_reels.js?v=c42b4ea751458f07",
+          "type": "Script",
+          "status": 200,
+          "contentLength": 31900,
+          "observedBodyBytes": 31900,
+          "complete": true,
+          "wireBytes": 32317
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/reels/posters/v15044gf0000d28k8pnog65o08bn9iug.MP4.96d5b318817abdda.160.webp?v=bffc11ef90705e7e",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 51656,
+          "observedBodyBytes": 51656,
+          "complete": true,
+          "wireBytes": 52100
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/reels/posters/v12044gd0000cvdk3hfog65urc6s4vug.MP4.ce2857e7ac70be92.160.webp?v=0bc67955ec674a50",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 49142,
+          "observedBodyBytes": 49142,
+          "complete": true,
+          "wireBytes": 49587
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/reels/posters/v15044gf0000d6celhvog65hp28gmueg.MP4.1e89bc3ffec35a31.160.webp?v=0734b7cbcee9485d",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 65580,
+          "observedBodyBytes": 65580,
+          "complete": true,
+          "wireBytes": 66025
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/reels/v15044gf0000d28k8pnog65o08bn9iug.MP4",
+          "type": "Media",
+          "status": 206,
+          "contentLength": 1427037,
+          "observedBodyBytes": 1427037,
+          "complete": true,
+          "wireBytes": 1427534
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/vendor/bootstrap/bootstrap.bundle.min.js?v=0833b2e9c3a26c25",
+          "type": "Script",
+          "status": 200,
+          "contentLength": 80721,
+          "observedBodyBytes": 80721,
+          "complete": true,
+          "wireBytes": 81146
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/favicon.ico?v=5ae6e6301bd609ea",
+          "type": "Other",
+          "status": 200,
+          "contentLength": 15086,
+          "observedBodyBytes": 15086,
+          "complete": true,
+          "wireBytes": 15482
+        }
+      ],
+      "errors": []
+    },
+    {
+      "profile": {
+        "name": "mobile",
+        "width": 390,
+        "height": 844,
+        "mbps": 1.6,
+        "latency": 150,
+        "cpu": 4
+      },
+      "run": 1,
+      "variant": "after",
+      "speed": {
+        "lcp": [
+          {
+            "time": 11088,
+            "url": "http://127.0.0.1:5001/static/optimized/heroes/hero_bg_mobile_compact.png.webp?v=fcac7316addf2dd3",
+            "tag": "HEADER"
+          }
+        ],
+        "cls": 0.023622491523375026,
+        "longTasks": [
+          82,
+          63,
+          91
+        ]
+      },
+      "navigation": {
+        "name": "http://127.0.0.1:5001/",
+        "entryType": "navigation",
+        "startTime": 0,
+        "duration": 14543.29999999702,
+        "initiatorType": "navigation",
+        "deliveryType": "",
+        "nextHopProtocol": "http/1.1",
+        "renderBlockingStatus": "non-blocking",
+        "contentEncoding": "",
+        "workerStart": 0,
+        "workerRouterEvaluationStart": 0,
+        "workerCacheLookupStart": 0,
+        "workerMatchedSourceType": "",
+        "workerFinalSourceType": "",
+        "redirectStart": 0,
+        "redirectEnd": 0,
+        "fetchStart": 0.19999998807907104,
+        "domainLookupStart": 0.19999998807907104,
+        "domainLookupEnd": 0.19999998807907104,
+        "connectStart": 0.19999998807907104,
+        "secureConnectionStart": 0,
+        "connectEnd": 0.19999998807907104,
+        "requestStart": 0.5,
+        "responseStart": 138.59999999403954,
+        "firstInterimResponseStart": 0,
+        "finalResponseHeadersStart": 138.59999999403954,
+        "responseEnd": 12254.89999999106,
+        "transferSize": 1006659,
+        "encodedBodySize": 1006359,
+        "decodedBodySize": 1006359,
+        "responseStatus": 200,
+        "serverTiming": [],
+        "unloadEventStart": 0,
+        "unloadEventEnd": 0,
+        "domInteractive": 12998.199999988079,
+        "domContentLoadedEventStart": 13122.39999999106,
+        "domContentLoadedEventEnd": 13200.699999988079,
+        "domComplete": 14540.09999999404,
+        "loadEventStart": 14540.09999999404,
+        "loadEventEnd": 14543.29999999702,
+        "type": "navigate",
+        "redirectCount": 0,
+        "activationStart": 0,
+        "criticalCHRestart": 0,
+        "notRestoredReasons": null,
+        "confidence": {
+          "randomizedTriggerRate": 0.4994798,
+          "value": "low"
+        }
+      },
+      "paint": [
+        {
+          "name": "first-paint",
+          "time": 3612
+        },
+        {
+          "name": "first-contentful-paint",
+          "time": 3612
+        }
+      ],
+      "observedAt": 20594.59999999404,
+      "completedBytes": 2729906,
+      "observedBytes": 3581005,
+      "assets": [
+        {
+          "url": "http://127.0.0.1:5001/",
+          "type": "Document",
+          "status": 200,
+          "contentLength": 1006359,
+          "observedBodyBytes": 0,
+          "complete": true,
+          "wireBytes": 1006764
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/css/bootstrap.site.min.css?v=849a36fc34b197ab",
+          "type": "Stylesheet",
+          "status": 200,
+          "contentLength": 50966,
+          "observedBodyBytes": 50966,
+          "complete": true,
+          "wireBytes": 51384
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/heroes/hero_bg_mobile_compact.png.webp?v=fcac7316addf2dd3",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 696076,
+          "observedBodyBytes": 696076,
+          "complete": true,
+          "wireBytes": 696492
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/assets/ce_logo_full.png?v=30e13349e9bbaf27",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 46319,
+          "observedBodyBytes": 46319,
+          "complete": true,
+          "wireBytes": 46716
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/vendor/fonts/lato-400-latin.woff2?v=d4ae5188a65370ec",
+          "type": "Font",
+          "status": 200,
+          "contentLength": 13980,
+          "observedBodyBytes": 13980,
+          "complete": true,
+          "wireBytes": 14383
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/css/styles/fonts.css?v=2d1b5c5fdba8e32d",
+          "type": "Stylesheet",
+          "status": 200,
+          "contentLength": 4059,
+          "observedBodyBytes": 4059,
+          "complete": true,
+          "wireBytes": 4462
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/css/styles/base.css?v=192fb0adc4e78ebd",
+          "type": "Stylesheet",
+          "status": 200,
+          "contentLength": 24299,
+          "observedBodyBytes": 24299,
+          "complete": true,
+          "wireBytes": 24703
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/vendor/fonts/playfair-display-latin.woff2?v=5d91eb5d522a0308",
+          "type": "Font",
+          "status": 200,
+          "contentLength": 38460,
+          "observedBodyBytes": 38460,
+          "complete": true,
+          "wireBytes": 38871
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/css/styles/layout.css?v=3954370ff14a8445",
+          "type": "Stylesheet",
+          "status": 200,
+          "contentLength": 85929,
+          "observedBodyBytes": 85929,
+          "complete": true,
+          "wireBytes": 86335
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/css/styles/nav.css?v=01bb38ff08049816",
+          "type": "Stylesheet",
+          "status": 200,
+          "contentLength": 9907,
+          "observedBodyBytes": 9907,
+          "complete": true,
+          "wireBytes": 10306
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/css/styles/home_catalog.css?v=db86df7681f555e7",
+          "type": "Stylesheet",
+          "status": 200,
+          "contentLength": 5363,
+          "observedBodyBytes": 5363,
+          "complete": true,
+          "wireBytes": 5773
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/css/styles/inline_reels.css?v=042d474f1bda5cfe",
+          "type": "Stylesheet",
+          "status": 200,
+          "contentLength": 3929,
+          "observedBodyBytes": 3929,
+          "complete": true,
+          "wireBytes": 4339
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/css/styles/home_reels.css?v=44b374e8fd93288e",
+          "type": "Stylesheet",
+          "status": 200,
+          "contentLength": 1089,
+          "observedBodyBytes": 1089,
+          "complete": true,
+          "wireBytes": 1495
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/assets/ce_logo_shape.png?v=1f5c69370e675783",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 123588,
+          "observedBodyBytes": 123588,
+          "complete": true,
+          "wireBytes": 123989
+        },
+        {
+          "url": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='.34'/%3E%3C/svg%3E",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 0,
+          "observedBodyBytes": 0,
+          "complete": true,
+          "wireBytes": 0
+        },
+        {
+          "url": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M6 6l8 8M14 6l-8 8' stroke='%23d7c07a' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 0,
+          "observedBodyBytes": 0,
+          "complete": true,
+          "wireBytes": 0
+        },
+        {
+          "url": "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(215, 192, 122, 0.95)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 0,
+          "observedBodyBytes": 0,
+          "complete": true,
+          "wireBytes": 0
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/101SB.jpg/160.webp?v=dece151ab3e71c3b",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 4438,
+          "observedBodyBytes": 4438,
+          "complete": true,
+          "wireBytes": 4826
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/233SB.jpg/160.webp?v=88ac62034e38f7ba",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 4848,
+          "observedBodyBytes": 4848,
+          "complete": true,
+          "wireBytes": 5235
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/vendor/fonts/lato-700-latin.woff2?v=7a7ce1a34f3e9944",
+          "type": "Font",
+          "status": 200,
+          "contentLength": 14168,
+          "observedBodyBytes": 14168,
+          "complete": true,
+          "wireBytes": 14571
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/1462LSB.jpg/160.webp?v=8cbcf8bc0cc262e8",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 9630,
+          "observedBodyBytes": 9630,
+          "complete": true,
+          "wireBytes": 10019
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/164SB.jpg/160.webp?v=52bf1be55a34827a",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 6410,
+          "observedBodyBytes": 6410,
+          "complete": true,
+          "wireBytes": 6798
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/1126SB.jpg/160.webp?v=41113ca7db0b502b",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 11368,
+          "observedBodyBytes": 11368,
+          "complete": true,
+          "wireBytes": 11758
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/1092LSB.jpg/160.webp?v=d108541ce71f59a6",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 12540,
+          "observedBodyBytes": 12540,
+          "complete": true,
+          "wireBytes": 12931
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/1665SB.jpg/160.webp?v=98cac0bd080e0480",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 10094,
+          "observedBodyBytes": 10094,
+          "complete": true,
+          "wireBytes": 10483
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/1036WB.jpg/160.webp?v=2b5948413c20883b",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 12126,
+          "observedBodyBytes": 12126,
+          "complete": true,
+          "wireBytes": 12516
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/1114NR.jpg/160.webp?v=d0967cb365809b08",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 7548,
+          "observedBodyBytes": 7548,
+          "complete": true,
+          "wireBytes": 7936
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/1541WBSET.jpg/160.webp?v=23b2933a3b098c21",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 21096,
+          "observedBodyBytes": 21096,
+          "complete": true,
+          "wireBytes": 21486
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/101SB.jpg/320.webp?v=748165b7c765dc1f",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 11116,
+          "observedBodyBytes": 11116,
+          "complete": true,
+          "wireBytes": 11506
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/102SB.jpg/320.webp?v=21c1d8a19aa473e5",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 10844,
+          "observedBodyBytes": 10844,
+          "complete": true,
+          "wireBytes": 11234
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/103SB.jpg/320.webp?v=c0cd792cd4c1642a",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 11964,
+          "observedBodyBytes": 11964,
+          "complete": true,
+          "wireBytes": 12353
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/104SB.jpg/320.webp?v=b446223ef2a581c5",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 17096,
+          "observedBodyBytes": 17096,
+          "complete": true,
+          "wireBytes": 17485
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/105SB.jpg/320.webp?v=c434cc46b5fb02e3",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 21410,
+          "observedBodyBytes": 21410,
+          "complete": true,
+          "wireBytes": 21800
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/106SB.jpg/320.webp?v=65e5dd5606545b3a",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 24126,
+          "observedBodyBytes": 24126,
+          "complete": true,
+          "wireBytes": 24515
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/107SB.jpg/320.webp?v=ca67069c4c832056",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 28178,
+          "observedBodyBytes": 28178,
+          "complete": true,
+          "wireBytes": 28568
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/108SB.jpg/320.webp?v=cdd7afa9b025cab0",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 37030,
+          "observedBodyBytes": 37030,
+          "complete": true,
+          "wireBytes": 37420
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/js/home_reels.js?v=3269c62a345464ba",
+          "type": "Script",
+          "status": 200,
+          "contentLength": 202,
+          "observedBodyBytes": 202,
+          "complete": true,
+          "wireBytes": 611
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/js/scroll_cue.js?v=425cfee0cac3d496",
+          "type": "Script",
+          "status": 200,
+          "contentLength": 7847,
+          "observedBodyBytes": 7847,
+          "complete": true,
+          "wireBytes": 8259
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/js/whatsapp_float.js?v=0b09fe3a859d6c86",
+          "type": "Script",
+          "status": 200,
+          "contentLength": 6838,
+          "observedBodyBytes": 6838,
+          "complete": true,
+          "wireBytes": 7256
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/js/catalog.js?v=739c9dd21b67f2bf",
+          "type": "Script",
+          "status": 200,
+          "contentLength": 17258,
+          "observedBodyBytes": 17258,
+          "complete": true,
+          "wireBytes": 17671
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/js/inline_reels.js?v=c42b4ea751458f07",
+          "type": "Script",
+          "status": 200,
+          "contentLength": 31900,
+          "observedBodyBytes": 31900,
+          "complete": true,
+          "wireBytes": 32317
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/vendor/bootstrap/bootstrap.bundle.min.js?v=0833b2e9c3a26c25",
+          "type": "Script",
+          "status": 200,
+          "contentLength": 80721,
+          "observedBodyBytes": 80721,
+          "complete": true,
+          "wireBytes": 81146
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/reels/posters/v15044gf0000d28k8pnog65o08bn9iug.MP4.96d5b318817abdda.160.webp?v=bffc11ef90705e7e",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 51656,
+          "observedBodyBytes": 51656,
+          "complete": true,
+          "wireBytes": 52100
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/reels/posters/v15044gf0000d6celhvog65hp28gmueg.MP4.1e89bc3ffec35a31.160.webp?v=0734b7cbcee9485d",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 65580,
+          "observedBodyBytes": 65580,
+          "complete": true,
+          "wireBytes": 66025
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/reels/posters/v12044gd0000cvdk3hfog65urc6s4vug.MP4.ce2857e7ac70be92.160.webp?v=0bc67955ec674a50",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 49142,
+          "observedBodyBytes": 49142,
+          "complete": true,
+          "wireBytes": 49587
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/reels/v15044gf0000d28k8pnog65o08bn9iug.MP4",
+          "type": "Media",
+          "status": 206,
+          "contentLength": 1427037,
+          "observedBodyBytes": 851099
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/favicon.ico?v=5ae6e6301bd609ea",
+          "type": "Other",
+          "status": 200,
+          "contentLength": 15086,
+          "observedBodyBytes": 15086,
+          "complete": true,
+          "wireBytes": 15482
+        }
+      ],
+      "errors": []
+    },
+    {
+      "profile": {
+        "name": "mobile",
+        "width": 390,
+        "height": 844,
+        "mbps": 1.6,
+        "latency": 150,
+        "cpu": 4
+      },
+      "run": 2,
+      "variant": "after",
+      "speed": {
+        "lcp": [
+          {
+            "time": 11076,
+            "url": "http://127.0.0.1:5001/static/optimized/heroes/hero_bg_mobile_compact.png.webp?v=fcac7316addf2dd3",
+            "tag": "HEADER"
+          }
+        ],
+        "cls": 0.022636963059495405,
+        "longTasks": [
+          86,
+          50,
+          61,
+          92
+        ]
+      },
+      "navigation": {
+        "name": "http://127.0.0.1:5001/",
+        "entryType": "navigation",
+        "startTime": 0,
+        "duration": 14541.10000000894,
+        "initiatorType": "navigation",
+        "deliveryType": "",
+        "nextHopProtocol": "http/1.1",
+        "renderBlockingStatus": "non-blocking",
+        "contentEncoding": "",
+        "workerStart": 0,
+        "workerRouterEvaluationStart": 0,
+        "workerCacheLookupStart": 0,
+        "workerMatchedSourceType": "",
+        "workerFinalSourceType": "",
+        "redirectStart": 0,
+        "redirectEnd": 0,
+        "fetchStart": 1.300000011920929,
+        "domainLookupStart": 1.300000011920929,
+        "domainLookupEnd": 1.300000011920929,
+        "connectStart": 1.300000011920929,
+        "secureConnectionStart": 0,
+        "connectEnd": 1.300000011920929,
+        "requestStart": 1.9000000059604645,
+        "responseStart": 143.90000000596046,
+        "firstInterimResponseStart": 0,
+        "finalResponseHeadersStart": 143.90000000596046,
+        "responseEnd": 12258.10000000894,
+        "transferSize": 1006659,
+        "encodedBodySize": 1006359,
+        "decodedBodySize": 1006359,
+        "responseStatus": 200,
+        "serverTiming": [],
+        "unloadEventStart": 0,
+        "unloadEventEnd": 0,
+        "domInteractive": 12999.300000011921,
+        "domContentLoadedEventStart": 13134,
+        "domContentLoadedEventEnd": 13212.10000000894,
+        "domComplete": 14537.90000000596,
+        "loadEventStart": 14537.90000000596,
+        "loadEventEnd": 14541.10000000894,
+        "type": "navigate",
+        "redirectCount": 0,
+        "activationStart": 0,
+        "criticalCHRestart": 0,
+        "notRestoredReasons": null,
+        "confidence": {
+          "randomizedTriggerRate": 0.4994798,
+          "value": "high"
+        }
+      },
+      "paint": [
+        {
+          "name": "first-paint",
+          "time": 3620
+        },
+        {
+          "name": "first-contentful-paint",
+          "time": 3620
+        }
+      ],
+      "observedAt": 20594.20000000298,
+      "completedBytes": 2729906,
+      "observedBytes": 3581005,
+      "assets": [
+        {
+          "url": "http://127.0.0.1:5001/",
+          "type": "Document",
+          "status": 200,
+          "contentLength": 1006359,
+          "observedBodyBytes": 0,
+          "complete": true,
+          "wireBytes": 1006764
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/assets/ce_logo_full.png?v=30e13349e9bbaf27",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 46319,
+          "observedBodyBytes": 46319,
+          "complete": true,
+          "wireBytes": 46716
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/heroes/hero_bg_mobile_compact.png.webp?v=fcac7316addf2dd3",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 696076,
+          "observedBodyBytes": 696076,
+          "complete": true,
+          "wireBytes": 696492
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/css/bootstrap.site.min.css?v=849a36fc34b197ab",
+          "type": "Stylesheet",
+          "status": 200,
+          "contentLength": 50966,
+          "observedBodyBytes": 50966,
+          "complete": true,
+          "wireBytes": 51384
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/vendor/fonts/lato-400-latin.woff2?v=d4ae5188a65370ec",
+          "type": "Font",
+          "status": 200,
+          "contentLength": 13980,
+          "observedBodyBytes": 13980,
+          "complete": true,
+          "wireBytes": 14383
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/css/styles/fonts.css?v=2d1b5c5fdba8e32d",
+          "type": "Stylesheet",
+          "status": 200,
+          "contentLength": 4059,
+          "observedBodyBytes": 4059,
+          "complete": true,
+          "wireBytes": 4462
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/css/styles/base.css?v=192fb0adc4e78ebd",
+          "type": "Stylesheet",
+          "status": 200,
+          "contentLength": 24299,
+          "observedBodyBytes": 24299,
+          "complete": true,
+          "wireBytes": 24703
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/vendor/fonts/playfair-display-latin.woff2?v=5d91eb5d522a0308",
+          "type": "Font",
+          "status": 200,
+          "contentLength": 38460,
+          "observedBodyBytes": 38460,
+          "complete": true,
+          "wireBytes": 38871
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/css/styles/layout.css?v=3954370ff14a8445",
+          "type": "Stylesheet",
+          "status": 200,
+          "contentLength": 85929,
+          "observedBodyBytes": 85929,
+          "complete": true,
+          "wireBytes": 86335
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/css/styles/nav.css?v=01bb38ff08049816",
+          "type": "Stylesheet",
+          "status": 200,
+          "contentLength": 9907,
+          "observedBodyBytes": 9907,
+          "complete": true,
+          "wireBytes": 10306
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/css/styles/home_catalog.css?v=db86df7681f555e7",
+          "type": "Stylesheet",
+          "status": 200,
+          "contentLength": 5363,
+          "observedBodyBytes": 5363,
+          "complete": true,
+          "wireBytes": 5773
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/css/styles/inline_reels.css?v=042d474f1bda5cfe",
+          "type": "Stylesheet",
+          "status": 200,
+          "contentLength": 3929,
+          "observedBodyBytes": 3929,
+          "complete": true,
+          "wireBytes": 4339
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/css/styles/home_reels.css?v=44b374e8fd93288e",
+          "type": "Stylesheet",
+          "status": 200,
+          "contentLength": 1089,
+          "observedBodyBytes": 1089,
+          "complete": true,
+          "wireBytes": 1495
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/assets/ce_logo_shape.png?v=1f5c69370e675783",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 123588,
+          "observedBodyBytes": 123588,
+          "complete": true,
+          "wireBytes": 123989
+        },
+        {
+          "url": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='.34'/%3E%3C/svg%3E",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 0,
+          "observedBodyBytes": 0,
+          "complete": true,
+          "wireBytes": 0
+        },
+        {
+          "url": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M6 6l8 8M14 6l-8 8' stroke='%23d7c07a' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 0,
+          "observedBodyBytes": 0,
+          "complete": true,
+          "wireBytes": 0
+        },
+        {
+          "url": "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(215, 192, 122, 0.95)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 0,
+          "observedBodyBytes": 0,
+          "complete": true,
+          "wireBytes": 0
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/101SB.jpg/160.webp?v=dece151ab3e71c3b",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 4438,
+          "observedBodyBytes": 4438,
+          "complete": true,
+          "wireBytes": 4826
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/233SB.jpg/160.webp?v=88ac62034e38f7ba",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 4848,
+          "observedBodyBytes": 4848,
+          "complete": true,
+          "wireBytes": 5235
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/vendor/fonts/lato-700-latin.woff2?v=7a7ce1a34f3e9944",
+          "type": "Font",
+          "status": 200,
+          "contentLength": 14168,
+          "observedBodyBytes": 14168,
+          "complete": true,
+          "wireBytes": 14571
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/1462LSB.jpg/160.webp?v=8cbcf8bc0cc262e8",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 9630,
+          "observedBodyBytes": 9630,
+          "complete": true,
+          "wireBytes": 10019
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/164SB.jpg/160.webp?v=52bf1be55a34827a",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 6410,
+          "observedBodyBytes": 6410,
+          "complete": true,
+          "wireBytes": 6798
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/1126SB.jpg/160.webp?v=41113ca7db0b502b",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 11368,
+          "observedBodyBytes": 11368,
+          "complete": true,
+          "wireBytes": 11758
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/1092LSB.jpg/160.webp?v=d108541ce71f59a6",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 12540,
+          "observedBodyBytes": 12540,
+          "complete": true,
+          "wireBytes": 12931
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/1665SB.jpg/160.webp?v=98cac0bd080e0480",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 10094,
+          "observedBodyBytes": 10094,
+          "complete": true,
+          "wireBytes": 10483
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/1036WB.jpg/160.webp?v=2b5948413c20883b",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 12126,
+          "observedBodyBytes": 12126,
+          "complete": true,
+          "wireBytes": 12516
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/1114NR.jpg/160.webp?v=d0967cb365809b08",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 7548,
+          "observedBodyBytes": 7548,
+          "complete": true,
+          "wireBytes": 7936
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/1541WBSET.jpg/160.webp?v=23b2933a3b098c21",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 21096,
+          "observedBodyBytes": 21096,
+          "complete": true,
+          "wireBytes": 21486
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/101SB.jpg/320.webp?v=748165b7c765dc1f",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 11116,
+          "observedBodyBytes": 11116,
+          "complete": true,
+          "wireBytes": 11506
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/102SB.jpg/320.webp?v=21c1d8a19aa473e5",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 10844,
+          "observedBodyBytes": 10844,
+          "complete": true,
+          "wireBytes": 11234
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/103SB.jpg/320.webp?v=c0cd792cd4c1642a",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 11964,
+          "observedBodyBytes": 11964,
+          "complete": true,
+          "wireBytes": 12353
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/104SB.jpg/320.webp?v=b446223ef2a581c5",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 17096,
+          "observedBodyBytes": 17096,
+          "complete": true,
+          "wireBytes": 17485
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/105SB.jpg/320.webp?v=c434cc46b5fb02e3",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 21410,
+          "observedBodyBytes": 21410,
+          "complete": true,
+          "wireBytes": 21800
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/106SB.jpg/320.webp?v=65e5dd5606545b3a",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 24126,
+          "observedBodyBytes": 24126,
+          "complete": true,
+          "wireBytes": 24515
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/107SB.jpg/320.webp?v=ca67069c4c832056",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 28178,
+          "observedBodyBytes": 28178,
+          "complete": true,
+          "wireBytes": 28568
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/108SB.jpg/320.webp?v=cdd7afa9b025cab0",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 37030,
+          "observedBodyBytes": 37030,
+          "complete": true,
+          "wireBytes": 37420
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/js/home_reels.js?v=3269c62a345464ba",
+          "type": "Script",
+          "status": 200,
+          "contentLength": 202,
+          "observedBodyBytes": 202,
+          "complete": true,
+          "wireBytes": 611
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/js/scroll_cue.js?v=425cfee0cac3d496",
+          "type": "Script",
+          "status": 200,
+          "contentLength": 7847,
+          "observedBodyBytes": 7847,
+          "complete": true,
+          "wireBytes": 8259
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/js/whatsapp_float.js?v=0b09fe3a859d6c86",
+          "type": "Script",
+          "status": 200,
+          "contentLength": 6838,
+          "observedBodyBytes": 6838,
+          "complete": true,
+          "wireBytes": 7256
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/js/catalog.js?v=739c9dd21b67f2bf",
+          "type": "Script",
+          "status": 200,
+          "contentLength": 17258,
+          "observedBodyBytes": 17258,
+          "complete": true,
+          "wireBytes": 17671
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/js/inline_reels.js?v=c42b4ea751458f07",
+          "type": "Script",
+          "status": 200,
+          "contentLength": 31900,
+          "observedBodyBytes": 31900,
+          "complete": true,
+          "wireBytes": 32317
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/vendor/bootstrap/bootstrap.bundle.min.js?v=0833b2e9c3a26c25",
+          "type": "Script",
+          "status": 200,
+          "contentLength": 80721,
+          "observedBodyBytes": 80721,
+          "complete": true,
+          "wireBytes": 81146
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/reels/posters/v15044gf0000d28k8pnog65o08bn9iug.MP4.96d5b318817abdda.160.webp?v=bffc11ef90705e7e",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 51656,
+          "observedBodyBytes": 51656,
+          "complete": true,
+          "wireBytes": 52100
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/reels/posters/v12044gd0000cvdk3hfog65urc6s4vug.MP4.ce2857e7ac70be92.160.webp?v=0bc67955ec674a50",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 49142,
+          "observedBodyBytes": 49142,
+          "complete": true,
+          "wireBytes": 49587
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/reels/posters/v15044gf0000d6celhvog65hp28gmueg.MP4.1e89bc3ffec35a31.160.webp?v=0734b7cbcee9485d",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 65580,
+          "observedBodyBytes": 65580,
+          "complete": true,
+          "wireBytes": 66025
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/reels/v15044gf0000d28k8pnog65o08bn9iug.MP4",
+          "type": "Media",
+          "status": 206,
+          "contentLength": 1427037,
+          "observedBodyBytes": 851099
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/favicon.ico?v=5ae6e6301bd609ea",
+          "type": "Other",
+          "status": 200,
+          "contentLength": 15086,
+          "observedBodyBytes": 15086,
+          "complete": true,
+          "wireBytes": 15482
+        }
+      ],
+      "errors": []
+    },
+    {
+      "profile": {
+        "name": "mobile",
+        "width": 390,
+        "height": 844,
+        "mbps": 1.6,
+        "latency": 150,
+        "cpu": 4
+      },
+      "run": 2,
+      "variant": "before",
+      "speed": {
+        "lcp": [
+          {
+            "time": 23732,
+            "url": "http://127.0.0.1:5001/static/optimized/assets/hero_bg_mobile_compact.png.webp?v=e74d6e4fb76f3967",
+            "tag": "HEADER"
+          }
+        ],
+        "cls": 0.02146886333242912,
+        "longTasks": [
+          113,
+          51,
+          59,
+          90
+        ]
+      },
+      "navigation": {
+        "name": "http://127.0.0.1:5001/",
+        "entryType": "navigation",
+        "startTime": 0,
+        "duration": 23608.10000000894,
+        "initiatorType": "navigation",
+        "deliveryType": "",
+        "nextHopProtocol": "http/1.1",
+        "renderBlockingStatus": "non-blocking",
+        "contentEncoding": "",
+        "workerStart": 0,
+        "workerRouterEvaluationStart": 0,
+        "workerCacheLookupStart": 0,
+        "workerMatchedSourceType": "",
+        "workerFinalSourceType": "",
+        "redirectStart": 0,
+        "redirectEnd": 0,
+        "fetchStart": 0.29999999701976776,
+        "domainLookupStart": 0.29999999701976776,
+        "domainLookupEnd": 0.29999999701976776,
+        "connectStart": 0.29999999701976776,
+        "secureConnectionStart": 0,
+        "connectEnd": 0.29999999701976776,
+        "requestStart": 0.7999999970197678,
+        "responseStart": 2.2999999970197678,
+        "firstInterimResponseStart": 0,
+        "finalResponseHeadersStart": 2.2999999970197678,
+        "responseEnd": 13628.90000000596,
+        "transferSize": 1006564,
+        "encodedBodySize": 1006264,
+        "decodedBodySize": 1006264,
+        "responseStatus": 200,
+        "serverTiming": [],
+        "unloadEventStart": 0,
+        "unloadEventEnd": 0,
+        "domInteractive": 14529.70000000298,
+        "domContentLoadedEventStart": 15216.10000000894,
+        "domContentLoadedEventEnd": 15293,
+        "domComplete": 23605.20000000298,
+        "loadEventStart": 23605.20000000298,
+        "loadEventEnd": 23608.10000000894,
+        "type": "navigate",
+        "redirectCount": 0,
+        "activationStart": 0,
+        "criticalCHRestart": 0,
+        "notRestoredReasons": null,
+        "confidence": {
+          "randomizedTriggerRate": 0.4994798,
+          "value": "high"
+        }
+      },
+      "paint": [
+        {
+          "name": "first-paint",
+          "time": 3680
+        },
+        {
+          "name": "first-contentful-paint",
+          "time": 3680
+        }
+      ],
+      "observedAt": 29663.29999999702,
+      "completedBytes": 5308492,
+      "observedBytes": 5308492,
+      "assets": [
+        {
+          "url": "http://127.0.0.1:5001/",
+          "type": "Document",
+          "status": 200,
+          "contentLength": 1006264,
+          "observedBodyBytes": 0,
+          "complete": true,
+          "wireBytes": 1006656
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/assets/ce_logo_full.png?v=30e13349e9bbaf27",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 46319,
+          "observedBodyBytes": 46319,
+          "complete": true,
+          "wireBytes": 46716
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/assets/hero_bg_mobile_compact.png.webp?v=e74d6e4fb76f3967",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 1847234,
+          "observedBodyBytes": 1847234,
+          "complete": true,
+          "wireBytes": 1847652
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/css/bootstrap.site.min.css?v=849a36fc34b197ab",
+          "type": "Stylesheet",
+          "status": 200,
+          "contentLength": 50966,
+          "observedBodyBytes": 50966,
+          "complete": true,
+          "wireBytes": 51384
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/vendor/fonts/lato-400-latin.woff2?v=d4ae5188a65370ec",
+          "type": "Font",
+          "status": 200,
+          "contentLength": 13980,
+          "observedBodyBytes": 13980,
+          "complete": true,
+          "wireBytes": 14383
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/css/styles/fonts.css?v=2d1b5c5fdba8e32d",
+          "type": "Stylesheet",
+          "status": 200,
+          "contentLength": 4059,
+          "observedBodyBytes": 4059,
+          "complete": true,
+          "wireBytes": 4462
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/css/styles/base.css?v=192fb0adc4e78ebd",
+          "type": "Stylesheet",
+          "status": 200,
+          "contentLength": 24299,
+          "observedBodyBytes": 24299,
+          "complete": true,
+          "wireBytes": 24703
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/vendor/fonts/playfair-display-latin.woff2?v=5d91eb5d522a0308",
+          "type": "Font",
+          "status": 200,
+          "contentLength": 38460,
+          "observedBodyBytes": 38460,
+          "complete": true,
+          "wireBytes": 38871
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/css/styles/layout.css?v=3954370ff14a8445",
+          "type": "Stylesheet",
+          "status": 200,
+          "contentLength": 85929,
+          "observedBodyBytes": 85929,
+          "complete": true,
+          "wireBytes": 86335
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/css/styles/nav.css?v=01bb38ff08049816",
+          "type": "Stylesheet",
+          "status": 200,
+          "contentLength": 9907,
+          "observedBodyBytes": 9907,
+          "complete": true,
+          "wireBytes": 10306
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/css/styles/home_catalog.css?v=db86df7681f555e7",
+          "type": "Stylesheet",
+          "status": 200,
+          "contentLength": 5363,
+          "observedBodyBytes": 5363,
+          "complete": true,
+          "wireBytes": 5773
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/css/styles/inline_reels.css?v=042d474f1bda5cfe",
+          "type": "Stylesheet",
+          "status": 200,
+          "contentLength": 3929,
+          "observedBodyBytes": 3929,
+          "complete": true,
+          "wireBytes": 4339
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/css/styles/home_reels.css?v=44b374e8fd93288e",
+          "type": "Stylesheet",
+          "status": 200,
+          "contentLength": 1089,
+          "observedBodyBytes": 1089,
+          "complete": true,
+          "wireBytes": 1495
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/assets/ce_logo_shape.png?v=1f5c69370e675783",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 123588,
+          "observedBodyBytes": 123588,
+          "complete": true,
+          "wireBytes": 123989
+        },
+        {
+          "url": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='.34'/%3E%3C/svg%3E",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 0,
+          "observedBodyBytes": 0,
+          "complete": true,
+          "wireBytes": 0
+        },
+        {
+          "url": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M6 6l8 8M14 6l-8 8' stroke='%23d7c07a' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 0,
+          "observedBodyBytes": 0,
+          "complete": true,
+          "wireBytes": 0
+        },
+        {
+          "url": "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(215, 192, 122, 0.95)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 0,
+          "observedBodyBytes": 0,
+          "complete": true,
+          "wireBytes": 0
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/101SB.jpg/160.webp?v=dece151ab3e71c3b",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 4438,
+          "observedBodyBytes": 4438,
+          "complete": true,
+          "wireBytes": 4826
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/233SB.jpg/160.webp?v=88ac62034e38f7ba",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 4848,
+          "observedBodyBytes": 4848,
+          "complete": true,
+          "wireBytes": 5235
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/vendor/fonts/lato-700-latin.woff2?v=7a7ce1a34f3e9944",
+          "type": "Font",
+          "status": 200,
+          "contentLength": 14168,
+          "observedBodyBytes": 14168,
+          "complete": true,
+          "wireBytes": 14571
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/1462LSB.jpg/160.webp?v=8cbcf8bc0cc262e8",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 9630,
+          "observedBodyBytes": 9630,
+          "complete": true,
+          "wireBytes": 10019
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/164SB.jpg/160.webp?v=52bf1be55a34827a",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 6410,
+          "observedBodyBytes": 6410,
+          "complete": true,
+          "wireBytes": 6798
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/1126SB.jpg/160.webp?v=41113ca7db0b502b",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 11368,
+          "observedBodyBytes": 11368,
+          "complete": true,
+          "wireBytes": 11758
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/1092LSB.jpg/160.webp?v=d108541ce71f59a6",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 12540,
+          "observedBodyBytes": 12540,
+          "complete": true,
+          "wireBytes": 12931
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/1665SB.jpg/160.webp?v=98cac0bd080e0480",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 10094,
+          "observedBodyBytes": 10094,
+          "complete": true,
+          "wireBytes": 10483
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/1036WB.jpg/160.webp?v=2b5948413c20883b",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 12126,
+          "observedBodyBytes": 12126,
+          "complete": true,
+          "wireBytes": 12516
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/1114NR.jpg/160.webp?v=d0967cb365809b08",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 7548,
+          "observedBodyBytes": 7548,
+          "complete": true,
+          "wireBytes": 7936
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/1541WBSET.jpg/160.webp?v=23b2933a3b098c21",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 21096,
+          "observedBodyBytes": 21096,
+          "complete": true,
+          "wireBytes": 21486
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/101SB.jpg/320.webp?v=748165b7c765dc1f",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 11116,
+          "observedBodyBytes": 11116,
+          "complete": true,
+          "wireBytes": 11506
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/102SB.jpg/320.webp?v=21c1d8a19aa473e5",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 10844,
+          "observedBodyBytes": 10844,
+          "complete": true,
+          "wireBytes": 11234
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/103SB.jpg/320.webp?v=c0cd792cd4c1642a",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 11964,
+          "observedBodyBytes": 11964,
+          "complete": true,
+          "wireBytes": 12353
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/104SB.jpg/320.webp?v=b446223ef2a581c5",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 17096,
+          "observedBodyBytes": 17096,
+          "complete": true,
+          "wireBytes": 17485
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/105SB.jpg/320.webp?v=c434cc46b5fb02e3",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 21410,
+          "observedBodyBytes": 21410,
+          "complete": true,
+          "wireBytes": 21800
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/106SB.jpg/320.webp?v=65e5dd5606545b3a",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 24126,
+          "observedBodyBytes": 24126,
+          "complete": true,
+          "wireBytes": 24515
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/107SB.jpg/320.webp?v=ca67069c4c832056",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 28178,
+          "observedBodyBytes": 28178,
+          "complete": true,
+          "wireBytes": 28568
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/108SB.jpg/320.webp?v=cdd7afa9b025cab0",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 37030,
+          "observedBodyBytes": 37030,
+          "complete": true,
+          "wireBytes": 37420
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/js/whatsapp_float.js?v=0b09fe3a859d6c86",
+          "type": "Script",
+          "status": 200,
+          "contentLength": 6838,
+          "observedBodyBytes": 6838,
+          "complete": true,
+          "wireBytes": 7256
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/js/scroll_cue.js?v=425cfee0cac3d496",
+          "type": "Script",
+          "status": 200,
+          "contentLength": 7847,
+          "observedBodyBytes": 7847,
+          "complete": true,
+          "wireBytes": 8259
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/js/home_reels.js?v=3269c62a345464ba",
+          "type": "Script",
+          "status": 200,
+          "contentLength": 202,
+          "observedBodyBytes": 202,
+          "complete": true,
+          "wireBytes": 611
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/js/catalog.js?v=739c9dd21b67f2bf",
+          "type": "Script",
+          "status": 200,
+          "contentLength": 17258,
+          "observedBodyBytes": 17258,
+          "complete": true,
+          "wireBytes": 17671
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/js/inline_reels.js?v=c42b4ea751458f07",
+          "type": "Script",
+          "status": 200,
+          "contentLength": 31900,
+          "observedBodyBytes": 31900,
+          "complete": true,
+          "wireBytes": 32317
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/reels/posters/v12044gd0000cvdk3hfog65urc6s4vug.MP4.ce2857e7ac70be92.160.webp?v=0bc67955ec674a50",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 49142,
+          "observedBodyBytes": 49142,
+          "complete": true,
+          "wireBytes": 49587
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/reels/posters/v15044gf0000d28k8pnog65o08bn9iug.MP4.96d5b318817abdda.160.webp?v=bffc11ef90705e7e",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 51656,
+          "observedBodyBytes": 51656,
+          "complete": true,
+          "wireBytes": 52100
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/reels/posters/v15044gf0000d6celhvog65hp28gmueg.MP4.1e89bc3ffec35a31.160.webp?v=0734b7cbcee9485d",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 65580,
+          "observedBodyBytes": 65580,
+          "complete": true,
+          "wireBytes": 66025
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/reels/v15044gf0000d28k8pnog65o08bn9iug.MP4",
+          "type": "Media",
+          "status": 206,
+          "contentLength": 1427037,
+          "observedBodyBytes": 1427037,
+          "complete": true,
+          "wireBytes": 1427534
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/vendor/bootstrap/bootstrap.bundle.min.js?v=0833b2e9c3a26c25",
+          "type": "Script",
+          "status": 200,
+          "contentLength": 80721,
+          "observedBodyBytes": 80721,
+          "complete": true,
+          "wireBytes": 81146
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/favicon.ico?v=5ae6e6301bd609ea",
+          "type": "Other",
+          "status": 200,
+          "contentLength": 15086,
+          "observedBodyBytes": 15086,
+          "complete": true,
+          "wireBytes": 15482
+        }
+      ],
+      "errors": []
+    },
+    {
+      "profile": {
+        "name": "mobile",
+        "width": 390,
+        "height": 844,
+        "mbps": 1.6,
+        "latency": 150,
+        "cpu": 4
+      },
+      "run": 3,
+      "variant": "before",
+      "speed": {
+        "lcp": [
+          {
+            "time": 23720,
+            "url": "http://127.0.0.1:5001/static/optimized/assets/hero_bg_mobile_compact.png.webp?v=e74d6e4fb76f3967",
+            "tag": "HEADER"
+          }
+        ],
+        "cls": 0.022184324010305706,
+        "longTasks": [
+          169,
+          59,
+          64,
+          115
+        ]
+      },
+      "navigation": {
+        "name": "http://127.0.0.1:5001/",
+        "entryType": "navigation",
+        "startTime": 0,
+        "duration": 23622.69999998808,
+        "initiatorType": "navigation",
+        "deliveryType": "",
+        "nextHopProtocol": "http/1.1",
+        "renderBlockingStatus": "non-blocking",
+        "contentEncoding": "",
+        "workerStart": 0,
+        "workerRouterEvaluationStart": 0,
+        "workerCacheLookupStart": 0,
+        "workerMatchedSourceType": "",
+        "workerFinalSourceType": "",
+        "redirectStart": 0,
+        "redirectEnd": 0,
+        "fetchStart": 1.2999999970197678,
+        "domainLookupStart": 1.2999999970197678,
+        "domainLookupEnd": 1.2999999970197678,
+        "connectStart": 1.2999999970197678,
+        "secureConnectionStart": 0,
+        "connectEnd": 1.2999999970197678,
+        "requestStart": 2.699999988079071,
+        "responseStart": 4.5999999940395355,
+        "firstInterimResponseStart": 0,
+        "finalResponseHeadersStart": 4.5999999940395355,
+        "responseEnd": 13610.699999988079,
+        "transferSize": 1006564,
+        "encodedBodySize": 1006264,
+        "decodedBodySize": 1006264,
+        "responseStatus": 200,
+        "serverTiming": [],
+        "unloadEventStart": 0,
+        "unloadEventEnd": 0,
+        "domInteractive": 14544.699999988079,
+        "domContentLoadedEventStart": 15142.89999999106,
+        "domContentLoadedEventEnd": 15231.39999999106,
+        "domComplete": 23613.29999999702,
+        "loadEventStart": 23613.29999999702,
+        "loadEventEnd": 23622.69999998808,
+        "type": "navigate",
+        "redirectCount": 0,
+        "activationStart": 0,
+        "criticalCHRestart": 0,
+        "notRestoredReasons": null,
+        "confidence": {
+          "randomizedTriggerRate": 0.4994798,
+          "value": "low"
+        }
+      },
+      "paint": [
+        {
+          "name": "first-paint",
+          "time": 8304
+        },
+        {
+          "name": "first-contentful-paint",
+          "time": 8304
+        }
+      ],
+      "observedAt": 29694.79999999702,
+      "completedBytes": 5308492,
+      "observedBytes": 5308492,
+      "assets": [
+        {
+          "url": "http://127.0.0.1:5001/",
+          "type": "Document",
+          "status": 200,
+          "contentLength": 1006264,
+          "observedBodyBytes": 0,
+          "complete": true,
+          "wireBytes": 1006656
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/assets/hero_bg_mobile_compact.png.webp?v=e74d6e4fb76f3967",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 1847234,
+          "observedBodyBytes": 1847234,
+          "complete": true,
+          "wireBytes": 1847652
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/css/bootstrap.site.min.css?v=849a36fc34b197ab",
+          "type": "Stylesheet",
+          "status": 200,
+          "contentLength": 50966,
+          "observedBodyBytes": 50966,
+          "complete": true,
+          "wireBytes": 51384
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/assets/ce_logo_full.png?v=30e13349e9bbaf27",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 46319,
+          "observedBodyBytes": 46319,
+          "complete": true,
+          "wireBytes": 46716
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/vendor/fonts/lato-400-latin.woff2?v=d4ae5188a65370ec",
+          "type": "Font",
+          "status": 200,
+          "contentLength": 13980,
+          "observedBodyBytes": 13980,
+          "complete": true,
+          "wireBytes": 14383
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/css/styles/fonts.css?v=2d1b5c5fdba8e32d",
+          "type": "Stylesheet",
+          "status": 200,
+          "contentLength": 4059,
+          "observedBodyBytes": 4059,
+          "complete": true,
+          "wireBytes": 4462
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/css/styles/base.css?v=192fb0adc4e78ebd",
+          "type": "Stylesheet",
+          "status": 200,
+          "contentLength": 24299,
+          "observedBodyBytes": 24299,
+          "complete": true,
+          "wireBytes": 24703
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/vendor/fonts/playfair-display-latin.woff2?v=5d91eb5d522a0308",
+          "type": "Font",
+          "status": 200,
+          "contentLength": 38460,
+          "observedBodyBytes": 38460,
+          "complete": true,
+          "wireBytes": 38871
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/css/styles/layout.css?v=3954370ff14a8445",
+          "type": "Stylesheet",
+          "status": 200,
+          "contentLength": 85929,
+          "observedBodyBytes": 85929,
+          "complete": true,
+          "wireBytes": 86335
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/css/styles/nav.css?v=01bb38ff08049816",
+          "type": "Stylesheet",
+          "status": 200,
+          "contentLength": 9907,
+          "observedBodyBytes": 9907,
+          "complete": true,
+          "wireBytes": 10306
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/css/styles/home_catalog.css?v=db86df7681f555e7",
+          "type": "Stylesheet",
+          "status": 200,
+          "contentLength": 5363,
+          "observedBodyBytes": 5363,
+          "complete": true,
+          "wireBytes": 5773
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/css/styles/inline_reels.css?v=042d474f1bda5cfe",
+          "type": "Stylesheet",
+          "status": 200,
+          "contentLength": 3929,
+          "observedBodyBytes": 3929,
+          "complete": true,
+          "wireBytes": 4339
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/css/styles/home_reels.css?v=44b374e8fd93288e",
+          "type": "Stylesheet",
+          "status": 200,
+          "contentLength": 1089,
+          "observedBodyBytes": 1089,
+          "complete": true,
+          "wireBytes": 1495
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/assets/ce_logo_shape.png?v=1f5c69370e675783",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 123588,
+          "observedBodyBytes": 123588,
+          "complete": true,
+          "wireBytes": 123989
+        },
+        {
+          "url": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='.34'/%3E%3C/svg%3E",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 0,
+          "observedBodyBytes": 0,
+          "complete": true,
+          "wireBytes": 0
+        },
+        {
+          "url": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M6 6l8 8M14 6l-8 8' stroke='%23d7c07a' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 0,
+          "observedBodyBytes": 0,
+          "complete": true,
+          "wireBytes": 0
+        },
+        {
+          "url": "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(215, 192, 122, 0.95)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 0,
+          "observedBodyBytes": 0,
+          "complete": true,
+          "wireBytes": 0
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/233SB.jpg/160.webp?v=88ac62034e38f7ba",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 4848,
+          "observedBodyBytes": 4848,
+          "complete": true,
+          "wireBytes": 5235
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/101SB.jpg/160.webp?v=dece151ab3e71c3b",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 4438,
+          "observedBodyBytes": 4438,
+          "complete": true,
+          "wireBytes": 4826
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/vendor/fonts/lato-700-latin.woff2?v=7a7ce1a34f3e9944",
+          "type": "Font",
+          "status": 200,
+          "contentLength": 14168,
+          "observedBodyBytes": 14168,
+          "complete": true,
+          "wireBytes": 14571
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/1462LSB.jpg/160.webp?v=8cbcf8bc0cc262e8",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 9630,
+          "observedBodyBytes": 9630,
+          "complete": true,
+          "wireBytes": 10019
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/164SB.jpg/160.webp?v=52bf1be55a34827a",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 6410,
+          "observedBodyBytes": 6410,
+          "complete": true,
+          "wireBytes": 6798
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/1126SB.jpg/160.webp?v=41113ca7db0b502b",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 11368,
+          "observedBodyBytes": 11368,
+          "complete": true,
+          "wireBytes": 11758
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/1092LSB.jpg/160.webp?v=d108541ce71f59a6",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 12540,
+          "observedBodyBytes": 12540,
+          "complete": true,
+          "wireBytes": 12931
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/1665SB.jpg/160.webp?v=98cac0bd080e0480",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 10094,
+          "observedBodyBytes": 10094,
+          "complete": true,
+          "wireBytes": 10483
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/1036WB.jpg/160.webp?v=2b5948413c20883b",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 12126,
+          "observedBodyBytes": 12126,
+          "complete": true,
+          "wireBytes": 12516
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/1114NR.jpg/160.webp?v=d0967cb365809b08",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 7548,
+          "observedBodyBytes": 7548,
+          "complete": true,
+          "wireBytes": 7936
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/1541WBSET.jpg/160.webp?v=23b2933a3b098c21",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 21096,
+          "observedBodyBytes": 21096,
+          "complete": true,
+          "wireBytes": 21486
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/101SB.jpg/320.webp?v=748165b7c765dc1f",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 11116,
+          "observedBodyBytes": 11116,
+          "complete": true,
+          "wireBytes": 11506
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/102SB.jpg/320.webp?v=21c1d8a19aa473e5",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 10844,
+          "observedBodyBytes": 10844,
+          "complete": true,
+          "wireBytes": 11234
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/103SB.jpg/320.webp?v=c0cd792cd4c1642a",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 11964,
+          "observedBodyBytes": 11964,
+          "complete": true,
+          "wireBytes": 12353
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/104SB.jpg/320.webp?v=b446223ef2a581c5",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 17096,
+          "observedBodyBytes": 17096,
+          "complete": true,
+          "wireBytes": 17485
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/105SB.jpg/320.webp?v=c434cc46b5fb02e3",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 21410,
+          "observedBodyBytes": 21410,
+          "complete": true,
+          "wireBytes": 21800
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/106SB.jpg/320.webp?v=65e5dd5606545b3a",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 24126,
+          "observedBodyBytes": 24126,
+          "complete": true,
+          "wireBytes": 24515
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/107SB.jpg/320.webp?v=ca67069c4c832056",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 28178,
+          "observedBodyBytes": 28178,
+          "complete": true,
+          "wireBytes": 28568
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/108SB.jpg/320.webp?v=cdd7afa9b025cab0",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 37030,
+          "observedBodyBytes": 37030,
+          "complete": true,
+          "wireBytes": 37420
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/js/scroll_cue.js?v=425cfee0cac3d496",
+          "type": "Script",
+          "status": 200,
+          "contentLength": 7847,
+          "observedBodyBytes": 7847,
+          "complete": true,
+          "wireBytes": 8259
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/js/whatsapp_float.js?v=0b09fe3a859d6c86",
+          "type": "Script",
+          "status": 200,
+          "contentLength": 6838,
+          "observedBodyBytes": 6838,
+          "complete": true,
+          "wireBytes": 7256
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/js/home_reels.js?v=3269c62a345464ba",
+          "type": "Script",
+          "status": 200,
+          "contentLength": 202,
+          "observedBodyBytes": 202,
+          "complete": true,
+          "wireBytes": 611
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/js/catalog.js?v=739c9dd21b67f2bf",
+          "type": "Script",
+          "status": 200,
+          "contentLength": 17258,
+          "observedBodyBytes": 17258,
+          "complete": true,
+          "wireBytes": 17671
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/js/inline_reels.js?v=c42b4ea751458f07",
+          "type": "Script",
+          "status": 200,
+          "contentLength": 31900,
+          "observedBodyBytes": 31900,
+          "complete": true,
+          "wireBytes": 32317
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/reels/posters/v15044gf0000d28k8pnog65o08bn9iug.MP4.96d5b318817abdda.160.webp?v=bffc11ef90705e7e",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 51656,
+          "observedBodyBytes": 51656,
+          "complete": true,
+          "wireBytes": 52100
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/reels/posters/v15044gf0000d6celhvog65hp28gmueg.MP4.1e89bc3ffec35a31.160.webp?v=0734b7cbcee9485d",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 65580,
+          "observedBodyBytes": 65580,
+          "complete": true,
+          "wireBytes": 66025
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/reels/posters/v12044gd0000cvdk3hfog65urc6s4vug.MP4.ce2857e7ac70be92.160.webp?v=0bc67955ec674a50",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 49142,
+          "observedBodyBytes": 49142,
+          "complete": true,
+          "wireBytes": 49587
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/reels/v15044gf0000d28k8pnog65o08bn9iug.MP4",
+          "type": "Media",
+          "status": 206,
+          "contentLength": 1427037,
+          "observedBodyBytes": 1427037,
+          "complete": true,
+          "wireBytes": 1427534
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/vendor/bootstrap/bootstrap.bundle.min.js?v=0833b2e9c3a26c25",
+          "type": "Script",
+          "status": 200,
+          "contentLength": 80721,
+          "observedBodyBytes": 80721,
+          "complete": true,
+          "wireBytes": 81146
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/favicon.ico?v=5ae6e6301bd609ea",
+          "type": "Other",
+          "status": 200,
+          "contentLength": 15086,
+          "observedBodyBytes": 15086,
+          "complete": true,
+          "wireBytes": 15482
+        }
+      ],
+      "errors": []
+    },
+    {
+      "profile": {
+        "name": "mobile",
+        "width": 390,
+        "height": 844,
+        "mbps": 1.6,
+        "latency": 150,
+        "cpu": 4
+      },
+      "run": 3,
+      "variant": "after",
+      "speed": {
+        "lcp": [
+          {
+            "time": 11124,
+            "url": "http://127.0.0.1:5001/static/optimized/heroes/hero_bg_mobile_compact.png.webp?v=fcac7316addf2dd3",
+            "tag": "HEADER"
+          }
+        ],
+        "cls": 0.023196109530060433,
+        "longTasks": [
+          83,
+          55,
+          67,
+          99
+        ]
+      },
+      "navigation": {
+        "name": "http://127.0.0.1:5001/",
+        "entryType": "navigation",
+        "startTime": 0,
+        "duration": 14590.60000000894,
+        "initiatorType": "navigation",
+        "deliveryType": "",
+        "nextHopProtocol": "http/1.1",
+        "renderBlockingStatus": "non-blocking",
+        "contentEncoding": "",
+        "workerStart": 0,
+        "workerRouterEvaluationStart": 0,
+        "workerCacheLookupStart": 0,
+        "workerMatchedSourceType": "",
+        "workerFinalSourceType": "",
+        "redirectStart": 0,
+        "redirectEnd": 0,
+        "fetchStart": 0.29999999701976776,
+        "domainLookupStart": 0.29999999701976776,
+        "domainLookupEnd": 0.29999999701976776,
+        "connectStart": 0.29999999701976776,
+        "secureConnectionStart": 0,
+        "connectEnd": 0.29999999701976776,
+        "requestStart": 0.7999999970197678,
+        "responseStart": 179.29999999701977,
+        "firstInterimResponseStart": 0,
+        "finalResponseHeadersStart": 179.29999999701977,
+        "responseEnd": 12283.90000000596,
+        "transferSize": 1006659,
+        "encodedBodySize": 1006359,
+        "decodedBodySize": 1006359,
+        "responseStatus": 200,
+        "serverTiming": [],
+        "unloadEventStart": 0,
+        "unloadEventEnd": 0,
+        "domInteractive": 13039.20000000298,
+        "domContentLoadedEventStart": 13152.29999999702,
+        "domContentLoadedEventEnd": 13235.5,
+        "domComplete": 14587.40000000596,
+        "loadEventStart": 14587.40000000596,
+        "loadEventEnd": 14590.60000000894,
+        "type": "navigate",
+        "redirectCount": 0,
+        "activationStart": 0,
+        "criticalCHRestart": 0,
+        "notRestoredReasons": null,
+        "confidence": {
+          "randomizedTriggerRate": 0.4994798,
+          "value": "high"
+        }
+      },
+      "paint": [
+        {
+          "name": "first-paint",
+          "time": 3292
+        },
+        {
+          "name": "first-contentful-paint",
+          "time": 3292
+        }
+      ],
+      "observedAt": 20671.5,
+      "completedBytes": 2729906,
+      "observedBytes": 3581005,
+      "assets": [
+        {
+          "url": "http://127.0.0.1:5001/",
+          "type": "Document",
+          "status": 200,
+          "contentLength": 1006359,
+          "observedBodyBytes": 0,
+          "complete": true,
+          "wireBytes": 1006764
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/css/bootstrap.site.min.css?v=849a36fc34b197ab",
+          "type": "Stylesheet",
+          "status": 200,
+          "contentLength": 50966,
+          "observedBodyBytes": 50966,
+          "complete": true,
+          "wireBytes": 51384
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/css/styles/fonts.css?v=2d1b5c5fdba8e32d",
+          "type": "Stylesheet",
+          "status": 200,
+          "contentLength": 4059,
+          "observedBodyBytes": 4059,
+          "complete": true,
+          "wireBytes": 4462
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/heroes/hero_bg_mobile_compact.png.webp?v=fcac7316addf2dd3",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 696076,
+          "observedBodyBytes": 696076,
+          "complete": true,
+          "wireBytes": 696492
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/css/styles/base.css?v=192fb0adc4e78ebd",
+          "type": "Stylesheet",
+          "status": 200,
+          "contentLength": 24299,
+          "observedBodyBytes": 24299,
+          "complete": true,
+          "wireBytes": 24703
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/vendor/fonts/lato-400-latin.woff2?v=d4ae5188a65370ec",
+          "type": "Font",
+          "status": 200,
+          "contentLength": 13980,
+          "observedBodyBytes": 13980,
+          "complete": true,
+          "wireBytes": 14383
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/css/styles/layout.css?v=3954370ff14a8445",
+          "type": "Stylesheet",
+          "status": 200,
+          "contentLength": 85929,
+          "observedBodyBytes": 85929,
+          "complete": true,
+          "wireBytes": 86335
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/vendor/fonts/playfair-display-latin.woff2?v=5d91eb5d522a0308",
+          "type": "Font",
+          "status": 200,
+          "contentLength": 38460,
+          "observedBodyBytes": 38460,
+          "complete": true,
+          "wireBytes": 38871
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/css/styles/nav.css?v=01bb38ff08049816",
+          "type": "Stylesheet",
+          "status": 200,
+          "contentLength": 9907,
+          "observedBodyBytes": 9907,
+          "complete": true,
+          "wireBytes": 10306
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/css/styles/home_catalog.css?v=db86df7681f555e7",
+          "type": "Stylesheet",
+          "status": 200,
+          "contentLength": 5363,
+          "observedBodyBytes": 5363,
+          "complete": true,
+          "wireBytes": 5773
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/css/styles/inline_reels.css?v=042d474f1bda5cfe",
+          "type": "Stylesheet",
+          "status": 200,
+          "contentLength": 3929,
+          "observedBodyBytes": 3929,
+          "complete": true,
+          "wireBytes": 4339
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/css/styles/home_reels.css?v=44b374e8fd93288e",
+          "type": "Stylesheet",
+          "status": 200,
+          "contentLength": 1089,
+          "observedBodyBytes": 1089,
+          "complete": true,
+          "wireBytes": 1495
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/assets/ce_logo_full.png?v=30e13349e9bbaf27",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 46319,
+          "observedBodyBytes": 46319,
+          "complete": true,
+          "wireBytes": 46716
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/assets/ce_logo_shape.png?v=1f5c69370e675783",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 123588,
+          "observedBodyBytes": 123588,
+          "complete": true,
+          "wireBytes": 123989
+        },
+        {
+          "url": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='.34'/%3E%3C/svg%3E",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 0,
+          "observedBodyBytes": 0,
+          "complete": true,
+          "wireBytes": 0
+        },
+        {
+          "url": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M6 6l8 8M14 6l-8 8' stroke='%23d7c07a' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 0,
+          "observedBodyBytes": 0,
+          "complete": true,
+          "wireBytes": 0
+        },
+        {
+          "url": "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(215, 192, 122, 0.95)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 0,
+          "observedBodyBytes": 0,
+          "complete": true,
+          "wireBytes": 0
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/101SB.jpg/160.webp?v=dece151ab3e71c3b",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 4438,
+          "observedBodyBytes": 4438,
+          "complete": true,
+          "wireBytes": 4826
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/233SB.jpg/160.webp?v=88ac62034e38f7ba",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 4848,
+          "observedBodyBytes": 4848,
+          "complete": true,
+          "wireBytes": 5235
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/vendor/fonts/lato-700-latin.woff2?v=7a7ce1a34f3e9944",
+          "type": "Font",
+          "status": 200,
+          "contentLength": 14168,
+          "observedBodyBytes": 14168,
+          "complete": true,
+          "wireBytes": 14571
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/1462LSB.jpg/160.webp?v=8cbcf8bc0cc262e8",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 9630,
+          "observedBodyBytes": 9630,
+          "complete": true,
+          "wireBytes": 10019
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/164SB.jpg/160.webp?v=52bf1be55a34827a",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 6410,
+          "observedBodyBytes": 6410,
+          "complete": true,
+          "wireBytes": 6798
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/1126SB.jpg/160.webp?v=41113ca7db0b502b",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 11368,
+          "observedBodyBytes": 11368,
+          "complete": true,
+          "wireBytes": 11758
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/1092LSB.jpg/160.webp?v=d108541ce71f59a6",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 12540,
+          "observedBodyBytes": 12540,
+          "complete": true,
+          "wireBytes": 12931
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/1665SB.jpg/160.webp?v=98cac0bd080e0480",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 10094,
+          "observedBodyBytes": 10094,
+          "complete": true,
+          "wireBytes": 10483
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/1036WB.jpg/160.webp?v=2b5948413c20883b",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 12126,
+          "observedBodyBytes": 12126,
+          "complete": true,
+          "wireBytes": 12516
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/1114NR.jpg/160.webp?v=d0967cb365809b08",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 7548,
+          "observedBodyBytes": 7548,
+          "complete": true,
+          "wireBytes": 7936
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/1541WBSET.jpg/160.webp?v=23b2933a3b098c21",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 21096,
+          "observedBodyBytes": 21096,
+          "complete": true,
+          "wireBytes": 21486
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/101SB.jpg/320.webp?v=748165b7c765dc1f",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 11116,
+          "observedBodyBytes": 11116,
+          "complete": true,
+          "wireBytes": 11506
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/102SB.jpg/320.webp?v=21c1d8a19aa473e5",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 10844,
+          "observedBodyBytes": 10844,
+          "complete": true,
+          "wireBytes": 11234
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/103SB.jpg/320.webp?v=c0cd792cd4c1642a",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 11964,
+          "observedBodyBytes": 11964,
+          "complete": true,
+          "wireBytes": 12353
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/104SB.jpg/320.webp?v=b446223ef2a581c5",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 17096,
+          "observedBodyBytes": 17096,
+          "complete": true,
+          "wireBytes": 17485
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/105SB.jpg/320.webp?v=c434cc46b5fb02e3",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 21410,
+          "observedBodyBytes": 21410,
+          "complete": true,
+          "wireBytes": 21800
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/106SB.jpg/320.webp?v=65e5dd5606545b3a",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 24126,
+          "observedBodyBytes": 24126,
+          "complete": true,
+          "wireBytes": 24515
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/107SB.jpg/320.webp?v=ca67069c4c832056",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 28178,
+          "observedBodyBytes": 28178,
+          "complete": true,
+          "wireBytes": 28568
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/108SB.jpg/320.webp?v=cdd7afa9b025cab0",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 37030,
+          "observedBodyBytes": 37030,
+          "complete": true,
+          "wireBytes": 37420
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/js/home_reels.js?v=3269c62a345464ba",
+          "type": "Script",
+          "status": 200,
+          "contentLength": 202,
+          "observedBodyBytes": 202,
+          "complete": true,
+          "wireBytes": 611
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/js/scroll_cue.js?v=425cfee0cac3d496",
+          "type": "Script",
+          "status": 200,
+          "contentLength": 7847,
+          "observedBodyBytes": 7847,
+          "complete": true,
+          "wireBytes": 8259
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/js/whatsapp_float.js?v=0b09fe3a859d6c86",
+          "type": "Script",
+          "status": 200,
+          "contentLength": 6838,
+          "observedBodyBytes": 6838,
+          "complete": true,
+          "wireBytes": 7256
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/js/catalog.js?v=739c9dd21b67f2bf",
+          "type": "Script",
+          "status": 200,
+          "contentLength": 17258,
+          "observedBodyBytes": 17258,
+          "complete": true,
+          "wireBytes": 17671
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/js/inline_reels.js?v=c42b4ea751458f07",
+          "type": "Script",
+          "status": 200,
+          "contentLength": 31900,
+          "observedBodyBytes": 31900,
+          "complete": true,
+          "wireBytes": 32317
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/vendor/bootstrap/bootstrap.bundle.min.js?v=0833b2e9c3a26c25",
+          "type": "Script",
+          "status": 200,
+          "contentLength": 80721,
+          "observedBodyBytes": 80721,
+          "complete": true,
+          "wireBytes": 81146
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/reels/posters/v15044gf0000d28k8pnog65o08bn9iug.MP4.96d5b318817abdda.160.webp?v=bffc11ef90705e7e",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 51656,
+          "observedBodyBytes": 51656,
+          "complete": true,
+          "wireBytes": 52100
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/reels/posters/v12044gd0000cvdk3hfog65urc6s4vug.MP4.ce2857e7ac70be92.160.webp?v=0bc67955ec674a50",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 49142,
+          "observedBodyBytes": 49142,
+          "complete": true,
+          "wireBytes": 49587
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/reels/posters/v15044gf0000d6celhvog65hp28gmueg.MP4.1e89bc3ffec35a31.160.webp?v=0734b7cbcee9485d",
+          "type": "Image",
+          "status": 200,
+          "contentLength": 65580,
+          "observedBodyBytes": 65580,
+          "complete": true,
+          "wireBytes": 66025
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/reels/v15044gf0000d28k8pnog65o08bn9iug.MP4",
+          "type": "Media",
+          "status": 206,
+          "contentLength": 1427037,
+          "observedBodyBytes": 851099
+        },
+        {
+          "url": "http://127.0.0.1:5001/static/favicon.ico?v=5ae6e6301bd609ea",
+          "type": "Other",
+          "status": 200,
+          "contentLength": 15086,
+          "observedBodyBytes": 15086,
+          "complete": true,
+          "wireBytes": 15482
+        }
+      ],
+      "errors": []
+    }
+  ],
+  "excludedPair": {
+    "reason": "Unrelated domains/emailing.py edit invalidated the CSS manifest in the third after sample, causing full Bootstrap fallback. Rebuilt the manifest and repeated both samples of pair 3.",
+    "results": [
+      {
+        "profile": {
+          "name": "mobile",
+          "width": 390,
+          "height": 844,
+          "mbps": 1.6,
+          "latency": 150,
+          "cpu": 4
+        },
+        "run": 3,
+        "variant": "before",
+        "speed": {
+          "lcp": [
+            {
+              "time": 23756,
+              "url": "http://127.0.0.1:5001/static/optimized/assets/hero_bg_mobile_compact.png.webp?v=e74d6e4fb76f3967",
+              "tag": "HEADER"
+            }
+          ],
+          "cls": 0.02163095574783493,
+          "longTasks": [
+            90,
+            61,
+            68,
+            100
+          ]
+        },
+        "navigation": {
+          "name": "http://127.0.0.1:5001/",
+          "entryType": "navigation",
+          "startTime": 0,
+          "duration": 23603.39999999106,
+          "initiatorType": "navigation",
+          "deliveryType": "",
+          "nextHopProtocol": "http/1.1",
+          "renderBlockingStatus": "non-blocking",
+          "contentEncoding": "",
+          "workerStart": 0,
+          "workerRouterEvaluationStart": 0,
+          "workerCacheLookupStart": 0,
+          "workerMatchedSourceType": "",
+          "workerFinalSourceType": "",
+          "redirectStart": 0,
+          "redirectEnd": 0,
+          "fetchStart": 0.19999998807907104,
+          "domainLookupStart": 0.19999998807907104,
+          "domainLookupEnd": 0.19999998807907104,
+          "connectStart": 0.19999998807907104,
+          "secureConnectionStart": 0,
+          "connectEnd": 0.19999998807907104,
+          "requestStart": 0.5999999940395355,
+          "responseStart": 2.2999999970197678,
+          "firstInterimResponseStart": 0,
+          "finalResponseHeadersStart": 2.2999999970197678,
+          "responseEnd": 13632.09999999404,
+          "transferSize": 1006564,
+          "encodedBodySize": 1006264,
+          "decodedBodySize": 1006264,
+          "responseStatus": 200,
+          "serverTiming": [],
+          "unloadEventStart": 0,
+          "unloadEventEnd": 0,
+          "domInteractive": 14544,
+          "domContentLoadedEventStart": 15190.89999999106,
+          "domContentLoadedEventEnd": 15275.09999999404,
+          "domComplete": 23600.29999999702,
+          "loadEventStart": 23600.29999999702,
+          "loadEventEnd": 23603.39999999106,
+          "type": "navigate",
+          "redirectCount": 0,
+          "activationStart": 0,
+          "criticalCHRestart": 0,
+          "notRestoredReasons": null,
+          "confidence": {
+            "randomizedTriggerRate": 0.4994798,
+            "value": "high"
+          }
+        },
+        "paint": [
+          {
+            "name": "first-paint",
+            "time": 3612
+          },
+          {
+            "name": "first-contentful-paint",
+            "time": 3612
+          }
+        ],
+        "observedAt": 29658.19999998808,
+        "completedBytes": 5308492,
+        "observedBytes": 5308492,
+        "assets": [
+          {
+            "url": "http://127.0.0.1:5001/",
+            "type": "Document",
+            "status": 200,
+            "contentLength": 1006264,
+            "observedBodyBytes": 0,
+            "complete": true,
+            "wireBytes": 1006656
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/optimized/assets/hero_bg_mobile_compact.png.webp?v=e74d6e4fb76f3967",
+            "type": "Image",
+            "status": 200,
+            "contentLength": 1847234,
+            "observedBodyBytes": 1847234,
+            "complete": true,
+            "wireBytes": 1847652
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/assets/ce_logo_full.png?v=30e13349e9bbaf27",
+            "type": "Image",
+            "status": 200,
+            "contentLength": 46319,
+            "observedBodyBytes": 46319,
+            "complete": true,
+            "wireBytes": 46716
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/css/bootstrap.site.min.css?v=849a36fc34b197ab",
+            "type": "Stylesheet",
+            "status": 200,
+            "contentLength": 50966,
+            "observedBodyBytes": 50966,
+            "complete": true,
+            "wireBytes": 51384
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/vendor/fonts/lato-400-latin.woff2?v=d4ae5188a65370ec",
+            "type": "Font",
+            "status": 200,
+            "contentLength": 13980,
+            "observedBodyBytes": 13980,
+            "complete": true,
+            "wireBytes": 14383
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/css/styles/fonts.css?v=2d1b5c5fdba8e32d",
+            "type": "Stylesheet",
+            "status": 200,
+            "contentLength": 4059,
+            "observedBodyBytes": 4059,
+            "complete": true,
+            "wireBytes": 4462
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/css/styles/base.css?v=192fb0adc4e78ebd",
+            "type": "Stylesheet",
+            "status": 200,
+            "contentLength": 24299,
+            "observedBodyBytes": 24299,
+            "complete": true,
+            "wireBytes": 24703
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/vendor/fonts/playfair-display-latin.woff2?v=5d91eb5d522a0308",
+            "type": "Font",
+            "status": 200,
+            "contentLength": 38460,
+            "observedBodyBytes": 38460,
+            "complete": true,
+            "wireBytes": 38871
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/css/styles/layout.css?v=3954370ff14a8445",
+            "type": "Stylesheet",
+            "status": 200,
+            "contentLength": 85929,
+            "observedBodyBytes": 85929,
+            "complete": true,
+            "wireBytes": 86335
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/css/styles/nav.css?v=01bb38ff08049816",
+            "type": "Stylesheet",
+            "status": 200,
+            "contentLength": 9907,
+            "observedBodyBytes": 9907,
+            "complete": true,
+            "wireBytes": 10306
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/css/styles/home_catalog.css?v=db86df7681f555e7",
+            "type": "Stylesheet",
+            "status": 200,
+            "contentLength": 5363,
+            "observedBodyBytes": 5363,
+            "complete": true,
+            "wireBytes": 5773
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/css/styles/inline_reels.css?v=042d474f1bda5cfe",
+            "type": "Stylesheet",
+            "status": 200,
+            "contentLength": 3929,
+            "observedBodyBytes": 3929,
+            "complete": true,
+            "wireBytes": 4339
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/css/styles/home_reels.css?v=44b374e8fd93288e",
+            "type": "Stylesheet",
+            "status": 200,
+            "contentLength": 1089,
+            "observedBodyBytes": 1089,
+            "complete": true,
+            "wireBytes": 1495
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/assets/ce_logo_shape.png?v=1f5c69370e675783",
+            "type": "Image",
+            "status": 200,
+            "contentLength": 123588,
+            "observedBodyBytes": 123588,
+            "complete": true,
+            "wireBytes": 123989
+          },
+          {
+            "url": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='.34'/%3E%3C/svg%3E",
+            "type": "Image",
+            "status": 200,
+            "contentLength": 0,
+            "observedBodyBytes": 0,
+            "complete": true,
+            "wireBytes": 0
+          },
+          {
+            "url": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M6 6l8 8M14 6l-8 8' stroke='%23d7c07a' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E",
+            "type": "Image",
+            "status": 200,
+            "contentLength": 0,
+            "observedBodyBytes": 0,
+            "complete": true,
+            "wireBytes": 0
+          },
+          {
+            "url": "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(215, 192, 122, 0.95)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e",
+            "type": "Image",
+            "status": 200,
+            "contentLength": 0,
+            "observedBodyBytes": 0,
+            "complete": true,
+            "wireBytes": 0
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/101SB.jpg/160.webp?v=dece151ab3e71c3b",
+            "type": "Image",
+            "status": 200,
+            "contentLength": 4438,
+            "observedBodyBytes": 4438,
+            "complete": true,
+            "wireBytes": 4826
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/233SB.jpg/160.webp?v=88ac62034e38f7ba",
+            "type": "Image",
+            "status": 200,
+            "contentLength": 4848,
+            "observedBodyBytes": 4848,
+            "complete": true,
+            "wireBytes": 5235
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/vendor/fonts/lato-700-latin.woff2?v=7a7ce1a34f3e9944",
+            "type": "Font",
+            "status": 200,
+            "contentLength": 14168,
+            "observedBodyBytes": 14168,
+            "complete": true,
+            "wireBytes": 14571
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/1462LSB.jpg/160.webp?v=8cbcf8bc0cc262e8",
+            "type": "Image",
+            "status": 200,
+            "contentLength": 9630,
+            "observedBodyBytes": 9630,
+            "complete": true,
+            "wireBytes": 10019
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/164SB.jpg/160.webp?v=52bf1be55a34827a",
+            "type": "Image",
+            "status": 200,
+            "contentLength": 6410,
+            "observedBodyBytes": 6410,
+            "complete": true,
+            "wireBytes": 6798
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/1126SB.jpg/160.webp?v=41113ca7db0b502b",
+            "type": "Image",
+            "status": 200,
+            "contentLength": 11368,
+            "observedBodyBytes": 11368,
+            "complete": true,
+            "wireBytes": 11758
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/1092LSB.jpg/160.webp?v=d108541ce71f59a6",
+            "type": "Image",
+            "status": 200,
+            "contentLength": 12540,
+            "observedBodyBytes": 12540,
+            "complete": true,
+            "wireBytes": 12931
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/1665SB.jpg/160.webp?v=98cac0bd080e0480",
+            "type": "Image",
+            "status": 200,
+            "contentLength": 10094,
+            "observedBodyBytes": 10094,
+            "complete": true,
+            "wireBytes": 10483
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/1036WB.jpg/160.webp?v=2b5948413c20883b",
+            "type": "Image",
+            "status": 200,
+            "contentLength": 12126,
+            "observedBodyBytes": 12126,
+            "complete": true,
+            "wireBytes": 12516
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/1114NR.jpg/160.webp?v=d0967cb365809b08",
+            "type": "Image",
+            "status": 200,
+            "contentLength": 7548,
+            "observedBodyBytes": 7548,
+            "complete": true,
+            "wireBytes": 7936
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/1541WBSET.jpg/160.webp?v=23b2933a3b098c21",
+            "type": "Image",
+            "status": 200,
+            "contentLength": 21096,
+            "observedBodyBytes": 21096,
+            "complete": true,
+            "wireBytes": 21486
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/101SB.jpg/320.webp?v=748165b7c765dc1f",
+            "type": "Image",
+            "status": 200,
+            "contentLength": 11116,
+            "observedBodyBytes": 11116,
+            "complete": true,
+            "wireBytes": 11506
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/102SB.jpg/320.webp?v=21c1d8a19aa473e5",
+            "type": "Image",
+            "status": 200,
+            "contentLength": 10844,
+            "observedBodyBytes": 10844,
+            "complete": true,
+            "wireBytes": 11234
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/103SB.jpg/320.webp?v=c0cd792cd4c1642a",
+            "type": "Image",
+            "status": 200,
+            "contentLength": 11964,
+            "observedBodyBytes": 11964,
+            "complete": true,
+            "wireBytes": 12353
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/104SB.jpg/320.webp?v=b446223ef2a581c5",
+            "type": "Image",
+            "status": 200,
+            "contentLength": 17096,
+            "observedBodyBytes": 17096,
+            "complete": true,
+            "wireBytes": 17485
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/105SB.jpg/320.webp?v=c434cc46b5fb02e3",
+            "type": "Image",
+            "status": 200,
+            "contentLength": 21410,
+            "observedBodyBytes": 21410,
+            "complete": true,
+            "wireBytes": 21800
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/106SB.jpg/320.webp?v=65e5dd5606545b3a",
+            "type": "Image",
+            "status": 200,
+            "contentLength": 24126,
+            "observedBodyBytes": 24126,
+            "complete": true,
+            "wireBytes": 24515
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/107SB.jpg/320.webp?v=ca67069c4c832056",
+            "type": "Image",
+            "status": 200,
+            "contentLength": 28178,
+            "observedBodyBytes": 28178,
+            "complete": true,
+            "wireBytes": 28568
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/108SB.jpg/320.webp?v=cdd7afa9b025cab0",
+            "type": "Image",
+            "status": 200,
+            "contentLength": 37030,
+            "observedBodyBytes": 37030,
+            "complete": true,
+            "wireBytes": 37420
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/js/scroll_cue.js?v=425cfee0cac3d496",
+            "type": "Script",
+            "status": 200,
+            "contentLength": 7847,
+            "observedBodyBytes": 7847,
+            "complete": true,
+            "wireBytes": 8259
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/js/whatsapp_float.js?v=0b09fe3a859d6c86",
+            "type": "Script",
+            "status": 200,
+            "contentLength": 6838,
+            "observedBodyBytes": 6838,
+            "complete": true,
+            "wireBytes": 7256
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/js/home_reels.js?v=3269c62a345464ba",
+            "type": "Script",
+            "status": 200,
+            "contentLength": 202,
+            "observedBodyBytes": 202,
+            "complete": true,
+            "wireBytes": 611
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/js/catalog.js?v=739c9dd21b67f2bf",
+            "type": "Script",
+            "status": 200,
+            "contentLength": 17258,
+            "observedBodyBytes": 17258,
+            "complete": true,
+            "wireBytes": 17671
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/js/inline_reels.js?v=c42b4ea751458f07",
+            "type": "Script",
+            "status": 200,
+            "contentLength": 31900,
+            "observedBodyBytes": 31900,
+            "complete": true,
+            "wireBytes": 32317
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/reels/posters/v15044gf0000d28k8pnog65o08bn9iug.MP4.96d5b318817abdda.160.webp?v=bffc11ef90705e7e",
+            "type": "Image",
+            "status": 200,
+            "contentLength": 51656,
+            "observedBodyBytes": 51656,
+            "complete": true,
+            "wireBytes": 52100
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/reels/posters/v12044gd0000cvdk3hfog65urc6s4vug.MP4.ce2857e7ac70be92.160.webp?v=0bc67955ec674a50",
+            "type": "Image",
+            "status": 200,
+            "contentLength": 49142,
+            "observedBodyBytes": 49142,
+            "complete": true,
+            "wireBytes": 49587
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/reels/posters/v15044gf0000d6celhvog65hp28gmueg.MP4.1e89bc3ffec35a31.160.webp?v=0734b7cbcee9485d",
+            "type": "Image",
+            "status": 200,
+            "contentLength": 65580,
+            "observedBodyBytes": 65580,
+            "complete": true,
+            "wireBytes": 66025
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/reels/v15044gf0000d28k8pnog65o08bn9iug.MP4",
+            "type": "Media",
+            "status": 206,
+            "contentLength": 1427037,
+            "observedBodyBytes": 1427037,
+            "complete": true,
+            "wireBytes": 1427534
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/vendor/bootstrap/bootstrap.bundle.min.js?v=0833b2e9c3a26c25",
+            "type": "Script",
+            "status": 200,
+            "contentLength": 80721,
+            "observedBodyBytes": 80721,
+            "complete": true,
+            "wireBytes": 81146
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/favicon.ico?v=5ae6e6301bd609ea",
+            "type": "Other",
+            "status": 200,
+            "contentLength": 15086,
+            "observedBodyBytes": 15086,
+            "complete": true,
+            "wireBytes": 15482
+          }
+        ],
+        "errors": []
+      },
+      {
+        "profile": {
+          "name": "mobile",
+          "width": 390,
+          "height": 844,
+          "mbps": 1.6,
+          "latency": 150,
+          "cpu": 4
+        },
+        "run": 3,
+        "variant": "after",
+        "speed": {
+          "lcp": [
+            {
+              "time": 12016,
+              "url": "http://127.0.0.1:5001/static/optimized/heroes/hero_bg_mobile_compact.png.webp?v=fcac7316addf2dd3",
+              "tag": "HEADER"
+            }
+          ],
+          "cls": 0.022894524143101006,
+          "longTasks": [
+            90,
+            56,
+            68,
+            107
+          ]
+        },
+        "navigation": {
+          "name": "http://127.0.0.1:5001/",
+          "entryType": "navigation",
+          "startTime": 0,
+          "duration": 15487.29999999702,
+          "initiatorType": "navigation",
+          "deliveryType": "",
+          "nextHopProtocol": "http/1.1",
+          "renderBlockingStatus": "non-blocking",
+          "contentEncoding": "",
+          "workerStart": 0,
+          "workerRouterEvaluationStart": 0,
+          "workerCacheLookupStart": 0,
+          "workerMatchedSourceType": "",
+          "workerFinalSourceType": "",
+          "redirectStart": 0,
+          "redirectEnd": 0,
+          "fetchStart": 0.29999999701976776,
+          "domainLookupStart": 0.29999999701976776,
+          "domainLookupEnd": 0.29999999701976776,
+          "connectStart": 0.29999999701976776,
+          "secureConnectionStart": 0,
+          "connectEnd": 0.29999999701976776,
+          "requestStart": 0.7000000029802322,
+          "responseStart": 161.09999999403954,
+          "firstInterimResponseStart": 0,
+          "finalResponseHeadersStart": 161.09999999403954,
+          "responseEnd": 13174.79999999702,
+          "transferSize": 1006667,
+          "encodedBodySize": 1006367,
+          "decodedBodySize": 1006367,
+          "responseStatus": 200,
+          "serverTiming": [],
+          "unloadEventStart": 0,
+          "unloadEventEnd": 0,
+          "domInteractive": 13938.29999999702,
+          "domContentLoadedEventStart": 14055.5,
+          "domContentLoadedEventEnd": 14145.29999999702,
+          "domComplete": 15484.09999999404,
+          "loadEventStart": 15484.20000000298,
+          "loadEventEnd": 15487.29999999702,
+          "type": "navigate",
+          "redirectCount": 0,
+          "activationStart": 0,
+          "criticalCHRestart": 0,
+          "notRestoredReasons": null,
+          "confidence": {
+            "randomizedTriggerRate": 0.4994798,
+            "value": "low"
+          }
+        },
+        "paint": [
+          {
+            "name": "first-paint",
+            "time": 5916
+          },
+          {
+            "name": "first-contentful-paint",
+            "time": 5916
+          }
+        ],
+        "observedAt": 21547.79999999702,
+        "completedBytes": 2911747,
+        "observedBytes": 3762846,
+        "assets": [
+          {
+            "url": "http://127.0.0.1:5001/",
+            "type": "Document",
+            "status": 200,
+            "contentLength": 1006367,
+            "observedBodyBytes": 0,
+            "complete": true,
+            "wireBytes": 1006772
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/optimized/heroes/hero_bg_mobile_compact.png.webp?v=fcac7316addf2dd3",
+            "type": "Image",
+            "status": 200,
+            "contentLength": 696076,
+            "observedBodyBytes": 696076,
+            "complete": true,
+            "wireBytes": 696492
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/css/styles/fonts.css?v=2d1b5c5fdba8e32d",
+            "type": "Stylesheet",
+            "status": 200,
+            "contentLength": 4059,
+            "observedBodyBytes": 4059,
+            "complete": true,
+            "wireBytes": 4462
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/vendor/bootstrap/bootstrap.min.css?v=3c8f27e6009ccfd7",
+            "type": "Stylesheet",
+            "status": 200,
+            "contentLength": 232803,
+            "observedBodyBytes": 232803,
+            "complete": true,
+            "wireBytes": 233217
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/css/styles/base.css?v=192fb0adc4e78ebd",
+            "type": "Stylesheet",
+            "status": 200,
+            "contentLength": 24299,
+            "observedBodyBytes": 24299,
+            "complete": true,
+            "wireBytes": 24703
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/vendor/fonts/lato-400-latin.woff2?v=d4ae5188a65370ec",
+            "type": "Font",
+            "status": 200,
+            "contentLength": 13980,
+            "observedBodyBytes": 13980,
+            "complete": true,
+            "wireBytes": 14383
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/css/styles/layout.css?v=3954370ff14a8445",
+            "type": "Stylesheet",
+            "status": 200,
+            "contentLength": 85929,
+            "observedBodyBytes": 85929,
+            "complete": true,
+            "wireBytes": 86335
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/vendor/fonts/playfair-display-latin.woff2?v=5d91eb5d522a0308",
+            "type": "Font",
+            "status": 200,
+            "contentLength": 38460,
+            "observedBodyBytes": 38460,
+            "complete": true,
+            "wireBytes": 38871
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/css/styles/nav.css?v=01bb38ff08049816",
+            "type": "Stylesheet",
+            "status": 200,
+            "contentLength": 9907,
+            "observedBodyBytes": 9907,
+            "complete": true,
+            "wireBytes": 10306
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/css/styles/home_catalog.css?v=db86df7681f555e7",
+            "type": "Stylesheet",
+            "status": 200,
+            "contentLength": 5363,
+            "observedBodyBytes": 5363,
+            "complete": true,
+            "wireBytes": 5773
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/css/styles/inline_reels.css?v=042d474f1bda5cfe",
+            "type": "Stylesheet",
+            "status": 200,
+            "contentLength": 3929,
+            "observedBodyBytes": 3929,
+            "complete": true,
+            "wireBytes": 4339
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/css/styles/home_reels.css?v=44b374e8fd93288e",
+            "type": "Stylesheet",
+            "status": 200,
+            "contentLength": 1089,
+            "observedBodyBytes": 1089,
+            "complete": true,
+            "wireBytes": 1495
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/assets/ce_logo_full.png?v=30e13349e9bbaf27",
+            "type": "Image",
+            "status": 200,
+            "contentLength": 46319,
+            "observedBodyBytes": 46319,
+            "complete": true,
+            "wireBytes": 46716
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/assets/ce_logo_shape.png?v=1f5c69370e675783",
+            "type": "Image",
+            "status": 200,
+            "contentLength": 123588,
+            "observedBodyBytes": 123588,
+            "complete": true,
+            "wireBytes": 123989
+          },
+          {
+            "url": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='.34'/%3E%3C/svg%3E",
+            "type": "Image",
+            "status": 200,
+            "contentLength": 0,
+            "observedBodyBytes": 0,
+            "complete": true,
+            "wireBytes": 0
+          },
+          {
+            "url": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M6 6l8 8M14 6l-8 8' stroke='%23d7c07a' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E",
+            "type": "Image",
+            "status": 200,
+            "contentLength": 0,
+            "observedBodyBytes": 0,
+            "complete": true,
+            "wireBytes": 0
+          },
+          {
+            "url": "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(215, 192, 122, 0.95)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e",
+            "type": "Image",
+            "status": 200,
+            "contentLength": 0,
+            "observedBodyBytes": 0,
+            "complete": true,
+            "wireBytes": 0
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/233SB.jpg/160.webp?v=88ac62034e38f7ba",
+            "type": "Image",
+            "status": 200,
+            "contentLength": 4848,
+            "observedBodyBytes": 4848,
+            "complete": true,
+            "wireBytes": 5235
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/1462LSB.jpg/160.webp?v=8cbcf8bc0cc262e8",
+            "type": "Image",
+            "status": 200,
+            "contentLength": 9630,
+            "observedBodyBytes": 9630,
+            "complete": true,
+            "wireBytes": 10019
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/101SB.jpg/160.webp?v=dece151ab3e71c3b",
+            "type": "Image",
+            "status": 200,
+            "contentLength": 4438,
+            "observedBodyBytes": 4438,
+            "complete": true,
+            "wireBytes": 4826
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/vendor/fonts/lato-700-latin.woff2?v=7a7ce1a34f3e9944",
+            "type": "Font",
+            "status": 200,
+            "contentLength": 14168,
+            "observedBodyBytes": 14168,
+            "complete": true,
+            "wireBytes": 14571
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/164SB.jpg/160.webp?v=52bf1be55a34827a",
+            "type": "Image",
+            "status": 200,
+            "contentLength": 6410,
+            "observedBodyBytes": 6410,
+            "complete": true,
+            "wireBytes": 6798
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/1126SB.jpg/160.webp?v=41113ca7db0b502b",
+            "type": "Image",
+            "status": 200,
+            "contentLength": 11368,
+            "observedBodyBytes": 11368,
+            "complete": true,
+            "wireBytes": 11758
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/1092LSB.jpg/160.webp?v=d108541ce71f59a6",
+            "type": "Image",
+            "status": 200,
+            "contentLength": 12540,
+            "observedBodyBytes": 12540,
+            "complete": true,
+            "wireBytes": 12931
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/1665SB.jpg/160.webp?v=98cac0bd080e0480",
+            "type": "Image",
+            "status": 200,
+            "contentLength": 10094,
+            "observedBodyBytes": 10094,
+            "complete": true,
+            "wireBytes": 10483
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/1036WB.jpg/160.webp?v=2b5948413c20883b",
+            "type": "Image",
+            "status": 200,
+            "contentLength": 12126,
+            "observedBodyBytes": 12126,
+            "complete": true,
+            "wireBytes": 12516
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/1114NR.jpg/160.webp?v=d0967cb365809b08",
+            "type": "Image",
+            "status": 200,
+            "contentLength": 7548,
+            "observedBodyBytes": 7548,
+            "complete": true,
+            "wireBytes": 7936
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/1541WBSET.jpg/160.webp?v=23b2933a3b098c21",
+            "type": "Image",
+            "status": 200,
+            "contentLength": 21096,
+            "observedBodyBytes": 21096,
+            "complete": true,
+            "wireBytes": 21486
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/101SB.jpg/320.webp?v=748165b7c765dc1f",
+            "type": "Image",
+            "status": 200,
+            "contentLength": 11116,
+            "observedBodyBytes": 11116,
+            "complete": true,
+            "wireBytes": 11506
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/102SB.jpg/320.webp?v=21c1d8a19aa473e5",
+            "type": "Image",
+            "status": 200,
+            "contentLength": 10844,
+            "observedBodyBytes": 10844,
+            "complete": true,
+            "wireBytes": 11234
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/103SB.jpg/320.webp?v=c0cd792cd4c1642a",
+            "type": "Image",
+            "status": 200,
+            "contentLength": 11964,
+            "observedBodyBytes": 11964,
+            "complete": true,
+            "wireBytes": 12353
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/104SB.jpg/320.webp?v=b446223ef2a581c5",
+            "type": "Image",
+            "status": 200,
+            "contentLength": 17096,
+            "observedBodyBytes": 17096,
+            "complete": true,
+            "wireBytes": 17485
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/105SB.jpg/320.webp?v=c434cc46b5fb02e3",
+            "type": "Image",
+            "status": 200,
+            "contentLength": 21410,
+            "observedBodyBytes": 21410,
+            "complete": true,
+            "wireBytes": 21800
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/106SB.jpg/320.webp?v=65e5dd5606545b3a",
+            "type": "Image",
+            "status": 200,
+            "contentLength": 24126,
+            "observedBodyBytes": 24126,
+            "complete": true,
+            "wireBytes": 24515
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/107SB.jpg/320.webp?v=ca67069c4c832056",
+            "type": "Image",
+            "status": 200,
+            "contentLength": 28178,
+            "observedBodyBytes": 28178,
+            "complete": true,
+            "wireBytes": 28568
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/optimized/responsive/product_images/108SB.jpg/320.webp?v=cdd7afa9b025cab0",
+            "type": "Image",
+            "status": 200,
+            "contentLength": 37030,
+            "observedBodyBytes": 37030,
+            "complete": true,
+            "wireBytes": 37420
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/js/home_reels.js?v=3269c62a345464ba",
+            "type": "Script",
+            "status": 200,
+            "contentLength": 202,
+            "observedBodyBytes": 202,
+            "complete": true,
+            "wireBytes": 611
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/js/whatsapp_float.js?v=0b09fe3a859d6c86",
+            "type": "Script",
+            "status": 200,
+            "contentLength": 6838,
+            "observedBodyBytes": 6838,
+            "complete": true,
+            "wireBytes": 7256
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/js/scroll_cue.js?v=425cfee0cac3d496",
+            "type": "Script",
+            "status": 200,
+            "contentLength": 7847,
+            "observedBodyBytes": 7847,
+            "complete": true,
+            "wireBytes": 8259
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/js/catalog.js?v=739c9dd21b67f2bf",
+            "type": "Script",
+            "status": 200,
+            "contentLength": 17258,
+            "observedBodyBytes": 17258,
+            "complete": true,
+            "wireBytes": 17671
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/js/inline_reels.js?v=c42b4ea751458f07",
+            "type": "Script",
+            "status": 200,
+            "contentLength": 31900,
+            "observedBodyBytes": 31900,
+            "complete": true,
+            "wireBytes": 32317
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/vendor/bootstrap/bootstrap.bundle.min.js?v=0833b2e9c3a26c25",
+            "type": "Script",
+            "status": 200,
+            "contentLength": 80721,
+            "observedBodyBytes": 80721,
+            "complete": true,
+            "wireBytes": 81146
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/reels/posters/v12044gd0000cvdk3hfog65urc6s4vug.MP4.ce2857e7ac70be92.160.webp?v=0bc67955ec674a50",
+            "type": "Image",
+            "status": 200,
+            "contentLength": 49142,
+            "observedBodyBytes": 49142,
+            "complete": true,
+            "wireBytes": 49587
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/reels/posters/v15044gf0000d28k8pnog65o08bn9iug.MP4.96d5b318817abdda.160.webp?v=bffc11ef90705e7e",
+            "type": "Image",
+            "status": 200,
+            "contentLength": 51656,
+            "observedBodyBytes": 51656,
+            "complete": true,
+            "wireBytes": 52100
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/reels/posters/v15044gf0000d6celhvog65hp28gmueg.MP4.1e89bc3ffec35a31.160.webp?v=0734b7cbcee9485d",
+            "type": "Image",
+            "status": 200,
+            "contentLength": 65580,
+            "observedBodyBytes": 65580,
+            "complete": true,
+            "wireBytes": 66025
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/reels/v15044gf0000d28k8pnog65o08bn9iug.MP4",
+            "type": "Media",
+            "status": 206,
+            "contentLength": 1427037,
+            "observedBodyBytes": 851099
+          },
+          {
+            "url": "http://127.0.0.1:5001/static/favicon.ico?v=5ae6e6301bd609ea",
+            "type": "Other",
+            "status": 200,
+            "contentLength": 15086,
+            "observedBodyBytes": 15086,
+            "complete": true,
+            "wireBytes": 15482
+          }
+        ],
+        "errors": []
+      }
+    ]
+  },
+  "summary": {
+    "before": {
+      "lcp": 23732,
+      "load": 23613.29999999702,
+      "cls": 0.02146886333242912
+    },
+    "after": {
+      "lcp": 11088,
+      "load": 14543.29999999702,
+      "cls": 0.023196109530060433
+    }
+  }
+}

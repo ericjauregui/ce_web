@@ -1,13 +1,16 @@
 <section class="latest-videos-section pb-3" aria-label="Product Reels">
-  <div class="sticky-section-header border-top border-bottom border-gold mb-3">
+  <div class="{% if request.endpoint == 'index' %}home-reels-heading{% else %}sticky-section-header{% endif %} border-top border-bottom border-gold mb-3">
     <div class="container section-header-row py-3">
+      <div>
       <h2 class="m-0 section-title catalog-section-title">
         <span class="catalog-section-title-text">Product Reels</span>
         <span class="catalog-section-title-rule" aria-hidden="true"></span>
       </h2>
+      {% if request.endpoint == 'index' %}<p class="home-row-subtitle">Discover our jewelry in motion</p>{% endif %}
+      </div>
       <div class="section-header-cats" aria-hidden="true"></div>
       <div class="section-header-jump d-flex gap-3 align-items-center">
-        <a class="{% if reels_view_all_button|default(false) %}btn btn-outline-gold reels-view-all-btn{% else %}chip catalog-row-action{% endif %}"
+        <a class="{% if reels_view_all_button|default(false) %}btn btn-outline-gold reels-view-all-btn{% elif request.endpoint == 'index' %}home-view-all{% else %}chip catalog-row-action{% endif %}"
           href="{{ url_for('reels_page') }}">View All</a>
       </div>
     </div>
@@ -33,13 +36,9 @@
           <div class="latest-video-card__media inline-reel-media">
             <video
               class="latest-video-preview inline-reel-video"
-              {%
-              if
-              loop.first
-              %}src="{{ reel.url }}"
-              {%
-              endif
-              %}
+              {% if reel.poster %}data-poster="{{ asset_url(reel.poster) }}"{% endif %}
+              {% if reel.poster_160 %}data-poster-small="{{ asset_url(reel.poster_160) }}"{% endif %}
+              {% if reel.poster_320 %}data-poster-medium="{{ asset_url(reel.poster_320) }}"{% endif %}
               data-src="{{ reel.url }}"
               muted
               loop

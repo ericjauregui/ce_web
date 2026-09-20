@@ -14,12 +14,14 @@ from datetime import UTC, datetime, timedelta
 from email.message import EmailMessage
 from email.policy import SMTP
 from email.utils import formataddr, make_msgid, parseaddr
-from html import escape
 from pathlib import Path
 from typing import Any
+from zoneinfo import ZoneInfo
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote, urlencode
 from urllib.request import Request, urlopen
+
+from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 from domains.cart import cart_to_pdf_bytes, country_export_code
 
@@ -394,79 +396,59 @@ def save_order_csv(order_id: str, customer: dict[str, str], csv_text: str) -> Pa
     return csv_path
 
 
-def build_order_plain_text(order_id: str, customer: dict[str, str], items: list[dict[str, Any]]) -> str:
-    total_unique_items = len(items)
+_EMAIL_TEMPLATES = Environment(
+    loader=FileSystemLoader(BASE_DIR / "templates" / "emails"),
+    autoescape=select_autoescape(("html",)),
+)
+
+
+def _receipt_context(
+    order_id: str,
+    customer: dict[str, str],
+    items: list[dict[str, Any]],
+    *,
+    support_email: str = "",
+    submitted_at: datetime | str | None = None,
+) -> dict[str, Any]:
+    # Codes are the existing orderable identity; retain each submitted line and note.
+    unique_count = len({item["code"] for item in items})
     total_quantity = sum(int(item.get("quantity", 0)) for item in items)
-    social_links = _load_order_email_social_links()
-    instagram_url = social_links["instagram_url"]
-    tiktok_url = social_links["tiktok_url"]
-    instagram_handle = _social_handle_from_url(instagram_url)
-    tiktok_handle = _social_handle_from_url(tiktok_url)
-    shipping_address_lines = _customer_shipping_address_lines(customer)
-
-    lines = [
-        "CALIFORNIA EARRINGS",
-        "Wholesaler of 14K Gold Earrings & Piercings",
-        "Over 30 Years in Business",
-        "",
-        "Wholesale Order",
-        "Review the customer details and order summary below.",
-        "",
-        "CUSTOMER DETAILS",
-        f"Name: {customer.get('name', '')}",
-        f"Company: {customer.get('company', '')}",
-        f"Phone: {customer.get('phone', '')}",
-        f"Email: {customer.get('email', '') or 'Not provided'}",
-    ]
-
-    if shipping_address_lines:
-        lines.append("Shipping Address:")
-        lines.extend(shipping_address_lines)
-    else:
-        lines.append("Shipping Address: Not provided")
-
-    if customer.get("notes"):
-        lines.append(f"Order notes: {customer['notes']}")
-
-    lines.extend(
-        [
-            "",
-            "ORDER SUMMARY",
-            f"Total unique items: {total_unique_items}",
-            f"Total quantity: {total_quantity}",
-            "",
-            "ITEMS",
-        ]
+    date_label = ""
+    if submitted_at:
+        try:
+            timestamp = (submitted_at if isinstance(submitted_at, datetime)
+                         else datetime.fromisoformat(str(submitted_at).replace("Z", "+00:00")))
+            if timestamp.tzinfo is not None:
+                date_label = timestamp.astimezone(ZoneInfo("America/Los_Angeles")).strftime("%b %d, %Y at %I:%M %p %Z")
+        except ValueError:
+            pass  # Never invent a submission date when the snapshot lacks one.
+    support_email = _normalized_email(support_email)
+    phone = customer.get("phone", "")
+    phone_target = "".join(c for c in phone if c in "+0123456789")
+    shipping_lines = _customer_shipping_address_lines(customer)
+    return dict(
+        order_id=order_id, customer=customer, items=items,
+        metrics=f"{unique_count} unique {'item' if unique_count == 1 else 'items'} · Total quantity: {total_quantity}",
+        submitted_date=date_label,
+        shipping_lines=shipping_lines,
+        shipping_map_url="https://www.google.com/maps/search/?api=1&" + urlencode({"query": ", ".join(shipping_lines)}, quote_via=quote),
+        support_email=support_email,
+        contact_url="mailto:" + quote(customer.get("email", ""), safe="@."),
+        phone_url="tel:" + phone_target if any(c.isdigit() for c in phone_target) else "",
+        action_url=("mailto:" + quote(support_email, safe="@.") + "?" + urlencode(
+            {"subject": f"Question about order request {order_id}"}, quote_via=quote
+        )) if support_email else "",
+        socials=_load_order_email_social_links(),
+        next_steps="Our team will review your request and contact you to confirm pricing, availability, and shipping before finalizing your order.",
     )
 
-    for index, item in enumerate(items, start=1):
-        line = f"{index}. {item.get('code', '')} | Qty: {item.get('quantity', 0)}"
-        if item.get("notes"):
-            line = f"{line} | Notes: {item['notes']}"
-        lines.append(line)
 
-    lines.extend(
-        [
-            "",
-            "CSV attachment included.",
-            "",
-            "Next step:",
-            "Contact customer to confirm availability, pricing, and fulfillment details.",
-            "",
-            "Keep up with our latest product releases:",
-            f"Instagram: {instagram_handle or instagram_url} - {instagram_url}",
-            f"TikTok: {tiktok_handle or tiktok_url} - {tiktok_url}",
-            "",
-            "California Earrings",
-            "650 S Hill St Suite 518",
-            "Los Angeles, CA 90014",
-            "Office: +1 (213) 935-7272",
-            "Mobile: +1 (818) 331-9292",
-            "californiaearrings.com",
-            "Instagram: @california_earrings",
-        ]
-    )
-    return "\n".join(lines)
+def build_order_plain_text(
+    order_id: str, customer: dict[str, str], items: list[dict[str, Any]],
+    *, support_email: str = "", submitted_at: datetime | str | None = None,
+) -> str:
+    context = _receipt_context(order_id, customer, items, support_email=support_email, submitted_at=submitted_at)
+    return _EMAIL_TEMPLATES.get_template("order_receipt.txt").render(**context).strip() + "\n"
 
 
 def build_order_html(
@@ -475,149 +457,15 @@ def build_order_html(
     items: list[dict[str, Any]],
     *,
     logo_cid: str | None = None,
+    thumbnail_cids: dict[str, str] | None = None,
+    social_cids: dict[str, str] | None = None,
     signature_cid: str | None = None,
+    support_email: str = "",
+    submitted_at: datetime | str | None = None,
 ) -> str:
-    total_unique_items = len(items)
-    total_quantity = sum(int(item.get("quantity", 0)) for item in items)
-    customer_notes = escape(customer.get("notes", ""))
-    social_links = _load_order_email_social_links()
-    instagram_url = social_links["instagram_url"]
-    tiktok_url = social_links["tiktok_url"]
-    instagram_handle = _social_handle_from_url(instagram_url) or "Instagram"
-    tiktok_handle = _social_handle_from_url(tiktok_url) or "TikTok"
-    shipping_address_lines = _customer_shipping_address_lines(customer)
-
-    item_rows: list[str] = []
-    for index, item in enumerate(items, start=1):
-        item_rows.append(
-            """
-        <tr>
-                    <td style="padding:14px 16px;border-bottom:1px solid #5d543f;color:#cdb175;font-weight:600;vertical-align:top;">{index}</td>
-                    <td style="padding:14px 16px;border-bottom:1px solid #5d543f;color:#f7f2e9;font-weight:700;vertical-align:top;">{code}</td>
-                    <td style="padding:14px 16px;border-bottom:1px solid #5d543f;color:#ddd1bd;vertical-align:top;">{notes}</td>
-                    <td style="padding:14px 16px;border-bottom:1px solid #5d543f;color:#f7f2e9;text-align:right;font-weight:700;vertical-align:top;">{quantity}</td>
-        </tr>
-        """.format(
-                index=index,
-                code=escape(str(item.get("code", ""))),
-                notes=escape(str(item.get("notes", ""))) or "-",
-                quantity=int(item.get("quantity", 0)),
-            )
-        )
-
-    if logo_cid:
-        brand_html = f"""
-            <img src="cid:{logo_cid}" width="420" alt="California Earrings" style="display:block;width:420px;max-width:100%;height:auto;margin:0 auto;">
-        """
-    else:
-        brand_html = """
-            <div style="font-size:28px;letter-spacing:0.4px;color:#241c12;font-weight:700;">California Earrings</div>
-        """
-
-    if signature_cid:
-        signature_html = f"""
-        <div style="padding:24px 32px;border-top:1px solid #e6dcc7;text-align:center;">
-                    <img src="cid:{signature_cid}" alt="California Earrings" style="max-width:540px;width:100%;height:auto;display:block;margin:0 auto;">
-        </div>
-        """
-    else:
-        signature_html = """
-        <div style="padding:24px 32px;border-top:1px solid #e6dcc7;color:#756648;font-size:13px;line-height:1.6;text-align:center;">
-          California Earrings<br>
-          650 S Hill St Suite 518, Los Angeles, CA 90014<br>
-          Office: +1 (213) 935-7272<br>
-          Mobile: +1 (818) 331-9292<br>
-          californiaearrings.com<br>
-          Instagram: @california_earrings
-        </div>
-        """
-
-    shipping_address_html = "<br>".join(escape(line) for line in shipping_address_lines) or "Not provided"
-    customer_name = escape(customer.get("name", "") or "Customer")
-    customer_company = escape(customer.get("company", "") or "Company not provided")
-    customer_phone = escape(customer.get("phone", "") or "Not provided")
-    customer_email = escape(customer.get("email", "") or "Not provided")
-    instagram_link = escape(instagram_url)
-    tiktok_link = escape(tiktok_url)
-    instagram_label = escape(instagram_handle)
-    tiktok_label = escape(tiktok_handle)
-    order_notes_block = ""
-    if customer_notes:
-        order_notes_block = f"""
-                        <tr><td style="padding:8px 0;color:#b7a57b;vertical-align:top;">Notes</td><td style="padding:8px 0;color:#f4efe6;">{customer_notes}</td></tr>
-        """
-
-    return f"""
-    <html>
-            <body style="margin:0;padding:24px 12px;background:#433d32;color:#f4efe6;font-family:Arial,Helvetica,sans-serif;">
-                <div style="max-width:760px;margin:0 auto;background:#353129;border:1px solid #5d543f;border-radius:24px;overflow:hidden;">
-                    <div style="padding:28px 32px 24px;border-bottom:1px solid #5d543f;background:#4a4438;text-align:center;">
-                        {brand_html}
-                        <p style="margin:16px auto 0;max-width:560px;color:#e3d9c5;font-size:15px;line-height:1.6;">A new wholesale order request was submitted through californiaearrings.com. Review order details and summary below.</p>
-          </div>
-
-                    <div style="padding:32px;">
-                        <h1 style="margin:0 0 10px;color:#f7f2e9;font-size:30px;line-height:1.2;">Wholesale Order</h1>
-                        <p style="margin:0 0 24px;color:#ddd1bd;font-size:15px;line-height:1.6;">Submitted by <strong>{customer_name}</strong> for <strong>{customer_company}</strong>.</p>
-
-                        <div style="background:#403a30;border:1px solid #5d543f;border-radius:18px;padding:22px;margin-bottom:22px;">
-                            <h2 style="margin:0 0 14px;color:#f7f2e9;font-size:17px;">Customer Details</h2>
-                            <table style="width:100%;border-collapse:collapse;font-size:14px;line-height:1.55;">
-                                <tr><td style="padding:8px 0;color:#b7a57b;width:120px;vertical-align:top;">Name</td><td style="padding:8px 0;color:#f4efe6;">{customer_name}</td></tr>
-                                <tr><td style="padding:8px 0;color:#b7a57b;vertical-align:top;">Company</td><td style="padding:8px 0;color:#f4efe6;">{customer_company}</td></tr>
-                                <tr><td style="padding:8px 0;color:#b7a57b;vertical-align:top;">Phone</td><td style="padding:8px 0;color:#f4efe6;">{customer_phone}</td></tr>
-                                <tr><td style="padding:8px 0;color:#b7a57b;vertical-align:top;">Email</td><td style="padding:8px 0;color:#f4efe6;">{customer_email}</td></tr>
-                                                                <tr><td style="padding:8px 0;color:#b7a57b;vertical-align:top;">Shipping Address</td><td style="padding:8px 0;color:#f4efe6;">{shipping_address_html}</td></tr>
-                {order_notes_block}
-              </table>
-            </div>
-
-                        <table role="presentation" style="width:100%;border-collapse:separate;border-spacing:0 0;margin:0 0 22px;">
-                            <tr>
-                                <td style="width:50%;padding:0 8px 0 0;">
-                                    <div style="background:#403a30;border:1px solid #5d543f;border-radius:18px;padding:18px 20px;">
-                                        <div style="color:#b7a57b;font-size:12px;letter-spacing:1.2px;text-transform:uppercase;font-weight:700;">Unique Items</div>
-                                        <div style="margin-top:8px;color:#f7f2e9;font-size:28px;font-weight:700;">{total_unique_items}</div>
-                                    </div>
-                                </td>
-                                <td style="width:50%;padding:0 0 0 8px;">
-                                    <div style="background:#403a30;border:1px solid #5d543f;border-radius:18px;padding:18px 20px;">
-                                        <div style="color:#b7a57b;font-size:11px;letter-spacing:0.8px;text-transform:uppercase;font-weight:700;white-space:nowrap;display:inline-block;">Total Quantity</div>
-                                        <div style="margin-top:8px;color:#f7f2e9;font-size:28px;font-weight:700;">{total_quantity}</div>
-                                    </div>
-                                </td>
-                            </tr>
-                        </table>
-
-                        <table style="width:100%;border-collapse:collapse;font-size:14px;background:#403a30;border:1px solid #5d543f;border-radius:18px;overflow:hidden;">
-              <thead>
-                                <tr style="background:#4a4438;">
-                                    <th style="padding:14px 16px;text-align:left;color:#cdb175;font-size:12px;letter-spacing:1px;text-transform:uppercase;">#</th>
-                                    <th style="padding:14px 16px;text-align:left;color:#cdb175;font-size:12px;letter-spacing:1px;text-transform:uppercase;">Code</th>
-                                    <th style="padding:14px 16px;text-align:left;color:#cdb175;font-size:12px;letter-spacing:1px;text-transform:uppercase;">Notes</th>
-                                    <th style="padding:14px 16px;text-align:right;color:#cdb175;font-size:12px;letter-spacing:1px;text-transform:uppercase;">Qty</th>
-                </tr>
-              </thead>
-              <tbody>{''.join(item_rows)}</tbody>
-            </table>
-
-                        <div style="margin-top:24px;padding:22px;background:#403a30;border:1px solid #5d543f;border-radius:18px;">
-                            <h2 style="margin:0 0 8px;color:#f7f2e9;font-size:18px;">Follow us on Instagram and TikTok</h2>
-                            <p style="margin:0 0 16px;color:#ddd1bd;line-height:1.6;">See new arrivals and product videos.</p>
-                            <a href="{instagram_link}" style="display:inline-block;margin:0 10px 10px 0;padding:12px 18px;border:1px solid #8d7750;border-radius:999px;background:#4a4438;color:#f4efe6;font-size:14px;font-weight:700;line-height:1.2;text-decoration:none;">Instagram {instagram_label}</a>
-                            <a href="{tiktok_link}" style="display:inline-block;margin:0 0 10px;padding:12px 18px;border:1px solid #8d7750;border-radius:999px;background:#4a4438;color:#f4efe6;font-size:14px;font-weight:700;line-height:1.2;text-decoration:none;">TikTok {tiktok_label}</a>
-                        </div>
-
-                        <div style="margin-top:22px;padding:18px 20px;border-left:4px solid #caa65c;background:#403a30;color:#e7dcc8;border-radius:0 14px 14px 0;">
-                            <p style="margin:0;line-height:1.6;">Next step: contact the customer to confirm pricing, availability, fulfillment, and shipping.</p>
-            </div>
-          </div>
-
-          {signature_html}
-        </div>
-      </body>
-    </html>
-    """
+    context = _receipt_context(order_id, customer, items, support_email=support_email, submitted_at=submitted_at)
+    # Keep the existing inline attachment interface; the receipt no longer displays the business card.
+    return _EMAIL_TEMPLATES.get_template("order_receipt.html").render(logo_cid=logo_cid, thumbnail_cids=thumbnail_cids or {}, social_cids=social_cids or {}, **context)
 
 
 def _guess_image_type(path: Path) -> tuple[str, str]:
@@ -654,7 +502,35 @@ def _inline_image_attachments() -> dict[str, tuple[bytes, str, str, str]]:
             signature_cid,
         )
 
+    for name in ("instagram", "tiktok"):
+        path = BASE_DIR / "static" / "assets" / "email" / f"{name}.png"
+        if path.is_file():
+            inline_images[name] = (path.read_bytes(), "image", "png", make_msgid(domain="californiaearrings.com")[1:-1])
     return inline_images
+
+
+def _product_thumbnail_attachments(
+    items: list[dict[str, Any]], base_dir: Path,
+) -> dict[str, tuple[bytes, str, str, str]]:
+    """Embed only existing local product photos, once per filename."""
+    root = (base_dir / "static" / "product_images").resolve()
+    attachments = {}
+    for item in items:
+        filename = str(item.get("image") or "").strip()
+        if not filename or filename in attachments or Path(filename).name != filename:
+            continue
+        path = root / filename
+        if path.suffix.lower() not in {".jpg", ".jpeg", ".png", ".gif"}:
+            continue
+        if path.resolve().parent != root:
+            continue
+        try:
+            data = path.read_bytes()
+        except OSError:
+            continue  # Missing photos must not prevent an order receipt.
+        maintype, subtype = _guess_image_type(path)
+        attachments[filename] = (data, maintype, subtype, make_msgid(domain="californiaearrings.com")[1:-1])
+    return attachments
 
 
 def make_message(
@@ -666,12 +542,15 @@ def make_message(
     settings: EmailSettings,
     *,
     base_dir: Path | None = None,
+    submitted_at: datetime | str | None = None,
 ) -> EmailMessage:
     if base_dir is None:
         base_dir = BASE_DIR
     company = "California Earrings"
     subject = f"{company} | Wholesale Order"
 
+    thumbnails = _product_thumbnail_attachments(items, base_dir)
+    thumbnail_cids = {name: image[3] for name, image in thumbnails.items()}
     inline_images = _inline_image_attachments()
     logo_cid = inline_images["logo"][3] if "logo" in inline_images else None
     signature_cid = inline_images["signature"][3] if "signature" in inline_images else None
@@ -696,14 +575,23 @@ def make_message(
     if deduped_bcc:
         message["Bcc"] = ", ".join(deduped_bcc)
 
-    message.set_content(build_order_plain_text(order_id, customer, items))
+    message.set_content(build_order_plain_text(order_id, customer, items, support_email=settings.sender_email, submitted_at=submitted_at))
     message.add_alternative(
-        build_order_html(order_id, customer, items, logo_cid=logo_cid, signature_cid=signature_cid),
+        build_order_html(order_id, customer, items, logo_cid=logo_cid, thumbnail_cids=thumbnail_cids, social_cids={name: inline_images[name][3] for name in ("instagram", "tiktok") if name in inline_images}, signature_cid=signature_cid, support_email=settings.sender_email, submitted_at=submitted_at),
         subtype="html",
     )
 
     html_part = message.get_body(preferencelist=("html",))
     if html_part is not None:
+        for name in ("instagram", "tiktok"):
+            if name in inline_images:
+                data, maintype, subtype, cid = inline_images[name]
+                html_part.add_related(data, maintype=maintype, subtype=subtype, cid=f"<{cid}>", filename=f"{name}.png", disposition="inline")
+        for filename, (data, maintype, subtype, cid) in thumbnails.items():
+            html_part.add_related(
+                data, maintype=maintype, subtype=subtype,
+                cid=f"<{cid}>", filename=filename, disposition="inline",
+            )
         if "logo" in inline_images:
             logo_bytes, logo_maintype, logo_subtype, logo_cid = inline_images["logo"]
             html_part.add_related(
@@ -901,6 +789,7 @@ def send_order_email(
         csv_text,
         csv_path,
         settings,
+        submitted_at=submitted_at,
     )
     if send_with_retry(normal_message, order_id, normalized_customer, settings, mode="order_email"):
         return {
@@ -927,6 +816,7 @@ def send_order_email(
         csv_text,
         csv_path,
         settings,
+        submitted_at=submitted_at,
     )
     if send_with_retry(fallback_message, order_id, normalized_customer, settings, mode="fallback_email"):
         return {

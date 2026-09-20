@@ -219,6 +219,36 @@ The test suite covers route contracts, metadata endpoints, reels/homepage fronte
 
 ## Deployment
 
+### Responsive product images and lossless hero assets
+
+Homepage heroes use smaller, full-resolution lossless WebP copies when available.
+All catalog and curated trade-show product photos also have proportional 160,
+320, 480, 640, and 960px variants where smaller than the original. Thumbnail
+surfaces use `srcset` and `sizes` to select a suitable resolution for the rendered
+size and screen density. Resizing uses Lanczos followed by lossless WebP encoding;
+images are never stretched, cropped, or upscaled by the generator. Originals
+remain authoritative for product details, exports, and full-resolution fallback.
+After changing source product/hero images, fonts, or the background logo, regenerate
+the alternatives and nested CSS fingerprints:
+
+```bash
+uv run python -m scripts.optimize_images
+uv run python -m unittest tests.test_image_assets
+```
+
+Commit the generated `static/optimized/` files and CSS changes with the source
+changes. Generation verifies lossless encoding against each resized intermediate
+(or the full-resolution source for hero/original alternatives) and keeps only
+smaller files. `responsive-manifest.json` records dimensions and content versions.
+Missing/modified candidates are omitted; stale source entries fall back to the
+original automatically. `sizes="auto, ..."` uses the measured lazy-image slot on
+supporting browsers, with CSS breakpoint/width fallbacks for other browsers.
+This is an offline maintenance step, not a request-time image conversion or a new
+Render build requirement. See [responsive image results](docs/audits/2026-09-20-responsive-images.md)
+and the [earlier lossless optimization results](docs/audits/2026-09-20-speed-implementation.md).
+
+### Render
+
 `render.yaml` installs with `uv sync --frozen` and starts the migration-gated web service with:
 
 ```bash
@@ -226,3 +256,44 @@ sh scripts/start_render.sh
 ```
 
 Configure `DATABASE_URL` from the existing Render database's internal URL before deploying. The start script applies Alembic migrations and starts one Gunicorn worker with two threads. See [deployment and production verification](docs/postgres-deployment.md) for the complete runbook and Cache-Control table.
+
+### Video previews and blocking CSS
+
+Reel previews use real frames extracted at 0.08 seconds, encoded as lossless WebP.
+After adding or replacing MP4 files, run `uv run python scripts/build_reel_posters.py`
+(requires FFmpeg and Pillow), and include `static/reels/posters/` in the deployment.
+Video fingerprints prevent a replaced clip from using an old poster. Missing posters
+fall back to extracting a frame in the browser only near the viewport. Visible active
+reels retain muted autoplay; other clips load on activation.
+
+After changing templates, application modules, JavaScript, or custom CSS, run:
+
+```sh
+uv run --with tinycss2 python scripts/build_site_css.py
+```
+
+Include `static/css/bootstrap.site.min.css` and its manifest. This preserves Bootstrap
+rule order and declarations, conservatively retaining functional selectors and framework
+states. If its source inventory or output changes without rebuilding, the app serves the
+original Bootstrap stylesheet. This is an offline optimization; no extra production
+package or CSS build step is required. Keep the original vendor stylesheet for fallback.
+
+Catalog drawers measure their contents when opened, instead of measuring all products
+on startup. Fixed-aspect-ratio product image wrappers use `content-visibility: auto`;
+product text, controls, section anchors, and document structure stay available.
+
+### Quality-first hero compression
+
+The homepage uses full-resolution quality-98 WebP copies of its three existing hero
+compositions. No resizing, cropping, breakpoint, CSS background positioning, or viewport
+changes are involved. `cwebp -sharp_yuv` preserves color edges more accurately during
+conversion. Encoding is lossy; the originals and earlier lossless alternatives remain
+available, and stale/missing/corrupt optimized heroes fall back automatically.
+
+After editing a source hero, run `uv run python -m scripts.optimize_heroes` (requires
+libwebp's `cwebp` and Pillow), visually review jewelry edges/dark texture at mobile,
+tablet, desktop, and high-density sizes, then rebuild the CSS manifest if its inputs
+changed. Include `static/optimized/heroes/` and `hero-manifest.json` in deployment.
+The generator verifies unchanged dimensions/metadata and a conservative pixel-error
+limit; this numerical guard does not replace visual review. Both preload URLs and
+background URLs use the same fingerprinted hero helper to avoid duplicate requests.

@@ -1,0 +1,32 @@
+{
+  "assets/hero_bg.png": {
+    "height": 1024,
+    "mean_channel_error": 1.089455074734158,
+    "path": "optimized/heroes/hero_bg.png.webp",
+    "quality": 98,
+    "sharp_yuv": true,
+    "source_version": "4ef82725d12d0478",
+    "version": "2060066023876a42",
+    "width": 1536
+  },
+  "assets/hero_bg_mobile_compact.png": {
+    "height": 1254,
+    "mean_channel_error": 1.4236181592640922,
+    "path": "optimized/heroes/hero_bg_mobile_compact.png.webp",
+    "quality": 98,
+    "sharp_yuv": true,
+    "source_version": "7709a2074af792f0",
+    "version": "fcac7316addf2dd3",
+    "width": 1254
+  },
+  "assets/hero_bg_wide.png": {
+    "height": 724,
+    "mean_channel_error": 1.0210898205522148,
+    "path": "optimized/heroes/hero_bg_wide.png.webp",
+    "quality": 98,
+    "sharp_yuv": true,
+    "source_version": "e0645d21156a9248",
+    "version": "3e1734dbcf640aaf",
+    "width": 2172
+  }
+}

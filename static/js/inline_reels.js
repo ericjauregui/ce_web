@@ -48,7 +48,6 @@
     const statusNode = statusNodeId
       ? document.getElementById(statusNodeId)
       : null;
-    const AUTOPRIME_CARD_COUNT = 5;
     const TOUCH_CONTROLS_HIDE_DELAY_MS = 2400;
     let activeCard = null;
     let preferredMutedState = true;
@@ -141,6 +140,7 @@
 
       viewportPausedPlayback = false;
       searchFocusPausedPlayback = false;
+      loadVideo(video);
       const playPromise = video.play();
       if (playPromise && typeof playPromise.catch === "function") {
         playPromise.catch(() => {
@@ -800,56 +800,43 @@
     }
 
     function scheduleThumbnailPriming() {
-      const thumbnailObserver = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (!entry.isIntersecting) {
-              return;
-            }
-
-            const video = entry.target;
-            const card = video.closest(".inline-reel-card");
-            if (!card) {
-              return;
-            }
-
-            primeThumbnailFrame(video, card, true);
-            thumbnailObserver.unobserve(video);
-          });
-        },
-        {
-          root: track,
-          rootMargin: "220px 0px",
-          threshold: 0.01,
-        },
-      );
-
-      videos.forEach((video, index) => {
+      // Real frame posters avoid downloading every clip just to paint a thumbnail.
+      // Reels added without a generated poster retain the near-viewport fallback.
+      const observer = typeof IntersectionObserver === "function"
+        ? new IntersectionObserver((entries) => {
+            entries.forEach(({ target, isIntersecting }) => {
+              if (!isIntersecting) return;
+              showPreview(target);
+              observer.unobserve(target);
+            });
+          }, { rootMargin: "220px", threshold: 0.01 })
+        : null;
+      function posterSource(video) {
+        const pixels = video.getBoundingClientRect().width * (window.devicePixelRatio || 1);
+        return (pixels <= 160 && video.dataset.posterSmall)
+          || (pixels <= 320 && video.dataset.posterMedium)
+          || video.dataset.poster;
+      }
+      function showPreview(video) {
         const card = video.closest(".inline-reel-card");
-        if (!card) {
-          return;
+        if (video.dataset.poster) {
+          const poster = new Image();
+          poster.onload = () => card.classList.add("is-loaded");
+          poster.onerror = () => primeThumbnailFrame(video, card, true);
+          video.poster = posterSource(video);
+          poster.src = video.poster;
+          video.addEventListener("loadeddata", () => card.classList.add("is-loaded"), { once: true });
+        } else {
+          primeThumbnailFrame(video, card, true);
         }
-
-        syncCardState(card, false);
-        if (index < AUTOPRIME_CARD_COUNT) {
-          if (index === 0) {
-            primeThumbnailFrame(video, card, true);
-            return;
-          }
-
-          // Stagger first few cards so they appear quickly without a single burst.
-          window.setTimeout(
-            () => {
-              primeThumbnailFrame(video, card, true);
-            },
-            Math.min(550, index * 95),
-          );
-          return;
-        }
-
-        // Remaining cards lazy-prime as they approach viewport.
-        thumbnailObserver.observe(video);
-      });
+      }
+      videos.forEach((video) => observer ? observer.observe(video) : showPreview(video));
+      window.addEventListener("resize", () => {
+        if (!track.isConnected) return;
+        videos.forEach((video) => {
+          if (video.poster && video.dataset.poster) video.poster = posterSource(video);
+        });
+      }, { passive: true });
     }
 
     videos.forEach((video) => {
@@ -1142,7 +1129,18 @@
 
     setTrackStatus(defaultStatus);
     setupViewportPauseGuard();
-    autoActivateFirstCard();
+    // Keep visible autoplay, but do not start an offscreen track during page load.
+    if (typeof IntersectionObserver === "function") {
+      const startThreshold = pauseWhenOutOfView ? 0.2 : 0.01;
+      const startObserver = new IntersectionObserver((entries) => {
+        if (!entries.some((entry) => entry.isIntersecting && entry.intersectionRatio >= startThreshold)) return;
+        if (!activeCard) autoActivateFirstCard();
+        startObserver.disconnect();
+      }, { threshold: startThreshold });
+      startObserver.observe(track);
+    } else {
+      autoActivateFirstCard();
+    }
     queueScrollCueRefresh();
   }
 

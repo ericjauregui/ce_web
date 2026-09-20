@@ -17,7 +17,7 @@ body::before {
     bottom: 0;
   z-index: -3;
 
-  background-image: url("/static/assets/ce_logo_shape.png");
+  background-image: url("/static/assets/ce_logo_shape.png?v=1f5c69370e675783");
   background-size: min(1120px, 92vw);
     background-position: center 52%;
   background-repeat: no-repeat;
@@ -117,9 +117,11 @@ html::before {
   }
 }
 
-.card.bg-dark {
+.card.bg-dark,
+.catalog-collection-heading {
   background-color: rgba(18, 18, 18, 0.85) !important;
   backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
 }
 
 
@@ -203,7 +205,7 @@ main {
   position: relative;
   isolation: isolate;
   overflow: visible;
-  min-height: max(300px, 66.6667vw);
+  min-height: 0;
   background-image:
     radial-gradient(118% 84% at 50% 6%, rgb(var(--gold-rgb) / 0.11), transparent 62%),
     radial-gradient(104% 76% at 50% 97%, rgb(var(--gold-rgb) / 0.1), transparent 74%),
@@ -251,8 +253,8 @@ main {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding-top: clamp(1.6rem, 3.3vw, 2.6rem);
-  padding-bottom: clamp(1.7rem, 3.4vw, 2.8rem);
+  padding-top: clamp(.9rem, 2vw, 1.6rem);
+  padding-bottom: clamp(1rem, 2.2vw, 1.75rem);
 }
 
 .hero-logo {
@@ -436,7 +438,7 @@ main {
     }
 
   .hero {
-    min-height: clamp(340px, 44svh, 420px);
+    min-height: 0;
   }
 
   .hero-logo {
@@ -501,12 +503,11 @@ main {
   }
 }
 
-/* Wide screens follow the artwork proportions. Phones use a compact height;
-   content can still grow the hero when text wraps or the visitor zooms in. */
+/* Responsive artwork changes with the viewport; hero height follows its content. */
 @media (min-width: 1200px) {
   .hero {
     --hero-bg-url: var(--hero-bg-wide);
-    min-height: max(300px, 33.3333vw);
+    min-height: 0;
   }
 }
 
@@ -517,6 +518,16 @@ main {
 }
 
 @media (max-width: 420px) {
+  .hero {
+    min-height: 0;
+  }
+
+  .hero .container {
+    min-height: 0;
+    padding-top: .9rem;
+    padding-bottom: 1rem;
+  }
+
   .hero-actions {
     width: 100%;
     margin-top: clamp(.88rem, 3.8vw, 1.2rem) !important;
@@ -587,6 +598,8 @@ main {
   }
 }
 .product-img-wrap {
+  /* Fixed aspect ratio preserves layout while offscreen image painting is skipped. */
+  content-visibility: auto;
   width: 100%;
   aspect-ratio: 1 / 1;
   display: flex;

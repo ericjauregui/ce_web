@@ -141,7 +141,7 @@
       <div class="trade-show-product-grid">
         {% for product in show.curated_products %}
         <a class="trade-show-product-card" href="{{ url_for('index') }}#section-{{ product.collection }}">
-          <img src="{{ asset_url(product.image) }}" alt="{{ product.name }}" width="720" height="720" loading="lazy" decoding="async">
+          <img src="{{ asset_url(product.image) }}" {{ product_image_attributes(product.image, 'trade')|xmlattr }} alt="{{ product.name }}" width="720" height="720" loading="lazy" decoding="async">
           <span>{{ product.name }} <span aria-hidden="true">→</span></span>
         </a>
         {% endfor %}

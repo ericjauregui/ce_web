@@ -1,0 +1,47 @@
+CALIFORNIA EARRINGS
+
+Order request received
+
+Thank you! We’ve received your wholesale order request.
+
+Order {{ order_id }}
+{% if submitted_date %}Submitted {{ submitted_date }}
+{% endif %}Pending confirmation
+{{ metrics }}
+
+WHAT HAPPENS NEXT?
+{{ next_steps }}
+
+ORDER SUMMARY
+{% for item in items %}
+{{ item.code }} | Qty: {{ item.quantity }}
+{% if item.notes %}Note: {{ item.notes }}
+{% endif %}{% endfor %}
+{% if shipping_lines %}SHIP TO
+{% for value in [customer.name, customer.company] if value %}{{ value }}
+{% endfor %}{% for line in shipping_lines %}{{ line }}
+{% endfor %}
+{% endif %}CONTACT DETAILS
+{% if not shipping_lines %}{% for value in [customer.name, customer.company] if value %}{{ value }}
+{% endfor %}{% endif %}{% if customer.email %}{{ customer.email }}
+{% endif %}{% if customer.phone %}{{ customer.phone }}
+{% endif %}{% if customer.notes %}
+YOUR ORDER NOTES
+{{ customer.notes }}
+{% endif %}
+Follow us on Instagram and TikTok
+See new arrivals and product videos.
+{% if socials.instagram_url %}Instagram: {{ socials.instagram_url }}
+{% endif %}{% if socials.tiktok_url %}TikTok: {{ socials.tiktok_url }}
+{% endif %}
+
+QUESTIONS OR CHANGES?
+Reply to this email and include your order number.
+{% if support_email %}Email our team: {{ support_email }}
+{% endif %}
+California Earrings
+650 S Hill St Suite 518
+Los Angeles, CA 90014
+Cell: +1 (818) 331-9292
+Office: +1 (213) 935-7272
+https://californiaearrings.com

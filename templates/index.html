@@ -2,12 +2,13 @@
 {% block title %}California Earrings | Wholesale 14K Gold Earrings & Body Jewelry{% endblock %}
 {% block meta_description %}Wholesaler of authentic 14K gold earrings, piercing jewelry, hoops, studs, hearts, and body jewelry from California Earrings in Los Angeles. Built for boutiques, jewelry stores, and resellers.{% endblock %}
 {% block page_preloads %}
-  <link rel="preload" as="image" href="{{ asset_url('assets/hero_bg_mobile_compact.png') }}" media="(max-width: 575.98px)" fetchpriority="high">
-  <link rel="preload" as="image" href="{{ asset_url('assets/hero_bg.png') }}" media="(min-width: 576px) and (max-width: 1199.98px)" fetchpriority="high">
-  <link rel="preload" as="image" href="{{ asset_url('assets/hero_bg_wide.png') }}" media="(min-width: 1200px)" fetchpriority="high">
+  <link rel="preload" as="image" href="{{ hero_image_url('assets/hero_bg_mobile_compact.png') }}" media="(max-width: 575.98px)" fetchpriority="high">
+  <link rel="preload" as="image" href="{{ hero_image_url('assets/hero_bg.png') }}" media="(min-width: 576px) and (max-width: 1199.98px)" fetchpriority="high">
+  <link rel="preload" as="image" href="{{ hero_image_url('assets/hero_bg_wide.png') }}" media="(min-width: 1200px)" fetchpriority="high">
   <link rel="preload" as="image" href="{{ asset_url('assets/ce_logo_full.png') }}" fetchpriority="high">
 {% endblock %}
 {% block page_css %}
+<link href="{{ asset_url('css/styles/home_catalog.css') }}" rel="stylesheet">
 {% if latest_reels %}
   <link href="{{ asset_url('css/styles/inline_reels.css') }}" rel="stylesheet">
   <link href="{{ asset_url('css/styles/home_reels.css') }}" rel="stylesheet">
@@ -15,7 +16,7 @@
 {% endblock %}
 {% block content %}
 {% set show_reels_after_results = q|default('', true)|trim != '' %}
-<header class="hero d-flex align-items-center text-center" style="--hero-bg-original: url('{{ asset_url('assets/hero_bg.png') }}'); --hero-bg-wide: url('{{ asset_url('assets/hero_bg_wide.png') }}'); --hero-bg-mobile: url('{{ asset_url('assets/hero_bg_mobile_compact.png') }}');">
+<header class="hero d-flex align-items-center text-center" style="--hero-bg-original: url('{{ hero_image_url('assets/hero_bg.png') }}'); --hero-bg-wide: url('{{ hero_image_url('assets/hero_bg_wide.png') }}'); --hero-bg-mobile: url('{{ hero_image_url('assets/hero_bg_mobile_compact.png') }}');">
   <div class="container">
     <h1 class="visually-hidden">California Earrings</h1>
     <img class="hero-logo" src="{{ asset_url('assets/ce_logo_full.png') }}" alt="California Earrings" loading="eager" decoding="sync" fetchpriority="high" width="339" height="88">
@@ -52,57 +53,31 @@
 
 <section class="{% if latest_reels and not show_reels_after_results %}pt-0 pb-5{% else %}py-5{% endif %}">
   {% if sections|length > 1 %}
-  <div class="sticky-section-header catalog-explorer-header border-top border-bottom border-gold mb-3">
-    <div class="container catalog-explorer-row py-3">
-      <div class="catalog-explorer-heading">
-        <div class="catalog-explorer-title-row">
-          <h2 class="m-0 section-title catalog-section-title">
-            <span class="catalog-section-title-text">Our Catalog</span>
-          </h2>
-          <span class="catalog-current-collection" data-catalog-current-collection aria-live="polite">
-            Viewing {{ sections[0].title }} Collection
-          </span>
+  <div class="home-collections border-top border-bottom border-gold mb-3" id="catalogCollectionPicker">
+    <div class="container py-3">
+      <div class="home-row-heading">
+        <div>
+          <h2 class="section-title m-0">Catalog Collections</h2>
         </div>
-        <p class="catalog-explorer-hint" data-catalog-collection-helper aria-live="polite">Browse by collection · All items shown</p>
+        <div class="home-row-actions">
+          {% include "partials/home_jump_top.html" %}
+          <button class="home-collections-toggle" type="button" aria-expanded="true" aria-controls="homeCollectionNavigation" aria-label="Collapse catalog collections">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 14 6-6 6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
       </div>
-      <details class="catalog-collection-picker" id="catalogCollectionPicker" data-pristine="true"
-        data-active-target="all-collections">
-        <summary class="catalog-collection-picker__summary">
-          <img class="catalog-collection-picker__thumbnail"
-            src="{{ asset_url('assets/ce_logo_shape.png') }}"
-            alt="" loading="lazy" decoding="async" data-catalog-collection-thumbnail>
-          <span data-catalog-collection-label>All Collections</span>
-          <span class="catalog-collection-picker__chevron" aria-hidden="true"></span>
-        </summary>
-        <div class="catalog-collection-picker__menu" aria-label="Browse collections">
-          <p class="catalog-collection-picker__heading">Browse collections</p>
-          <div class="catalog-collection-picker__options">
-            <a href="#section-studs"
-              class="catalog-collection-picker__option catalog-collection-picker__option--all section-chip-btn"
-              data-target="all-collections"
-              data-collection-title="All Collections"
-              aria-label="Show all collections"
-              aria-current="true"
-              data-selected="true">
-              <img src="{{ asset_url('assets/ce_logo_shape.png') }}" alt="" loading="lazy" decoding="async">
-              <span>All Collections</span>
-            </a>
-            {% for other in sections %}
-            <a href="#section-{{ other.key }}"
-              class="catalog-collection-picker__option section-chip-btn"
-              data-target="section-{{ other.key }}"
-              data-collection-title="{{ other.title }}"
-              aria-label="Show {{ other.title }}"
-              data-selected="false">
-              <img src="{{ asset_url('product_images/' ~ other.items[0].image) }}"
-                alt="" loading="lazy" decoding="async">
-              <span>{{ other.title }}</span>
-            </a>
-            {% endfor %}
-          </div>
+      <nav id="homeCollectionNavigation" class="home-collection-navigation" aria-label="Catalog collections">
+        <div class="home-collection-current"></div>
+        <div class="home-collection-track">
+        {% for other in sections %}
+        <a href="#section-{{ other.key }}" class="home-collection-option section-chip-btn"
+          data-target="section-{{ other.key }}" data-collection-title="{{ other.title }}">
+          <img src="{{ optimized_image_url('product_images/' ~ other.items[0].image) }}" {{ product_image_attributes('product_images/' ~ other.items[0].image, 'collection')|xmlattr }} alt="" width="80" height="80" loading="lazy" decoding="async">
+          <span>{{ other.title }}</span>
+        </a>
+        {% endfor %}
         </div>
-      </details>
-      <a class="chip catalog-explorer-jump catalog-row-action" href="#top">Jump to Top</a>
+      </nav>
     </div>
   </div>
   {% endif %}
@@ -119,6 +94,7 @@
         <div class="section-header-cats" aria-hidden="true"></div>
         <div class="section-header-jump d-flex gap-3 align-items-center">
           <a class="chip" href="{{ url_for('index') }}#section-studs">← Full Catalog</a>
+          {% include "partials/home_jump_top.html" %}
         </div>
       </div>
     </div>
@@ -129,6 +105,7 @@
         <span class="catalog-section-title-text">{{ section.title }}</span>
         <span class="catalog-section-title-rule" aria-hidden="true"></span>
       </h2>
+      {% include "partials/home_jump_top.html" %}
       </div>
     </div>
     {% endif %}

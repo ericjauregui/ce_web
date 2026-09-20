@@ -3,6 +3,8 @@ from __future__ import annotations
 import random
 from pathlib import Path
 
+from domains.file_cache import get_path_version
+
 
 def discover_reels(reels_dir: Path) -> list[dict[str, str]]:
     """Return deterministic reel metadata for non-hidden MP4 files."""
@@ -19,7 +21,15 @@ def discover_reels(reels_dir: Path) -> list[dict[str, str]]:
         if entry.suffix.lower() != ".mp4":
             continue
 
-        reels.append({"filename": name, "url": f"/static/reels/{name}"})
+        reel = {"filename": name, "url": f"/static/reels/{name}"}
+        poster_name = f"{name}.{get_path_version(entry)}.webp"
+        if (reels_dir / "posters" / poster_name).is_file():
+            reel["poster"] = f"reels/posters/{poster_name}"
+            for width in (160, 320):
+                sized = poster_name.removesuffix('.webp') + f'.{width}.webp'
+                if (reels_dir / "posters" / sized).is_file():
+                    reel[f"poster_{width}"] = f"reels/posters/{sized}"
+        reels.append(reel)
 
     reels.sort(key=lambda reel: reel["filename"].lower())
     return reels

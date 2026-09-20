@@ -129,6 +129,7 @@ class EmailingTests(unittest.TestCase):
         self.assertIn("Content-ID:", raw_message)
         self.assertIn("cid:", raw_message)
         self.assertNotIn("text/csv", raw_message)  # CSV is saved but not attached to email
+        self.assertIn("application/pdf", raw_message)
 
     def test_send_order_email_uses_persisted_order_number_without_sqlite_sequence(self) -> None:
         with patch("domains.emailing.next_order_number") as next_number:
@@ -154,50 +155,92 @@ class EmailingTests(unittest.TestCase):
         self.assertIn("'=HYPERLINK", csv_text)
         self.assertIn("'+cmd", csv_text)
 
-    def test_build_order_html_uses_cleaner_layout_and_social_cta(self) -> None:
-        html = emailing.build_order_html(
-            "#00001",
-            self._customer(),
-            self._items(),
-            logo_cid="logo-cid",
-            signature_cid="signature-cid",
-        )
+    def test_receipt_content_and_plain_text_parity(self) -> None:
+        options = dict(support_email="orders@californiaearrings.com", submitted_at="2026-09-20T17:00:00+00:00")
+        html = emailing.build_order_html("#CE00000042", self._customer(), self._items(), logo_cid="logo-cid", signature_cid="signature-cid", **options)
+        text = emailing.build_order_plain_text("#CE00000042", self._customer(), self._items(), **options)
+        for content in (html, text):
+            for value in ("Order request received", "#CE00000042", "Pending confirmation", "1 unique item · Total quantity: 3", "Sep 20, 2026 at 10:00 AM PDT", "Building A", "A100", "Need matching pair"):
+                self.assertIn(value, content)
+            self.assertNotIn("contact the customer", content.lower())
+            self.assertNotIn("CSV attachment included", content)
+        self.assertIn('width="200"', html)
+        self.assertIn('max-width:600px', html)
+        self.assertIn('scope="col"', html)
+        self.assertNotIn("cid:signature-cid", html)
+        self.assertIn("mailto:orders@californiaearrings.com?subject=Question%20about%20order%20request%20%23CE00000042", html)
+        self.assertLess(len(html.encode()), 80_000)
 
-        self.assertIn("Wholesale Order</h1>", html)
-        self.assertNotIn("Wholesale Order #00001", html)
-        self.assertNotIn("Order ID", html)
-        self.assertNotIn(">Item<", html)
-        self.assertNotIn(">Collection<", html)
-        self.assertIn("width=\"420\"", html)
-        self.assertIn("max-width:540px", html)
-        self.assertIn("Shipping Address", html)
-        self.assertIn("650 S Hill St Suite 518", html)
-        self.assertIn("Building A", html)
-        self.assertIn("Los Angeles, California 90014, United States", html)
-        self.assertIn("Follow us on Instagram and TikTok", html)
-        self.assertIn("See new arrivals and product videos.", html)
-        self.assertIn("Instagram @california_earrings", html)
-        self.assertIn("TikTok @californiaearrings", html)
-        self.assertIn("href=\"https://www.instagram.com/california_earrings/\"", html)
-        self.assertIn("href=\"https://www.tiktok.com/@californiaearrings\"", html)
-        self.assertNotIn("background:#0d0d0d", html)
-        self.assertNotIn("background:#ffffff;text-align:center;", html)
+    def test_receipt_embeds_original_product_photo_once(self) -> None:
+        items = [dict(code="101SB", name="Gold Earrings", quantity=2, image="101SB.jpg", notes="First"),
+                 dict(code="101SB", name="Gold Earrings", quantity=1, image="101SB.jpg", notes="Second"),
+                 dict(code="missing", name="No photo", quantity=1, image="absent-photo.jpg")]
+        message = emailing.make_message("#CE1", self._customer(), items, "", Path("order.csv"), emailing._load_email_settings())
+        photos = [part for part in message.walk() if part.get_filename() == "101SB.jpg"]
+        self.assertEqual(len(photos), 1)
+        self.assertEqual(photos[0].get_payload(decode=True), (emailing.BASE_DIR / "static/product_images/101SB.jpg").read_bytes())
+        html = message.get_body(preferencelist=("html",)).get_content()
+        self.assertEqual(html.count("cid:" + str(photos[0]["Content-ID"])[1:-1]), 2)
+        self.assertNotIn(">Photo</th>", html)
+        self.assertIn(">Notes</th>", html)
+        self.assertIn("missing", html)
+        self.assertNotIn("absent-photo.jpg", html)
+        self.assertIn('width="56"', html)
 
-    def test_build_order_html_renders_without_customer_notes(self) -> None:
+    def test_thumbnail_loader_rejects_external_and_parent_paths(self) -> None:
+        images = ["../assets/ce_logo_full.png", "https://example.com/image.jpg", "/tmp/photo.jpg", "absent.jpg"]
+        self.assertEqual(emailing._product_thumbnail_attachments([dict(image=image) for image in images], emailing.BASE_DIR), {})
+
+    def test_receipt_codes_maps_and_cell_contact(self) -> None:
+        from urllib.parse import parse_qs, urlsplit
+        from html import unescape
+        import re
+
         customer = self._customer()
+        customer["address_line_1"] = '123 A & B Street'
+        html = emailing.build_order_html("#CE1", customer, self._items())
+        text = emailing.build_order_plain_text("#CE1", customer, self._items())
+        for content in (html, text):
+            self.assertNotIn("Gold Stud", content)
+            self.assertIn("A100", content)
+            self.assertLess(content.index("Cell: +1 (818) 331-9292"), content.index("Office: +1 (213) 935-7272"))
+        links = re.findall(r'href="([^"]+)"', html)
+        maps = [parse_qs(urlsplit(unescape(link)).query)["query"][0] for link in links if "google.com/maps" in link]
+        self.assertEqual(maps[0], ", ".join(emailing._customer_shipping_address_lines(customer)))
+        self.assertIn("650 S Hill St Suite 518", maps[1])
+        self.assertIn('href="tel:+18183319292"', html)
+
+    def test_receipt_timestamp_uses_pacific_standard_time_in_winter(self) -> None:
+        for renderer in (emailing.build_order_html, emailing.build_order_plain_text):
+            content = renderer("#CE1", self._customer(), self._items(), submitted_at="2026-01-20T02:30:00+00:00")
+            self.assertIn("Jan 19, 2026 at 06:30 PM PST", content)
+
+    def test_receipt_optional_fields_and_escaping(self) -> None:
+        customer = dict(name='A & B <Buyer>', email='buyer@example.com', notes='First line\n<script>alert("x")</script>')
+        items = [dict(code='A<100', name='Gold & Pearl', quantity=999, notes='First note'),
+                 dict(code='A<100', name='Gold & Pearl', quantity=2, notes='Second note'),
+                 dict(code='A<100-B', name='Variant', quantity=1, notes='')]
+        html = emailing.build_order_html("#CE1", customer, items)
+        self.assertIn("2 unique items · Total quantity: 1002", html)
+        self.assertIn("First note", html)
+        self.assertIn("Second note", html)
+        self.assertIn("A &amp; B &lt;Buyer&gt;", html)
+        self.assertIn("&lt;script&gt;", html)
+        self.assertNotIn("<script>", html)
+        self.assertNotIn(">Ship to<", html)
+        self.assertNotIn("Submitted ", html)
+        self.assertNotIn("<img", html)
         customer["notes"] = ""
+        self.assertNotIn("Your order notes", emailing.build_order_html("#CE1", customer, items))
 
-        html = emailing.build_order_html(
-            "#00001",
-            customer,
-            self._items(),
-            logo_cid="logo-cid",
-            signature_cid="signature-cid",
-        )
-
-        self.assertIn("Submitted by <strong>Test Buyer</strong>", html)
-        self.assertIn("Instagram @california_earrings", html)
-        self.assertNotIn("<td style=\"padding:8px 0;color:#8f7b54;vertical-align:top;\">Notes</td>", html)
+    def test_receipt_retains_every_line_in_large_order(self) -> None:
+        items = [dict(code=f"SKU-{i}", name=f"Product {i}", quantity=999, notes=f"Note {i}") for i in range(100)]
+        html = emailing.build_order_html("#CE1", self._customer(), items)
+        text = emailing.build_order_plain_text("#CE1", self._customer(), items)
+        for item in items:
+            self.assertIn(f"<strong>{item['code']}</strong>", html)
+            self.assertIn(f"{item['code']} | Qty: 999", text)
+        self.assertIn("100 unique items · Total quantity: 99900", html)
 
     def test_send_order_email_uses_fallback_after_normal_retries(self) -> None:
         subjects: list[str] = []

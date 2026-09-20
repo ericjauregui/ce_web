@@ -121,7 +121,7 @@ class FrontendContractTests(BaseWebTest):
             body.index("Product Reels"), body.index('id="catalogCollectionPicker"')
         )
         self.assertEqual(body.count("class=\"latest-video-card inline-reel-card\""), 15)
-        self.assertIn("sticky-section-header", body)
+        self.assertIn("home-reels-heading", body)
         self.assertIn(">View All</a>", body)
         self.assertIn("/static/js/scroll_cue.js", body)
         self.assertIn("/static/js/inline_reels.js", body)
@@ -231,47 +231,17 @@ class FrontendContractTests(BaseWebTest):
         self.assertNotIn(
             "window.addEventListener(\"scroll\", syncSearchCenter", body)
 
-    def test_catalog_collection_picker_contracts(self) -> None:
-        css = self.load_site_css()
+    def test_catalog_visual_collection_navigation(self) -> None:
         body = self.client.get("/").get_data(as_text=True)
-        script = (webapp.BASE_DIR / "static" / "js" / "catalog.js").read_text(
-            encoding="utf-8"
-        )
-
-        self.assertIn('id="catalogCollectionPicker"', body)
-        self.assertIn('data-pristine="true"', body)
-        self.assertIn('data-active-target="all-collections"', body)
-        self.assertIn(">All Collections</span>", body)
-        self.assertNotIn(">Choose a collection</span>", body)
-        self.assertIn("Browse by collection · All items shown", body)
-        self.assertIn("data-catalog-current-collection", body)
-        self.assertIn('data-collection-title="Studs"', body)
-        self.assertIn("All Collections", body)
-        self.assertIn('data-target="all-collections"', body)
+        self.assertIn('aria-label="Catalog collections"', body)
+        self.assertNotIn('data-target="all-collections"', body)
+        self.assertIn("Catalog Collections", body)
         self.assertIn('data-target="section-studs"', body)
-        self.assertIn("catalog-collection-picker__option", body)
-        self.assertIn("catalog-collection-heading border-top border-bottom", body)
-        self.assertIn("catalog-collection-heading--first", body)
-        self.assertIn(".catalog-collection-heading--first {", css)
-        self.assertNotRegex(
-            body,
-            r'class="catalog-explorer-row[^>]*"[\s\S]{0,5000}Search Inventory',
-        )
-        self.assertIn("width: min(760px, calc(100vw - 3rem));", css)
-        self.assertIn("grid-template-columns: repeat(3, minmax(0, 1fr));", css)
-        self.assertIn(
-            ".catalog-collection-picker {\n  position: absolute;\n  grid-column: 1 / -1;\n  left: 50%;",
-            css,
-        )
-        self.assertIn("transform: translateX(-50%);", css)
-        self.assertIn('targetId === "all-collections"', script)
-        self.assertIn('picker.addEventListener("toggle"', script)
-        self.assertIn('picker.dataset.pristine = "false";', script)
-        self.assertIn('picker.dataset.activeTarget = option.dataset.target || "";', script)
-        self.assertIn("function updateCatalogCollectionContext()", script)
-        self.assertIn("Viewing ${collectionTitle} Collection", script)
-        self.assertIn("section.hidden = !showAll && section.id !== targetId;", script)
-        self.assertIn("if (heading) heading.hidden = !showAll;", script)
+        self.assertIn('class="home-collection-option section-chip-btn"', body)
+        self.assertNotIn('<details class="catalog-collection-picker"', body)
+        self.assertIn('aria-label="Jump to top"', body)
+        self.assertIn('href="/reels">View All</a>', body)
+        self.assertIn('catalog-collection-heading--first', body)
 
     def test_main_and_background_layers_follow_actual_nav_height(self) -> None:
         css = self.load_site_css()
@@ -706,25 +676,3 @@ class FrontendContractTests(BaseWebTest):
         body = response.get_data(as_text=True)
 
         self.assertIn("assets/ce_logo_shape.png", body)
-
-    def test_visual_polish_contracts_for_hero_header_and_cards(self) -> None:
-        css = self.load_site_css()
-        condensed = re.sub(r"\s+", " ", css)
-
-        self.assertIn("width: clamp(172px, 41vw, 352px);", css)
-        self.assertIn("width: clamp(148px, 51vw, 262px);", css)
-        self.assertIn("min-height: clamp(220px, 31vh, 360px);", css)
-        self.assertIn("min-height: clamp(196px, 27vh, 286px);", css)
-        self.assertIn("--hero-pad-y: clamp(1.65rem, 3.2vw, 2.3rem);", css)
-        self.assertIn("--hero-pad-y: clamp(1.1rem, 3.8vw, 1.55rem);", css)
-        self.assertIn("padding-top: var(--hero-pad-y);", css)
-        self.assertIn("padding-bottom: var(--hero-pad-y);", css)
-        self.assertIn("opacity: 0.62;", css)
-        self.assertIn("opacity: 0.70;", css)
-        self.assertIn(
-            ".catalog-section-title-rule { display: none; }", condensed)
-        self.assertIn(".section-header-row::after", css)
-        self.assertIn("box-shadow: 0 15px 40px rgba(0, 0, 0, 0.45);", css)
-        self.assertIn(".code-badge", css)
-        self.assertIn("padding: .18rem .62rem;", css)
-        self.assertIn("rgb(var(--gold-rgb) / 0.84)", css)

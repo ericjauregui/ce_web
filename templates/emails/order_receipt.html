@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="x-apple-disable-message-reformatting">
+<meta name="color-scheme" content="light dark">
+<meta name="supported-color-schemes" content="light dark">
+<title>Order request received</title>
+<style>
+:root { color-scheme:light dark; supported-color-schemes:light dark; }
+table { border-spacing:0; mso-table-lspace:0pt; mso-table-rspace:0pt; }
+a[x-apple-data-detectors] { color:inherit !important; }
+@media screen and (min-width:620px) { .content { padding:28px 32px 32px !important; } }
+@media (prefers-color-scheme:dark) {
+.email-bg { background-color:#000000 !important; }
+.white { color:#FFFFFF !important; } .gold { color:#D4AF37 !important; } .muted { color:#C7C7C7 !important; }
+}
+[data-ogsc] .email-bg { background-color:#000000 !important; }
+[data-ogsc] .white { color:#FFFFFF !important; }
+[data-ogsc] .gold { color:#D4AF37 !important; }
+[data-ogsc] .muted { color:#C7C7C7 !important; }
+</style>
+</head>
+{% set body_style = 'margin:0;color:#FFFFFF;font-size:16px;line-height:25px;' %}
+{% set heading_style = 'margin:24px 0 8px;color:#FFFFFF;font-size:18px;line-height:26px;' %}
+{% set link_style = 'color:#D4AF37;text-decoration:underline;word-break:break-all;overflow-wrap:anywhere;' %}
+{% macro multiline(value) -%}{% for line in value.splitlines() %}{{ line }}{% if not loop.last %}<br>{% endif %}{% endfor %}{%- endmacro %}
+<body class="email-bg" bgcolor="#000000" style="margin:0;padding:0;width:100%;background-color:#000000;color:#FFFFFF;font-family:Arial,Helvetica,sans-serif;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;">
+<div style="display:none;font-size:1px;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;mso-hide:all;">We’ll review pricing, availability, and shipping before finalizing your order.</div>
+<table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#000000" class="email-bg" style="width:100%;background-color:#000000;">
+<tr><td align="center" bgcolor="#000000" class="email-bg" style="background-color:#000000;">
+<!--[if mso]><table role="presentation" width="600" align="center" border="0" cellspacing="0" cellpadding="0" bgcolor="#000000"><tr><td><![endif]-->
+<table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#000000" class="email-bg" style="width:100%;max-width:600px;table-layout:fixed;background-color:#000000;">
+<tr><td class="content email-bg" bgcolor="#000000" style="padding:24px 20px 28px;background-color:#000000;font-family:Arial,Helvetica,sans-serif;word-wrap:break-word;overflow-wrap:anywhere;">
+{% if logo_cid %}<img src="cid:{{ logo_cid }}" width="200" alt="California Earrings" style="display:block;width:200px;max-width:100%;height:auto;margin:0 0 22px;">
+{% else %}<p class="gold" style="margin:0 0 22px;color:#D4AF37;font-size:20px;line-height:26px;font-weight:bold;">California Earrings</p>{% endif %}
+<h1 class="white" style="margin:0 0 12px;color:#FFFFFF;font-size:28px;line-height:34px;">Order request received</h1>
+<p class="white" style="{{ body_style }}">Thank you! We’ve received your wholesale order request.</p>
+<p class="white" style="margin:16px 0 2px;color:#FFFFFF;font-size:16px;line-height:24px;font-weight:bold;">Order {{ order_id }}</p>
+{% if submitted_date %}<p class="muted" style="margin:0;color:#C7C7C7;font-size:14px;line-height:22px;">Submitted {{ submitted_date }}</p>{% endif %}
+<p class="gold" style="margin:5px 0 0;color:#D4AF37;font-size:14px;line-height:22px;font-weight:bold;">Pending confirmation</p>
+<p class="muted" style="margin:10px 0 0;color:#C7C7C7;font-size:14px;line-height:22px;">{{ metrics }}</p>
+<table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-top:20px;"><tr><td bgcolor="#000000" class="email-bg" style="padding:0 0 0 14px;border-left:2px solid #D4AF37;background-color:#000000;">
+<h2 class="white" style="margin:0 0 6px;color:#FFFFFF;font-size:18px;line-height:26px;">What happens next?</h2>
+<p class="muted" style="margin:0;color:#C7C7C7;font-size:16px;line-height:25px;">{{ next_steps }}</p>
+</td></tr></table>
+<h2 class="white" style="{{ heading_style }}">Order summary</h2>
+<table width="100%" border="0" cellspacing="0" cellpadding="0" style="width:100%;border-collapse:collapse;table-layout:fixed;">
+<thead><tr>{% if thumbnail_cids %}<th scope="col" width="68" align="left" class="gold" style="width:68px;padding:0 0 10px;border-bottom:1px solid #332B18;color:#D4AF37;font-size:14px;line-height:22px;" aria-label="Product image"></th>{% endif %}<th scope="col" width="64" align="left" class="gold" style="width:64px;padding:0 12px 10px 0;border-bottom:1px solid #332B18;color:#D4AF37;font-size:14px;line-height:22px;">Item</th><th scope="col" align="left" class="gold" style="padding:0 12px 10px 0;border-bottom:1px solid #332B18;color:#D4AF37;font-size:14px;line-height:22px;">Notes</th><th scope="col" width="36" align="right" class="gold" style="width:36px;padding:0 0 10px;border-bottom:1px solid #332B18;color:#D4AF37;font-size:14px;line-height:22px;">Qty</th></tr></thead>
+<tbody>{% for item in items %}<tr>
+{% if thumbnail_cids %}<td style="padding:12px 12px 12px 0;border-bottom:1px solid #332B18;vertical-align:top;">{% if thumbnail_cids.get(item.image) %}<img src="cid:{{ thumbnail_cids[item.image] }}" width="56" alt="{{ item.code }}" style="display:block;width:56px;max-width:100%;height:auto;color:#FFFFFF;font-size:12px;">{% endif %}</td>{% endif %}
+<td class="white" style="padding:12px 12px 12px 0;border-bottom:1px solid #332B18;color:#FFFFFF;font-size:16px;line-height:24px;vertical-align:top;word-break:break-word;overflow-wrap:anywhere;"><strong>{{ item.code }}</strong></td>
+<td class="muted" style="padding:12px 12px 12px 0;border-bottom:1px solid #332B18;color:#C7C7C7;font-size:16px;line-height:24px;vertical-align:top;white-space:normal;word-wrap:break-word;word-break:break-word;overflow-wrap:anywhere;">{% if item.notes %}{{ multiline(item.notes) }}{% endif %}</td>
+<td align="right" class="white" style="padding:12px 0;border-bottom:1px solid #332B18;color:#FFFFFF;font-size:16px;line-height:24px;vertical-align:top;">{{ item.quantity }}</td>
+</tr>{% endfor %}</tbody></table>
+{% if shipping_lines %}<h2 class="white" style="{{ heading_style }}">Ship to</h2>
+<p class="white" style="{{ body_style }}">{% for value in [customer.name, customer.company] if value %}{{ value }}<br>{% endfor %}<a class="gold" href="{{ shipping_map_url }}" style="color:#D4AF37;text-decoration:underline;overflow-wrap:anywhere;">{% for line in shipping_lines %}{{ line }}{% if not loop.last %}<br>{% endif %}{% endfor %}</a></p>{% endif %}
+<h2 class="white" style="{{ heading_style }}">Contact details</h2>
+<p class="white" style="{{ body_style }}">{% if not shipping_lines %}{% for value in [customer.name, customer.company] if value %}{{ value }}<br>{% endfor %}{% endif %}
+{% if customer.email %}<a class="gold" href="{{ contact_url }}" style="{{ link_style }}">{{ customer.email }}</a>{% endif %}
+{% if customer.phone %}{% if customer.email %}<br>{% endif %}{% if phone_url %}<a class="gold" href="{{ phone_url }}" style="{{ link_style }}">{{ customer.phone }}</a>{% else %}{{ customer.phone }}{% endif %}{% endif %}</p>
+{% if customer.notes %}<h2 class="white" style="{{ heading_style }}">Your order notes</h2><p class="white" style="{{ body_style }}">{{ multiline(customer.notes) }}</p>{% endif %}
+{% if socials.instagram_url or socials.tiktok_url %}
+<table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-top:24px;border:1px solid #D4AF37;border-radius:12px;background-color:#000000;"><tr><td bgcolor="#000000" style="padding:18px 16px;">
+<h2 class="white" style="margin:0 0 6px;color:#FFFFFF;font-size:18px;line-height:26px;">Follow us on Instagram and TikTok</h2>
+<p class="muted" style="margin:0 0 14px;color:#C7C7C7;font-size:14px;line-height:22px;">See new arrivals and product videos.</p>
+{% for name, label in [('instagram', 'Instagram'), ('tiktok', 'TikTok')] %}{% if socials[name ~ '_url'] %}
+<a class="gold" href="{{ socials[name ~ '_url'] }}" style="display:inline-block;margin:0 8px 8px 0;padding:10px 12px;border:1px solid #D4AF37;border-radius:999px;color:#D4AF37;text-decoration:none;font-size:14px;line-height:24px;font-weight:bold;">{% if social_cids.get(name) %}<img src="cid:{{ social_cids[name] }}" width="20" height="20" alt="" style="display:inline-block;width:20px;height:20px;vertical-align:middle;margin-right:6px;border:0;">{% endif %}{{ label }}</a>
+{% endif %}{% endfor %}
+</td></tr></table>
+{% endif %}
+<h2 class="white" style="{{ heading_style }}">Questions or changes?</h2>
+<p class="white" style="{{ body_style }}">Reply to this email and include your order number{% if support_email %}, or email our team below{% endif %}.</p>
+{% if support_email %}<table role="presentation" border="0" cellspacing="0" cellpadding="0" style="margin-top:14px;"><tr><td align="center" bgcolor="#000000" class="email-bg" style="background-color:#000000;border:1px solid #D4AF37;border-radius:6px;mso-padding-alt:12px 18px;"><a class="gold" href="{{ action_url }}" style="display:block;padding:12px 18px;mso-padding-alt:0;color:#D4AF37;font-size:16px;line-height:22px;font-weight:bold;text-decoration:none;">Email us about this order</a></td></tr></table>{% endif %}
+<div class="muted" style="margin-top:26px;padding-top:18px;border-top:1px solid #332B18;color:#C7C7C7;font-size:14px;line-height:22px;">
+<strong class="white" style="color:#FFFFFF;">California Earrings</strong><br>
+<a class="gold" href="https://www.google.com/maps/search/?api=1&amp;query=650%20S%20Hill%20St%20Suite%20518%2C%20Los%20Angeles%2C%20CA%2090014" style="color:#D4AF37;text-decoration:underline;overflow-wrap:anywhere;">650 S Hill St Suite 518<br>Los Angeles, CA 90014</a><br>
+<a class="gold" href="tel:+18183319292" style="{{ link_style }}">Cell: +1 (818) 331-9292</a><br>
+<a class="gold" href="tel:+12139357272" style="{{ link_style }}">Office: +1 (213) 935-7272</a><br>
+{% if support_email %}<a class="gold" href="mailto:{{ support_email }}" style="{{ link_style }}">{{ support_email }}</a><br>{% endif %}
+<a class="gold" href="https://californiaearrings.com" style="{{ link_style }}">californiaearrings.com</a>
+
+</div>
+
+
+</td></tr></table>
+<!--[if mso]></td></tr></table><![endif]-->
+</td></tr></table>
+</body></html>

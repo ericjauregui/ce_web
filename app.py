@@ -22,6 +22,7 @@ from domains.cache_control import PUBLIC_ENDPOINT_POLICIES, install_cache_contro
 from domains.emailing import send_order_email
 from domains.faqs import load_faqs as load_faqs_from_path
 from domains.file_cache import get_path_version
+from domains.image_assets import PRODUCT_IMAGE_SIZES, optimized_image_path, responsive_image_candidates
 from domains.site_routes import register_site_routes
 from domains.seo import build_sitemap_urls as build_sitemap_urls_from_context
 from domains.seo import canonical_base_url
@@ -80,6 +81,9 @@ def _slugify(value: str) -> str:
 
 
 def asset_url(filename: str) -> str:
+    if filename == "vendor/bootstrap/bootstrap.min.css":
+        from domains.stylesheets import bootstrap_stylesheet
+        filename = bootstrap_stylesheet(BASE_DIR)
     static_path = BASE_DIR / "static" / filename
     version = get_path_version(static_path)
     if version is None:
@@ -90,6 +94,26 @@ def asset_url(filename: str) -> str:
 
 def load_products() -> list[dict[str, Any]]:
     return load_products_from_path(CATALOG_PATH)
+
+
+def hero_image_url(filename: str) -> str:
+    from domains.image_assets import hero_image_path
+    return asset_url(hero_image_path(BASE_DIR / "static", filename))
+
+
+def optimized_image_url(filename: str) -> str:
+    return asset_url(optimized_image_path(BASE_DIR / "static", filename))
+
+
+def product_image_attributes(filename: str, usage: str = "catalog") -> dict[str, str]:
+    candidates = responsive_image_candidates(BASE_DIR / "static", filename)
+    if not candidates:
+        return {}
+    srcset = ", ".join(
+        f"{url_for('static', filename=item['path'], v=item['version'])} {item['width']}w"
+        for item in candidates
+    )
+    return {"srcset": srcset, "sizes": PRODUCT_IMAGE_SIZES[usage]}
 
 
 def load_social() -> dict[str, Any]:
@@ -160,6 +184,9 @@ def inject_site_config():
     cart = {} if request.endpoint in PUBLIC_ENDPOINT_POLICIES else get_cart()
     return {
         "asset_url": asset_url,
+        "optimized_image_url": optimized_image_url,
+        "hero_image_url": hero_image_url,
+        "product_image_attributes": product_image_attributes,
         "cart_distinct_item_count": len(cart),
         "cart_item_count": cart_total_items(cart),
         "current_year": date.today().year,
