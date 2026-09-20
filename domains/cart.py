@@ -241,6 +241,17 @@ def cart_to_pdf_bytes(
     )
 
     styles = getSampleStyleSheet()
+    cell_style = styles["Normal"].clone("OrderItemCell")
+    cell_style.fontSize = 9
+    cell_style.leading = 12
+    cell_style.alignment = 1
+    cell_style.splitLongWords = 1
+
+    def text_cell(value: Any) -> Any:
+        # Paragraphs wrap to the padded column width; escape user/catalog text.
+        text = escape(str(value or "")).replace("\r\n", "\n").replace("\r", "\n")
+        return Paragraph(text.replace("\n", "<br/>"), cell_style)
+
     logo_path = product_images_dir.parent / "assets" / "ce_logo_dark.png"
     title_style = styles["Title"].clone("OrderSummaryTitle")
     title_style.alignment = 1
@@ -301,10 +312,10 @@ def cart_to_pdf_bytes(
         table_data.append(
             [
                 image_cell,
-                row.get("code", ""),
-                row.get("name", ""),
+                text_cell(row.get("code", "")),
+                text_cell(row.get("name", "")),
                 str(row.get("quantity", 0)),
-                row.get("notes", "") or "—",
+                text_cell(row.get("notes", "") or "—"),
             ]
         )
 

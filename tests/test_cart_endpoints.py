@@ -581,7 +581,7 @@ class CartEndpointTests(BaseWebTest):
                 self.buffer.write(b"%PDF-test")
 
         def fake_styles() -> dict[str, FakeStyle]:
-            return {"Title": FakeStyle("Title")}
+            return {"Title": FakeStyle("Title"), "Normal": FakeStyle("Normal")}
 
         fake_colors = types.ModuleType("reportlab.lib.colors")
         fake_colors.white = "white"
@@ -703,7 +703,7 @@ class CartEndpointTests(BaseWebTest):
                 self.buffer.write(b"%PDF-test")
 
         def fake_styles() -> dict[str, FakeStyle]:
-            return {"Title": FakeStyle("Title")}
+            return {"Title": FakeStyle("Title"), "Normal": FakeStyle("Normal")}
 
         fake_colors = types.ModuleType("reportlab.lib.colors")
         fake_colors.white = "white"
