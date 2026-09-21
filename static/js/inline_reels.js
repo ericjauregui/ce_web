@@ -802,14 +802,14 @@
     function scheduleThumbnailPriming() {
       // Real frame posters avoid downloading every clip just to paint a thumbnail.
       // Reels added without a generated poster retain the near-viewport fallback.
-      const observer = typeof IntersectionObserver === "function"
+      let observer = typeof IntersectionObserver === "function"
         ? new IntersectionObserver((entries) => {
             entries.forEach(({ target, isIntersecting }) => {
               if (!isIntersecting) return;
               showPreview(target);
               observer.unobserve(target);
             });
-          }, { rootMargin: "220px", threshold: 0.01 })
+          }, { rootMargin: window.catalogHeroReady ? "0px" : "220px", threshold: 0.01 })
         : null;
       function posterSource(video) {
         const pixels = video.getBoundingClientRect().width * (window.devicePixelRatio || 1);
@@ -848,6 +848,21 @@
         poster.src = source;
       }
       videos.forEach((video) => observer ? observer.observe(video) : showPreview(video));
+      if (observer && window.catalogHeroReady) {
+        window.catalogHeroReady.then(() => {
+          observer.disconnect();
+          observer = new IntersectionObserver((entries) => {
+            entries.forEach(({ target, isIntersecting }) => {
+              if (!isIntersecting) return;
+              showPreview(target);
+              observer.unobserve(target);
+            });
+          }, { rootMargin: "220px", threshold: 0.01 });
+          videos.forEach(video => {
+            if (!video.dataset.requestedPoster) observer.observe(video);
+          });
+        });
+      }
       window.addEventListener("resize", () => {
         if (!track.isConnected) return;
         videos.forEach((video) => {

@@ -266,6 +266,15 @@ Video fingerprints prevent a replaced clip from using an old poster. Missing pos
 fall back to extracting a frame in the browser only near the viewport. Visible active
 reels retain muted autoplay; other clips load on activation.
 
+On the homepage, `catalog_images.js` limits product and collection-thumbnail
+requests to visible images while the hero is downloading, then enables a 400px
+look-ahead. Scrolling or selecting a category enables look-ahead immediately;
+category clicks also prepare the first four destination images. Image sources,
+responsive candidates, and catalog text remain server-rendered, with native
+image markup in `noscript` for visitors without JavaScript. Reel posters reuse
+the same image bytes through a low-priority image request; offscreen poster
+look-ahead resumes after the hero. Visible autoplay is unchanged.
+
 After changing templates, application modules, JavaScript, or custom CSS, run:
 
 ```sh

@@ -8,6 +8,8 @@
   <link rel="preload" as="image" href="{{ asset_url('assets/ce_logo_full.png') }}" fetchpriority="high">
 {% endblock %}
 {% block page_css %}
+<noscript><style>img[data-catalog-src] { display: none; } .product-img-wrap > noscript, .home-collection-option > noscript { display: contents; }</style></noscript>
+<script src="{{ asset_url('js/catalog_images.js') }}" defer></script>
 <link href="{{ asset_url('css/styles/home_catalog.css') }}" rel="stylesheet">
 {% if latest_reels %}
   <link href="{{ asset_url('css/styles/inline_reels.css') }}" rel="stylesheet">
@@ -72,7 +74,14 @@
         {% for other in sections %}
         <a href="#section-{{ other.key }}" class="home-collection-option section-chip-btn"
           data-target="section-{{ other.key }}" data-collection-title="{{ other.title }}">
-          <img src="{{ optimized_image_url('product_images/' ~ other.items[0].image) }}" {{ product_image_attributes('product_images/' ~ other.items[0].image, 'collection')|xmlattr }} alt="" width="80" height="80" loading="lazy" decoding="async">
+          {% set collection_image = 'product_images/' ~ other.items[0].image %}
+          {% set collection_attributes = product_image_attributes(collection_image, 'collection') %}
+          <img data-catalog-src="{{ optimized_image_url(collection_image) }}"
+            {% for key, value in collection_attributes.items() %}
+            {% if key == 'srcset' %}data-catalog-srcset="{{ value }}"{% else %}{{ key }}="{{ value }}"{% endif %}
+            {% endfor %}
+            alt="" width="80" height="80" loading="lazy" decoding="async">
+          <noscript><img src="{{ optimized_image_url(collection_image) }}" {{ collection_attributes|xmlattr }} alt="" width="80" height="80" loading="lazy" decoding="async"></noscript>
           <span>{{ other.title }}</span>
         </a>
         {% endfor %}
@@ -188,7 +197,7 @@
 <script src="{{ asset_url('js/catalog.js') }}"></script>
 <script src="{{ asset_url('js/whatsapp_float.js') }}"></script>
 {% if latest_reels %}
-<script src="{{ asset_url('js/inline_reels.js') }}"></script>
-<script src="{{ asset_url('js/home_reels.js') }}"></script>
+<script src="{{ asset_url('js/inline_reels.js') }}" defer></script>
+<script src="{{ asset_url('js/home_reels.js') }}" defer></script>
 {% endif %}
 {% endblock %}

@@ -9,9 +9,15 @@
        aria-expanded="false"
        aria-controls="{{ drawer_id }}">
     <div class="product-img-wrap">
-      <img class="card-img-top product-img" src="{{ optimized_image_url('product_images/' ~ p.image) }}"
-        {{ product_image_attributes('product_images/' ~ p.image)|xmlattr }}
+      {% set image_path = 'product_images/' ~ p.image %}
+      {% set image_attributes = product_image_attributes(image_path) %}
+      <img class="card-img-top product-img" data-catalog-src="{{ optimized_image_url(image_path) }}"
+        {% for key, value in image_attributes.items() %}
+        {% if key == 'srcset' %}data-catalog-srcset="{{ value }}"{% else %}{{ key }}="{{ value }}"{% endif %}
+        {% endfor %}
         alt="{{ p.name }}" loading="lazy" decoding="async" fetchpriority="low">
+      <noscript><img class="card-img-top product-img" src="{{ optimized_image_url(image_path) }}"
+        {{ image_attributes|xmlattr }} alt="{{ p.name }}" loading="lazy" decoding="async"></noscript>
     </div>
     <div class="card-body text-center d-flex flex-column">
       <a class="small code-badge product-detail-link" href="{{ url_for('product_detail', product_code=p.code) }}"
