@@ -2,11 +2,12 @@ from __future__ import annotations
 
 import os
 from datetime import date, timedelta
+from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
 from dotenv import load_dotenv
-from flask import Flask, request, session, url_for
+from flask import Flask, g, request, session, url_for
 
 from domains.cart import (
     cart_total_items,
@@ -22,7 +23,8 @@ from domains.cache_control import PUBLIC_ENDPOINT_POLICIES, install_cache_contro
 from domains.emailing import send_order_email
 from domains.faqs import load_faqs as load_faqs_from_path
 from domains.file_cache import get_path_version
-from domains.image_assets import PRODUCT_IMAGE_SIZES, optimized_image_path, responsive_image_candidates
+from domains.image_assets import PRODUCT_IMAGE_SIZES
+from domains.image_asset_cache import ImageAssetCache
 from domains.site_routes import register_site_routes
 from domains.seo import build_sitemap_urls as build_sitemap_urls_from_context
 from domains.seo import canonical_base_url
@@ -96,24 +98,49 @@ def load_products() -> list[dict[str, Any]]:
     return load_products_from_path(CATALOG_PATH)
 
 
+_image_assets = ImageAssetCache(BASE_DIR / "static")
+
+
+def _image_selection(filename: str, *, hero: bool = False):
+    if not hasattr(g, "image_asset_snapshot"):
+        g.image_asset_snapshot = _image_assets.snapshot()
+        g.image_asset_selections = {}
+        g.image_static_base = url_for("static", filename="")
+    key = filename, hero
+    if key not in g.image_asset_selections:
+        g.image_asset_selections[key] = _image_assets.get(filename, g.image_asset_snapshot, hero=hero)
+    return g.image_asset_selections[key]
+
+
+@lru_cache(maxsize=4096)
+def _image_url(filename: str, version: str | None, static_base: str) -> str:
+    # static_base partitions the cache by the current mount prefix/static host.
+    # Let Flask escape URLs; do not concatenate filenames or cache customer HTML.
+    return url_for("static", filename=filename, **({"v": version} if version else {}))
+
+
+@lru_cache(maxsize=1024)
+def _image_srcset(candidates: tuple, static_base: str) -> str:
+    return ", ".join(f"{_image_url(path, version, static_base)} {width}w"
+                     for path, width, version in candidates)
+
+
 def hero_image_url(filename: str) -> str:
-    from domains.image_assets import hero_image_path
-    return asset_url(hero_image_path(BASE_DIR / "static", filename))
+    image = _image_selection(filename, hero=True)
+    return _image_url(image.path, image.version, g.image_static_base)
 
 
 def optimized_image_url(filename: str) -> str:
-    return asset_url(optimized_image_path(BASE_DIR / "static", filename))
+    image = _image_selection(filename)
+    return _image_url(image.path, image.version, g.image_static_base)
 
 
 def product_image_attributes(filename: str, usage: str = "catalog") -> dict[str, str]:
-    candidates = responsive_image_candidates(BASE_DIR / "static", filename)
-    if not candidates:
+    image = _image_selection(filename)
+    if not image.candidates:
         return {}
-    srcset = ", ".join(
-        f"{url_for('static', filename=item['path'], v=item['version'])} {item['width']}w"
-        for item in candidates
-    )
-    return {"srcset": srcset, "sizes": PRODUCT_IMAGE_SIZES[usage]}
+    return {"srcset": _image_srcset(image.candidates, g.image_static_base),
+            "sizes": PRODUCT_IMAGE_SIZES[usage]}
 
 
 def load_social() -> dict[str, Any]:
@@ -140,7 +167,16 @@ def warm_runtime_caches() -> None:
     # Warm catalog and search caches once per process so initial customer
     # requests avoid cold-path indexing work.
     try:
-        load_products()
+        products = load_products()
+        # Build image metadata and relative URLs before Gunicorn accepts traffic.
+        # No session/cart access or database queries occur in this context.
+        with app.test_request_context("/"):
+            for product in products:
+                filename = "product_images/" + product["image"]
+                optimized_image_url(filename)
+                product_image_attributes(filename)
+            for filename in ("assets/hero_bg.png", "assets/hero_bg_mobile_compact.png", "assets/hero_bg_wide.png"):
+                hero_image_url(filename)
     except Exception:
         # Do not fail app startup if warmup misses; normal request path will recover.
         pass

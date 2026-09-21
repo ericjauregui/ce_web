@@ -1,5 +1,5 @@
 {
-  "app.py": "30f8cd8238112546",
+  "app.py": "8939158fbbef77c7",
   "domains/__init__.py": "e3b0c44298fc1c14",
   "domains/cache_control.py": "0be48abcd37b9c09",
   "domains/cart.py": "d2c3b2a5dc6be68e",
@@ -9,6 +9,7 @@
   "domains/faqs.py": "cbca8b882a48f820",
   "domains/file_cache.py": "d574c633939da306",
   "domains/homepage.py": "5d7dddab8784f4df",
+  "domains/image_asset_cache.py": "b31c7af99b3844d1",
   "domains/image_assets.py": "19aee09cc89cad6f",
   "domains/location_options.py": "f01221cf65ba21af",
   "domains/orders.py": "e0d9c06f279d9a22",
@@ -48,7 +49,7 @@
   "templates/contact.html": "5b21f98387be4ae0",
   "templates/emails/order_receipt.html": "fa6c0377376ec266",
   "templates/faqs.html": "e9714d6c9462cfd4",
-  "templates/index.html": "8671015ff1df2b57",
+  "templates/index.html": "72bf0df44ea0e3fa",
   "templates/order_submitted.html": "d0ddc58be09ee33a",
   "templates/partials/cart_icon.html": "57a18f0177d36a9f",
   "templates/partials/contact_details_card.html": "e9010c70863a758f",

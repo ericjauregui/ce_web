@@ -1,0 +1,75 @@
+{
+  "method": "Nine local warm requests per case, medians. Same running Flask app and CSS selection, legacy uncached image helpers compared against new cache. Identical seeded reels and session state. Not production timing.",
+  "results": [
+    {
+      "case": "empty",
+      "uncachedMedianSeconds": 0.14485700000659563,
+      "cachedMedianSeconds": 0.023789750004652888,
+      "identicalHTML": true,
+      "speedupPercent": 83.57707946211113
+    },
+    {
+      "case": "cart",
+      "uncachedMedianSeconds": 0.14356604201020673,
+      "cachedMedianSeconds": 0.023868292002589442,
+      "identicalHTML": true,
+      "speedupPercent": 83.37469524938736
+    },
+    {
+      "case": "search",
+      "uncachedMedianSeconds": 0.010901082991040312,
+      "cachedMedianSeconds": 0.008507083999575116,
+      "identicalHTML": true,
+      "speedupPercent": 21.961111510047605
+    },
+    {
+      "case": "prefix",
+      "uncachedMedianSeconds": 0.1410500000056345,
+      "cachedMedianSeconds": 0.024957083005574532,
+      "identicalHTML": true,
+      "speedupPercent": 82.30621552316371
+    }
+  ],
+  "browserInteractions": [
+    {
+      "browser": "chromium",
+      "passed": [
+        "navigation",
+        "catalog anchor",
+        "add to cart",
+        "quantity increment",
+        "mini-cart",
+        "clear quantity",
+        "product detail image",
+        "search",
+        "offscreen video deferral",
+        "drawer keyboard expansion",
+        "muted autoplay",
+        "reel keyboard activation",
+        "manual mute",
+        "reel advance"
+      ],
+      "errors": []
+    },
+    {
+      "browser": "webkit",
+      "passed": [
+        "navigation",
+        "catalog anchor",
+        "add to cart",
+        "quantity increment",
+        "mini-cart",
+        "clear quantity",
+        "product detail image",
+        "search",
+        "offscreen video deferral",
+        "drawer keyboard expansion",
+        "muted autoplay",
+        "reel keyboard activation",
+        "manual mute",
+        "reel advance"
+      ],
+      "errors": []
+    }
+  ]
+}

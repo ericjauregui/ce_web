@@ -297,3 +297,19 @@ changed. Include `static/optimized/heroes/` and `hero-manifest.json` in deployme
 The generator verifies unchanged dimensions/metadata and a conservative pixel-error
 limit; this numerical guard does not replace visual review. Both preload URLs and
 background URLs use the same fingerprinted hero helper to avoid duplicate requests.
+
+### Server-side image metadata cache
+
+Image URLs and responsive candidate sets are cached per worker, with bounded,
+thread-safe storage. Each request checks the three manifest file stamps once and
+checks the relevant source/derivative file stamps before reusing a selection.
+Fingerprint validation and URL generation repeat only when inputs change. Repeated
+uses of an image within one request share the same selection. This preserves the
+existing missing/corrupt/stale-image fallbacks without caching customer HTML or carts.
+
+`warm_runtime_caches()` prepares catalog image metadata and hero URLs when the app
+loads, before the production worker accepts traffic. Warmup is best-effort; normal
+requests populate any missing entries. Changes published through the asset-generation
+scripts (which update file timestamps and manifests) invalidate the cache automatically.
+URL caches also separate different static URL/mount prefixes. No new service, database
+cache, environment setting, or frontend change is required.
