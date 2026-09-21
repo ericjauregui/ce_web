@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Please Try Again Shortly | California Earrings{% endblock %}
+{% block robots_meta %}noindex,nofollow{% endblock %}
+{% block content %}
+<section class="container py-5" style="max-width: 900px;">
+  <div class="card bg-dark text-light border-gold p-3 p-md-4">
+    <h1 class="text-gold">Please try again shortly</h1>
+    <p>There have been too many order attempts from your connection. Please wait up to 10 minutes before trying again.</p>
+    <p>Your cart is still saved. Use your browser's Back button to return to your form.</p>
+    <a class="text-gold" href="{{ url_for('cart') }}">Review your cart</a>
+  </div>
+</section>
+{% endblock %}

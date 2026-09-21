@@ -43,7 +43,7 @@ class MetaRouteTests(BaseWebTest):
         self.assertIn('rel="icon" type="image/png" sizes="32x32" href="/static/favicon/favicon-32x32.png?v=', home_body)
         self.assertIn('rel="icon" type="image/png" sizes="16x16" href="/static/favicon/favicon-16x16.png?v=', home_body)
         self.assertIn('rel="apple-touch-icon" href="/static/favicon/apple-touch-icon.png?v=', home_body)
-        self.assertIn('"@type": "Organization"', home_body)
+        self.assertIn('"@type": "LocalBusiness"', home_body)
         self.assertIn('"@type": "WebSite"', home_body)
         self.assertIn('"@type": "CollectionPage"', home_body)
 

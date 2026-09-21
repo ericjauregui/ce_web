@@ -95,7 +95,7 @@ class EmailingTests(unittest.TestCase):
 
         self.assertEqual(log_path.name, "email_events_20260608.log")
 
-    def test_send_order_email_saves_csv_and_embeds_signature(self) -> None:
+    def test_send_order_email_saves_csv_and_embeds_logo(self) -> None:
         sent_messages: list[str] = []
 
         def fake_graph_send(message, settings) -> None:
@@ -125,7 +125,6 @@ class EmailingTests(unittest.TestCase):
         self.assertIn("To: buyer@example.com", raw_message)
         self.assertIn("Bcc: orders@californiaearrings.com, sales@example.com, merch@example.com", raw_message)
         self.assertIn("ce_logo_full.png", raw_message)
-        self.assertIn("ce_email_signature.png", raw_message)
         self.assertIn("Content-ID:", raw_message)
         self.assertIn("cid:", raw_message)
         self.assertNotIn("text/csv", raw_message)  # CSV is saved but not attached to email
@@ -377,5 +376,4 @@ class EmailingTests(unittest.TestCase):
         self.assertIn(b"Content-ID:", mime_bytes)
         self.assertIn(b"Content-Disposition: inline", mime_bytes)
         self.assertIn(b"ce_logo_full.png", mime_bytes)
-        self.assertIn(b"ce_email_signature.png", mime_bytes)
         self.assertIn(b"cid:", mime_bytes)

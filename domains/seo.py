@@ -36,6 +36,12 @@ def build_sitemap_urls(
 ) -> list[dict[str, str | float | None]]:
     pages = [
         {
+            "path": "/privacy",
+            "changefreq": "yearly",
+            "priority": 0.3,
+            "lastmod": iso_lastmod(base_dir / "templates" / "privacy.html"),
+        },
+        {
             "path": "/",
             "changefreq": "daily",
             "priority": 1.0,

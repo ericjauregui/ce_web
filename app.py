@@ -20,6 +20,7 @@ from domains.catalog import (
 )
 from domains.cart_routes import register_cart_routes
 from domains.cache_control import PUBLIC_ENDPOINT_POLICIES, install_cache_control
+from domains.rate_limiting import install_rate_limiting
 from domains.emailing import send_order_email
 from domains.faqs import load_faqs as load_faqs_from_path
 from domains.file_cache import get_path_version
@@ -226,7 +227,7 @@ def inject_site_config():
         "cart_distinct_item_count": len(cart),
         "cart_item_count": cart_total_items(cart),
         "current_year": date.today().year,
-        "plausible_domain": os.getenv("PLAUSIBLE_DOMAIN", "").strip(),
+        "cloudflare_web_analytics_token": os.getenv("CLOUDFLARE_WEB_ANALYTICS_TOKEN", "30e9fc0a5f4f49379c768839796e2af1").strip(),
         "site_base_url": os.getenv("SITE_BASE_URL", "").strip(),
         "social": load_social(),
         "site_name": "California Earrings",
@@ -257,6 +258,7 @@ register_cart_routes(
     canonical_base_url=_canonical_base_url,
 )
 
+install_rate_limiting(app)
 warm_runtime_caches()
 
 

@@ -85,7 +85,7 @@ Optional:
 - `PORT`: local bind port. Defaults to `5001`.
 - `FLASK_DEBUG`: set to `1` to enable Flask debug mode.
 - `SITE_BASE_URL`: public canonical base URL used for sitemap entries, canonical URLs, and absolute OG image links.
-- `PLAUSIBLE_DOMAIN`: enables Plausible analytics injection in the base template.
+- `CLOUDFLARE_WEB_ANALYTICS_TOKEN`: overrides the configured Cloudflare Web Analytics token on site pages. The supplied token is enabled by default; set this variable to an empty value to disable it. Do not also enable Cloudflare's automatic snippet injection, which would load analytics twice.
 
 Order email settings (preserve the existing Render values):
 

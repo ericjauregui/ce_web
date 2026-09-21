@@ -40,6 +40,10 @@ def register_site_routes(
     canonical_base_url: CanonicalBaseUrl,
     slugify: Slugify,
 ) -> None:
+    @app.route("/privacy")
+    def privacy_policy():
+        return render_template("privacy.html")
+
     @app.route("/")
     def index():
         products = load_products()

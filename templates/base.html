@@ -44,10 +44,6 @@
   <link href="{{ asset_url('css/styles/nav.css') }}" rel="stylesheet">
   {% block page_css %}{% endblock %}
 
-  {% if plausible_domain %}
-  <script defer data-domain="{{ plausible_domain }}" src="https://plausible.io/js/script.js"></script>
-  {% endif %}
-
   {% block schema_json_ld %}
   <script type="application/ld+json">
   {{ {
@@ -218,10 +214,15 @@
       </div>
     </div>
     © {{ current_year }} California Earrings · Los Angeles, CA, USA
+    <div class="mt-2"><a class="text-gold" href="{{ url_for('privacy_policy') }}">Privacy Policy</a></div>
   </footer>
   {% endblock %}
 
   <script defer src="{{ asset_url('vendor/bootstrap/bootstrap.bundle.min.js') }}"></script>
+  {% if cloudflare_web_analytics_token %}
+  <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js"
+    data-cf-beacon='{{ {"token": cloudflare_web_analytics_token}|tojson }}'></script>
+  {% endif %}
   {% block body_end %}{% endblock %}
   <script>
   (function () {
