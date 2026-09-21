@@ -10,7 +10,7 @@
       </div>
       <div class="section-header-cats" aria-hidden="true"></div>
       <div class="section-header-jump d-flex gap-3 align-items-center">
-        <a class="{% if reels_view_all_button|default(false) %}btn btn-outline-gold reels-view-all-btn{% elif request.endpoint == 'index' %}home-view-all{% else %}chip catalog-row-action{% endif %}"
+        <a class="{% if reels_view_all_button|default(false) %}btn btn-outline-gold reels-view-all-btn{% elif request.endpoint == 'index' %}home-row-button{% else %}chip catalog-row-action{% endif %}"
           href="{{ url_for('reels_page') }}">View All</a>
       </div>
     </div>

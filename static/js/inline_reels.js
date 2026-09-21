@@ -820,21 +820,40 @@
       function showPreview(video) {
         const card = video.closest(".inline-reel-card");
         if (video.dataset.poster) {
-          const poster = new Image();
-          poster.onload = () => card.classList.add("is-loaded");
-          poster.onerror = () => primeThumbnailFrame(video, card, true);
-          video.poster = posterSource(video);
-          poster.src = video.poster;
+          loadPoster(video, card);
           video.addEventListener("loadeddata", () => card.classList.add("is-loaded"), { once: true });
         } else {
           primeThumbnailFrame(video, card, true);
         }
       }
+      function loadPoster(video, card) {
+        const source = posterSource(video);
+        if (video.dataset.requestedPoster === source) return;
+        video.dataset.requestedPoster = source;
+        const poster = new Image();
+        // Setting video.poster first starts a separate, normal-priority request.
+        // Fetch the identical pixels at low priority, then reuse the cached image.
+        poster.fetchPriority = "low";
+        poster.onload = () => {
+          if (video.dataset.requestedPoster !== source) return;
+          video.poster = source;
+          card.classList.add("is-loaded");
+        };
+        poster.onerror = () => {
+          if (video.dataset.requestedPoster === source) {
+            delete video.dataset.requestedPoster;
+            primeThumbnailFrame(video, card, true);
+          }
+        };
+        poster.src = source;
+      }
       videos.forEach((video) => observer ? observer.observe(video) : showPreview(video));
       window.addEventListener("resize", () => {
         if (!track.isConnected) return;
         videos.forEach((video) => {
-          if (video.poster && video.dataset.poster) video.poster = posterSource(video);
+          if (video.dataset.requestedPoster && video.dataset.poster) {
+            loadPoster(video, video.closest(".inline-reel-card"));
+          }
         });
       }, { passive: true });
     }
