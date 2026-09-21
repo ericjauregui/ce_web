@@ -94,7 +94,6 @@
         <div class="section-header-cats" aria-hidden="true"></div>
         <div class="section-header-jump d-flex gap-3 align-items-center">
           <a class="chip" href="{{ url_for('index') }}#section-studs">← Full Catalog</a>
-          {% include "partials/home_jump_top.html" %}
         </div>
       </div>
     </div>
@@ -105,7 +104,6 @@
         <span class="catalog-section-title-text">{{ section.title }}</span>
         <span class="catalog-section-title-rule" aria-hidden="true"></span>
       </h2>
-      {% include "partials/home_jump_top.html" %}
       </div>
     </div>
     {% endif %}
