@@ -821,12 +821,17 @@
         const card = video.closest(".inline-reel-card");
         if (video.dataset.poster) {
           loadPoster(video, card);
-          video.addEventListener("loadeddata", () => card.classList.add("is-loaded"), { once: true });
+          if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+            card.classList.add("is-loaded");
+          }
         } else {
           primeThumbnailFrame(video, card, true);
         }
       }
       function loadPoster(video, card) {
+        // A poster belongs to an unstarted preview. Never replace the display
+        // surface once a video source is attached, including paused playback.
+        if (video.hasAttribute("src")) return;
         const source = posterSource(video);
         if (video.dataset.requestedPoster === source) return;
         video.dataset.requestedPoster = source;
@@ -835,14 +840,14 @@
         // Fetch the identical pixels at low priority, then reuse the cached image.
         poster.fetchPriority = "low";
         poster.onload = () => {
-          if (video.dataset.requestedPoster !== source) return;
+          if (video.dataset.requestedPoster !== source || video.hasAttribute("src")) return;
           video.poster = source;
           card.classList.add("is-loaded");
         };
         poster.onerror = () => {
           if (video.dataset.requestedPoster === source) {
             delete video.dataset.requestedPoster;
-            primeThumbnailFrame(video, card, true);
+            if (!video.hasAttribute("src")) primeThumbnailFrame(video, card, true);
           }
         };
         poster.src = source;
@@ -882,6 +887,17 @@
       // Native controls remain available, but looping is handled by advancing to the next card.
       video.loop = false;
       initializeTouchVideoSound(video);
+
+      // Register before autoplay or thumbnail observers can start loading media.
+      // Poster completion is independent of whether a real video frame is ready.
+      const revealVideoFrame = () => {
+        if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+          card.classList.add("is-loaded");
+        }
+      };
+      video.addEventListener("loadeddata", revealVideoFrame);
+      video.addEventListener("playing", revealVideoFrame);
+      revealVideoFrame();
 
       video.addEventListener("ended", () => {
         if (card !== activeCard) {
