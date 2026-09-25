@@ -17,6 +17,11 @@ from domains.file_cache import load_json_cached
 from domains.homepage import build_homepage_context, load_latest_reels
 from domains.reels import load_random_reels
 from domains.orders import DatabaseConfigurationError
+from domains.site_analytics import (
+    ANALYTICS_SESSION_COOKIE, SiteAnalytics, normalize_click_target,
+    normalize_campaign_value, normalize_page_context, normalize_page_path,
+    normalize_referrer_host, session_id_digest,
+)
 from domains.team import build_member_vcard, build_team_members, ensure_team_qr_assets
 
 LoadProducts = Callable[[], list[dict[str, Any]]]
@@ -53,6 +58,7 @@ def register_site_routes(
     slugify: Slugify,
 ) -> None:
     connect_analytics_lock = Lock()
+    site_analytics_lock = Lock()
 
     @app.route("/privacy")
     def privacy_policy():
@@ -219,6 +225,78 @@ def register_site_routes(
         except (DatabaseConfigurationError, SQLAlchemyError):
             app.logger.warning("Connect analytics could not be saved")
             return "", 503
+        return "", 204
+
+    @app.post("/api/analytics/event")
+    def site_analytics_event():
+        session_hash = session_id_digest(request.cookies.get(ANALYTICS_SESSION_COOKIE))
+        if not session_hash:
+            return "", 204
+
+        payload = request.get_json(silent=True)
+        if not isinstance(payload, dict):
+            return "", 400
+        event_type = payload.get("event_type")
+        page_path = normalize_page_path(payload.get("page_path"))
+        context_value = payload.get("page_context")
+        page_context = normalize_page_context(context_value)
+        target_value = payload.get("click_target")
+        click_target = normalize_click_target(target_value) if target_value is not None else None
+        attribution_values = {
+            "referrer_host": payload.get("referrer_host"),
+            "utm_source": payload.get("utm_source"),
+            "utm_medium": payload.get("utm_medium"),
+            "utm_campaign": payload.get("utm_campaign"),
+        }
+        attribution = {
+            "referrer_host": normalize_referrer_host(attribution_values["referrer_host"]),
+            "utm_source": normalize_campaign_value(attribution_values["utm_source"]),
+            "utm_medium": normalize_campaign_value(attribution_values["utm_medium"]),
+            "utm_campaign": normalize_campaign_value(attribution_values["utm_campaign"]),
+        }
+
+        if (
+            not isinstance(event_type, str)
+            or event_type not in {"page_view", "click"}
+            or page_path is None
+            or (context_value not in (None, "") and page_context is None)
+            or (event_type == "page_view" and target_value is not None)
+            or (event_type == "click" and click_target is None)
+            or (event_type == "click" and any(attribution.values()))
+        ):
+            return "", 400
+
+        try:
+            with site_analytics_lock:
+                analytics = app.extensions.get("site_analytics")
+                if analytics is None:
+                    connect_store = app.extensions.get("connect_analytics")
+                    if app.testing:
+                        if connect_store is None:
+                            return "", 204
+                        analytics = SiteAnalytics(engine=connect_store.engine)
+                        analytics.create_schema_for_tests()
+                    else:
+                        analytics = SiteAnalytics(
+                            engine=connect_store.engine if connect_store is not None else None
+                        )
+                        app.extensions["site_analytics"] = analytics
+            analytics.record(
+                session_hash=session_hash,
+                event_type=event_type,
+                page_path=page_path,
+                page_context=page_context,
+                click_target=click_target,
+                **attribution,
+            )
+        except DatabaseConfigurationError:
+            app.logger.debug("Site analytics is unavailable without database configuration")
+            return "", 204
+        except SQLAlchemyError:
+            app.logger.warning("Site analytics event could not be saved")
+            return "", 503
+        except ValueError:
+            return "", 400
         return "", 204
 
     @app.route("/trade-shows")

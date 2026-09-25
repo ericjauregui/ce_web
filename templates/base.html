@@ -223,6 +223,7 @@
   <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js"
     data-cf-beacon='{{ {"token": cloudflare_web_analytics_token}|tojson }}'></script>
   {% endif %}
+  <script defer src="{{ asset_url('js/site_analytics.js') }}"></script>
   {% block body_end %}{% endblock %}
   <script>
   (function () {

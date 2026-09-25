@@ -28,6 +28,7 @@ from domains.file_cache import get_path_version
 from domains.image_assets import PRODUCT_IMAGE_SIZES
 from domains.image_asset_cache import ImageAssetCache
 from domains.site_routes import register_site_routes
+from domains.site_analytics import install_analytics_session_cookie
 from domains.seo import build_sitemap_urls as build_sitemap_urls_from_context
 from domains.seo import canonical_base_url
 from domains.team import (
@@ -57,6 +58,7 @@ app.secret_key = os.environ["SECRET_KEY"]
 
 
 install_cache_control(app)
+install_analytics_session_cookie(app)
 
 
 if not app.secret_key:

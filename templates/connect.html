@@ -9,7 +9,7 @@
 {% endblock %}
 {% block bootstrap_js %}{% endblock %}
 {% block content %}
-<section class="connect-page" data-trade-show="{{ event.key if event else '' }}" aria-label="Connect with California Earrings">
+<section class="connect-page" data-trade-show="{{ event.key if event else '' }}" data-analytics-context="{{ event.key if event else '' }}" aria-label="Connect with California Earrings">
   <header class="connect-header">
     <a href="{{ url_for('index') }}" aria-label="California Earrings home">
       <img class="connect-logo" src="{{ asset_url('assets/ce_logo_full.webp') }}" alt="California Earrings" width="350" height="84" fetchpriority="high">

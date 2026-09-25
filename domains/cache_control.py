@@ -23,6 +23,7 @@ PUBLIC_ENDPOINT_POLICIES = {
     "team_member_vcard_qr": PUBLIC_METADATA,
     "connect_vcard": PUBLIC_CONNECT,
     "connect_event": NO_STORE,
+    "site_analytics_event": NO_STORE,
 }
 
 
