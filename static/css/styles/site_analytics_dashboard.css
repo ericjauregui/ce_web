@@ -1,0 +1,448 @@
+.analytics-dashboard {
+  max-width: 1380px;
+  padding-top: clamp(6.5rem, 9vw, 8.5rem) !important;
+  padding-bottom: 5rem !important;
+}
+
+.analytics-heading,
+.analytics-section-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.analytics-heading {
+  margin-bottom: 1.5rem;
+}
+
+.analytics-heading h1 {
+  margin: 0;
+  color: var(--gold);
+  font: 500 clamp(2rem, 4vw, 3rem) / 1.08 var(--font-display, "Playfair Display", serif);
+}
+
+.analytics-eyebrow {
+  margin: 0 0 0.45rem;
+  color: var(--gold-70);
+  font-size: 0.73rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.analytics-subtitle,
+.analytics-section-heading p {
+  margin: 0.5rem 0 0;
+  color: rgb(255 255 255 / 0.65);
+  font-size: 0.9rem;
+}
+
+.analytics-range {
+  display: grid;
+  min-width: 180px;
+  gap: 0.35rem;
+  color: var(--gold-70);
+  font-size: 0.78rem;
+  font-weight: 650;
+}
+
+.analytics-range .form-select {
+  min-height: 42px;
+  border-color: var(--gold-outline);
+  background-color: #141414;
+  color: #fff;
+}
+
+.analytics-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.analytics-card {
+  min-width: 0;
+  border: 1px solid var(--gold-outline);
+  border-radius: 14px;
+  background: linear-gradient(150deg, rgb(255 255 255 / 0.055), rgb(255 255 255 / 0.018));
+  box-shadow: 0 14px 36px rgb(0 0 0 / 0.18);
+  padding: 1.25rem;
+}
+
+.metric-card {
+  display: flex;
+  min-height: 145px;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.35rem;
+}
+
+.metric-card > span {
+  color: var(--gold-70);
+  font-size: 0.8rem;
+  font-weight: 650;
+  letter-spacing: 0.03em;
+}
+
+.metric-card strong {
+  color: #fff;
+  font-size: clamp(1.8rem, 3.3vw, 2.65rem);
+  font-weight: 650;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.metric-card small {
+  color: rgb(255 255 255 / 0.5);
+  font-size: 0.74rem;
+}
+
+.analytics-activity {
+  margin-bottom: 1rem;
+}
+
+.analytics-section-heading {
+  align-items: center;
+  margin-bottom: 1.1rem;
+}
+
+.analytics-section-heading h2 {
+  margin: 0;
+  color: #fff;
+  font-size: 1.06rem;
+  font-weight: 650;
+}
+
+.analytics-section-heading p {
+  font-size: 0.76rem;
+}
+
+.analytics-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  color: rgb(255 255 255 / 0.65);
+  font-size: 0.74rem;
+}
+
+.analytics-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.analytics-legend i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+
+.legend-views,
+.bar-views {
+  background: var(--gold);
+}
+
+.legend-clicks,
+.bar-clicks {
+  background: #75b9b2;
+}
+
+.analytics-chart {
+  display: flex;
+  min-height: 210px;
+  align-items: stretch;
+  gap: 0.35rem;
+  overflow-x: auto;
+  padding: 0.25rem 0 0;
+  scrollbar-color: var(--gold-outline) transparent;
+}
+
+.analytics-day {
+  display: flex;
+  min-width: 24px;
+  flex: 1 0 24px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.45rem;
+}
+
+.analytics-bars {
+  display: flex;
+  width: 100%;
+  height: 174px;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 3px;
+  border-bottom: 1px solid rgb(255 255 255 / 0.13);
+}
+
+.analytics-bar {
+  width: min(36%, 11px);
+  min-height: 0;
+  border-radius: 4px 4px 0 0;
+  opacity: 0.9;
+}
+
+.analytics-day small {
+  min-height: 1rem;
+  color: rgb(255 255 255 / 0.5);
+  font-size: 0.62rem;
+  white-space: nowrap;
+}
+
+.analytics-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.analytics-ranked-list {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.analytics-ranked-list > li {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  border-top: 1px solid rgb(255 255 255 / 0.08);
+  padding: 0.72rem 0;
+  color: rgb(255 255 255 / 0.78);
+  font-size: 0.81rem;
+}
+
+.analytics-ranked-list > li:first-child {
+  border-top: 0;
+}
+
+.analytics-ranked-list strong {
+  flex: 0 0 auto;
+  color: var(--gold);
+  font-size: 0.79rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.analytics-path {
+  overflow-wrap: anywhere;
+}
+
+.analytics-table-wrap {
+  overflow-x: auto;
+}
+
+.analytics-table {
+  width: 100%;
+  border-collapse: collapse;
+  color: rgb(255 255 255 / 0.78);
+  font-size: 0.75rem;
+}
+
+.analytics-table th,
+.analytics-table td {
+  border-top: 1px solid rgb(255 255 255 / 0.08);
+  padding: 0.7rem 0.5rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.analytics-table th {
+  color: var(--gold-70);
+  font-weight: 650;
+}
+
+.analytics-table td:last-child,
+.analytics-table th:last-child {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.analytics-empty {
+  margin: 0;
+  border-top: 1px solid rgb(255 255 255 / 0.08);
+  padding: 0.9rem 0 0.15rem;
+  color: rgb(255 255 255 / 0.5);
+  font-size: 0.8rem;
+}
+
+.analytics-sessions {
+  grid-column: 1 / -1;
+}
+
+.session-row {
+  display: grid !important;
+  grid-template-columns: minmax(130px, 0.7fr) minmax(130px, 1fr) minmax(145px, 0.7fr);
+}
+
+.session-select {
+  margin: 0;
+}
+
+.session-select button {
+  border: 0;
+  background: transparent;
+  color: var(--gold);
+  font: inherit;
+  padding: 0;
+  text-decoration: underline;
+  text-decoration-color: rgb(var(--gold-rgb) / 0.45);
+  text-underline-offset: 3px;
+}
+
+.session-select button:hover,
+.session-select button:focus-visible,
+.analytics-clear-link {
+  color: var(--gold);
+  text-decoration-color: rgb(var(--gold-rgb) / 0.45);
+  text-underline-offset: 3px;
+}
+
+.session-select button:hover,
+.session-select button:focus-visible,
+.analytics-clear-link:hover {
+  color: #fff;
+}
+
+.session-row time {
+  color: rgb(255 255 255 / 0.52);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.analytics-journey {
+  margin-top: 1rem;
+}
+
+.analytics-clear-link {
+  flex: 0 0 auto;
+  font-size: 0.78rem;
+}
+
+.journey-list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.journey-list li {
+  display: grid;
+  grid-template-columns: minmax(140px, 0.6fr) minmax(90px, 0.4fr) minmax(150px, 1fr) minmax(150px, 1fr) auto;
+  align-items: center;
+  gap: 0.75rem;
+  border-top: 1px solid rgb(255 255 255 / 0.08);
+  padding: 0.8rem 0;
+  color: rgb(255 255 255 / 0.75);
+  font-size: 0.78rem;
+}
+
+.journey-list time {
+  color: rgb(255 255 255 / 0.5);
+  white-space: nowrap;
+}
+
+.journey-event-type {
+  color: var(--gold);
+}
+
+.journey-path,
+.journey-target,
+.journey-context {
+  overflow-wrap: anywhere;
+}
+
+.journey-target,
+.journey-context {
+  color: rgb(255 255 255 / 0.5);
+}
+
+.analytics-footnote {
+  margin: 1rem 0 0;
+  color: rgb(255 255 255 / 0.42);
+  font-size: 0.7rem;
+  text-align: right;
+}
+
+@media (max-width: 767.98px) {
+  .analytics-heading {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .analytics-range {
+    min-width: 0;
+    max-width: 240px;
+  }
+
+  .analytics-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.65rem;
+  }
+
+  .metric-card {
+    min-height: 124px;
+    padding: 1rem;
+  }
+
+  .analytics-card {
+    padding: 1rem;
+  }
+
+  .analytics-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.65rem;
+  }
+
+  .analytics-sessions {
+    grid-column: auto;
+  }
+
+  .session-row {
+    grid-template-columns: minmax(0, 1fr) auto !important;
+  }
+
+  .session-row span {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .session-row time {
+    grid-column: 2;
+    grid-row: 1;
+    font-size: 0.68rem;
+  }
+
+  .journey-list li {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.3rem 0.75rem;
+  }
+
+  .journey-list time {
+    grid-column: 1;
+    grid-row: 1;
+    font-size: 0.7rem;
+  }
+
+  .journey-event-type {
+    grid-column: 2;
+    grid-row: 1;
+    text-align: right;
+  }
+
+  .journey-path,
+  .journey-target,
+  .journey-context {
+    grid-column: 1 / -1;
+  }
+
+  .analytics-footnote {
+    text-align: left;
+  }
+}

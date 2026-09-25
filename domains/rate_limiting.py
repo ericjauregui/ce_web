@@ -27,6 +27,7 @@ def install_rate_limiting(app: Flask) -> Limiter:
     app.config.setdefault("CART_RATE_LIMIT", "300 per minute")
     app.config.setdefault("CONNECT_EVENT_RATE_LIMIT", "600 per minute")
     app.config.setdefault("SITE_ANALYTICS_RATE_LIMIT", "600 per minute")
+    app.config.setdefault("SITE_ANALYTICS_DASHBOARD_RATE_LIMIT", "20 per minute")
     limiter = Limiter(
         client_address,
         app=app,
@@ -51,12 +52,17 @@ def install_rate_limiting(app: Flask) -> Limiter:
     app.view_functions["site_analytics_event"] = limiter.limit(
         lambda: app.config["SITE_ANALYTICS_RATE_LIMIT"], methods=["POST"]
     )(app.view_functions["site_analytics_event"])
+    app.view_functions["site_analytics_dashboard"] = limiter.limit(
+        lambda: app.config["SITE_ANALYTICS_DASHBOARD_RATE_LIMIT"], methods=["GET", "POST"]
+    )(app.view_functions["site_analytics_dashboard"])
 
     @app.errorhandler(429)
     def too_many_requests(error):
         if request.path.startswith("/api/"):
             response = jsonify(ok=False, error="Too many cart updates. Please wait a minute and try again.")
             response.status_code = 429
+        elif request.endpoint == "site_analytics_dashboard":
+            response = make_response("Too many analytics requests. Please wait and try again.", 429)
         else:
             response = make_response(render_template("429.html"), 429)
         response.headers["Cache-Control"] = "private, no-store, max-age=0"

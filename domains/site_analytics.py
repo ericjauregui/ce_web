@@ -4,14 +4,16 @@ from __future__ import annotations
 import hashlib
 import re
 import secrets
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 from flask import Flask, Response, g, request
 from sqlalchemy import (
-    CheckConstraint, Column, DateTime, Index, Integer, MetaData, String, Table,
+    CheckConstraint, Column, DateTime, Index, Integer, MetaData, String,
+    Table, case, func, inspect, select,
 )
 from sqlalchemy.engine import Engine
 
+from domains.connect_analytics import connect_event_counts
 from domains.orders import create_database_engine, database_url_from_env
 
 
@@ -194,13 +196,264 @@ class SiteAnalytics:
                 )
             )
 
+    def dashboard_summary(
+        self,
+        *,
+        days: int = 30,
+        selected_session: str | None = None,
+    ) -> dict[str, object]:
+        """Return bounded, aggregated data for the private analytics dashboard."""
+        if days not in {7, 30, 90}:
+            days = 30
+
+        now = datetime.now(timezone.utc)
+        first_day = now.date() - timedelta(days=days - 1)
+        since = datetime.combine(first_day, datetime.min.time(), tzinfo=timezone.utc)
+        events = site_analytics_events
+        is_page_view = events.c.event_type == "page_view"
+        is_click = events.c.event_type == "click"
+
+        with self.engine.connect() as connection:
+            page_views = connection.execute(
+                select(func.count()).select_from(events).where(
+                    events.c.occurred_at >= since, is_page_view
+                )
+            ).scalar_one()
+            clicks = connection.execute(
+                select(func.count()).select_from(events).where(
+                    events.c.occurred_at >= since, is_click
+                )
+            ).scalar_one()
+            sessions = connection.execute(
+                select(func.count(func.distinct(events.c.session_id_hash))).where(
+                    events.c.occurred_at >= since
+                )
+            ).scalar_one()
+
+            date_bucket = (
+                func.date_trunc("day", events.c.occurred_at)
+                if self.engine.dialect.name == "postgresql"
+                else func.date(events.c.occurred_at)
+            )
+            daily_rows = connection.execute(
+                select(
+                    date_bucket.label("event_day"),
+                    func.sum(case((is_page_view, 1), else_=0)).label("page_views"),
+                    func.sum(case((is_click, 1), else_=0)).label("clicks"),
+                    func.count(func.distinct(events.c.session_id_hash)).label("sessions"),
+                )
+                .where(events.c.occurred_at >= since)
+                .group_by("event_day")
+                .order_by("event_day")
+            ).all()
+
+            page_rows = connection.execute(
+                select(events.c.page_path, func.count().label("count"))
+                .where(events.c.occurred_at >= since, is_page_view)
+                .group_by(events.c.page_path)
+                .order_by(func.count().desc(), events.c.page_path)
+                .limit(10)
+            ).all()
+            click_rows = connection.execute(
+                select(events.c.click_target, func.count().label("count"))
+                .where(events.c.occurred_at >= since, is_click)
+                .group_by(events.c.click_target)
+                .order_by(func.count().desc(), events.c.click_target)
+                .limit(10)
+            ).all()
+            referrer_rows = connection.execute(
+                select(
+                    events.c.referrer_host,
+                    func.count(func.distinct(events.c.session_id_hash)).label("sessions"),
+                )
+                .where(
+                    events.c.occurred_at >= since,
+                    is_page_view,
+                    events.c.referrer_host.is_not(None),
+                )
+                .group_by(events.c.referrer_host)
+                .order_by(func.count(func.distinct(events.c.session_id_hash)).desc(), events.c.referrer_host)
+                .limit(10)
+            ).all()
+            campaign_rows = connection.execute(
+                select(
+                    events.c.utm_source,
+                    events.c.utm_medium,
+                    events.c.utm_campaign,
+                    func.count(func.distinct(events.c.session_id_hash)).label("sessions"),
+                )
+                .where(
+                    events.c.occurred_at >= since,
+                    is_page_view,
+                    (events.c.utm_source.is_not(None))
+                    | (events.c.utm_medium.is_not(None))
+                    | (events.c.utm_campaign.is_not(None)),
+                )
+                .group_by(events.c.utm_source, events.c.utm_medium, events.c.utm_campaign)
+                .order_by(func.count(func.distinct(events.c.session_id_hash)).desc())
+                .limit(10)
+            ).all()
+            context_rows = connection.execute(
+                select(
+                    events.c.page_context,
+                    func.sum(case((is_page_view, 1), else_=0)).label("page_views"),
+                    func.sum(case((is_click, 1), else_=0)).label("clicks"),
+                )
+                .where(
+                    events.c.occurred_at >= since,
+                    events.c.page_context.is_not(None),
+                )
+                .group_by(events.c.page_context)
+                .order_by(func.sum(case((is_page_view, 1), else_=0)).desc())
+                .limit(10)
+            ).all()
+            connect_rows = []
+            if inspect(connection).has_table(connect_event_counts.name):
+                connect_rows = connection.execute(
+                    select(
+                        connect_event_counts.c.trade_show_key,
+                        connect_event_counts.c.trade_show_name,
+                        connect_event_counts.c.booth,
+                        connect_event_counts.c.action,
+                        func.sum(connect_event_counts.c.count).label("count"),
+                    )
+                    .where(
+                        connect_event_counts.c.event_date >= first_day,
+                        connect_event_counts.c.event_date <= now.date(),
+                    )
+                    .group_by(
+                        connect_event_counts.c.trade_show_key,
+                        connect_event_counts.c.trade_show_name,
+                        connect_event_counts.c.booth,
+                        connect_event_counts.c.action,
+                    )
+                    .order_by(func.sum(connect_event_counts.c.count).desc())
+                    .limit(20)
+                ).all()
+            session_rows = connection.execute(
+                select(
+                    events.c.session_id_hash,
+                    func.max(events.c.occurred_at).label("last_seen"),
+                    func.sum(case((is_page_view, 1), else_=0)).label("page_views"),
+                    func.sum(case((is_click, 1), else_=0)).label("clicks"),
+                )
+                .where(events.c.occurred_at >= since)
+                .group_by(events.c.session_id_hash)
+                .order_by(func.max(events.c.occurred_at).desc())
+                .limit(12)
+            ).all()
+
+            journey = []
+            if selected_session and re.fullmatch(r"[0-9a-f]{64}", selected_session):
+                journey = [
+                    {
+                        "occurred_at": row.occurred_at,
+                        "event_type": row.event_type,
+                        "page_path": row.page_path,
+                        "page_context": row.page_context,
+                        "click_target": row.click_target,
+                    }
+                    for row in connection.execute(
+                        select(
+                            events.c.occurred_at,
+                            events.c.event_type,
+                            events.c.page_path,
+                            events.c.page_context,
+                            events.c.click_target,
+                        )
+                        .where(
+                            events.c.session_id_hash == selected_session,
+                            events.c.occurred_at >= since,
+                        )
+                        .order_by(events.c.occurred_at, events.c.id)
+                        .limit(250)
+                    ).all()
+                ]
+
+        daily_lookup = {
+            str(row.event_day)[:10]: {
+                "page_views": int(row.page_views or 0),
+                "clicks": int(row.clicks or 0),
+                "sessions": int(row.sessions or 0),
+            }
+            for row in daily_rows
+        }
+        daily = []
+        for offset in range(days):
+            date_value = first_day + timedelta(days=offset)
+            counts = daily_lookup.get(date_value.isoformat(), {})
+            daily.append({
+                "label": date_value.strftime("%b %d"),
+                "page_views": counts.get("page_views", 0),
+                "clicks": counts.get("clicks", 0),
+                "sessions": counts.get("sessions", 0),
+            })
+
+        return {
+            "days": days,
+            "page_views": int(page_views),
+            "clicks": int(clicks),
+            "sessions": int(sessions),
+            "pages_per_session": round(page_views / sessions, 1) if sessions else 0,
+            "daily": daily,
+            "daily_peak": max(
+                (max(row["page_views"], row["clicks"]) for row in daily),
+                default=1,
+            ) or 1,
+            "top_pages": [{"path": row.page_path, "count": int(row.count)} for row in page_rows],
+            "top_clicks": [{"target": row.click_target, "count": int(row.count)} for row in click_rows],
+            "referrers": [
+                {"host": row.referrer_host, "sessions": int(row.sessions)} for row in referrer_rows
+            ],
+            "campaigns": [
+                {
+                    "source": row.utm_source,
+                    "medium": row.utm_medium,
+                    "campaign": row.utm_campaign,
+                    "sessions": int(row.sessions),
+                }
+                for row in campaign_rows
+            ],
+            "contexts": [
+                {
+                    "name": row.page_context,
+                    "page_views": int(row.page_views or 0),
+                    "clicks": int(row.clicks or 0),
+                }
+                for row in context_rows
+            ],
+            "connect_actions": [
+                {
+                    "key": row.trade_show_key,
+                    "show": row.trade_show_name,
+                    "booth": row.booth,
+                    "action": row.action,
+                    "count": int(row.count or 0),
+                }
+                for row in connect_rows
+            ],
+            "recent_sessions": [
+                {
+                    "hash": row.session_id_hash,
+                    "short_id": row.session_id_hash[-8:],
+                    "last_seen": row.last_seen,
+                    "page_views": int(row.page_views or 0),
+                    "clicks": int(row.clicks or 0),
+                }
+                for row in session_rows
+            ],
+            "selected_session": selected_session if journey else None,
+            "selected_session_short": selected_session[-8:] if journey and selected_session else None,
+            "journey": journey,
+        }
+
 
 def install_analytics_session_cookie(app: Flask) -> None:
     """Issue a separate HttpOnly cookie that expires with the browser session."""
 
     @app.before_request
     def prepare_analytics_session_cookie() -> None:
-        if request.method != "GET" or request.endpoint == "static":
+        if request.method != "GET" or request.endpoint in {"static", "site_analytics_dashboard"}:
             return
 
         existing = request.cookies.get(ANALYTICS_SESSION_COOKIE)

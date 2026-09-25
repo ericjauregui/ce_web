@@ -26,6 +26,8 @@ Unique lookup constraints support actual idempotency, order retrieval, and priva
 6. **Settings → Edge Caching → Cacheable file types**: keep **Common static files**. Do not select All files. A successful new deployment purges Render's edge cache; verify headers after deployment. See [Render caching](https://render.com/docs/web-service-caching).
 7. Confirm database backup/retention and restrict public database access as appropriate in Render. Preserve legacy local CSVs/email attachments separately before retiring the old instance; this migration creates tables and does not import historical orders.
 
+The private site analytics dashboard is available at `/admin/analytics` after setting `SITE_ANALYTICS_ADMIN_USERNAME` and a strong `SITE_ANALYTICS_ADMIN_PASSWORD` in the web service's Render environment. These values stay server-side; the route returns 404 while either value is missing and requires HTTP Basic authentication when enabled. It reads `site_analytics_events` and the existing aggregate `connect_event_counts` table through the web service's `DATABASE_URL`, uses `private, no-store` responses, and excludes dashboard visits from both site and Cloudflare analytics beacons.
+
 Required new variable: `DATABASE_URL`. Recommended explicit production variable: `SESSION_COOKIE_SECURE=true`. Existing required `SECRET_KEY` and email values remain. Pool limits are deliberately fixed in code; no pool tuning variables are required for this small database.
 
 ## Commands

@@ -47,10 +47,13 @@ def _is_current_asset_version(app: Flask) -> bool:
 def install_cache_control(app: Flask) -> None:
     @app.before_request
     def keep_customer_session_permanent() -> None:
-        # Static and explicitly public metadata/contact requests must not create
-        # a session cookie. Customer-facing application routes retain the
-        # existing persistent-cart behavior.
-        if request.endpoint == "static" or request.endpoint in PUBLIC_ENDPOINT_POLICIES:
+        # Static, public metadata/contact requests, and private analytics must
+        # not create a customer cart session.
+        if (
+            request.endpoint == "static"
+            or request.endpoint in PUBLIC_ENDPOINT_POLICIES
+            or request.endpoint == "site_analytics_dashboard"
+        ):
             return
         session.permanent = True
 

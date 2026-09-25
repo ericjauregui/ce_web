@@ -13,3 +13,7 @@ services:
         sync: false
       - key: SESSION_COOKIE_SECURE
         value: "true"
+      - key: SITE_ANALYTICS_ADMIN_USERNAME
+        sync: false
+      - key: SITE_ANALYTICS_ADMIN_PASSWORD
+        sync: false

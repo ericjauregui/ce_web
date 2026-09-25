@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 import io
+import hmac
+import os
+import re
 from pathlib import Path
 from threading import Lock
 from typing import Any, Callable
@@ -298,6 +301,79 @@ def register_site_routes(
         except ValueError:
             return "", 400
         return "", 204
+
+    @app.route("/admin/analytics", methods=["GET", "POST"])
+    def site_analytics_dashboard():
+        expected_username = str(
+            app.config.get("SITE_ANALYTICS_ADMIN_USERNAME")
+            or os.getenv("SITE_ANALYTICS_ADMIN_USERNAME", "")
+        )
+        expected_password = str(
+            app.config.get("SITE_ANALYTICS_ADMIN_PASSWORD")
+            or os.getenv("SITE_ANALYTICS_ADMIN_PASSWORD", "")
+        )
+        if not expected_username or not expected_password:
+            abort(404)
+
+        authorization = request.authorization
+        username = authorization.username if authorization and authorization.type.lower() == "basic" else ""
+        password = authorization.password if authorization and authorization.type.lower() == "basic" else ""
+        username_ok = hmac.compare_digest(
+            (username or "").encode("utf-8"), expected_username.encode("utf-8")
+        )
+        password_ok = hmac.compare_digest(
+            (password or "").encode("utf-8"), expected_password.encode("utf-8")
+        )
+        if not (username_ok and password_ok):
+            return "Authentication required", 401, {
+                "WWW-Authenticate": 'Basic realm="Site Analytics", charset="UTF-8"'
+            }
+
+        if request.method == "POST":
+            origin = request.headers.get("Origin")
+            if origin:
+                from urllib.parse import urlsplit
+
+                if urlsplit(origin).netloc != request.host:
+                    return "Invalid request origin", 403
+
+        requested_days = request.args.get("days", "30")
+        if request.method == "POST":
+            requested_days = request.form.get("days", "30")
+        days = int(requested_days) if requested_days in {"7", "30", "90"} else 30
+        selected_session = (
+            request.form.get("session", "")
+            if request.method == "POST"
+            else ""
+        )
+        if not re.fullmatch(r"[0-9a-f]{64}", selected_session):
+            selected_session = None
+
+        try:
+            with site_analytics_lock:
+                analytics = app.extensions.get("site_analytics")
+                if analytics is None:
+                    connect_store = app.extensions.get("connect_analytics")
+                    analytics = SiteAnalytics(
+                        engine=connect_store.engine if connect_store is not None else None
+                    )
+                    app.extensions["site_analytics"] = analytics
+            summary = analytics.dashboard_summary(
+                days=days,
+                selected_session=selected_session,
+            )
+        except DatabaseConfigurationError:
+            app.logger.warning("Site analytics dashboard is unavailable without database configuration")
+            return "Analytics are unavailable", 503
+        except SQLAlchemyError:
+            app.logger.warning("Site analytics dashboard could not read its data")
+            return "Analytics are temporarily unavailable", 503
+
+        response = app.make_response(
+            render_template("site_analytics_dashboard.html", analytics=summary)
+        )
+        response.headers["X-Robots-Tag"] = "noindex, nofollow"
+        return response
 
     @app.route("/trade-shows")
     def trade_shows_page():

@@ -219,11 +219,13 @@
   {% endblock %}
 
   {% block bootstrap_js %}<script defer src="{{ asset_url('vendor/bootstrap/bootstrap.bundle.min.js') }}"></script>{% endblock %}
-  {% if cloudflare_web_analytics_token %}
+  {% if request.endpoint != 'site_analytics_dashboard' and cloudflare_web_analytics_token %}
   <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js"
     data-cf-beacon='{{ {"token": cloudflare_web_analytics_token}|tojson }}'></script>
   {% endif %}
+  {% if request.endpoint != 'site_analytics_dashboard' %}
   <script defer src="{{ asset_url('js/site_analytics.js') }}"></script>
+  {% endif %}
   {% block body_end %}{% endblock %}
   <script>
   (function () {

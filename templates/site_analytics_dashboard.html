@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+{% block title %}Site Analytics | California Earrings{% endblock %}
+{% block meta_description %}Private site usage analytics for California Earrings.{% endblock %}
+{% block robots_meta %}noindex,nofollow{% endblock %}
+{% block page_css %}<link href="{{ asset_url('css/styles/site_analytics_dashboard.css') }}" rel="stylesheet">{% endblock %}
+{% block schema_json_ld %}{% endblock %}
+{% block content %}
+<main class="analytics-dashboard container py-5" aria-labelledby="analytics-title">
+  <header class="analytics-heading">
+    <div>
+      <p class="analytics-eyebrow">Private reporting</p>
+      <h1 id="analytics-title">Site analytics</h1>
+      <p class="analytics-subtitle">Visitor sessions, page journeys, clicks, and campaign sources. Times are UTC.</p>
+    </div>
+    <form class="analytics-range" method="get" action="{{ url_for('site_analytics_dashboard') }}">
+      <label for="analytics-days">Date range</label>
+      <select id="analytics-days" name="days" class="form-select" onchange="this.form.submit()">
+        <option value="7" {{ 'selected' if analytics.days == 7 else '' }}>Last 7 days</option>
+        <option value="30" {{ 'selected' if analytics.days == 30 else '' }}>Last 30 days</option>
+        <option value="90" {{ 'selected' if analytics.days == 90 else '' }}>Last 90 days</option>
+      </select>
+      <noscript><button class="btn btn-outline-warning mt-2" type="submit">Update</button></noscript>
+    </form>
+  </header>
+
+  <section class="analytics-metrics" aria-label="Summary metrics">
+    <article class="analytics-card metric-card">
+      <span>Sessions</span><strong>{{ '{:,}'.format(analytics.sessions) }}</strong>
+      <small>Unique browser sessions</small>
+    </article>
+    <article class="analytics-card metric-card">
+      <span>Page views</span><strong>{{ '{:,}'.format(analytics.page_views) }}</strong>
+      <small>Across {{ analytics.days }} days</small>
+    </article>
+    <article class="analytics-card metric-card">
+      <span>Clicks</span><strong>{{ '{:,}'.format(analytics.clicks) }}</strong>
+      <small>Tracked link and button clicks</small>
+    </article>
+    <article class="analytics-card metric-card">
+      <span>Pages per session</span><strong>{{ analytics.pages_per_session }}</strong>
+      <small>Average page views per session</small>
+    </article>
+  </section>
+
+  <section class="analytics-card analytics-activity" aria-labelledby="activity-title">
+    <div class="analytics-section-heading">
+      <div><h2 id="activity-title">Activity over time</h2><p>Daily page views and clicks</p></div>
+      <div class="analytics-legend"><span><i class="legend-views"></i>Page views</span><span><i class="legend-clicks"></i>Clicks</span></div>
+    </div>
+    <div class="analytics-chart" role="img" aria-label="Daily page views and clicks for the last {{ analytics.days }} days">
+      {% for day in analytics.daily %}
+      <div class="analytics-day" title="{{ day.label }}: {{ day.page_views }} page views, {{ day.clicks }} clicks">
+        <div class="analytics-bars">
+          <span class="analytics-bar bar-views" style="height: {{ (day.page_views * 100 / analytics.daily_peak)|round|int }}%"></span>
+          <span class="analytics-bar bar-clicks" style="height: {{ (day.clicks * 100 / analytics.daily_peak)|round|int }}%"></span>
+        </div>
+        {% if analytics.days <= 30 or loop.first or loop.last or loop.index0 % 7 == 0 %}<small>{{ day.label }}</small>{% else %}<small aria-hidden="true">&nbsp;</small>{% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <div class="analytics-grid">
+    <section class="analytics-card" aria-labelledby="pages-title">
+      <div class="analytics-section-heading"><div><h2 id="pages-title">Top pages</h2><p>Page views in this range</p></div></div>
+      {% if analytics.top_pages %}
+      <ol class="analytics-ranked-list">
+        {% for page in analytics.top_pages %}<li><span class="analytics-path">{{ page.path }}</span><strong>{{ '{:,}'.format(page.count) }}</strong></li>{% endfor %}
+      </ol>
+      {% else %}<p class="analytics-empty">No page views recorded in this range.</p>{% endif %}
+    </section>
+
+    <section class="analytics-card" aria-labelledby="clicks-title">
+      <div class="analytics-section-heading"><div><h2 id="clicks-title">Click destinations</h2><p>Most-used links and controls</p></div></div>
+      {% if analytics.top_clicks %}
+      <ol class="analytics-ranked-list">
+        {% for item in analytics.top_clicks %}<li><span>{{ item.target }}</span><strong>{{ '{:,}'.format(item.count) }}</strong></li>{% endfor %}
+      </ol>
+      {% else %}<p class="analytics-empty">No clicks recorded in this range.</p>{% endif %}
+    </section>
+
+    <section class="analytics-card" aria-labelledby="sources-title">
+      <div class="analytics-section-heading"><div><h2 id="sources-title">Referrer hosts</h2><p>Distinct sessions attributed to a referrer</p></div></div>
+      {% if analytics.referrers %}
+      <ol class="analytics-ranked-list">
+        {% for source in analytics.referrers %}<li><span>{{ source.host }}</span><strong>{{ '{:,}'.format(source.sessions) }}</strong></li>{% endfor %}
+      </ol>
+      {% else %}<p class="analytics-empty">No external referrers recorded in this range.</p>{% endif %}
+    </section>
+
+    <section class="analytics-card" aria-labelledby="campaigns-title">
+      <div class="analytics-section-heading"><div><h2 id="campaigns-title">Campaigns</h2><p>Sessions grouped by saved UTM tags</p></div></div>
+      {% if analytics.campaigns %}
+      <div class="analytics-table-wrap"><table class="analytics-table">
+        <thead><tr><th>Source</th><th>Medium</th><th>Campaign</th><th>Sessions</th></tr></thead>
+        <tbody>{% for campaign in analytics.campaigns %}<tr><td>{{ campaign.source or '—' }}</td><td>{{ campaign.medium or '—' }}</td><td>{{ campaign.campaign or '—' }}</td><td>{{ '{:,}'.format(campaign.sessions) }}</td></tr>{% endfor %}</tbody>
+      </table></div>
+      {% else %}<p class="analytics-empty">No tagged campaign visits recorded in this range.</p>{% endif %}
+    </section>
+
+    {% if analytics.contexts %}
+    <section class="analytics-card" aria-labelledby="context-title">
+      <div class="analytics-section-heading"><div><h2 id="context-title">Page contexts</h2><p>Trade show or page-specific activity</p></div></div>
+      <ol class="analytics-ranked-list">
+        {% for context in analytics.contexts %}<li><span>{{ context.name }}</span><strong>{{ context.page_views }} views · {{ context.clicks }} clicks</strong></li>{% endfor %}
+      </ol>
+    </section>
+    {% endif %}
+
+    {% if analytics.connect_actions %}
+    <section class="analytics-card" aria-labelledby="connect-actions-title">
+      <div class="analytics-section-heading"><div><h2 id="connect-actions-title">Connect-page actions</h2><p>Existing aggregate counts by show and action</p></div></div>
+      <div class="analytics-table-wrap"><table class="analytics-table">
+        <thead><tr><th>Trade show</th><th>Booth</th><th>Action</th><th>Events</th></tr></thead>
+        <tbody>{% for item in analytics.connect_actions %}<tr><td>{{ item.show or item.key }}</td><td>{{ item.booth or '—' }}</td><td>{{ item.action|replace('_', ' ')|title }}</td><td>{{ '{:,}'.format(item.count) }}</td></tr>{% endfor %}</tbody>
+      </table></div>
+    </section>
+    {% endif %}
+
+    <section class="analytics-card analytics-sessions" aria-labelledby="sessions-title">
+      <div class="analytics-section-heading"><div><h2 id="sessions-title">Recent sessions</h2><p>Open a session to inspect its journey</p></div></div>
+      {% if analytics.recent_sessions %}
+      <ol class="analytics-ranked-list session-list">
+        {% for item in analytics.recent_sessions %}
+        <li class="session-row">
+          <form class="session-select" method="post" action="{{ url_for('site_analytics_dashboard') }}">
+            <input type="hidden" name="days" value="{{ analytics.days }}">
+            <input type="hidden" name="session" value="{{ item.hash }}">
+            <button type="submit">Session ·{{ item.short_id }}</button>
+          </form>
+          <span>{{ item.page_views }} views · {{ item.clicks }} clicks</span>
+          <time datetime="{{ item.last_seen.isoformat() }}">{{ item.last_seen.strftime('%b %d, %H:%M') }} UTC</time>
+        </li>
+        {% endfor %}
+      </ol>
+      {% else %}<p class="analytics-empty">No sessions recorded in this range.</p>{% endif %}
+    </section>
+  </div>
+
+  {% if analytics.selected_session %}
+  <section class="analytics-card analytics-journey" aria-labelledby="journey-title">
+    <div class="analytics-section-heading">
+      <div><h2 id="journey-title">Journey ·{{ analytics.selected_session_short }}</h2><p>Events in time order for this browser session</p></div>
+      <a class="analytics-clear-link" href="{{ url_for('site_analytics_dashboard', days=analytics.days) }}">Close journey</a>
+    </div>
+    {% if analytics.journey %}
+    <ol class="journey-list">
+      {% for event in analytics.journey %}
+      <li>
+        <time datetime="{{ event.occurred_at.isoformat() }}">{{ event.occurred_at.strftime('%b %d, %H:%M:%S') }} UTC</time>
+        <span class="journey-event-type">{{ event.event_type|replace('_', ' ')|title }}</span>
+        <span class="journey-path">{{ event.page_path }}</span>
+        {% if event.click_target %}<span class="journey-target">{{ event.click_target }}</span>{% endif %}
+        {% if event.page_context %}<span class="journey-context">{{ event.page_context }}</span>{% endif %}
+      </li>
+      {% endfor %}
+    </ol>
+    {% else %}<p class="analytics-empty">This session has no events within the selected date range.</p>{% endif %}
+  </section>
+  {% endif %}
+
+  <p class="analytics-footnote">Session IDs are random and stored as one-way hashes. Attribution includes only referrer host and selected UTM tags.</p>
+</main>
+{% endblock %}
