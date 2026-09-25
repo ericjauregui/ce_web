@@ -53,7 +53,7 @@ def install_rate_limiting(app: Flask) -> Limiter:
         lambda: app.config["SITE_ANALYTICS_RATE_LIMIT"], methods=["POST"]
     )(app.view_functions["site_analytics_event"])
     app.view_functions["site_analytics_dashboard"] = limiter.limit(
-        lambda: app.config["SITE_ANALYTICS_DASHBOARD_RATE_LIMIT"], methods=["GET", "POST"]
+        lambda: app.config["SITE_ANALYTICS_DASHBOARD_RATE_LIMIT"], methods=["GET"]
     )(app.view_functions["site_analytics_dashboard"])
 
     @app.errorhandler(429)

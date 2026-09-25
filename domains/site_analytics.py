@@ -200,9 +200,8 @@ class SiteAnalytics:
         self,
         *,
         days: int = 30,
-        selected_session: str | None = None,
     ) -> dict[str, object]:
-        """Return bounded, aggregated data for the private analytics dashboard."""
+        """Return bounded aggregate data suitable for the shared dashboard."""
         if days not in {7, 30, 90}:
             days = 30
 
@@ -330,46 +329,6 @@ class SiteAnalytics:
                     .order_by(func.sum(connect_event_counts.c.count).desc())
                     .limit(20)
                 ).all()
-            session_rows = connection.execute(
-                select(
-                    events.c.session_id_hash,
-                    func.max(events.c.occurred_at).label("last_seen"),
-                    func.sum(case((is_page_view, 1), else_=0)).label("page_views"),
-                    func.sum(case((is_click, 1), else_=0)).label("clicks"),
-                )
-                .where(events.c.occurred_at >= since)
-                .group_by(events.c.session_id_hash)
-                .order_by(func.max(events.c.occurred_at).desc())
-                .limit(12)
-            ).all()
-
-            journey = []
-            if selected_session and re.fullmatch(r"[0-9a-f]{64}", selected_session):
-                journey = [
-                    {
-                        "occurred_at": row.occurred_at,
-                        "event_type": row.event_type,
-                        "page_path": row.page_path,
-                        "page_context": row.page_context,
-                        "click_target": row.click_target,
-                    }
-                    for row in connection.execute(
-                        select(
-                            events.c.occurred_at,
-                            events.c.event_type,
-                            events.c.page_path,
-                            events.c.page_context,
-                            events.c.click_target,
-                        )
-                        .where(
-                            events.c.session_id_hash == selected_session,
-                            events.c.occurred_at >= since,
-                        )
-                        .order_by(events.c.occurred_at, events.c.id)
-                        .limit(250)
-                    ).all()
-                ]
-
         daily_lookup = {
             str(row.event_day)[:10]: {
                 "page_views": int(row.page_views or 0),
@@ -432,19 +391,6 @@ class SiteAnalytics:
                 }
                 for row in connect_rows
             ],
-            "recent_sessions": [
-                {
-                    "hash": row.session_id_hash,
-                    "short_id": row.session_id_hash[-8:],
-                    "last_seen": row.last_seen,
-                    "page_views": int(row.page_views or 0),
-                    "clicks": int(row.clicks or 0),
-                }
-                for row in session_rows
-            ],
-            "selected_session": selected_session if journey else None,
-            "selected_session_short": selected_session[-8:] if journey and selected_session else None,
-            "journey": journey,
         }
 
 

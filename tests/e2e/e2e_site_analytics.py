@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import base64
-
 from sqlalchemy import create_engine
 from sqlalchemy.pool import StaticPool
 
@@ -15,8 +13,6 @@ class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
     def setUp(self) -> None:
         super().setUp()
         self.prior_analytics = webapp.app.extensions.get("site_analytics")
-        self.prior_username = webapp.app.config.get("SITE_ANALYTICS_ADMIN_USERNAME")
-        self.prior_password = webapp.app.config.get("SITE_ANALYTICS_ADMIN_PASSWORD")
         engine = create_engine(
             "sqlite+pysqlite:///:memory:",
             connect_args={"check_same_thread": False},
@@ -27,12 +23,8 @@ class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
         self.connect_analytics = ConnectAnalytics(engine)
         self.connect_analytics.create_schema_for_tests()
         webapp.app.extensions["site_analytics"] = self.analytics
-        webapp.app.config.update(
-            SITE_ANALYTICS_ADMIN_USERNAME="analytics-test",
-            SITE_ANALYTICS_ADMIN_PASSWORD="synthetic-test-password",
-        )
         self.primary_session = "a" * 64
-        secondary_session = "b" * 64
+        self.secondary_session = "b" * 64
         self.analytics.record(
             session_hash=self.primary_session,
             event_type="page_view",
@@ -56,7 +48,7 @@ class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
             click_target="external:whatsapp",
         )
         self.analytics.record(
-            session_hash=secondary_session,
+            session_hash=self.secondary_session,
             event_type="page_view",
             page_path="/team",
             referrer_host="google.com",
@@ -69,9 +61,6 @@ class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
             action="whatsapp",
             event={"key": "jis-fall-2026", "name": "JIS Miami", "booth": "117"},
         )
-        self.dashboard_auth_header = "Basic " + base64.b64encode(
-                b"analytics-test:synthetic-test-password"
-            ).decode("ascii")
         self.addCleanup(self._restore_analytics_state)
 
     def _restore_analytics_state(self) -> None:
@@ -79,30 +68,34 @@ class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
             webapp.app.extensions.pop("site_analytics", None)
         else:
             webapp.app.extensions["site_analytics"] = self.prior_analytics
-        for key, value in (
-            ("SITE_ANALYTICS_ADMIN_USERNAME", self.prior_username),
-            ("SITE_ANALYTICS_ADMIN_PASSWORD", self.prior_password),
-        ):
-            if value is None:
-                webapp.app.config.pop(key, None)
-            else:
-                webapp.app.config[key] = value
         self.analytics.engine.dispose()
 
-    def test_private_dashboard_summarizes_and_drills_into_synthetic_journeys(self) -> None:
+    def test_public_dashboard_shows_aggregates_without_session_identifiers(self) -> None:
         anonymous_client = self._playwright_context.request.new_context()
         try:
-            unauthenticated = anonymous_client.get(f"{self.base_url}/admin/analytics")
-            self.assertEqual(unauthenticated.status, 401)
-            self.assertIn("Basic", unauthenticated.headers.get("www-authenticate", ""))
-            self.assertIn("no-store", unauthenticated.headers.get("cache-control", ""))
+            response = anonymous_client.get(f"{self.base_url}/admin/analytics?days=7")
+            self.assertEqual(response.status, 200)
+            self.assertNotIn("www-authenticate", response.headers)
+            self.assertIn("no-store", response.headers.get("cache-control", ""))
+            self.assertEqual(response.headers.get("x-robots-tag"), "noindex, nofollow")
+            self.assertNotIn(self.primary_session, response.text())
+            self.assertNotIn(self.primary_session[-8:], response.text())
+            self.assertNotIn(self.secondary_session, response.text())
+            self.assertNotIn(self.secondary_session[-8:], response.text())
+            self.assertNotIn("Recent sessions", response.text())
+            self.assertNotIn("Journey", response.text())
+            self.assertIn("Anyone with this link can view the report", response.text())
+            post_response = anonymous_client.post(
+                f"{self.base_url}/admin/analytics",
+                data={"session": self.primary_session},
+            )
+            self.assertEqual(post_response.status, 405)
         finally:
             anonymous_client.dispose()
 
         tracked_requests: list[str] = []
         self.page.on("request", lambda request: tracked_requests.append(request.url)
                      if "/api/analytics/event" in request.url else None)
-        self.page.set_extra_http_headers({"Authorization": self.dashboard_auth_header})
         response = self.goto("/admin/analytics?days=7")
         self.assertIn("no-store", response.headers["cache-control"])
         self.assertEqual(response.headers.get("x-robots-tag"), "noindex, nofollow")
@@ -110,6 +103,10 @@ class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
         self.assertEqual(self.page.locator(".metric-card").nth(0).locator("strong").inner_text(), "2")
         self.assertEqual(self.page.locator(".metric-card").nth(1).locator("strong").inner_text(), "3")
         self.assertEqual(self.page.locator(".metric-card").nth(2).locator("strong").inner_text(), "1")
+        self.assertIn(
+            "Anyone with this link can view the report",
+            self.page.locator("main.analytics-dashboard").inner_text(),
+        )
         pages_card = self.page.locator("#pages-title").locator("xpath=../../..")
         sources_card = self.page.locator("#sources-title").locator("xpath=../../..")
         campaigns_card = self.page.locator("#campaigns-title").locator("xpath=../../..")
@@ -122,9 +119,9 @@ class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
         self.assertFalse(any("cloudflareinsights.com/beacon" in url for url in tracked_requests))
         self.assertFalse(any("/api/analytics/event" in url for url in tracked_requests))
         self.assertFalse(any(cookie["name"] == "ce_analytics_session" for cookie in self.context.cookies()))
-
-        self.page.get_by_role("button", name=f"Session ·{self.primary_session[-8:]}").click()
-        self.assertNotIn(self.primary_session, self.page.url)
-        self.page.get_by_role("heading", name=f"Journey ·{self.primary_session[-8:]}").wait_for()
-        self.assertEqual(self.page.locator(".journey-list li").count(), 3)
-        self.assertIn("external:whatsapp", self.page.locator(".journey-list").inner_text())
+        self.assertNotIn(self.primary_session, self.page.content())
+        self.assertNotIn(self.primary_session[-8:], self.page.content())
+        self.assertNotIn(self.secondary_session, self.page.content())
+        self.assertNotIn(self.secondary_session[-8:], self.page.content())
+        self.assertNotIn("Recent sessions", self.page.content())
+        self.assertNotIn("Journey", self.page.content())

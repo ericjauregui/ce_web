@@ -86,7 +86,7 @@ Optional:
 - `FLASK_DEBUG`: set to `1` to enable Flask debug mode.
 - `SITE_BASE_URL`: public canonical base URL used for sitemap entries, canonical URLs, and absolute OG image links.
 - `CLOUDFLARE_WEB_ANALYTICS_TOKEN`: overrides the configured Cloudflare Web Analytics token on site pages. The supplied token is enabled by default; set this variable to an empty value to disable it. Do not also enable Cloudflare's automatic snippet injection, which would load analytics twice.
-- `SITE_ANALYTICS_ADMIN_USERNAME` and `SITE_ANALYTICS_ADMIN_PASSWORD`: enable the private, HTTP Basic Auth dashboard at `/admin/analytics`. Keep both values in the server environment only; the route returns 404 until both are configured.
+- `/admin/analytics`: publicly viewable aggregate analytics dashboard. It shows totals and grouped breakdowns; individual session identifiers and journeys are not exposed.
 
 Order email settings (preserve the existing Render values):
 
