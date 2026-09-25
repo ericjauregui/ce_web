@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+from zoneinfo import ZoneInfo
 
 from sqlalchemy import (
     Column, Date, DateTime, Integer, MetaData, PrimaryKeyConstraint,
@@ -15,6 +16,7 @@ from domains.orders import create_database_engine, database_url_from_env
 CONNECT_ACTIONS = frozenset({
     "visit", "whatsapp", "save_contact", "instagram", "tiktok", "shop",
 })
+PACIFIC_TIME = ZoneInfo("America/Los_Angeles")
 
 metadata = MetaData()
 connect_event_counts = Table(
@@ -44,6 +46,7 @@ class ConnectAnalytics:
         if action not in CONNECT_ACTIONS:
             raise ValueError("Unknown connect action")
         now = datetime.now(timezone.utc)
+        event_date = now.astimezone(PACIFIC_TIME).date()
         with self.engine.begin() as connection:
             connection.execute(
                 text("""
@@ -55,7 +58,7 @@ class ConnectAnalytics:
                     DO UPDATE SET count = connect_event_counts.count + 1, updated_at = excluded.updated_at
                 """),
                 {
-                    "event_date": now.date(),
+                    "event_date": event_date,
                     "trade_show_key": event.get("key", ""),
                     "trade_show_name": event.get("name", ""),
                     "booth": event.get("booth", ""),

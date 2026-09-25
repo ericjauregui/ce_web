@@ -8,20 +8,96 @@
 <main class="analytics-dashboard container py-5" aria-labelledby="analytics-title">
   <header class="analytics-heading">
     <div>
-      <p class="analytics-eyebrow">Shared reporting</p>
       <h1 id="analytics-title">Site analytics</h1>
-      <p class="analytics-subtitle">Aggregate visits, page views, clicks, and campaign sources. Times are UTC.</p>
+      <p class="analytics-subtitle">Aggregate visits, page views, and clicks. All dates and times are Pacific Time (PT).</p>
+      <p class="analytics-range-label">{{ analytics.range_description }} · {{ analytics.range_label }}</p>
     </div>
-    <form class="analytics-range" method="get" action="{{ url_for('site_analytics_dashboard') }}">
-      <label for="analytics-days">Date range</label>
-      <select id="analytics-days" name="days" class="form-select" onchange="this.form.submit()">
-        <option value="7" {{ 'selected' if analytics.days == 7 else '' }}>Last 7 days</option>
-        <option value="30" {{ 'selected' if analytics.days == 30 else '' }}>Last 30 days</option>
-        <option value="90" {{ 'selected' if analytics.days == 90 else '' }}>Last 90 days</option>
-      </select>
-      <noscript><button class="btn btn-outline-warning mt-2" type="submit">Update</button></noscript>
-    </form>
   </header>
+
+  <form class="analytics-card analytics-filters" method="get" action="{{ url_for('site_analytics_dashboard') }}">
+    <div class="analytics-filter-field">
+      <label for="analytics-range-mode">Date range</label>
+      <select id="analytics-range-mode" name="range" class="form-select">
+        <option value="rolling" {{ 'selected' if analytics.mode == 'rolling' else '' }}>Last X complete periods</option>
+        <option value="previous_month" {{ 'selected' if analytics.mode == 'previous_month' else '' }}>Previous calendar month</option>
+        <option value="custom" {{ 'selected' if analytics.mode == 'custom' else '' }}>Custom dates</option>
+      </select>
+    </div>
+
+    <div class="analytics-filter-field analytics-period-fields" data-range-fields="rolling"
+      {% if analytics.mode != 'rolling' %}hidden{% endif %}>
+      <label for="analytics-period-count">Last</label>
+      <div class="analytics-inline-fields">
+        <input id="analytics-period-count" class="form-control" name="count" type="number"
+          min="1" max="{{ analytics.max_count }}" value="{{ analytics.count }}" inputmode="numeric"
+          {% if analytics.mode != 'rolling' %}disabled{% endif %}>
+        <select name="unit" class="form-select" aria-label="Complete period unit"
+          {% if analytics.mode != 'rolling' %}disabled{% endif %}>
+          <option value="days" {{ 'selected' if analytics.unit == 'days' else '' }}>complete days</option>
+          <option value="weeks" {{ 'selected' if analytics.unit == 'weeks' else '' }}>complete weeks</option>
+          <option value="months" {{ 'selected' if analytics.unit == 'months' else '' }}>complete months</option>
+        </select>
+      </div>
+    </div>
+
+    <fieldset class="analytics-filter-field analytics-custom-fields" data-range-fields="custom"
+      {% if analytics.mode != 'custom' %}disabled hidden{% endif %}>
+      <legend>Custom Pacific dates</legend>
+      <div class="analytics-inline-fields">
+        <label class="visually-hidden" for="analytics-date-from">From</label>
+        <input id="analytics-date-from" class="form-control" name="date_from" type="date"
+          value="{{ analytics.date_from }}" max="{{ analytics.latest_complete_date }}">
+        <span aria-hidden="true">to</span>
+        <label class="visually-hidden" for="analytics-date-to">Through</label>
+        <input id="analytics-date-to" class="form-control" name="date_to" type="date"
+          value="{{ analytics.date_to }}" max="{{ analytics.latest_complete_date }}">
+      </div>
+    </fieldset>
+
+    <div class="analytics-filter-field">
+      <label for="analytics-page-filter">Page filter</label>
+      <select id="analytics-page-filter" name="page_filter" class="form-select">
+        {% for option in analytics.page_filter_options %}
+        {% if loop.index == 6 %}<optgroup label="Tracked page URLs">{% endif %}
+        <option value="{{ option.value }}" {{ 'selected' if analytics.page_filter == option.value else '' }}>{{ option.label }}</option>
+        {% endfor %}
+        {% if analytics.page_paths %}</optgroup>{% endif %}
+      </select>
+    </div>
+
+    <div class="analytics-filter-field">
+      <label for="analytics-granularity">Graph grouping</label>
+      <select id="analytics-granularity" name="granularity" class="form-select">
+        <option value="day" {{ 'selected' if analytics.granularity == 'day' else '' }}>Daily</option>
+        <option value="week" {{ 'selected' if analytics.granularity == 'week' else '' }}>Weekly</option>
+        <option value="month" {{ 'selected' if analytics.granularity == 'month' else '' }}>Monthly</option>
+      </select>
+    </div>
+
+    <div class="analytics-filter-field">
+      <label for="analytics-metric">Graph metric</label>
+      <select id="analytics-metric" name="metric" class="form-select">
+        <option value="both" {{ 'selected' if analytics.chart_metric == 'both' else '' }}>Views and clicks</option>
+        <option value="page_views" {{ 'selected' if analytics.chart_metric == 'page_views' else '' }}>Views only</option>
+        <option value="clicks" {{ 'selected' if analytics.chart_metric == 'clicks' else '' }}>Clicks only</option>
+      </select>
+    </div>
+
+    <div class="analytics-filter-field analytics-journey-start-field">
+      <label for="analytics-journey-start">Journey starts at</label>
+      <select id="analytics-journey-start" name="journey_start" class="form-select">
+        {% for option in analytics.journey_start_options %}
+        {% if loop.index == 3 %}<optgroup label="Tracked page URLs">{% endif %}
+        <option value="{{ option.value }}" {{ 'selected' if analytics.journey_start == option.value else '' }}>{{ option.label }}</option>
+        {% endfor %}
+        {% if analytics.page_paths %}</optgroup>{% endif %}
+      </select>
+    </div>
+
+    <div class="analytics-filter-actions">
+      <button class="btn btn-outline-warning" type="submit">Apply filters</button>
+    </div>
+  </form>
 
   <section class="analytics-metrics" aria-label="Summary metrics">
     <article class="analytics-card metric-card">
@@ -30,11 +106,11 @@
     </article>
     <article class="analytics-card metric-card">
       <span>Page views</span><strong>{{ '{:,}'.format(analytics.page_views) }}</strong>
-      <small>Across {{ analytics.days }} days</small>
+      <small>Across {{ analytics.range_days }} complete Pacific dates</small>
     </article>
     <article class="analytics-card metric-card">
       <span>Clicks</span><strong>{{ '{:,}'.format(analytics.clicks) }}</strong>
-      <small>Tracked link and button clicks</small>
+      <small>Tracked links and actions</small>
     </article>
     <article class="analytics-card metric-card">
       <span>Pages per session</span><strong>{{ analytics.pages_per_session }}</strong>
@@ -44,20 +120,37 @@
 
   <section class="analytics-card analytics-activity" aria-labelledby="activity-title">
     <div class="analytics-section-heading">
-      <div><h2 id="activity-title">Activity over time</h2><p>Daily page views and clicks</p></div>
-      <div class="analytics-legend"><span><i class="legend-views"></i>Page views</span><span><i class="legend-clicks"></i>Clicks</span></div>
+      <div>
+        <h2 id="activity-title">Activity over time</h2>
+        <p>{{ analytics.granularity_label }} {{ analytics.chart_metric_label|lower }} · populated periods only</p>
+      </div>
+      {% if analytics.chart %}
+      <div class="analytics-legend">
+        {% if analytics.chart_metric != 'clicks' %}<span><i class="legend-views"></i>Page views</span>{% endif %}
+        {% if analytics.chart_metric != 'page_views' %}<span><i class="legend-clicks"></i>Clicks</span>{% endif %}
+      </div>
+      {% endif %}
     </div>
-    <div class="analytics-chart" role="img" aria-label="Daily page views and clicks for the last {{ analytics.days }} days">
-      {% for day in analytics.daily %}
-      <div class="analytics-day" title="{{ day.label }}: {{ day.page_views }} page views, {{ day.clicks }} clicks">
+    {% if analytics.chart %}
+    <div class="analytics-chart" role="img"
+      aria-label="{{ analytics.granularity_label }} {{ analytics.chart_metric_label|lower }} from {{ analytics.range_label }}">
+      {% for bucket in analytics.chart %}
+      <div class="analytics-bucket" title="{{ bucket.label }} PT: {{ bucket.page_views }} page views, {{ bucket.clicks }} clicks">
         <div class="analytics-bars">
-          <span class="analytics-bar bar-views" style="height: {{ (day.page_views * 100 / analytics.daily_peak)|round|int }}%"></span>
-          <span class="analytics-bar bar-clicks" style="height: {{ (day.clicks * 100 / analytics.daily_peak)|round|int }}%"></span>
+          {% if analytics.chart_metric != 'clicks' %}
+          <span class="analytics-bar bar-views" style="height: {{ (bucket.page_views * 100 / analytics.chart_peak)|round|int }}%"></span>
+          {% endif %}
+          {% if analytics.chart_metric != 'page_views' %}
+          <span class="analytics-bar bar-clicks" style="height: {{ (bucket.clicks * 100 / analytics.chart_peak)|round|int }}%"></span>
+          {% endif %}
         </div>
-        {% if analytics.days <= 30 or loop.first or loop.last or loop.index0 % 7 == 0 %}<small>{{ day.label }}</small>{% else %}<small aria-hidden="true">&nbsp;</small>{% endif %}
+        {% if bucket.show_label %}<small>{{ bucket.label }}</small>{% else %}<small aria-hidden="true">&nbsp;</small>{% endif %}
       </div>
       {% endfor %}
     </div>
+    {% else %}
+    <p class="analytics-empty">No selected graph metric has activity in this date range.</p>
+    {% endif %}
   </section>
 
   <div class="analytics-grid">
@@ -71,7 +164,7 @@
     </section>
 
     <section class="analytics-card" aria-labelledby="clicks-title">
-      <div class="analytics-section-heading"><div><h2 id="clicks-title">Click destinations</h2><p>Most-used links and controls</p></div></div>
+      <div class="analytics-section-heading"><div><h2 id="clicks-title">Clicked links and actions</h2><p>Most-used destinations and controls</p></div></div>
       {% if analytics.top_clicks %}
       <ol class="analytics-ranked-list">
         {% for item in analytics.top_clicks %}<li><span>{{ item.target }}</span><strong>{{ '{:,}'.format(item.count) }}</strong></li>{% endfor %}
@@ -116,9 +209,26 @@
       </table></div>
     </section>
     {% endif %}
-
   </div>
 
-  <p class="analytics-footnote">This shareable report shows aggregate counts only. It does not display individual session identifiers or page-by-page session journeys. Anyone with this link can view the report.</p>
+  <section class="analytics-card analytics-paths" aria-labelledby="paths-title">
+    <div class="analytics-section-heading">
+      <div>
+        <h2 id="paths-title">Top visitor paths</h2>
+        <p>Aggregated page-to-page flow for sessions that start at the selected page. Wider bands mean more sessions; hover for counts.</p>
+      </div>
+    </div>
+    {% if analytics.journey_flow %}
+    <div class="analytics-sankey-scroll">
+      <div id="analytics-sankey" role="img" aria-label="Aggregated top visitor paths for {{ analytics.range_label }}"></div>
+    </div>
+    <script id="analytics-sankey-data" type="application/json">{{ analytics.journey_flow|tojson }}</script>
+    {% else %}
+    <p class="analytics-empty">No multi-page paths are available for this starting page and date range.</p>
+    {% endif %}
+  </section>
+
+  <p class="analytics-footnote">This public report displays aggregate counts only. It does not expose session identifiers or individual page-by-page journeys.</p>
 </main>
 {% endblock %}
+{% block body_end %}<script defer src="{{ asset_url('js/site_analytics_dashboard.js') }}"></script>{% endblock %}

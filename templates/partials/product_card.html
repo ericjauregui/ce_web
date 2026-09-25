@@ -3,8 +3,9 @@
   {% set initial_qty = p.initial_qty|default(0, true)|int %}
   <article class="card product product-card shadow-sm bg-dark border-0"
        role="button"
-       tabindex="0"
+      tabindex="0"
       data-qty="{{ initial_qty }}"
+      data-analytics-target="component:product-card"
       data-detail-url="{{ url_for('product_detail', product_code=p.code) }}"
        aria-expanded="false"
        aria-controls="{{ drawer_id }}">

@@ -58,12 +58,39 @@
     }).catch(() => {});
   }
 
+  function actionSlug(value) {
+    const slug = String(value || "")
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .replace(/&/g, " and ")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .split("-")
+      .filter(Boolean)
+      .slice(0, 20)
+      .join("-")
+      .slice(0, 80)
+      .replace(/-+$/g, "");
+    return slug || "unlabeled-control";
+  }
+
   function targetFor(element) {
+    if (element.matches(".add-to-cart-btn")) return "action:add-to-order";
+
+    const explicitTarget = element.getAttribute("data-analytics-target");
+    if (/^(?:action|component):[a-z0-9]+(?:-[a-z0-9]+){0,19}$/.test(explicitTarget || "")) {
+      return explicitTarget;
+    }
+
+    const productCard = element.closest(".product-card");
+    if (productCard && !element.closest(".add-to-cart-btn, .qty-adjust-btn, .qty-clear-btn")) {
+      return "component:product-card";
+    }
+
     if (!(element instanceof HTMLAnchorElement)) {
-      const detailPath = element.getAttribute("data-detail-url");
-      if (detailPath) return `internal:${new URL(detailPath, window.location.href).pathname}`;
-      const id = element.id || "";
-      return /^[A-Za-z0-9_-]{1,80}$/.test(id) ? `button:${id}` : "button";
+      const label = element.getAttribute("aria-label") || element.textContent || element.value || element.id;
+      return `action:${actionSlug(label)}`;
     }
 
     const href = element.getAttribute("href") || "";

@@ -20,7 +20,7 @@ from domains.orders import DatabaseConfigurationError
 from domains.site_analytics import (
     ANALYTICS_SESSION_COOKIE, SiteAnalytics, normalize_click_target,
     normalize_campaign_value, normalize_page_context, normalize_page_path,
-    normalize_referrer_host, session_id_digest,
+    normalize_referrer_host, resolve_dashboard_range, session_id_digest,
 )
 from domains.team import build_member_vcard, build_team_members, ensure_team_qr_assets
 
@@ -301,8 +301,11 @@ def register_site_routes(
 
     @app.route("/admin/analytics", methods=["GET"])
     def site_analytics_dashboard():
-        requested_days = request.args.get("days", "30")
-        days = int(requested_days) if requested_days in {"7", "30", "90"} else 30
+        range_values = resolve_dashboard_range(request.args)
+        granularity = request.args.get("granularity", "day")
+        chart_metric = request.args.get("metric", "both")
+        page_filter = request.args.get("page_filter", "all")
+        journey_start = request.args.get("journey_start", "filter")
 
         try:
             with site_analytics_lock:
@@ -313,7 +316,13 @@ def register_site_routes(
                         engine=connect_store.engine if connect_store is not None else None
                     )
                     app.extensions["site_analytics"] = analytics
-            summary = analytics.dashboard_summary(days=days)
+            summary = analytics.dashboard_summary(
+                range_values=range_values,
+                granularity=granularity,
+                chart_metric=chart_metric,
+                page_filter=page_filter,
+                journey_start=journey_start,
+            )
         except DatabaseConfigurationError:
             app.logger.warning("Site analytics dashboard is unavailable without database configuration")
             return "Analytics are unavailable", 503
