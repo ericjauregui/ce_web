@@ -40,7 +40,7 @@
   <link href="{{ asset_url('vendor/bootstrap/bootstrap.min.css') }}" rel="stylesheet">
   <link href="{{ asset_url('css/styles/fonts.css') }}" rel="stylesheet">
   <link href="{{ asset_url('css/styles/base.css') }}" rel="stylesheet">
-  <link href="{{ asset_url('css/styles/layout.css') }}" rel="stylesheet">
+  {% block site_layout_css %}<link href="{{ asset_url('css/styles/layout.css') }}" rel="stylesheet">{% endblock %}
   <link href="{{ asset_url('css/styles/nav.css') }}" rel="stylesheet">
   {% block page_css %}{% endblock %}
 
@@ -108,7 +108,7 @@
   <nav class="navbar navbar-dark bg-black border-bottom border-gold fixed-top">
     <div class="container-fluid position-relative px-2 px-md-3">
       <a href="{{ url_for('index') }}" class="navbar-brand brand-lockup" aria-label="{{ site_name }}">
-        <img src="{{ asset_url('assets/ce_logo_shape.png') }}" alt="{{ site_name }}" class="brand-logo"
+        <img src="{{ asset_url('assets/ce_logo_shape.webp') }}" alt="{{ site_name }}" class="brand-logo"
           loading="eager" decoding="async" fetchpriority="high" width="450" height="433" />
       </a>
 {% set current_q = request.args.get('q', '') %}
@@ -218,7 +218,7 @@
   </footer>
   {% endblock %}
 
-  <script defer src="{{ asset_url('vendor/bootstrap/bootstrap.bundle.min.js') }}"></script>
+  {% block bootstrap_js %}<script defer src="{{ asset_url('vendor/bootstrap/bootstrap.bundle.min.js') }}"></script>{% endblock %}
   {% if cloudflare_web_analytics_token %}
   <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js"
     data-cf-beacon='{{ {"token": cloudflare_web_analytics_token}|tojson }}'></script>

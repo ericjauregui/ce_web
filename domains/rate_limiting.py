@@ -25,6 +25,7 @@ def install_rate_limiting(app: Flask) -> Limiter:
     app.config.setdefault("RATE_LIMIT_TRUST_PROXY", os.getenv("RENDER", "").lower() == "true")
     app.config.setdefault("CHECKOUT_RATE_LIMIT", "30 per 10 minutes")
     app.config.setdefault("CART_RATE_LIMIT", "300 per minute")
+    app.config.setdefault("CONNECT_EVENT_RATE_LIMIT", "600 per minute")
     limiter = Limiter(
         client_address,
         app=app,
@@ -43,6 +44,9 @@ def install_rate_limiting(app: Flask) -> Limiter:
     )
     for endpoint in ("api_cart_add", "api_cart_set", "api_cart_remove", "api_cart_clear", "api_cart_note"):
         app.view_functions[endpoint] = cart_limit(app.view_functions[endpoint])
+    app.view_functions["connect_event"] = limiter.limit(
+        lambda: app.config["CONNECT_EVENT_RATE_LIMIT"], methods=["POST"]
+    )(app.view_functions["connect_event"])
 
     @app.errorhandler(429)
     def too_many_requests(error):

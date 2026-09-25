@@ -12,4 +12,4 @@ Flask-Limiter uses thread-safe process-local memory, matching the current Render
 
 When RENDER=true, the limiter uses the rightmost X-Forwarded-For address, assuming the Render ingress appends the connecting client's address. Elsewhere it uses the socket address and ignores forwarded headers. Confirm that assumption in the deployed proxy chain before relying on per-client limits; additional proxies require revisiting this configuration. Never switch to trusting arbitrary leftmost headers.
 
-Local verification: `uv run python -m unittest tests.test_rate_limiting`. Ordinary tests bypass limits; this focused suite explicitly enables them and resets counters between tests. It does not send real orders or emails.
+Local verification: `uv run python -m tests.run e2e`, then `uv run python -m tests.verify_e2e_artifacts --check-source`. The commerce browser journey enables short local test limits, checks rejected writes and cart recovery, and resets counters between tests. It uses a synthetic local order database and intercepts email delivery.

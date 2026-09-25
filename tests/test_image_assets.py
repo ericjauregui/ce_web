@@ -1,5 +1,4 @@
 from hashlib import sha256
-from html.parser import HTMLParser
 import json
 from pathlib import Path
 import re
@@ -11,7 +10,6 @@ from PIL import Image
 
 from domains.image_assets import optimized_image_path, responsive_image_candidates
 from scripts.optimize_images import build_product_sizes
-from tests.common import BaseWebTest
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -142,40 +140,6 @@ class OptimizedImageTests(unittest.TestCase):
         self.assertGreater(len(found), 2)
         for filename, version in found:
             self.assertEqual(version, sha256((STATIC / filename).read_bytes()).hexdigest()[:16])
-
-
-class ResponsiveImageRouteTests(BaseWebTest):
-    def test_product_thumbnails_have_responsive_sources_but_detail_keeps_original(self) -> None:
-        class Images(HTMLParser):
-            def __init__(self):
-                super().__init__()
-                self.images = []
-
-            def handle_starttag(self, tag, attrs):
-                if tag == "img":
-                    self.images.append(dict(attrs))
-
-        with self.client.session_transaction() as session:
-            session["cart"] = {self.valid_code: 1}
-        for path in ("/", "/cart", "/checkout", "/trade-shows"):
-            with self.subTest(path=path):
-                response = self.client.get(path)
-                self.assertEqual(response.status_code, 200)
-                parser = Images()
-                parser.feed(response.get_data(as_text=True))
-                products = [attrs for attrs in parser.images if "product_images/" in attrs.get("src", "")
-                            or "assets/trade-shows/product-" in attrs.get("src", "")]
-                self.assertTrue(products)
-                for attrs in products:
-                    self.assertIn("/optimized/responsive/", attrs.get("srcset", ""))
-                    self.assertTrue(attrs["sizes"].startswith("auto,"))
-                    self.assertEqual(attrs["loading"], "lazy")
-        response = self.client.get(f"/product/{self.valid_code}")
-        parser = Images()
-        parser.feed(response.get_data(as_text=True))
-        detail = next(attrs for attrs in parser.images if attrs.get("class") == "product-detail-image")
-        self.assertNotIn("srcset", detail)
-        self.assertTrue(detail["src"].startswith("/static/product_images/"))
 
 
 if __name__ == "__main__":

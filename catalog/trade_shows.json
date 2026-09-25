@@ -1,12 +1,15 @@
 {
   "active_event": "jis-fall-2026",
+  "connect_event_override": null,
   "events": {
     "jis-fall-2026": {
       "name": "JIS Fall 2026",
+      "connect_name": "JIS Miami Fall 2026",
       "season": "Fall 2026",
       "dates_display": "October 16–19, 2026",
       "start_date": "2026-10-16",
       "end_date": "2026-10-19",
+      "time_zone": "America/New_York",
       "venue": "Miami Beach Convention Center",
       "address": "1901 Convention Center Drive",
       "city": "Miami Beach, Florida",
@@ -32,10 +35,12 @@
     },
     "jis-spring-2027": {
       "name": "JIS Spring 2027",
+      "connect_name": "JIS Miami Spring 2027",
       "season": "Spring 2027",
       "dates_display": "March 7–9, 2027",
       "start_date": "2027-03-07",
       "end_date": "2027-03-09",
+      "time_zone": "America/New_York",
       "venue": "Miami Beach Convention Center",
       "address": "1901 Convention Center Drive",
       "city": "Miami Beach, Florida",
@@ -60,6 +65,7 @@
       "dates_display": "June 4–7, 2027",
       "start_date": "2027-06-04",
       "end_date": "2027-06-07",
+      "time_zone": "America/Los_Angeles",
       "venue": "The Venetian Expo",
       "address": "201 Sands Avenue",
       "city": "Las Vegas, Nevada",

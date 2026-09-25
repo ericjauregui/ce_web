@@ -39,28 +39,28 @@ class NavLayoutE2ETests(BaseE2ETest):
         nav_center_after = nav_rect_after["y"] + (nav_rect_after["height"] / 2)
         self.assertLessEqual(abs(nav_center_after - trigger_center_after), 6)
 
-    def test_catalog_picker_and_cta_buttons_are_vertically_centered(self) -> None:
+    def test_collection_controls_and_cta_buttons_are_vertically_centered(self) -> None:
         self.page.goto(f"{self.base_url}/", wait_until="domcontentloaded")
         self.page.wait_for_timeout(180)
 
-        picker_alignment = self.page.evaluate(
+        collection_alignment = self.page.evaluate(
             """
             () => {
-              const row = document.querySelector('.catalog-explorer-row');
-              const summary = row?.querySelector('.catalog-collection-picker__summary');
-              if (!row || !summary) return null;
+              const row = document.querySelector('.home-collections .home-row-heading');
+              const toggle = row?.querySelector('.home-collections-toggle');
+              if (!row || !toggle) return null;
               const rowRect = row.getBoundingClientRect();
-              const summaryRect = summary.getBoundingClientRect();
+              const toggleRect = toggle.getBoundingClientRect();
               return {
-                centerDelta: Math.abs((rowRect.top + rowRect.height / 2) - (summaryRect.top + summaryRect.height / 2)),
-                summaryVisible: summaryRect.width > 0 && summaryRect.height >= 40,
+                centerDelta: Math.abs((rowRect.top + rowRect.height / 2) - (toggleRect.top + toggleRect.height / 2)),
+                toggleVisible: toggleRect.width >= 30 && toggleRect.height >= 30,
               };
             }
             """
         )
-        self.assertIsNotNone(picker_alignment)
-        self.assertLessEqual(picker_alignment["centerDelta"], 6)
-        self.assertTrue(picker_alignment["summaryVisible"])
+        self.assertIsNotNone(collection_alignment)
+        self.assertLessEqual(collection_alignment["centerDelta"], 8)
+        self.assertTrue(collection_alignment["toggleVisible"])
 
         cta_styles = self.page.evaluate(
             """
@@ -81,61 +81,26 @@ class NavLayoutE2ETests(BaseE2ETest):
         self.assertEqual(cta_styles["alignItems"], "center")
         self.assertEqual(cta_styles["justifyContent"], "center")
 
-    def test_mobile_catalog_picker_and_reel_scroll_hint(self) -> None:
+    def test_mobile_collection_navigation_and_reel_scroll_hint(self) -> None:
         self.page.set_viewport_size({"width": 390, "height": 900})
         self.page.goto(f"{self.base_url}/", wait_until="domcontentloaded")
         self.page.wait_for_timeout(180)
 
-        summary = self.page.locator(".catalog-collection-picker__summary")
-        self.assertIn("Choose a collection", summary.inner_text())
-        summary.click()
-        self.assertIn("All Collections", summary.inner_text())
-
-        picker_state = self.page.evaluate(
-            """
-            () => {
-              const picker = document.querySelector('#catalogCollectionPicker');
-              const summary = picker?.querySelector('.catalog-collection-picker__summary');
-              const menu = picker?.querySelector('.catalog-collection-picker__menu');
-              const options = picker?.querySelector('.catalog-collection-picker__options');
-              if (!picker || !summary || !menu || !options) return null;
-              picker.open = true;
-              const summaryRect = summary.getBoundingClientRect();
-              const menuRect = menu.getBoundingClientRect();
-              return {
-                summaryHeight: summaryRect.height,
-                menuLeft: menuRect.left,
-                menuRight: menuRect.right,
-                columns: getComputedStyle(options).gridTemplateColumns.split(' ').length,
-                viewportWidth: window.innerWidth,
-              };
-            }
-            """
-        )
-        self.assertIsNotNone(picker_state)
-        self.assertGreaterEqual(picker_state["summaryHeight"], 40)
-        self.assertGreaterEqual(picker_state["menuLeft"], 0)
-        self.assertLessEqual(picker_state["menuRight"], picker_state["viewportWidth"])
-        self.assertEqual(picker_state["columns"], 2)
+        toggle = self.page.locator(".home-collections-toggle")
+        navigation = self.page.locator("#homeCollectionNavigation")
+        self.assertTrue(navigation.is_visible())
+        self.assertGreater(self.page.locator(".home-collection-option").count(), 1)
+        toggle.click()
+        self.assertEqual(toggle.get_attribute("aria-expanded"), "false")
+        self.assertFalse(navigation.is_visible())
+        toggle.click()
+        self.assertEqual(toggle.get_attribute("aria-expanded"), "true")
+        self.assertTrue(navigation.is_visible())
 
         self.page.locator('[data-target="section-hearts"]').click()
-        self.assertEqual(
-            self.page.locator(".catalog-collection-section:visible").count(),
-            1,
-        )
-        self.assertEqual(
-            self.page.locator(".catalog-collection-heading:visible").count(),
-            0,
-        )
-
-        self.page.locator(".catalog-collection-picker__summary").click()
-        self.page.locator('[data-target="all-collections"]').click()
-        visible_sections = self.page.locator(".catalog-collection-section:visible").count()
-        self.assertGreater(visible_sections, 1)
-        self.assertEqual(
-            self.page.locator(".catalog-collection-heading:visible").count(),
-            visible_sections,
-        )
+        self.page.wait_for_function("() => location.hash === '#section-hearts'")
+        self.page.wait_for_function("() => window.scrollY > 0")
+        self.assertGreater(self.page.locator(".catalog-collection-section").count(), 1)
 
         reel_state = self.page.evaluate(
             """

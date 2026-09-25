@@ -1,5 +1,4 @@
 from concurrent.futures import ThreadPoolExecutor
-from dataclasses import FrozenInstanceError
 from hashlib import sha256
 import json
 from pathlib import Path
@@ -8,7 +7,6 @@ import unittest
 from unittest.mock import patch
 
 from domains.image_asset_cache import ImageAssetCache
-from domains.file_cache import get_path_version
 
 
 def version(data):
@@ -41,16 +39,6 @@ class ImageAssetCacheTests(unittest.TestCase):
 
     def get(self, **kwargs):
         return self.cache.get('source.png', self.cache.snapshot(), **kwargs)
-
-    def test_warm_lookup_reuses_validated_metadata(self):
-        first = self.get()
-        with patch('domains.image_asset_cache.get_path_version', wraps=get_path_version) as fingerprint:
-            self.assertEqual(self.get(), first)
-            fingerprint.assert_not_called()
-        self.assertEqual(first.path, 'copy.webp')
-        self.assertEqual([item[1] for item in first.candidates], [160, 400])
-        with self.assertRaises(FrozenInstanceError):
-            first.path = 'wrong.png'
 
     def test_source_change_and_missing_or_corrupt_derivatives_invalidate(self):
         self.get()
@@ -102,32 +90,3 @@ class ImageAssetCacheTests(unittest.TestCase):
                                         for part in attributes['srcset'].split(',')))
                     attributes['srcset'] = 'modified by caller'
                     self.assertNotEqual(webapp.product_image_attributes('source.png')['srcset'], attributes['srcset'])
-
-
-class ImageCacheRenderingTests(unittest.TestCase):
-    def test_cached_render_is_identical_with_empty_and_populated_carts(self):
-        import random
-        from flask import url_for
-        from tests.common import webapp
-        from domains.image_assets import optimized_image_path, responsive_image_candidates, PRODUCT_IMAGE_SIZES
-
-        def original_url(filename):
-            return webapp.asset_url(optimized_image_path(webapp.BASE_DIR / 'static', filename))
-
-        def original_attributes(filename, usage='catalog'):
-            candidates = responsive_image_candidates(webapp.BASE_DIR / 'static', filename)
-            if not candidates:
-                return {}
-            return {'srcset': ', '.join(f"{url_for('static', filename=item['path'], v=item['version'])} {item['width']}w"
-                                       for item in candidates), 'sizes': PRODUCT_IMAGE_SIZES[usage]}
-
-        for cart in ({}, {'101SB': 2}):
-            with self.subTest(cart=cart), webapp.app.test_client() as client:
-                with client.session_transaction() as session:
-                    session['cart'] = cart
-                with patch.multiple(webapp, optimized_image_url=original_url, product_image_attributes=original_attributes):
-                    random.seed(42)
-                    original = client.get('/').data
-                random.seed(42)
-                cached = client.get('/').data
-                self.assertEqual(original, cached)

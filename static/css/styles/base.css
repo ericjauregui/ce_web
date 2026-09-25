@@ -17,7 +17,7 @@ body::before {
     bottom: 0;
   z-index: -3;
 
-  background-image: url("/static/assets/ce_logo_shape.png?v=1f5c69370e675783");
+  background-image: url("/static/assets/ce_logo_shape.webp?v=6dad5a274be52545");
   background-size: min(1120px, 92vw);
     background-position: center 52%;
   background-repeat: no-repeat;

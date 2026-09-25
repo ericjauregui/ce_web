@@ -20,6 +20,7 @@ from domains.catalog import (
 )
 from domains.cart_routes import register_cart_routes
 from domains.cache_control import PUBLIC_ENDPOINT_POLICIES, install_cache_control
+from domains.connect import load_connect_event as load_connect_event_from_path
 from domains.rate_limiting import install_rate_limiting
 from domains.emailing import send_order_email
 from domains.faqs import load_faqs as load_faqs_from_path
@@ -164,6 +165,10 @@ def load_trade_show() -> dict[str, Any]:
     return load_trade_show_from_path(TRADE_SHOWS_PATH, load_products(), BASE_DIR / "static")
 
 
+def load_connect_event() -> dict[str, str]:
+    return load_connect_event_from_path(TRADE_SHOWS_PATH)
+
+
 def warm_runtime_caches() -> None:
     # Warm catalog and search caches once per process so initial customer
     # requests avoid cold-path indexing work.
@@ -237,11 +242,13 @@ register_site_routes(
     app,
     base_dir=BASE_DIR,
     get_reels_path=get_reels_path,
+    get_trade_shows_path=lambda: TRADE_SHOWS_PATH,
     load_products=load_products,
     load_collections_cfg=load_collections_cfg,
     load_team=load_team,
     load_faqs=load_faqs,
     load_trade_show=load_trade_show,
+    load_connect_event=load_connect_event,
     get_cart=get_cart,
     get_team_member_by_slug=get_team_member_by_slug,
     build_sitemap_urls=build_sitemap_urls,

@@ -69,7 +69,9 @@ Already-shared links may still need an external platform re-scrape.
 
 ```sh
 uv run python -m scripts.build_trade_show_social --check
-uv run python -m unittest tests.test_trade_show_social tests.test_trade_show_routes
+uv run python -m unittest tests.test_trade_show_social
+uv run python -m tests.run e2e --browser chromium --require-e2e
+uv run python -m tests.verify_e2e_artifacts --check-source
 ```
 
 `--check` and normal site requests never call the API. If someone bypasses checks,

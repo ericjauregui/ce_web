@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import os
+import hashlib
+import json
 import shutil
 import socket
 import threading
@@ -180,6 +182,8 @@ class BaseE2ETest(unittest.TestCase):
 					server_thread.join(timeout=2)
 
 	def setUp(self) -> None:
+		self._prior_analytics_token = os.environ.get("CLOUDFLARE_WEB_ANALYTICS_TOKEN")
+		os.environ["CLOUDFLARE_WEB_ANALYTICS_TOKEN"] = ""
 		self.context = self._browser.new_context(viewport=self.viewport)
 		self.page = self.context.new_page()
 		self.page.set_default_timeout(60000)
@@ -192,16 +196,24 @@ class BaseE2ETest(unittest.TestCase):
 		self.page.on("requestfailed", self._record_request_failure)
 
 	def tearDown(self) -> None:
+		failed_in_teardown = False
 		try:
 			if self.enforce_clean_browser:
 				self.assert_browser_clean()
 		except Exception:
-			self._write_failure_artifacts()
+			failed_in_teardown = True
 			raise
 		finally:
-			if self._current_test_failed():
-				self._write_failure_artifacts()
-			self.context.close()
+			try:
+				self._write_artifacts(failed=failed_in_teardown or self._current_test_failed())
+			finally:
+				try:
+					self.context.close()
+				finally:
+					if self._prior_analytics_token is None:
+						os.environ.pop("CLOUDFLARE_WEB_ANALYTICS_TOKEN", None)
+					else:
+						os.environ["CLOUDFLARE_WEB_ANALYTICS_TOKEN"] = self._prior_analytics_token
 
 	def goto(self, path: str, *, wait_until: str = "domcontentloaded"):
 		target = path if path.startswith("http") else f"{self.base_url}{path}"
@@ -246,7 +258,6 @@ class BaseE2ETest(unittest.TestCase):
 		if not unexpected_page_errors and not unexpected_console_errors and not unexpected_request_failures:
 			return
 
-		self._write_failure_artifacts()
 		sections: list[str] = []
 		if unexpected_page_errors:
 			sections.append("Page errors:\n" + "\n".join(unexpected_page_errors))
@@ -281,20 +292,21 @@ class BaseE2ETest(unittest.TestCase):
 		safe_test_id = self.id().replace(os.sep, "_").replace(":", "_")
 		return _artifact_root() / self.browser_name / safe_test_id
 
-	def _write_failure_artifacts(self) -> None:
+	def _write_artifacts(self, *, failed: bool) -> None:
 		artifact_dir = self._artifact_dir()
 		artifact_dir.mkdir(parents=True, exist_ok=True)
 
 		page = getattr(self, "page", None)
+		capture_errors: list[str] = []
 		if page is not None:
 			try:
-				page.screenshot(path=str(artifact_dir / "page.png"), full_page=True)
-			except Exception:
-				pass
+				page.screenshot(path=str(artifact_dir / "page.png"), animations="disabled", timeout=15000)
+			except Exception as exc:
+				capture_errors.append(f"screenshot: {type(exc).__name__}: {exc}")
 			try:
 				(artifact_dir / "page.html").write_text(page.content(), encoding="utf-8")
-			except Exception:
-				pass
+			except Exception as exc:
+				capture_errors.append(f"HTML: {type(exc).__name__}: {exc}")
 
 		log_lines = [f"URL: {getattr(page, 'url', '')}"]
 		if self.page_errors:
@@ -304,3 +316,20 @@ class BaseE2ETest(unittest.TestCase):
 		if self.request_failures:
 			log_lines.extend(["", "[request failures]", *self.request_failures])
 		(artifact_dir / "browser-events.txt").write_text("\n".join(log_lines), encoding="utf-8")
+		files = {}
+		for path in sorted(artifact_dir.iterdir()):
+			if path.is_file() and path.name != "evidence.json":
+				files[path.name] = hashlib.sha256(path.read_bytes()).hexdigest()
+		(artifact_dir / "evidence.json").write_text(
+			json.dumps({
+				"test_id": self.id(),
+				"run_id": os.environ.get("CE_E2E_RUN_ID", "direct-unittest"),
+				"status": "failed" if failed else "passed",
+				"browser": self.browser_name,
+				"viewport": page.viewport_size if page is not None else self.viewport,
+				"url": getattr(page, "url", ""),
+				"files_sha256": files,
+				"capture_errors": capture_errors,
+			}, indent=2, sort_keys=True) + "\n",
+			encoding="utf-8",
+		)

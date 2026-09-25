@@ -29,7 +29,7 @@
   <div class="dbc-layout">
     <div class="dbc-main">
       <article class="dbc-profile" aria-labelledby="memberName">
-        <div class="dbc-backdrop"><img class="dbc-wordmark" src="{{ asset_url('assets/ce_logo_full.png') }}" alt="{{ company_name }}" width="350" height="84"></div>
+        <div class="dbc-backdrop"><img class="dbc-wordmark" src="{{ asset_url('assets/ce_logo_full.webp') }}" alt="{{ company_name }}" width="350" height="84"></div>
         <div class="dbc-identity">
           <div class="dbc-portrait-ring"><div class="dbc-portrait-crop">
             {% if member.photo %}<img class="dbc-portrait" src="{{ asset_url('team/' ~ member.photo) }}" alt="{{ member.name }}" width="116" height="116" style="object-position: {{ member.photo_position }}; transform: scale({{ member.photo_scale }}); transform-origin: {{ member.photo_position }}" fetchpriority="high" decoding="async">

@@ -2,34 +2,30 @@
 
 ## Commands
 
-The project declares Python >=3.13, uses `uv`, and tests with `unittest`, not pytest. Run from repo root. `UV_CACHE_DIR=/tmp/ce-web-uv-cache` is a local workaround for an inaccessible default cache, not an app requirement.
+The project declares Python >=3.13, uses `uv`, and tests with `unittest`, not pytest. Run from repo root. Follow the E2E-first rules in root `AGENTS.md`. `UV_CACHE_DIR=/tmp/ce-web-uv-cache` is a local workaround for an inaccessible default cache, not an app requirement.
 
 ```sh
 # Preview using the configured development secret/environment.
 UV_CACHE_DIR=/tmp/ce-web-uv-cache uv run flask --app app run --host 127.0.0.1 --port 5001
 
-# Choose relevant modules, not necessarily all of these.
-UV_CACHE_DIR=/tmp/ce-web-uv-cache uv run python -m unittest tests.test_frontend_contracts tests.test_trade_show_routes
-UV_CACHE_DIR=/tmp/ce-web-uv-cache uv run python -m unittest tests.test_team_routes
-UV_CACHE_DIR=/tmp/ce-web-uv-cache uv run python -m unittest tests.test_product_routes
+# Browser E2E is the primary suite and requires Playwright/browser binaries.
+UV_CACHE_DIR=/tmp/ce-web-uv-cache uv run python -m tests.run e2e
+UV_CACHE_DIR=/tmp/ce-web-uv-cache uv run python -m tests.verify_e2e_artifacts --check-source
+UV_CACHE_DIR=/tmp/ce-web-uv-cache uv run python -m tests.run e2e --browser webkit --keep-artifacts
 
-# Broader suite when warranted.
+# Narrowly justified isolation checks, when relevant to the change.
 UV_CACHE_DIR=/tmp/ce-web-uv-cache uv run python -m tests.run standard
-
-# Existing E2E harness when dependencies are installed.
-UV_CACHE_DIR=/tmp/ce-web-uv-cache uv run python -m tests.run e2e --browser chromium --require-e2e --keep-artifacts
-UV_CACHE_DIR=/tmp/ce-web-uv-cache uv run python -m tests.run e2e --browser webkit --require-e2e --keep-artifacts
 
 git diff --check
 ```
 
 App startup requires `SECRET_KEY`; checkout needs a configured database. Do not print `.env` while diagnosing configuration. Check process/port ownership before starting/stopping a preview.
 
-For orders, choose repository, checkout, email, cache, migration, and database-command tests. PostgreSQL integration is opt-in via `TEST_DATABASE_URL` against a dedicated migrated test database, never production. Inspect E2E database/email mocking before submitting a test order; local UI work does not authorize real staff notifications.
+For orders, run the synthetic local commerce E2E flow first. Retained isolated checks and their failure inventory are in `tests/ISOLATED_TEST_RATIONALE.md`. PostgreSQL integration is opt-in via `TEST_DATABASE_URL` against a dedicated migrated test database, never production. Inspect E2E database/email mocking before submitting a test order; local UI work does not authorize real staff notifications.
 
-Dev extras include Playwright. Do not assume Node, pytest, browser binaries, or an old app-bundled runtime path exists. Inspect installed tools. Browser dependencies can be skipped by tests; use `--require-e2e` when browser coverage is required.
+Dev extras include Playwright. Do not assume Node, pytest, browser binaries, or an old app-bundled runtime path exists. Inspect installed tools. The E2E runner treats missing Playwright or browser binaries as a failure.
 
-Artifacts default to `.test-artifacts/e2e/` and are normally cleaned on E2E startup. `--keep-artifacts` preserves prior evidence. Never aim automatic cleanup at unrelated user folders.
+Artifacts default to `.test-artifacts/e2e/` and are normally cleaned on E2E startup. Each test writes screenshot, HTML, browser events, and SHA-256 evidence; the runner writes a run manifest. `--keep-artifacts` preserves prior evidence. Never aim automatic cleanup at unrelated user folders.
 
 ## Browser checks
 

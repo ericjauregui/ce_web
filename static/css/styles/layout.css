@@ -2816,7 +2816,7 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background-image: url("/static/assets/ce_logo_shape.png");
+  background-image: url("/static/assets/ce_logo_shape.webp?v=6dad5a274be52545");
   background-repeat: no-repeat;
   background-position: right -12px bottom -12px;
   background-size: min(140px, 34vw);

@@ -11,6 +11,7 @@ MUTABLE_STATIC = "public, max-age=300, must-revalidate"
 IMMUTABLE_STATIC = "public, max-age=31536000, immutable"
 PUBLIC_METADATA = "public, max-age=300, must-revalidate"
 PUBLIC_CONTACT = "public, max-age=3600, must-revalidate"
+PUBLIC_CONNECT = "public, max-age=60, must-revalidate"
 
 # These endpoints do not render the shared cart-aware page layout and contain
 # no customer-specific data. Keep this list intentionally small.
@@ -20,6 +21,8 @@ PUBLIC_ENDPOINT_POLICIES = {
     "sitemap": PUBLIC_METADATA,
     "team_member_vcard": PUBLIC_CONTACT,
     "team_member_vcard_qr": PUBLIC_METADATA,
+    "connect_vcard": PUBLIC_CONNECT,
+    "connect_event": NO_STORE,
 }
 
 

@@ -2,13 +2,21 @@ from __future__ import annotations
 
 import io
 from pathlib import Path
+from threading import Lock
 from typing import Any, Callable
 
 from flask import Flask, abort, redirect, render_template, request, send_file, url_for
+from sqlalchemy.exc import SQLAlchemyError
 
 from domains.catalog import build_sections, find_product_by_code
+from domains.connect import (
+    build_connect_vcard, connect_event_by_key, connect_whatsapp_url,
+)
+from domains.connect_analytics import CONNECT_ACTIONS, ConnectAnalytics
+from domains.file_cache import load_json_cached
 from domains.homepage import build_homepage_context, load_latest_reels
 from domains.reels import load_random_reels
+from domains.orders import DatabaseConfigurationError
 from domains.team import build_member_vcard, build_team_members, ensure_team_qr_assets
 
 LoadProducts = Callable[[], list[dict[str, Any]]]
@@ -16,12 +24,14 @@ LoadCollectionsCfg = Callable[[], dict[str, Any]]
 LoadTeam = Callable[[], dict[str, Any]]
 LoadFaqs = Callable[[], list[dict[str, Any]]]
 LoadTradeShow = Callable[[], dict[str, Any]]
+LoadConnectEvent = Callable[[], dict[str, str]]
 GetCart = Callable[[], dict[str, int]]
 GetTeamMemberBySlug = Callable[[str], tuple[dict[str, Any], list[dict[str, Any]], dict[str, Any] | None]]
 BuildSitemapUrls = Callable[[str], list[dict[str, str | float | None]]]
 CanonicalBaseUrl = Callable[[], str]
 Slugify = Callable[[str], str]
 GetReelsPath = Callable[[], Path]
+GetTradeShowsPath = Callable[[], Path]
 
 
 def register_site_routes(
@@ -29,17 +39,21 @@ def register_site_routes(
     *,
     base_dir: Path,
     get_reels_path: GetReelsPath,
+    get_trade_shows_path: GetTradeShowsPath,
     load_products: LoadProducts,
     load_collections_cfg: LoadCollectionsCfg,
     load_team: LoadTeam,
     load_faqs: LoadFaqs,
     load_trade_show: LoadTradeShow,
+    load_connect_event: LoadConnectEvent,
     get_cart: GetCart,
     get_team_member_by_slug: GetTeamMemberBySlug,
     build_sitemap_urls: BuildSitemapUrls,
     canonical_base_url: CanonicalBaseUrl,
     slugify: Slugify,
 ) -> None:
+    connect_analytics_lock = Lock()
+
     @app.route("/privacy")
     def privacy_policy():
         return render_template("privacy.html")
@@ -117,6 +131,17 @@ def register_site_routes(
         if not member:
             abort(404)
 
+        photo_bytes, photo_type = _member_photo(member)
+        vcard_text = build_member_vcard(member, team, photo_bytes=photo_bytes, photo_type=photo_type)
+        filename = f"{slugify(member.get('name', 'contact'))}.vcf"
+        return send_file(
+            io.BytesIO(vcard_text.encode("utf-8")),
+            mimetype="text/vcard; charset=utf-8",
+            as_attachment=True,
+            download_name=filename,
+        )
+
+    def _member_photo(member: dict[str, Any]) -> tuple[bytes | None, str | None]:
         photo_bytes = None
         photo_type = None
         photo_name = str(member.get("photo") or "").strip()
@@ -131,15 +156,7 @@ def register_site_routes(
                 }.get(photo_path.suffix.lower())
                 if photo_type:
                     photo_bytes = photo_path.read_bytes()
-
-        vcard_text = build_member_vcard(member, team, photo_bytes=photo_bytes, photo_type=photo_type)
-        filename = f"{slugify(member.get('name', 'contact'))}.vcf"
-        return send_file(
-            io.BytesIO(vcard_text.encode("utf-8")),
-            mimetype="text/vcard; charset=utf-8",
-            as_attachment=True,
-            download_name=filename,
-        )
+        return photo_bytes, photo_type
 
     @app.route("/about")
     def about():
@@ -148,6 +165,61 @@ def register_site_routes(
     @app.route("/contact")
     def contact():
         return render_template("contact.html")
+
+    @app.route("/connect")
+    def connect_page():
+        event = load_connect_event()
+        _, _, giancarlo = get_team_member_by_slug("giancarlo")
+        if not giancarlo:
+            abort(404)
+        return render_template(
+            "connect.html",
+            event=event,
+            whatsapp_url=connect_whatsapp_url(event, giancarlo["phone_digits"]),
+        )
+
+    @app.route("/connect/contact.vcf")
+    def connect_vcard():
+        event = load_connect_event()
+        team, _, giancarlo = get_team_member_by_slug("giancarlo")
+        if not giancarlo:
+            abort(404)
+        photo_bytes, photo_type = _member_photo(giancarlo)
+        social = load_json_cached(base_dir / "catalog" / "social.json", {})
+        vcard = build_connect_vcard(
+            giancarlo, team, social, event, photo_bytes=photo_bytes, photo_type=photo_type
+        )
+        return send_file(
+            io.BytesIO(vcard.encode("utf-8")),
+            mimetype="text/vcard; charset=utf-8",
+            as_attachment=True,
+            download_name="california-earrings.vcf",
+        )
+
+    @app.post("/api/connect/event")
+    def connect_event():
+        payload = request.get_json(silent=True)
+        if not isinstance(payload, dict):
+            return "", 400
+        action = payload.get("action")
+        key = payload.get("trade_show_key")
+        if not isinstance(action, str) or action not in CONNECT_ACTIONS or not isinstance(key, str):
+            return "", 400
+        event = connect_event_by_key(get_trade_shows_path(), key)
+        if event is None:
+            return "", 400
+
+        try:
+            with connect_analytics_lock:
+                analytics = app.extensions.get("connect_analytics")
+                if analytics is None:
+                    analytics = ConnectAnalytics()
+                    app.extensions["connect_analytics"] = analytics
+            analytics.record(action=action, event=event)
+        except (DatabaseConfigurationError, SQLAlchemyError):
+            app.logger.warning("Connect analytics could not be saved")
+            return "", 503
+        return "", 204
 
     @app.route("/trade-shows")
     def trade_shows_page():

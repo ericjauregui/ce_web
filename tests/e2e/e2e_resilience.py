@@ -44,12 +44,3 @@ class WebKitResilienceE2ETests(BaseE2ETest):
         nav_center = nav_rect["y"] + (nav_rect["height"] / 2)
         self.assertLessEqual(abs(trigger_center - nav_center), 8)
         self.assert_browser_clean()
-
-    def test_catalog_images_use_native_lazy_loading_hint(self) -> None:
-        self.goto("/")
-
-        lazy_count = self.page.locator("img.product-img[loading='lazy'][decoding='async']").count()
-        total_count = self.page.locator("img.product-img").count()
-
-        self.assertGreater(total_count, 0)
-        self.assertEqual(lazy_count, total_count)

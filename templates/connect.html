@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Connect with California Earrings{% if event %} at {{ event.name }}{% endif %}{% endblock %}
+{% block meta_description %}Stay connected with California Earrings. Message us on WhatsApp or save our contact details.{% endblock %}
+{% block robots_meta %}noindex, follow{% endblock %}
+{% block body_class %}connect-view{% endblock %}
+{% block site_layout_css %}{% endblock %}
+{% block page_css %}
+<link rel="stylesheet" href="{{ asset_url('css/styles/connect.css') }}">
+{% endblock %}
+{% block bootstrap_js %}{% endblock %}
+{% block content %}
+<section class="connect-page" data-trade-show="{{ event.key if event else '' }}" aria-label="Connect with California Earrings">
+  <header class="connect-header">
+    <a href="{{ url_for('index') }}" aria-label="California Earrings home">
+      <img class="connect-logo" src="{{ asset_url('assets/ce_logo_full.webp') }}" alt="California Earrings" width="350" height="84" fetchpriority="high">
+    </a>
+  </header>
+
+  <div class="connect-main">
+    <div class="connect-intro">
+      <div class="connect-rule" aria-hidden="true"></div>
+      {% if event %}
+        <p class="connect-eyebrow">Great meeting you at</p>
+        <h1 class="connect-title hero-title text-gold">{{ event.name|upper }}</h1>
+        {% if event.booth %}<p class="connect-booth">{{ event.booth }}</p>{% endif %}
+        <p class="connect-description">Stay connected with California Earrings.</p>
+      {% else %}
+        <h1 class="connect-title hero-title text-gold">CONNECT WITH CALIFORNIA EARRINGS</h1>
+        <p class="connect-description">Wholesale 14K gold jewelry from Los Angeles.</p>
+      {% endif %}
+    </div>
+
+    <div class="connect-actions" aria-label="Contact California Earrings">
+      <a class="connect-action connect-action-primary" data-destination="whatsapp" href="{{ whatsapp_url }}" target="_blank" rel="noopener noreferrer">Message Us on WhatsApp</a>
+      <a class="connect-action connect-action-secondary" data-destination="save_contact" href="{{ url_for('connect_vcard') }}">Save Our Contact</a>
+      <a class="btn btn-outline-gold hero-action-btn connect-catalog-btn" data-destination="shop" href="{{ url_for('catalog_start') }}">
+        <svg class="hero-action-btn__icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 4.5h16v15H4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"></path>
+          <path d="M8 9h8M8 13h8M8 17h5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path>
+        </svg>
+        <span class="hero-action-btn__label">See Our Catalog</span>
+      </a>
+      <div class="connect-social-actions">
+        <a data-destination="instagram" href="{{ social.instagram.profile_url }}" target="_blank" rel="noopener noreferrer" aria-label="Follow on Instagram">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5" ry="5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="17.3" cy="6.8" r="1.1" fill="currentColor"/></svg>
+          <span>Instagram</span>
+        </a>
+        <a data-destination="tiktok" href="{{ social.tiktok.profile_url }}" target="_blank" rel="noopener noreferrer" aria-label="Follow on TikTok">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 4v9.2a3.7 3.7 0 1 1-3.7-3.7" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><path d="M14.5 4c.6 1.7 2 3 3.7 3.7" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span>TikTok</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+{% block body_end %}<script defer src="{{ asset_url('js/connect.js') }}"></script>{% endblock %}

@@ -178,16 +178,16 @@ Cart API routes:
 
 Tests are intended to run locally in this repo. No GitHub Actions or other CI workflow is maintained here.
 
-Use the unified runner for the standard route/contract suite:
-
-```bash
-uv run python -m tests.run standard
-```
-
-Run the Playwright E2E suite:
+Run the browser E2E suite (the default test command):
 
 ```bash
 uv run python -m tests.run e2e
+```
+
+Run the remaining focused isolated checks only when their specific failure modes matter:
+
+```bash
+uv run python -m tests.run standard
 ```
 
 Run everything together:
@@ -199,16 +199,16 @@ uv run python -m tests.run all
 Useful E2E options:
 
 ```bash
-uv run python -m tests.run e2e --require-e2e
 uv run python -m tests.run e2e --browser webkit
 uv run python -m tests.run e2e --headed
 uv run python -m tests.run e2e --keep-artifacts
+uv run python -m tests.verify_e2e_artifacts --check-source
 ```
 
-Failing E2E tests write screenshots, page HTML, and browser event logs into `.test-artifacts/e2e/` by default.
+Every E2E test writes a screenshot, rendered HTML, browser event log, and SHA-256 evidence record into `.test-artifacts/e2e/`. The runner writes a run manifest with the source fingerprint and evidence hashes. The E2E command fails if Playwright or browser binaries are missing.
 That directory is cleaned automatically at the start of each new E2E run unless you pass `--keep-artifacts`.
 
-The test suite covers route contracts, metadata endpoints, reels/homepage frontend contracts, and cross-browser E2E layout/resilience behavior, including mobile checkout field behavior.
+The browser suite covers customer workflows, route behavior, and cross-browser layout/resilience. Focused isolated checks remain for failure modes a browser cannot reliably expose.
 
 ## Troubleshooting
 

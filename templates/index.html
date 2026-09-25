@@ -5,7 +5,7 @@
   <link rel="preload" as="image" href="{{ hero_image_url('assets/hero_bg_mobile_compact.png') }}" media="(max-width: 575.98px)" fetchpriority="high">
   <link rel="preload" as="image" href="{{ hero_image_url('assets/hero_bg.png') }}" media="(min-width: 576px) and (max-width: 1199.98px)" fetchpriority="high">
   <link rel="preload" as="image" href="{{ hero_image_url('assets/hero_bg_wide.png') }}" media="(min-width: 1200px)" fetchpriority="high">
-  <link rel="preload" as="image" href="{{ asset_url('assets/ce_logo_full.png') }}" fetchpriority="high">
+  <link rel="preload" as="image" href="{{ asset_url('assets/ce_logo_full.webp') }}" fetchpriority="high">
 {% endblock %}
 {% block page_css %}
 <noscript><style>img[data-catalog-src] { display: none; } .product-img-wrap > noscript, .home-collection-option > noscript { display: contents; }</style></noscript>
@@ -21,7 +21,7 @@
 <header class="hero d-flex align-items-center text-center" style="--hero-bg-original: url('{{ hero_image_url('assets/hero_bg.png') }}'); --hero-bg-wide: url('{{ hero_image_url('assets/hero_bg_wide.png') }}'); --hero-bg-mobile: url('{{ hero_image_url('assets/hero_bg_mobile_compact.png') }}');">
   <div class="container">
     <h1 class="visually-hidden">California Earrings</h1>
-    <img class="hero-logo" src="{{ asset_url('assets/ce_logo_full.png') }}" alt="California Earrings" loading="eager" decoding="sync" fetchpriority="high" width="339" height="88">
+    <img class="hero-logo" src="{{ asset_url('assets/ce_logo_full.webp') }}" alt="California Earrings" loading="eager" decoding="sync" fetchpriority="high" width="339" height="88">
     <div class="hero-content-shell">
       <div class="hero-copy">
         <p class="hero-kicker text-gold">Wholesale</p>
