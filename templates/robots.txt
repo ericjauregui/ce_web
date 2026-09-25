@@ -5,6 +5,7 @@ Disallow: /api/
 Disallow: /cart
 Disallow: /checkout
 Disallow: /download/
+Disallow: /admin/analytics
 Disallow: /*?q=
 
 Sitemap: {{ sitemap_url }}

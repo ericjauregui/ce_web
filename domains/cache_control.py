@@ -13,8 +13,8 @@ PUBLIC_METADATA = "public, max-age=300, must-revalidate"
 PUBLIC_CONTACT = "public, max-age=3600, must-revalidate"
 PUBLIC_CONNECT = "public, max-age=60, must-revalidate"
 
-# These endpoints do not render the shared cart-aware page layout and contain
-# no customer-specific data. Keep this list intentionally small.
+# These endpoints contain no customer-specific cart data and use an empty cart
+# context when rendered inside the shared page layout. Keep this list small.
 PUBLIC_ENDPOINT_POLICIES = {
     "favicon": MUTABLE_STATIC,
     "robots": PUBLIC_METADATA,
@@ -24,6 +24,7 @@ PUBLIC_ENDPOINT_POLICIES = {
     "connect_vcard": PUBLIC_CONNECT,
     "connect_event": NO_STORE,
     "site_analytics_event": NO_STORE,
+    "site_analytics_dashboard": NO_STORE,
 }
 
 
@@ -52,7 +53,6 @@ def install_cache_control(app: Flask) -> None:
         if (
             request.endpoint == "static"
             or request.endpoint in PUBLIC_ENDPOINT_POLICIES
-            or request.endpoint == "site_analytics_dashboard"
         ):
             return
         session.permanent = True
