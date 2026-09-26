@@ -144,7 +144,7 @@ class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
             self.page.locator("main.analytics-dashboard").inner_text(),
         )
         self.assertNotIn("Shared reporting", self.page.locator("main.analytics-dashboard").inner_text())
-        self.assertIn("Pacific Time (PT)", self.page.locator("main.analytics-dashboard").inner_text())
+        self.assertNotIn("Pacific", self.page.locator("main.analytics-dashboard").inner_text())
         self.assertEqual(self.page.locator(".analytics-bucket").count(), 1)
         self.assertRegex(self.page.locator(".analytics-bucket small").inner_text(), r"^\d{1,2}/\d{1,2}$")
         self.assertGreater(self.page.locator("#analytics-sankey .sankey-link").count(), 0)

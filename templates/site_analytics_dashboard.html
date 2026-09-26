@@ -9,7 +9,7 @@
   <header class="analytics-heading">
     <div>
       <h1 id="analytics-title">Site analytics</h1>
-      <p class="analytics-subtitle">Aggregate visits, page views, and clicks. All dates and times are Pacific Time (PT).</p>
+      <p class="analytics-subtitle">Aggregate visits, page views, and clicks.</p>
       <p class="analytics-range-label">{{ analytics.range_description }} · {{ analytics.range_label }}</p>
     </div>
   </header>
@@ -47,7 +47,7 @@
 
     <fieldset class="analytics-filter-field analytics-custom-fields" data-range-fields="custom"
       {% if analytics.mode != 'custom' %}disabled hidden{% endif %}>
-      <legend>Custom Pacific dates</legend>
+      <legend>Custom dates</legend>
       <div class="analytics-inline-fields">
         <label class="visually-hidden" for="analytics-date-from">From</label>
         <input id="analytics-date-from" class="form-control" name="date_from" type="date"
@@ -122,7 +122,7 @@
     </article>
     <article class="analytics-card metric-card">
       <span>Page views</span><strong>{{ '{:,}'.format(analytics.page_views) }}</strong>
-      <small>Across {{ analytics.range_days }} complete Pacific dates</small>
+      <small>Across {{ analytics.range_days }} days</small>
     </article>
     <article class="analytics-card metric-card">
       <span>Clicks</span><strong>{{ '{:,}'.format(analytics.clicks) }}</strong>
@@ -151,7 +151,7 @@
     <div class="analytics-chart" role="img"
       aria-label="{{ analytics.granularity_label }} {{ analytics.chart_metric_label|lower }} from {{ analytics.range_label }}">
       {% for bucket in analytics.chart %}
-      <div class="analytics-bucket" title="{{ bucket.label }} PT: {{ bucket.page_views }} page views, {{ bucket.clicks }} clicks">
+      <div class="analytics-bucket" title="{{ bucket.label }}: {{ bucket.page_views }} page views, {{ bucket.clicks }} clicks">
         <div class="analytics-bars">
           {% if analytics.chart_metric != 'clicks' %}
           <span class="analytics-bar bar-views" style="height: {{ (bucket.page_views * 100 / analytics.chart_peak)|round|int }}%"></span>

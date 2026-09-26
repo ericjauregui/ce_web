@@ -124,7 +124,7 @@ def resolve_dashboard_range(query_args, *, today: date | None = None) -> dict[st
         "latest_complete_date": latest_complete_date.isoformat(),
         "range_days": (end_exclusive - start_date).days,
         "range_description": description,
-        "range_label": f"{_format_date(start_date)} – {_format_date(end_date)} PT",
+        "range_label": f"{_format_date(start_date)} – {_format_date(end_date)}",
     }
 
 
