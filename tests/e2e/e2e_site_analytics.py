@@ -91,7 +91,7 @@ class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
     def test_public_dashboard_shows_aggregates_without_session_identifiers(self) -> None:
         dashboard_query = (
             "range=rolling&count=7&unit=days&granularity=day&metric=both"
-            "&page_filter=all&journey_start=all"
+            "&page_filter=all&journey_start=filter"
         )
         anonymous_client = self._playwright_context.request.new_context()
         try:
@@ -170,6 +170,25 @@ class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
         self.assertNotIn(self.secondary_session[-8:], self.page.content())
         self.assertNotIn("Recent sessions", self.page.content())
         self.assertNotIn("session_id_hash", self.page.content())
+
+        more_filters = self.page.locator("#analytics-more-filters")
+        self.assertIsNone(more_filters.get_attribute("open"))
+        self.assertTrue(self.page.locator("#analytics-range-mode").is_visible())
+        self.assertTrue(self.page.locator("#analytics-page-filter").is_visible())
+        self.assertFalse(self.page.locator("#analytics-metric").is_visible())
+        self.page.locator("#analytics-more-filters > summary").click()
+        self.page.locator("#analytics-metric").select_option("clicks")
+        self.page.locator("#analytics-more-filters > summary").click()
+        self.page.wait_for_function(
+            "document.querySelector('#analytics-more-filters-state').value === '0'"
+        )
+        with self.page.expect_navigation(wait_until="domcontentloaded") as applied_filters:
+            self.page.locator(".analytics-filter-actions button").click()
+        self.assertEqual(applied_filters.value.status, 200)
+        self.assertIn("metric=clicks", self.page.url)
+        self.assertIn("more_filters=0", self.page.url)
+        self.assertEqual(self.page.locator("#analytics-metric").input_value(), "clicks")
+        self.assertIsNone(self.page.locator("#analytics-more-filters").get_attribute("open"))
 
         filtered_response = self.goto(
             "/admin/analytics?range=rolling&count=7&unit=days&page_filter=path:/connect"

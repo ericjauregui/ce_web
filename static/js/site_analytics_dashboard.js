@@ -3,6 +3,8 @@
   const rangeFields = document.querySelectorAll("[data-range-fields]");
   const periodCount = document.getElementById("analytics-period-count");
   const periodUnit = document.querySelector("[name='unit']");
+  const moreFilters = document.getElementById("analytics-more-filters");
+  const moreFiltersState = document.getElementById("analytics-more-filters-state");
 
   function updateRangeFields() {
     const mode = rangeMode?.value || "rolling";
@@ -21,6 +23,9 @@
 
   rangeMode?.addEventListener("change", updateRangeFields);
   periodUnit?.addEventListener("change", updateRangeFields);
+  moreFilters?.addEventListener("toggle", () => {
+    if (moreFiltersState) moreFiltersState.value = moreFilters.open ? "1" : "0";
+  });
   updateRangeFields();
 
   const chartHost = document.getElementById("analytics-sankey");

@@ -14,6 +14,11 @@
     </div>
   </header>
 
+  {% set more_filters_open = request.args.get('more_filters') == '1' or (
+    request.args.get('more_filters') is none and (
+      analytics.granularity != 'day' or analytics.chart_metric != 'both' or analytics.journey_start != 'filter'
+    )
+  ) %}
   <form class="analytics-card analytics-filters" method="get" action="{{ url_for('site_analytics_dashboard') }}">
     <div class="analytics-filter-field">
       <label for="analytics-range-mode">Date range</label>
@@ -65,34 +70,45 @@
       </select>
     </div>
 
-    <div class="analytics-filter-field">
-      <label for="analytics-granularity">Graph grouping</label>
-      <select id="analytics-granularity" name="granularity" class="form-select">
-        <option value="day" {{ 'selected' if analytics.granularity == 'day' else '' }}>Daily</option>
-        <option value="week" {{ 'selected' if analytics.granularity == 'week' else '' }}>Weekly</option>
-        <option value="month" {{ 'selected' if analytics.granularity == 'month' else '' }}>Monthly</option>
-      </select>
-    </div>
+    <input type="hidden" name="more_filters" id="analytics-more-filters-state"
+      value="{{ '1' if more_filters_open else '0' }}">
+    <details id="analytics-more-filters" class="analytics-more-filters"
+      {% if more_filters_open %}open{% endif %}>
+      <summary>
+        <span>More filters</span>
+        <small>Graph grouping, metric, and visitor path</small>
+      </summary>
+      <div class="analytics-more-filters-grid">
+        <div class="analytics-filter-field">
+          <label for="analytics-granularity">Graph grouping</label>
+          <select id="analytics-granularity" name="granularity" class="form-select">
+            <option value="day" {{ 'selected' if analytics.granularity == 'day' else '' }}>Daily</option>
+            <option value="week" {{ 'selected' if analytics.granularity == 'week' else '' }}>Weekly</option>
+            <option value="month" {{ 'selected' if analytics.granularity == 'month' else '' }}>Monthly</option>
+          </select>
+        </div>
 
-    <div class="analytics-filter-field">
-      <label for="analytics-metric">Graph metric</label>
-      <select id="analytics-metric" name="metric" class="form-select">
-        <option value="both" {{ 'selected' if analytics.chart_metric == 'both' else '' }}>Views and clicks</option>
-        <option value="page_views" {{ 'selected' if analytics.chart_metric == 'page_views' else '' }}>Views only</option>
-        <option value="clicks" {{ 'selected' if analytics.chart_metric == 'clicks' else '' }}>Clicks only</option>
-      </select>
-    </div>
+        <div class="analytics-filter-field">
+          <label for="analytics-metric">Graph metric</label>
+          <select id="analytics-metric" name="metric" class="form-select">
+            <option value="both" {{ 'selected' if analytics.chart_metric == 'both' else '' }}>Views and clicks</option>
+            <option value="page_views" {{ 'selected' if analytics.chart_metric == 'page_views' else '' }}>Views only</option>
+            <option value="clicks" {{ 'selected' if analytics.chart_metric == 'clicks' else '' }}>Clicks only</option>
+          </select>
+        </div>
 
-    <div class="analytics-filter-field analytics-journey-start-field">
-      <label for="analytics-journey-start">Journey starts at</label>
-      <select id="analytics-journey-start" name="journey_start" class="form-select">
-        {% for option in analytics.journey_start_options %}
-        {% if loop.index == 3 %}<optgroup label="Tracked page URLs">{% endif %}
-        <option value="{{ option.value }}" {{ 'selected' if analytics.journey_start == option.value else '' }}>{{ option.label }}</option>
-        {% endfor %}
-        {% if analytics.page_paths %}</optgroup>{% endif %}
-      </select>
-    </div>
+        <div class="analytics-filter-field analytics-journey-start-field">
+          <label for="analytics-journey-start">Journey starts at</label>
+          <select id="analytics-journey-start" name="journey_start" class="form-select">
+            {% for option in analytics.journey_start_options %}
+            {% if loop.index == 3 %}<optgroup label="Tracked page URLs">{% endif %}
+            <option value="{{ option.value }}" {{ 'selected' if analytics.journey_start == option.value else '' }}>{{ option.label }}</option>
+            {% endfor %}
+            {% if analytics.page_paths %}</optgroup>{% endif %}
+          </select>
+        </div>
+      </div>
+    </details>
 
     <div class="analytics-filter-actions">
       <button class="btn btn-outline-warning" type="submit">Apply filters</button>
