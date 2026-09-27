@@ -8,7 +8,9 @@ from sqlalchemy.pool import StaticPool
 
 import app as webapp
 from domains.connect_analytics import ConnectAnalytics, connect_event_counts
-from domains.site_analytics import SiteAnalytics, site_analytics_events
+from domains.site_analytics import (
+    SiteAnalytics, site_analytics_events, site_request_status_daily_counts,
+)
 from tests.e2e.common import BaseE2ETest
 
 
@@ -28,6 +30,7 @@ class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
         webapp.app.extensions["site_analytics"] = self.analytics
         self.primary_session = "a" * 64
         self.secondary_session = "b" * 64
+        self.long_session = "c" * 64
         self.analytics.record(
             session_hash=self.primary_session,
             event_type="page_view",
@@ -45,6 +48,29 @@ class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
         )
         self.analytics.record(
             session_hash=self.primary_session,
+            event_type="page_view",
+            page_path="/checkout",
+        )
+        self.analytics.record(
+            session_hash=self.primary_session,
+            event_type="page_duration",
+            page_path="/checkout",
+            duration_seconds=75,
+        )
+        self.analytics.record(
+            session_hash=self.primary_session,
+            event_type="checkout_field",
+            page_path="/checkout",
+            field_key="name",
+        )
+        self.analytics.record(
+            session_hash=self.primary_session,
+            event_type="checkout_field",
+            page_path="/checkout",
+            field_key="email",
+        )
+        self.analytics.record(
+            session_hash=self.primary_session,
             event_type="click",
             page_path="/connect",
             page_context="jis-fall-2026",
@@ -56,6 +82,14 @@ class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
             page_path="/team",
             referrer_host="google.com",
         )
+        for page_path in (
+            "/", "/catalog", "/product/test", "/checkout", "/connect", "/team", "/trade-shows",
+        ):
+            self.analytics.record(
+                session_hash=self.long_session,
+                event_type="page_view",
+                page_path=page_path,
+            )
         self.connect_analytics.record(
             action="visit",
             event={"key": "jis-fall-2026", "name": "JIS Miami", "booth": "117"},
@@ -70,6 +104,9 @@ class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
             page_path="/catalog",
             click_target="action:add-to-order",
         )
+        for _ in range(4):
+            self.analytics.record_request_status(page_path="/", status_code=200)
+        self.analytics.record_request_status(page_path="/missing-fixture", status_code=404)
         self.fixture_date = datetime.now(ZoneInfo("America/Los_Angeles")).date() - timedelta(days=1)
         fixture_time = datetime.combine(
             self.fixture_date,
@@ -79,6 +116,9 @@ class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
         with engine.begin() as connection:
             connection.execute(site_analytics_events.update().values(occurred_at=fixture_time))
             connection.execute(connect_event_counts.update().values(event_date=self.fixture_date))
+            connection.execute(
+                site_request_status_daily_counts.update().values(event_date=self.fixture_date)
+            )
         self.addCleanup(self._restore_analytics_state)
 
     def _restore_analytics_state(self) -> None:
@@ -90,7 +130,7 @@ class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
 
     def test_public_dashboard_shows_aggregates_without_session_identifiers(self) -> None:
         dashboard_query = (
-            "range=rolling&count=7&unit=days&granularity=day&metric=both"
+            "range=rolling&count=7&unit=days&granularity=day&metric=views_sessions"
             "&page_filter=all&journey_start=filter"
         )
         anonymous_client = self._playwright_context.request.new_context()
@@ -136,8 +176,8 @@ class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
         self.assertNotIn("set-cookie", response.headers)
         self.assertEqual(response.headers.get("x-robots-tag"), "noindex, nofollow")
         self.assertEqual(self.page.locator("h1").inner_text(), "Site analytics")
-        self.assertEqual(self.page.locator(".metric-card").nth(0).locator("strong").inner_text(), "2")
-        self.assertEqual(self.page.locator(".metric-card").nth(1).locator("strong").inner_text(), "3")
+        self.assertEqual(self.page.locator(".metric-card").nth(0).locator("strong").inner_text(), "3")
+        self.assertEqual(self.page.locator(".metric-card").nth(1).locator("strong").inner_text(), "11")
         self.assertEqual(self.page.locator(".metric-card").nth(2).locator("strong").inner_text(), "2")
         self.assertIn(
             "This public report displays aggregate counts only",
@@ -146,7 +186,18 @@ class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
         self.assertNotIn("Shared reporting", self.page.locator("main.analytics-dashboard").inner_text())
         self.assertNotIn("Pacific", self.page.locator("main.analytics-dashboard").inner_text())
         self.assertEqual(self.page.locator(".analytics-bucket").count(), 1)
-        self.assertRegex(self.page.locator(".analytics-bucket small").inner_text(), r"^\d{1,2}/\d{1,2}$")
+        self.assertRegex(self.page.locator(".analytics-bucket > small").inner_text(), r"^\d{1,2}/\d{1,2}$")
+        self.assertEqual(self.page.locator(".bar-views").count(), 1)
+        self.assertEqual(self.page.locator(".bar-sessions").count(), 1)
+        self.assertEqual(self.page.locator(".bar-clicks").count(), 0)
+        self.assertEqual(self.page.locator(".analytics-bar-value").count(), 2)
+        self.assertIn("80.0%", self.page.locator("#request-status-title").locator("xpath=../../..")
+                      .inner_text())
+        checkout_card = self.page.locator("#checkout-insights-title").locator("xpath=../../..")
+        self.assertIn("1m 15s", checkout_card.inner_text())
+        self.assertIn("Name", checkout_card.inner_text())
+        self.assertIn("Email", checkout_card.inner_text())
+        self.assertNotIn("Synthetic Buyer", checkout_card.inner_text())
         self.assertGreater(self.page.locator("#analytics-sankey .sankey-link").count(), 0)
         pages_card = self.page.locator("#pages-title").locator("xpath=../../..")
         sources_card = self.page.locator("#sources-title").locator("xpath=../../..")
@@ -154,6 +205,7 @@ class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
         clicks_card = self.page.locator("#clicks-title").locator("xpath=../../..")
         self.assertIn("/connect", pages_card.inner_text())
         self.assertIn("Add to order", clicks_card.inner_text())
+        self.assertIn("Toggle navigation menu opens the menu", clicks_card.inner_text())
         self.assertIn("newsletter.example", sources_card.inner_text())
         self.assertIn("fall-launch", campaigns_card.inner_text())
         self.assertIn("JIS Miami", self.page.locator("#connect-actions-title")
@@ -192,7 +244,7 @@ class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
 
         filtered_response = self.goto(
             "/admin/analytics?range=rolling&count=7&unit=days&page_filter=path:/connect"
-            "&journey_start=path:/&granularity=week&metric=clicks"
+            "&journey_start=path:/team&granularity=week&metric=clicks"
         )
         self.assertEqual(filtered_response.status, 200)
         self.assertEqual(self.page.locator("#analytics-page-filter").input_value(), "path:/connect")
@@ -200,9 +252,34 @@ class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
         self.assertEqual(self.page.locator("#analytics-metric").input_value(), "clicks")
         self.assertEqual(self.page.locator(".analytics-bucket").count(), 1)
         self.assertEqual(self.page.locator(".bar-views").count(), 0)
+        self.assertEqual(self.page.locator(".bar-sessions").count(), 0)
         self.assertGreater(self.page.locator(".bar-clicks").count(), 0)
-        self.assertEqual(self.page.locator("#analytics-sankey .sankey-link").count(), 2)
+        self.assertEqual(self.page.locator("#analytics-sankey .sankey-link").count(), 1)
         self.assertEqual(self.context.cookies(), [])
+
+        journey_response = self.goto(
+            "/admin/analytics?range=rolling&count=7&unit=days&granularity=day"
+            "&metric=views_sessions&page_filter=all&journey_start=all&journey_depth=5"
+        )
+        self.assertEqual(journey_response.status, 200)
+        expand_link = self.page.locator("#analytics-sankey .sankey-link[aria-label*='More pages']").first
+        self.assertGreater(expand_link.count(), 0)
+        with self.page.expect_navigation(wait_until="domcontentloaded"):
+            expand_link.evaluate(
+                "element => element.dispatchEvent(new MouseEvent('click', { bubbles: true }))"
+            )
+        self.assertIn("journey_depth=10", self.page.url)
+        self.assertGreater(self.page.locator("#analytics-sankey .sankey-link").count(), 0)
+
+        first_path_link = self.page.locator("#analytics-sankey .sankey-link[aria-label^='/ → /catalog']").first
+        self.assertGreater(first_path_link.count(), 0)
+        with self.page.expect_navigation(wait_until="domcontentloaded"):
+            first_path_link.evaluate(
+                "element => element.dispatchEvent(new MouseEvent('click', { bubbles: true }))"
+            )
+        self.assertIn("journey_page=%2F", self.page.url)
+        self.assertIn("journey_page=%2Fcatalog", self.page.url)
+        self.assertIn("1 of 3 starting sessions", self.page.locator(".analytics-journey-result").inner_text())
 
         fixture_day = self.fixture_date.isoformat()
         custom_response = self.goto(
@@ -213,7 +290,7 @@ class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
         self.assertEqual(self.page.locator("#analytics-range-mode").input_value(), "custom")
         self.assertEqual(self.page.locator("#analytics-date-from").input_value(), fixture_day)
         self.assertEqual(self.page.locator("#analytics-date-to").input_value(), fixture_day)
-        self.assertEqual(self.page.locator(".metric-card").nth(1).locator("strong").inner_text(), "3")
+        self.assertEqual(self.page.locator(".metric-card").nth(1).locator("strong").inner_text(), "11")
         self.assertEqual(self.page.locator(".metric-card").nth(2).locator("strong").inner_text(), "2")
         self.assertEqual(self.page.locator(".analytics-bucket").count(), 1)
 
@@ -243,3 +320,21 @@ class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
 
         click_and_assert(".product-card", "component:product-card")
         click_and_assert(".product-card .add-to-cart-btn", "action:add-to-order")
+
+        self.open_checkout_with_item()
+        self.page.locator('#checkoutForm [name="name"]').fill("Synthetic Buyer Name")
+        self.page.locator('#checkoutForm [name="email"]').fill("buyer@example.test")
+        self.page.wait_for_timeout(1200)
+        self.page.evaluate("window.dispatchEvent(new Event('pagehide'))")
+        self.page.wait_for_function(
+            "window.__analyticsEvents.some(event => event.event_type === 'page_duration') && "
+            "window.__analyticsEvents.some(event => event.event_type === 'checkout_field' && event.field_key === 'name')"
+        )
+        checkout_events = self.page.evaluate(
+            "window.__analyticsEvents.filter(event => ['page_duration', 'checkout_field'].includes(event.event_type))"
+        )
+        self.assertTrue(any(event["event_type"] == "page_duration" for event in checkout_events))
+        self.assertTrue(any(event.get("field_key") == "email" for event in checkout_events))
+        self.assertTrue(all("value" not in event for event in checkout_events))
+        self.assertNotIn("Synthetic Buyer Name", str(checkout_events))
+        self.assertNotIn("buyer@example.test", str(checkout_events))
