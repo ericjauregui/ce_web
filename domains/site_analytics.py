@@ -384,7 +384,6 @@ def _click_target_label(target: str) -> str:
         "internal:/checkout": "Open checkout",
         "internal:/": "Open homepage",
         "action:toggle-navigation": "Toggle menu button",
-        "action:play-video-1": "Play video 1",
         "action:turn-video-sound-on": "Turn video sound on",
         "action:mute-video": "Mute video",
         "action:add-to-order": "Add to order",
@@ -394,6 +393,9 @@ def _click_target_label(target: str) -> str:
     }
     if target in labels:
         return labels[target]
+    reel_match = re.fullmatch(r"action:play-video-(\d+)", target)
+    if reel_match:
+        return f"Click reel card {reel_match.group(1)}"
     for prefix, label in (("internal:", "Open"), ("action:", ""), ("component:", ""), ("button:", "Button")):
         if target.startswith(prefix):
             value = target[len(prefix):].replace("-", " ").replace("_", " ").strip()
