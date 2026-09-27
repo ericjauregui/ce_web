@@ -198,7 +198,7 @@
     </section>
 
     <section class="analytics-card" aria-labelledby="clicks-title">
-      <div class="analytics-section-heading"><div><h2 id="clicks-title">Clicked links and actions</h2><p>Toggle navigation menu opens the menu; Play video 1 starts the first video; Open homepage goes to /.</p></div></div>
+      <div class="analytics-section-heading"><div><h2 id="clicks-title">Clicked links and actions</h2><p>Toggle menu button opens or closes the navigation menu; Play video 1 is a click on the first video card, which autoplays muted; Turn video sound on is a separate click. Open homepage goes to /.</p></div></div>
       {% if analytics.top_clicks %}
       <ol class="analytics-ranked-list">
         {% for item in analytics.top_clicks %}<li><span>{{ item.target }}</span><strong>{{ '{:,}'.format(item.count) }}</strong></li>{% endfor %}

@@ -104,6 +104,17 @@ class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
             page_path="/catalog",
             click_target="action:add-to-order",
         )
+        for click_target in (
+            "action:toggle-navigation",
+            "action:play-video-1",
+            "action:turn-video-sound-on",
+        ):
+            self.analytics.record(
+                session_hash=self.primary_session,
+                event_type="click",
+                page_path="/",
+                click_target=click_target,
+            )
         for _ in range(4):
             self.analytics.record_request_status(page_path="/", status_code=200)
         self.analytics.record_request_status(page_path="/missing-fixture", status_code=404)
@@ -178,7 +189,7 @@ class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
         self.assertEqual(self.page.locator("h1").inner_text(), "Site analytics")
         self.assertEqual(self.page.locator(".metric-card").nth(0).locator("strong").inner_text(), "3")
         self.assertEqual(self.page.locator(".metric-card").nth(1).locator("strong").inner_text(), "11")
-        self.assertEqual(self.page.locator(".metric-card").nth(2).locator("strong").inner_text(), "2")
+        self.assertEqual(self.page.locator(".metric-card").nth(2).locator("strong").inner_text(), "5")
         self.assertIn(
             "This public report displays aggregate counts only",
             self.page.locator("main.analytics-dashboard").inner_text(),
@@ -205,7 +216,11 @@ class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
         clicks_card = self.page.locator("#clicks-title").locator("xpath=../../..")
         self.assertIn("/connect", pages_card.inner_text())
         self.assertIn("Add to order", clicks_card.inner_text())
-        self.assertIn("Toggle navigation menu opens the menu", clicks_card.inner_text())
+        self.assertIn("Toggle menu button", clicks_card.inner_text())
+        self.assertIn("Play video 1", clicks_card.inner_text())
+        self.assertIn("Turn video sound on", clicks_card.inner_text())
+        self.assertIn("Toggle menu button opens or closes the navigation menu", clicks_card.inner_text())
+        self.assertIn("Play video 1 is a click on the first video card", clicks_card.inner_text())
         self.assertIn("newsletter.example", sources_card.inner_text())
         self.assertIn("fall-launch", campaigns_card.inner_text())
         self.assertIn("JIS Miami", self.page.locator("#connect-actions-title")
@@ -291,7 +306,7 @@ class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
         self.assertEqual(self.page.locator("#analytics-date-from").input_value(), fixture_day)
         self.assertEqual(self.page.locator("#analytics-date-to").input_value(), fixture_day)
         self.assertEqual(self.page.locator(".metric-card").nth(1).locator("strong").inner_text(), "11")
-        self.assertEqual(self.page.locator(".metric-card").nth(2).locator("strong").inner_text(), "2")
+        self.assertEqual(self.page.locator(".metric-card").nth(2).locator("strong").inner_text(), "5")
         self.assertEqual(self.page.locator(".analytics-bucket").count(), 1)
 
     def test_click_tracking_uses_action_and_product_card_labels(self) -> None:
