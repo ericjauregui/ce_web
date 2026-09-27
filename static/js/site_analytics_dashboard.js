@@ -28,6 +28,61 @@
   });
   updateRangeFields();
 
+  const journeyForm = document.getElementById("analytics-journey-filter");
+  const journeyPages = document.getElementById("analytics-journey-pages");
+  const journeyDepth = document.getElementById("analytics-journey-depth");
+  const journeyTemplate = document.getElementById("analytics-journey-page-template");
+  const addJourneyPage = document.getElementById("analytics-add-journey-page");
+  const journeyStatus = document.getElementById("analytics-journey-expand-status");
+
+  function journeyPageSelects() {
+    return [...(journeyPages?.querySelectorAll("select[name='journey_page']") || [])];
+  }
+
+  function refreshJourneyRows() {
+    if (!journeyPages) return;
+    const rows = [...journeyPages.querySelectorAll(".analytics-journey-page-row")];
+    rows.forEach((row, index) => {
+      const select = row.querySelector("select[name='journey_page']");
+      const label = row.querySelector("label");
+      const remove = row.querySelector(".analytics-remove-journey-page");
+      const number = index + 1;
+      if (select) {
+        select.id = `journey-page-${number}`;
+        select.setAttribute("aria-label", `Page ${number} in ordered path`);
+      }
+      if (label) {
+        label.htmlFor = `journey-page-${number}`;
+        label.textContent = `Page ${number} in ordered path`;
+      }
+      if (remove) remove.setAttribute("aria-label", `Remove page ${number}`);
+    });
+    if (addJourneyPage) addJourneyPage.disabled = rows.length >= Number(journeyPages.dataset.maxPages || 8);
+  }
+
+  function addJourneyPathPage(value = "") {
+    if (!journeyPages || !journeyTemplate) return null;
+    if (journeyPageSelects().length >= Number(journeyPages.dataset.maxPages || 8)) return null;
+    const row = journeyTemplate.content.firstElementChild.cloneNode(true);
+    const select = row.querySelector("select[name='journey_page']");
+    if (select) select.value = value;
+    journeyPages.appendChild(row);
+    refreshJourneyRows();
+    return select;
+  }
+
+  addJourneyPage?.addEventListener("click", () => {
+    addJourneyPathPage()?.focus();
+  });
+
+  journeyPages?.addEventListener("click", (event) => {
+    const removeButton = event.target.closest(".analytics-remove-journey-page");
+    if (!removeButton) return;
+    removeButton.closest(".analytics-journey-page-row")?.remove();
+    refreshJourneyRows();
+  });
+  refreshJourneyRows();
+
   const chartHost = document.getElementById("analytics-sankey");
   const chartPayload = document.getElementById("analytics-sankey-data");
   if (!chartHost || !chartPayload) return;
@@ -66,7 +121,14 @@
     const step = Math.max(1, Number(edge.step) || 1);
     const source = nodeFor(step - 1, edge.source);
     const target = nodeFor(step, edge.target);
-    const link = { source, target, count: Math.max(0, Number(edge.count) || 0), step };
+    const link = {
+      source,
+      target,
+      count: Math.max(0, Number(edge.count) || 0),
+      previousStepCount: Math.max(0, Number(edge.previous_step_count) || 0),
+      step,
+      isMorePages: Boolean(edge.is_more_pages),
+    };
     source.outgoing.push(link);
     target.incoming.push(link);
     return link;
@@ -114,6 +176,68 @@
   links.forEach((link) => {
     link.width = Math.max(1.5, Math.min(20, 3 + 17 * Math.sqrt(link.count / maxCount)));
   });
+
+  function selectedJourneyPages() {
+    return journeyPageSelects().map((select) => select.value).filter(Boolean);
+  }
+
+  function mostCommonJourneyTo(link) {
+    const path = Array(link.step);
+    path[link.step - 1] = link.source.label;
+    let current = link.source.label;
+    for (let step = link.step - 1; step >= 1; step -= 1) {
+      const parent = edges
+        .filter((edge) => Number(edge.step) === step && edge.target === current &&
+          edge.target !== "More pages" && edge.target !== "Exit")
+        .sort((a, b) => Number(b.count) - Number(a.count))[0];
+      if (!parent) return null;
+      path[step - 1] = parent.source;
+      current = parent.source;
+    }
+    return path;
+  }
+
+  function applyLinkAsJourney(link) {
+    if (link.isMorePages || link.target.label === "More pages") {
+      const currentDepth = Number(journeyDepth?.value || 5);
+      const maxDepth = Number(chartHost.dataset.maxDepth || 20);
+      if (currentDepth >= maxDepth) {
+        if (journeyStatus) journeyStatus.textContent = `The path view is already showing the maximum ${maxDepth} pages.`;
+        return;
+      }
+      if (journeyDepth) journeyDepth.value = String(Math.min(maxDepth, currentDepth + 5));
+      journeyForm?.requestSubmit();
+      return;
+    }
+
+    if (link.target.label === "Exit") {
+      if (journeyStatus) journeyStatus.textContent = "Exit bands show sessions leaving after this page. Choose page bands to filter an ordered page sequence.";
+      return;
+    }
+
+    const selected = selectedJourneyPages();
+    let prefix = null;
+    if (selected.length >= link.step && selected[link.step - 1] === link.source.label) {
+      prefix = selected.slice(0, link.step);
+    } else if (link.step === 1) {
+      prefix = [link.source.label];
+    } else {
+      prefix = mostCommonJourneyTo(link);
+    }
+
+    if (!prefix) {
+      if (journeyStatus) journeyStatus.textContent = "Select an earlier page band first to build this path.";
+      return;
+    }
+    const nextPath = [...prefix, link.target.label];
+    while (journeyPageSelects().length > nextPath.length) {
+      journeyPages.lastElementChild.remove();
+    }
+    while (journeyPageSelects().length < nextPath.length) addJourneyPathPage();
+    journeyPageSelects().forEach((select, index) => { select.value = nextPath[index] || ""; });
+    journeyForm?.requestSubmit();
+  }
+
   links.forEach((link) => {
     const sourceTotal = link.source.outgoing.reduce((sum, item) => sum + item.width, 0);
     const targetTotal = link.target.incoming.reduce((sum, item) => sum + item.width, 0);
@@ -132,9 +256,23 @@
     path.setAttribute("stroke-linecap", "round");
     path.setAttribute("stroke-opacity", "0.42");
     path.classList.add("sankey-link");
+    path.setAttribute("role", "button");
+    path.setAttribute("tabindex", "0");
+    const previousCount = link.previousStepCount;
+    const share = previousCount ? (link.count * 100 / previousCount).toFixed(1) : "0.0";
+    const action = link.isMorePages ? "Click to show the next pages." : "Click to filter this ordered path.";
+    const description = `${link.source.label} → ${link.target.label}: ${link.count.toLocaleString()} sessions, ${share}% of the previous step (${previousCount.toLocaleString()} sessions). ${action}`;
+    path.setAttribute("aria-label", description);
     const title = document.createElementNS(svgNS, "title");
-    title.textContent = `${link.source.label} → ${link.target.label}: ${link.count.toLocaleString()} sessions`;
+    title.textContent = description;
     path.appendChild(title);
+    path.addEventListener("click", () => applyLinkAsJourney(link));
+    path.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        applyLinkAsJourney(link);
+      }
+    });
     svg.appendChild(path);
   });
 

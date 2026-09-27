@@ -9,14 +9,14 @@
   <header class="analytics-heading">
     <div>
       <h1 id="analytics-title">Site analytics</h1>
-      <p class="analytics-subtitle">Aggregate visits, page views, and clicks.</p>
+      <p class="analytics-subtitle">Aggregate sessions, page views, and clicks.</p>
       <p class="analytics-range-label">{{ analytics.range_description }} · {{ analytics.range_label }}</p>
     </div>
   </header>
 
   {% set more_filters_open = request.args.get('more_filters') == '1' or (
     request.args.get('more_filters') is none and (
-      analytics.granularity != 'day' or analytics.chart_metric != 'both' or analytics.journey_start != 'filter'
+      analytics.granularity != 'day' or analytics.chart_metric != 'views_sessions' or analytics.journey_start != 'filter'
     )
   ) %}
   <form class="analytics-card analytics-filters" method="get" action="{{ url_for('site_analytics_dashboard') }}">
@@ -72,6 +72,8 @@
 
     <input type="hidden" name="more_filters" id="analytics-more-filters-state"
       value="{{ '1' if more_filters_open else '0' }}">
+    <input type="hidden" name="journey_depth" value="{{ analytics.journey_depth }}">
+    {% for path in analytics.journey_pages %}<input type="hidden" name="journey_page" value="{{ path }}">{% endfor %}
     <details id="analytics-more-filters" class="analytics-more-filters"
       {% if more_filters_open %}open{% endif %}>
       <summary>
@@ -91,9 +93,12 @@
         <div class="analytics-filter-field">
           <label for="analytics-metric">Graph metric</label>
           <select id="analytics-metric" name="metric" class="form-select">
-            <option value="both" {{ 'selected' if analytics.chart_metric == 'both' else '' }}>Views and clicks</option>
+            <option value="views_sessions" {{ 'selected' if analytics.chart_metric == 'views_sessions' else '' }}>Sessions and page views</option>
+            <option value="sessions" {{ 'selected' if analytics.chart_metric == 'sessions' else '' }}>Sessions only</option>
             <option value="page_views" {{ 'selected' if analytics.chart_metric == 'page_views' else '' }}>Views only</option>
             <option value="clicks" {{ 'selected' if analytics.chart_metric == 'clicks' else '' }}>Clicks only</option>
+            <option value="views_clicks" {{ 'selected' if analytics.chart_metric == 'views_clicks' else '' }}>Views and clicks</option>
+            <option value="all" {{ 'selected' if analytics.chart_metric == 'all' else '' }}>All three</option>
           </select>
         </div>
 
@@ -118,7 +123,7 @@
   <section class="analytics-metrics" aria-label="Summary metrics">
     <article class="analytics-card metric-card">
       <span>Sessions</span><strong>{{ '{:,}'.format(analytics.sessions) }}</strong>
-      <small>Unique browser sessions</small>
+      <small>Browser sessions; a rough daily visitor measure</small>
     </article>
     <article class="analytics-card metric-card">
       <span>Page views</span><strong>{{ '{:,}'.format(analytics.page_views) }}</strong>
@@ -142,8 +147,9 @@
       </div>
       {% if analytics.chart %}
       <div class="analytics-legend">
-        {% if analytics.chart_metric != 'clicks' %}<span><i class="legend-views"></i>Page views</span>{% endif %}
-        {% if analytics.chart_metric != 'page_views' %}<span><i class="legend-clicks"></i>Clicks</span>{% endif %}
+        {% if analytics.chart_metric in ['views_sessions', 'page_views', 'views_clicks', 'all'] %}<span><i class="legend-views"></i>Page views</span>{% endif %}
+        {% if analytics.chart_metric in ['views_sessions', 'sessions', 'all'] %}<span><i class="legend-sessions"></i>Sessions</span>{% endif %}
+        {% if analytics.chart_metric in ['clicks', 'views_clicks', 'all'] %}<span><i class="legend-clicks"></i>Clicks</span>{% endif %}
       </div>
       {% endif %}
     </div>
@@ -151,13 +157,25 @@
     <div class="analytics-chart" role="img"
       aria-label="{{ analytics.granularity_label }} {{ analytics.chart_metric_label|lower }} from {{ analytics.range_label }}">
       {% for bucket in analytics.chart %}
-      <div class="analytics-bucket" title="{{ bucket.label }}: {{ bucket.page_views }} page views, {{ bucket.clicks }} clicks">
+      <div class="analytics-bucket" title="{{ bucket.label }}: {{ bucket.page_views }} page views, {{ bucket.sessions }} sessions, {{ bucket.clicks }} clicks">
         <div class="analytics-bars">
-          {% if analytics.chart_metric != 'clicks' %}
-          <span class="analytics-bar bar-views" style="height: {{ (bucket.page_views * 100 / analytics.chart_peak)|round|int }}%"></span>
+          {% if analytics.chart_metric in ['views_sessions', 'page_views', 'views_clicks', 'all'] %}
+          <span class="analytics-bar-column" style="--bar-height: {{ (bucket.page_views * 85 / analytics.chart_peak)|round|int }}%" aria-label="{{ bucket.page_views }} page views">
+            <small class="analytics-bar-value">{{ bucket.page_views }}</small>
+            <span class="analytics-bar bar-views"></span>
+          </span>
           {% endif %}
-          {% if analytics.chart_metric != 'page_views' %}
-          <span class="analytics-bar bar-clicks" style="height: {{ (bucket.clicks * 100 / analytics.chart_peak)|round|int }}%"></span>
+          {% if analytics.chart_metric in ['views_sessions', 'sessions', 'all'] %}
+          <span class="analytics-bar-column" style="--bar-height: {{ (bucket.sessions * 85 / analytics.chart_peak)|round|int }}%" aria-label="{{ bucket.sessions }} sessions">
+            <small class="analytics-bar-value">{{ bucket.sessions }}</small>
+            <span class="analytics-bar bar-sessions"></span>
+          </span>
+          {% endif %}
+          {% if analytics.chart_metric in ['clicks', 'views_clicks', 'all'] %}
+          <span class="analytics-bar-column" style="--bar-height: {{ (bucket.clicks * 85 / analytics.chart_peak)|round|int }}%" aria-label="{{ bucket.clicks }} clicks">
+            <small class="analytics-bar-value">{{ bucket.clicks }}</small>
+            <span class="analytics-bar bar-clicks"></span>
+          </span>
           {% endif %}
         </div>
         {% if bucket.show_label %}<small>{{ bucket.label }}</small>{% else %}<small aria-hidden="true">&nbsp;</small>{% endif %}
@@ -180,7 +198,7 @@
     </section>
 
     <section class="analytics-card" aria-labelledby="clicks-title">
-      <div class="analytics-section-heading"><div><h2 id="clicks-title">Clicked links and actions</h2><p>Most-used destinations and controls</p></div></div>
+      <div class="analytics-section-heading"><div><h2 id="clicks-title">Clicked links and actions</h2><p>Toggle navigation menu opens the menu; Play video 1 starts the first video; Open homepage goes to /.</p></div></div>
       {% if analytics.top_clicks %}
       <ol class="analytics-ranked-list">
         {% for item in analytics.top_clicks %}<li><span>{{ item.target }}</span><strong>{{ '{:,}'.format(item.count) }}</strong></li>{% endfor %}
@@ -216,6 +234,46 @@
     </section>
     {% endif %}
 
+    <section class="analytics-card" aria-labelledby="request-status-title">
+      <div class="analytics-section-heading">
+        <div><h2 id="request-status-title">Page response status</h2><p>HTML page requests only</p></div>
+      </div>
+      {% if analytics.request_status.total %}
+      <div class="analytics-status-grid">
+        <div><span>Successful (200)</span><strong>{{ '{:,}'.format(analytics.request_status.success_count) }}</strong><small>{{ analytics.request_status.success_percent }}%</small></div>
+        <div><span>Not found (404)</span><strong>{{ '{:,}'.format(analytics.request_status.not_found_count) }}</strong><small>{{ analytics.request_status.not_found_percent }}%</small></div>
+      </div>
+      {% if analytics.request_status.not_found_pages %}
+      <h3 class="analytics-subheading">Most requested missing pages</h3>
+      <ol class="analytics-ranked-list">
+        {% for page in analytics.request_status.not_found_pages %}<li><span class="analytics-path">{{ page.path }}</span><strong>{{ '{:,}'.format(page.count) }}</strong></li>{% endfor %}
+      </ol>
+      {% endif %}
+      {% else %}<p class="analytics-empty">No page response counts are available for this range yet.</p>{% endif %}
+    </section>
+
+    <section class="analytics-card" aria-labelledby="checkout-insights-title">
+      <div class="analytics-section-heading">
+        <div><h2 id="checkout-insights-title">Checkout progress</h2><p>Time and non-empty fields, without entered values</p></div>
+      </div>
+      {% if analytics.checkout_insights.in_scope %}
+      <div class="analytics-status-grid">
+        <div><span>Checkout sessions</span><strong>{{ '{:,}'.format(analytics.checkout_insights.sessions) }}</strong></div>
+        <div><span>Average active time</span><strong>{{ analytics.checkout_insights.average_duration }}</strong><small>Median {{ analytics.checkout_insights.median_duration }}</small></div>
+      </div>
+      {% if analytics.checkout_insights.sessions %}
+      <h3 class="analytics-subheading">Fields filled in</h3>
+      <ol class="analytics-ranked-list">
+        {% for field in analytics.checkout_insights.field_progress %}
+        {% if field.sessions %}<li><span>{{ field.label }}</span><strong>{{ '{:,}'.format(field.sessions) }} · {{ field.percent }}%</strong></li>{% endif %}
+        {% endfor %}
+      </ol>
+      {% endif %}
+      {% if analytics.checkout_insights.timed_sessions %}<p class="analytics-small-note">Average based on {{ analytics.checkout_insights.timed_sessions }} sessions with time data.</p>{% endif %}
+      <p class="analytics-small-note">Active time counts only while this page is visible. Field totals show whether a field was filled; text is never collected.</p>
+      {% else %}<p class="analytics-empty">Select all pages or a cart and checkout filter to view checkout progress.</p>{% endif %}
+    </section>
+
     {% if analytics.connect_actions %}
     <section class="analytics-card" aria-labelledby="connect-actions-title">
       <div class="analytics-section-heading"><div><h2 id="connect-actions-title">Connect-page actions</h2><p>Existing aggregate counts by show and action</p></div></div>
@@ -231,12 +289,52 @@
     <div class="analytics-section-heading">
       <div>
         <h2 id="paths-title">Top visitor paths</h2>
-        <p>Aggregated page-to-page flow for sessions that start at the selected page. Wider bands mean more sessions; hover for counts.</p>
+        <p>Aggregated page-to-page flow. Hover or focus a band for sessions and share of the previous step. Select a band to filter an ordered page sequence.</p>
       </div>
     </div>
+    <form class="analytics-journey-filter" method="get" action="{{ url_for('site_analytics_dashboard') }}" id="analytics-journey-filter">
+      <input type="hidden" name="range" value="{{ analytics.mode }}">
+      <input type="hidden" name="count" value="{{ analytics.count }}">
+      <input type="hidden" name="unit" value="{{ analytics.unit }}">
+      <input type="hidden" name="date_from" value="{{ analytics.date_from }}">
+      <input type="hidden" name="date_to" value="{{ analytics.date_to }}">
+      <input type="hidden" name="granularity" value="{{ analytics.granularity }}">
+      <input type="hidden" name="metric" value="{{ analytics.chart_metric }}">
+      <input type="hidden" name="page_filter" value="{{ analytics.page_filter }}">
+      <input type="hidden" name="journey_start" value="{{ analytics.journey_start }}">
+      <input type="hidden" name="journey_depth" id="analytics-journey-depth" value="{{ analytics.journey_depth }}">
+      <input type="hidden" name="more_filters" value="{{ '1' if more_filters_open else '0' }}">
+      <div class="analytics-journey-controls">
+        <div>
+          <h3>Find an ordered path</h3>
+          <p>Count sessions that started at the selected entry page and viewed these pages in this order.</p>
+        </div>
+        <div id="analytics-journey-pages" class="analytics-journey-pages" data-max-pages="8">
+          {% for selected_path in analytics.journey_pages %}
+          <div class="analytics-journey-page-row">
+            <label class="visually-hidden" for="journey-page-{{ loop.index }}">Page {{ loop.index }} in path</label>
+            <select id="journey-page-{{ loop.index }}" name="journey_page" class="form-select">
+              <option value="">Choose a page</option>
+              {% for path in analytics.page_paths %}<option value="{{ path }}" {{ 'selected' if selected_path == path else '' }}>{{ path }}</option>{% endfor %}
+            </select>
+            <button class="btn btn-outline-light analytics-remove-journey-page" type="button" aria-label="Remove page {{ loop.index }}">Remove</button>
+          </div>
+          {% endfor %}
+        </div>
+        <div class="analytics-journey-actions">
+          <button class="btn btn-outline-light" type="button" id="analytics-add-journey-page">Add page</button>
+          <button class="btn btn-outline-warning" type="submit">Apply path filter</button>
+          {% if analytics.journey_pages %}<a class="btn btn-link" href="{{ url_for('site_analytics_dashboard', range=analytics.mode, count=analytics.count, unit=analytics.unit, date_from=analytics.date_from, date_to=analytics.date_to, granularity=analytics.granularity, metric=analytics.chart_metric, page_filter=analytics.page_filter, journey_start=analytics.journey_start, journey_depth=analytics.journey_depth, more_filters='1' if more_filters_open else '0') }}">Clear path</a>{% endif %}
+        </div>
+      </div>
+      {% if analytics.journey_match_count is not none %}
+      <p class="analytics-journey-result" role="status">{{ '{:,}'.format(analytics.journey_match_count) }} of {{ '{:,}'.format(analytics.journey_population_sessions) }} starting sessions ({{ analytics.journey_match_percent }}%) followed this exact sequence.</p>
+      {% endif %}
+      <p class="analytics-small-note" id="analytics-journey-expand-status" aria-live="polite"></p>
+    </form>
     {% if analytics.journey_flow %}
     <div class="analytics-sankey-scroll">
-      <div id="analytics-sankey" role="img" aria-label="Aggregated top visitor paths for {{ analytics.range_label }}"></div>
+      <div id="analytics-sankey" data-max-depth="{{ analytics.journey_depth_limit }}" role="group" aria-label="Aggregated top visitor paths for {{ analytics.range_label }}"></div>
     </div>
     <script id="analytics-sankey-data" type="application/json">{{ analytics.journey_flow|tojson }}</script>
     {% else %}
@@ -245,6 +343,16 @@
   </section>
 
   <p class="analytics-footnote">This public report displays aggregate counts only. It does not expose session identifiers or individual page-by-page journeys.</p>
+  <template id="analytics-journey-page-template">
+    <div class="analytics-journey-page-row">
+      <label class="visually-hidden"></label>
+      <select name="journey_page" class="form-select">
+        <option value="">Choose a page</option>
+        {% for path in analytics.page_paths %}<option value="{{ path }}">{{ path }}</option>{% endfor %}
+      </select>
+      <button class="btn btn-outline-light analytics-remove-journey-page" type="button">Remove</button>
+    </div>
+  </template>
 </main>
 {% endblock %}
 {% block body_end %}<script defer src="{{ asset_url('js/site_analytics_dashboard.js') }}"></script>{% endblock %}

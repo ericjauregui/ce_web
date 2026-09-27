@@ -18,7 +18,7 @@ from domains.homepage import build_homepage_context, load_latest_reels
 from domains.reels import load_random_reels
 from domains.orders import DatabaseConfigurationError
 from domains.site_analytics import (
-    ANALYTICS_SESSION_COOKIE, SiteAnalytics, normalize_click_target,
+    ANALYTICS_SESSION_COOKIE, EVENT_TYPES, SiteAnalytics, normalize_click_target,
     normalize_campaign_value, normalize_page_context, normalize_page_path,
     normalize_referrer_host, resolve_dashboard_range, session_id_digest,
 )
@@ -254,15 +254,34 @@ def register_site_routes(
             "utm_medium": normalize_campaign_value(attribution_values["utm_medium"]),
             "utm_campaign": normalize_campaign_value(attribution_values["utm_campaign"]),
         }
+        duration_seconds = payload.get("duration_seconds")
+        field_key = payload.get("field_key")
 
         if (
             not isinstance(event_type, str)
-            or event_type not in {"page_view", "click"}
+            or event_type not in EVENT_TYPES
             or page_path is None
             or (context_value not in (None, "") and page_context is None)
-            or (event_type == "page_view" and target_value is not None)
             or (event_type == "click" and click_target is None)
-            or (event_type == "click" and any(attribution.values()))
+            or (event_type != "click" and target_value is not None)
+            or (event_type != "page_view" and any(attribution.values()))
+            or (event_type == "page_duration" and (
+                page_path != "/checkout"
+                or not isinstance(duration_seconds, int)
+                or isinstance(duration_seconds, bool)
+                or not 1 <= duration_seconds <= 1800
+                or field_key is not None
+            ))
+            or (event_type != "page_duration" and duration_seconds is not None)
+            or (event_type == "checkout_field" and (
+                page_path != "/checkout"
+                or not isinstance(field_key, str)
+                or field_key not in {
+                    "name", "company", "phone", "email", "address_line_1",
+                    "address_line_2", "city", "state", "postal_code", "country",
+                }
+            ))
+            or (event_type != "checkout_field" and field_key is not None)
         ):
             return "", 400
 
@@ -287,6 +306,8 @@ def register_site_routes(
                 page_path=page_path,
                 page_context=page_context,
                 click_target=click_target,
+                duration_seconds=duration_seconds,
+                field_key=field_key,
                 **attribution,
             )
         except DatabaseConfigurationError:
@@ -303,9 +324,11 @@ def register_site_routes(
     def site_analytics_dashboard():
         range_values = resolve_dashboard_range(request.args)
         granularity = request.args.get("granularity", "day")
-        chart_metric = request.args.get("metric", "both")
+        chart_metric = request.args.get("metric", "views_sessions")
         page_filter = request.args.get("page_filter", "all")
         journey_start = request.args.get("journey_start", "filter")
+        journey_depth = request.args.get("journey_depth", "5")
+        journey_pages = request.args.getlist("journey_page")[:8]
 
         try:
             with site_analytics_lock:
@@ -322,6 +345,8 @@ def register_site_routes(
                 chart_metric=chart_metric,
                 page_filter=page_filter,
                 journey_start=journey_start,
+                journey_depth=journey_depth,
+                journey_pages=journey_pages,
             )
         except DatabaseConfigurationError:
             app.logger.warning("Site analytics dashboard is unavailable without database configuration")
@@ -334,6 +359,41 @@ def register_site_routes(
             render_template("site_analytics_dashboard.html", analytics=summary)
         )
         response.headers["X-Robots-Tag"] = "noindex, nofollow"
+        return response
+
+    @app.after_request
+    def record_html_page_status(response):
+        if (
+            request.method != "GET"
+            or response.status_code not in {200, 404}
+            or response.mimetype != "text/html"
+            or request.endpoint == "static"
+            or request.path.startswith(("/api/", "/admin/analytics"))
+        ):
+            return response
+
+        try:
+            with site_analytics_lock:
+                analytics = app.extensions.get("site_analytics")
+                if analytics is None:
+                    if app.testing:
+                        return response
+                    connect_store = app.extensions.get("connect_analytics")
+                    analytics = SiteAnalytics(
+                        engine=connect_store.engine if connect_store is not None else None
+                    )
+                    app.extensions["site_analytics"] = analytics
+            analytics.record_request_status(
+                page_path=request.path,
+                status_code=response.status_code,
+            )
+        except DatabaseConfigurationError:
+            app.logger.debug("Page response status analytics is unavailable without database configuration")
+        except SQLAlchemyError:
+            app.logger.warning("Page response status analytics could not be saved")
+        except ValueError:
+            # Invalid paths are omitted rather than changing the page response.
+            pass
         return response
 
     @app.route("/trade-shows")

@@ -25,13 +25,14 @@
     }
   }
 
-  function send(eventType, clickTarget = null) {
+  function send(eventType, clickTarget = null, extra = null) {
     const payload = {
       event_type: eventType,
       page_path: window.location.pathname,
     };
     if (pageContext) payload.page_context = pageContext;
     if (clickTarget) payload.click_target = clickTarget;
+    if (extra && typeof extra === "object") Object.assign(payload, extra);
     if (eventType === "page_view") {
       const referrerHost = externalReferrerHost();
       if (referrerHost) payload.referrer_host = referrerHost;
@@ -132,6 +133,66 @@
 
   send("page_view");
 
+  if (window.location.pathname === "/checkout") {
+    let activeSince = performance.now();
+    const checkoutFields = [
+      ["name", '[name="name"]'],
+      ["company", '[name="company"]'],
+      ["phone", '[name="phone"]'],
+      ["email", '[name="email"]'],
+      ["address_line_1", '[name="address_line_1"]'],
+      ["address_line_2", '[name="address_line_2"]'],
+      ["city", '[name="city"]'],
+      ["state", '[name="state"]'],
+      ["postal_code", '[name="postal_code"]'],
+      ["country", '[name="country"]'],
+    ];
+
+    function recordActiveCheckoutTime() {
+      if (activeSince === null) return;
+      const activeSeconds = Math.floor((performance.now() - activeSince) / 1000);
+      activeSince = null;
+      if (activeSeconds > 0) {
+        send("page_duration", null, {
+          duration_seconds: Math.min(1800, activeSeconds),
+        });
+      }
+    }
+
+    function resumeActiveCheckoutTime() {
+      if (activeSince === null) activeSince = performance.now();
+    }
+
+    function recordCheckoutFieldProgress() {
+      const form = document.getElementById("checkoutForm");
+      if (!form) return;
+      checkoutFields.forEach(([fieldKey, selector]) => {
+        const field = form.querySelector(selector);
+        if (field instanceof HTMLInputElement && field.value.trim()) {
+          send("checkout_field", null, { field_key: fieldKey });
+        }
+      });
+    }
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "hidden") {
+        recordActiveCheckoutTime();
+      } else {
+        resumeActiveCheckoutTime();
+      }
+    });
+    window.addEventListener("pagehide", () => {
+      recordActiveCheckoutTime();
+      recordCheckoutFieldProgress();
+    });
+    window.addEventListener("pageshow", (event) => {
+      if (event.persisted) {
+        resumeActiveCheckoutTime();
+        send("page_view");
+      }
+    });
+  }
+
   document.addEventListener("click", (event) => {
     if (!(event.target instanceof Element)) return;
     const target = event.target.closest(
@@ -141,7 +202,9 @@
     send("click", targetFor(target));
   }, true);
 
-  window.addEventListener("pageshow", (event) => {
-    if (event.persisted) send("page_view");
-  });
+  if (window.location.pathname !== "/checkout") {
+    window.addEventListener("pageshow", (event) => {
+      if (event.persisted) send("page_view");
+    });
+  }
 })();

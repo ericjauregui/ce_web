@@ -6,14 +6,17 @@ import math
 import re
 import secrets
 from datetime import date, datetime, time, timedelta, timezone
+from statistics import median
 from zoneinfo import ZoneInfo
 
 from flask import Flask, Response, g, request
 from sqlalchemy import (
-    CheckConstraint, Column, DateTime, Index, Integer, MetaData, String,
+    CheckConstraint, Column, Date, DateTime, Index, Integer, MetaData, String,
     Table, and_, case, func, inspect, literal, or_, select,
 )
 from sqlalchemy.engine import Engine
+from sqlalchemy.dialects.postgresql import insert as postgres_insert
+from sqlalchemy.dialects.sqlite import insert as sqlite_insert
 
 from domains.connect_analytics import connect_event_counts
 from domains.orders import create_database_engine, database_url_from_env
@@ -30,16 +33,32 @@ _SAFE_SEMANTIC_TARGET_PATTERN = re.compile(
 _SAFE_CAMPAIGN_PATTERN = re.compile(r"[A-Za-z0-9][A-Za-z0-9 ._-]{0,79}\Z")
 _SAFE_HOST_PATTERN = re.compile(r"[A-Za-z0-9.-]{1,253}\Z")
 
-EVENT_TYPES = frozenset({"page_view", "click"})
+EVENT_TYPES = frozenset({"page_view", "click", "page_duration", "checkout_field"})
 CLICK_TARGETS = frozenset({
     "button", "external:other", "external:whatsapp", "external:instagram",
     "external:tiktok", "external:facebook", "external:youtube",
     "external:maps", "contact:email", "contact:phone",
 })
+CHECKOUT_FIELDS = {
+    "name": "Name",
+    "company": "Company",
+    "phone": "Phone",
+    "email": "Email",
+    "address_line_1": "Address line 1",
+    "address_line_2": "Address line 2",
+    "city": "City",
+    "state": "State",
+    "postal_code": "Postal code",
+    "country": "Country",
+}
 PACIFIC_TIME = ZoneInfo("America/Los_Angeles")
 GRANULARITIES = frozenset({"day", "week", "month"})
 PERIOD_UNITS = frozenset({"days", "weeks", "months"})
 MAX_CUSTOM_RANGE_DAYS = 1825
+MAX_JOURNEY_DEPTH = 20
+JOURNEY_DEPTH_INCREMENT = 5
+MAX_JOURNEY_FILTER_PAGES = 8
+MAX_PAGE_DURATION_SECONDS = 1800
 
 
 def _shift_months(value: date, offset: int) -> date:
@@ -164,14 +183,28 @@ site_analytics_events = Table(
     Column("utm_source", String(80), nullable=True),
     Column("utm_medium", String(80), nullable=True),
     Column("utm_campaign", String(80), nullable=True),
+    Column("duration_seconds", Integer, nullable=True),
+    Column("field_key", String(40), nullable=True),
     CheckConstraint(
-        "event_type IN ('page_view', 'click')",
+        "event_type IN ('page_view', 'click', 'page_duration', 'checkout_field')",
         name="ck_site_analytics_events_type",
     ),
     CheckConstraint(
-        "(event_type = 'page_view' AND click_target IS NULL) OR "
+        "(event_type IN ('page_view', 'page_duration', 'checkout_field') AND click_target IS NULL) OR "
         "(event_type = 'click' AND click_target IS NOT NULL)",
         name="ck_site_analytics_events_click_target",
+    ),
+    CheckConstraint(
+        "(event_type = 'page_duration' AND duration_seconds BETWEEN 1 AND 1800) OR "
+        "(event_type <> 'page_duration' AND duration_seconds IS NULL)",
+        name="ck_site_analytics_events_duration",
+    ),
+    CheckConstraint(
+        "(event_type = 'checkout_field' AND field_key IN "
+        "('name', 'company', 'phone', 'email', 'address_line_1', 'address_line_2', "
+        "'city', 'state', 'postal_code', 'country')) OR "
+        "(event_type <> 'checkout_field' AND field_key IS NULL)",
+        name="ck_site_analytics_events_checkout_field",
     ),
 )
 Index(
@@ -180,6 +213,17 @@ Index(
     site_analytics_events.c.id,
 )
 Index("ix_site_analytics_events_occurred_at", site_analytics_events.c.occurred_at)
+
+site_request_status_daily_counts = Table(
+    "site_request_status_daily_counts",
+    metadata,
+    Column("event_date", Date, primary_key=True),
+    Column("page_path", String(255), primary_key=True),
+    Column("status_code", Integer, primary_key=True),
+    Column("request_count", Integer, nullable=False),
+    CheckConstraint("status_code IN (200, 404)", name="ck_site_request_status_code"),
+    CheckConstraint("request_count > 0", name="ck_site_request_count_positive"),
+)
 
 
 def session_id_digest(token: object) -> str | None:
@@ -256,6 +300,10 @@ def normalize_click_target(value: object) -> str | None:
     return None
 
 
+def normalize_checkout_field(value: object) -> str | None:
+    return value if isinstance(value, str) and value in CHECKOUT_FIELDS else None
+
+
 def _page_filter_clause(events, page_filter: str):
     if page_filter == "home":
         return events.c.page_path == "/"
@@ -296,6 +344,30 @@ def _page_filter_label(page_filter: str) -> str:
     return labels.get(page_filter, "All pages")
 
 
+def _request_page_filter_clause(requests, page_filter: str):
+    if page_filter == "home":
+        return requests.c.page_path == "/"
+    if page_filter == "cart":
+        return requests.c.page_path.in_(("/cart", "/checkout"))
+    if page_filter == "team":
+        return or_(requests.c.page_path == "/team", requests.c.page_path.like("/team/%"))
+    if page_filter == "trade-shows":
+        return requests.c.page_path.in_(("/connect", "/trade-shows"))
+    if page_filter.startswith("path:"):
+        path = normalize_page_path(page_filter[5:])
+        return requests.c.page_path == path if path else literal(False)
+    return None
+
+
+def _format_duration(seconds: int | None) -> str:
+    if seconds is None:
+        return "—"
+    minutes, remainder = divmod(max(0, int(seconds)), 60)
+    if minutes:
+        return f"{minutes}m {remainder}s"
+    return f"{remainder}s"
+
+
 def _click_target_label(target: str) -> str:
     labels = {
         "button": "Unlabeled button (older event)",
@@ -310,6 +382,9 @@ def _click_target_label(target: str) -> str:
         "contact:phone": "Phone link",
         "internal:/cart": "Open cart",
         "internal:/checkout": "Open checkout",
+        "internal:/": "Open homepage",
+        "action:toggle-navigation": "Toggle navigation menu",
+        "action:play-video-1": "Play video 1",
         "action:add-to-order": "Add to order",
         "action:add-to-cart": "Add to cart",
         "action:open-cart": "Open cart",
@@ -346,6 +421,8 @@ class SiteAnalytics:
         utm_source: str | None = None,
         utm_medium: str | None = None,
         utm_campaign: str | None = None,
+        duration_seconds: int | None = None,
+        field_key: str | None = None,
     ) -> None:
         if not re.fullmatch(r"[0-9a-f]{64}", session_hash):
             raise ValueError("Invalid analytics session hash")
@@ -359,16 +436,33 @@ class SiteAnalytics:
         safe_utm_source = normalize_campaign_value(utm_source)
         safe_utm_medium = normalize_campaign_value(utm_medium)
         safe_utm_campaign = normalize_campaign_value(utm_campaign)
+        safe_field_key = normalize_checkout_field(field_key) if field_key is not None else None
         if not safe_path or (page_context is not None and page_context != "" and not safe_context):
             raise ValueError("Invalid analytics page")
-        if event_type == "page_view" and safe_target is not None:
-            raise ValueError("Page views cannot have a click target")
         if event_type == "click" and safe_target is None:
             raise ValueError("Clicks require a valid target")
-        if event_type == "click" and any((
+        if event_type != "click" and safe_target is not None:
+            raise ValueError("Only clicks can have a click target")
+        if event_type != "page_view" and any((
             safe_referrer, safe_utm_source, safe_utm_medium, safe_utm_campaign,
         )):
             raise ValueError("Attribution fields belong on page views")
+        if event_type == "page_duration":
+            if (
+                safe_path != "/checkout"
+                or not isinstance(duration_seconds, int)
+                or isinstance(duration_seconds, bool)
+                or not 1 <= duration_seconds <= MAX_PAGE_DURATION_SECONDS
+                or safe_field_key is not None
+            ):
+                raise ValueError("Invalid checkout duration")
+        elif duration_seconds is not None:
+            raise ValueError("Duration belongs on page-duration events")
+        if event_type == "checkout_field":
+            if safe_path != "/checkout" or safe_field_key is None:
+                raise ValueError("Invalid checkout field event")
+        elif field_key is not None:
+            raise ValueError("Field keys belong on checkout-field events")
 
         with self.engine.begin() as connection:
             connection.execute(
@@ -383,8 +477,30 @@ class SiteAnalytics:
                     utm_source=safe_utm_source,
                     utm_medium=safe_utm_medium,
                     utm_campaign=safe_utm_campaign,
+                    duration_seconds=duration_seconds,
+                    field_key=safe_field_key,
                 )
             )
+
+    def record_request_status(self, *, page_path: str, status_code: int) -> None:
+        safe_path = normalize_page_path(page_path)
+        if not safe_path or status_code not in {200, 404}:
+            raise ValueError("Invalid page response status")
+
+        table = site_request_status_daily_counts
+        insert = postgres_insert if self.engine.dialect.name == "postgresql" else sqlite_insert
+        statement = insert(table).values(
+            event_date=datetime.now(PACIFIC_TIME).date(),
+            page_path=safe_path,
+            status_code=status_code,
+            request_count=1,
+        )
+        statement = statement.on_conflict_do_update(
+            index_elements=[table.c.event_date, table.c.page_path, table.c.status_code],
+            set_={"request_count": table.c.request_count + 1},
+        )
+        with self.engine.begin() as connection:
+            connection.execute(statement)
 
     def _journey_edges(
         self,
@@ -393,6 +509,7 @@ class SiteAnalytics:
         time_conditions: list,
         page_filter: str,
         journey_start: str,
+        max_depth: int,
     ) -> list[dict[str, object]]:
         events = site_analytics_events
         ordering = [events.c.occurred_at, events.c.id]
@@ -400,6 +517,7 @@ class SiteAnalytics:
             events.c.session_id_hash,
             events.c.page_path,
             events.c.page_context,
+            events.c.click_target,
             func.row_number().over(
                 partition_by=events.c.session_id_hash,
                 order_by=ordering,
@@ -423,7 +541,7 @@ class SiteAnalytics:
 
         target_path = case(
             (
-                and_(sequence.c.step == 5, sequence.c.next_path.is_not(None)),
+                and_(sequence.c.step == max_depth, sequence.c.next_path.is_not(None)),
                 literal("More pages"),
             ),
             (sequence.c.next_path.is_(None), literal("Exit")),
@@ -436,22 +554,32 @@ class SiteAnalytics:
             func.count(func.distinct(sequence.c.session_id_hash)).label("sessions"),
         ).select_from(
             sequence.join(starts, sequence.c.session_id_hash == starts.c.session_id_hash)
-        ).where(sequence.c.step <= 5).group_by(
+        ).where(sequence.c.step <= max_depth).group_by(
             sequence.c.step,
             sequence.c.page_path,
             target_path,
         ).cte("journey_edge_counts")
-        ranked_edges = select(
+        edges_with_source_totals = select(
             edge_counts.c.step,
             edge_counts.c.source_path,
             edge_counts.c.target_path,
             edge_counts.c.sessions,
+            func.sum(edge_counts.c.sessions).over(
+                partition_by=[edge_counts.c.step, edge_counts.c.source_path]
+            ).label("previous_step_count"),
+        ).cte("journey_edges_with_source_totals")
+        ranked_edges = select(
+            edges_with_source_totals.c.step,
+            edges_with_source_totals.c.source_path,
+            edges_with_source_totals.c.target_path,
+            edges_with_source_totals.c.sessions,
+            edges_with_source_totals.c.previous_step_count,
             func.row_number().over(
-                partition_by=edge_counts.c.step,
+                partition_by=edges_with_source_totals.c.step,
                 order_by=[
-                    edge_counts.c.sessions.desc(),
-                    edge_counts.c.source_path,
-                    edge_counts.c.target_path,
+                    edges_with_source_totals.c.sessions.desc(),
+                    edges_with_source_totals.c.source_path,
+                    edges_with_source_totals.c.target_path,
                 ],
             ).label("edge_rank"),
         ).cte("ranked_journey_edges")
@@ -461,6 +589,7 @@ class SiteAnalytics:
                 ranked_edges.c.source_path,
                 ranked_edges.c.target_path,
                 ranked_edges.c.sessions,
+                ranked_edges.c.previous_step_count,
             )
             .where(ranked_edges.c.edge_rank <= 8)
             .order_by(ranked_edges.c.step, ranked_edges.c.edge_rank)
@@ -471,24 +600,105 @@ class SiteAnalytics:
                 "source": row.source_path,
                 "target": row.target_path,
                 "count": int(row.sessions or 0),
+                "previous_step_count": int(row.previous_step_count or 0),
+                "is_more_pages": row.target_path == "More pages",
             }
             for row in rows
         ]
+
+    def _journey_sequence_metrics(
+        self,
+        connection,
+        *,
+        time_conditions: list,
+        page_filter: str,
+        journey_start: str,
+        journey_pages: list[str],
+    ) -> tuple[int, int | None]:
+        events = site_analytics_events
+        sequence = select(
+            events.c.session_id_hash,
+            events.c.page_path,
+            events.c.page_context,
+            events.c.click_target,
+            func.row_number().over(
+                partition_by=events.c.session_id_hash,
+                order_by=[events.c.occurred_at, events.c.id],
+            ).label("step"),
+        ).where(*time_conditions, events.c.event_type == "page_view").cte("journey_filter_sequence")
+
+        first_page = sequence.alias("journey_filter_start_page")
+        start_conditions = [first_page.c.step == 1]
+        if journey_start == "filter":
+            start_clause = _page_filter_clause(first_page, page_filter)
+            if start_clause is not None:
+                start_conditions.append(start_clause)
+        elif journey_start.startswith("path:"):
+            start_path = normalize_page_path(journey_start[5:])
+            if start_path:
+                start_conditions.append(first_page.c.page_path == start_path)
+        starts = select(first_page.c.session_id_hash).where(*start_conditions).cte(
+            "journey_filter_starts"
+        )
+        population = int(connection.execute(
+            select(func.count(func.distinct(starts.c.session_id_hash)))
+        ).scalar_one() or 0)
+        if not journey_pages:
+            return population, None
+
+        steps = [sequence.alias(f"journey_filter_page_{index}") for index in range(len(journey_pages))]
+        from_clause = steps[0].join(
+            starts,
+            steps[0].c.session_id_hash == starts.c.session_id_hash,
+        )
+        conditions = [steps[0].c.page_path == journey_pages[0]]
+        for previous, current, page_path in zip(steps, steps[1:], journey_pages[1:]):
+            from_clause = from_clause.join(
+                current,
+                and_(
+                    current.c.session_id_hash == previous.c.session_id_hash,
+                    current.c.step == previous.c.step + 1,
+                ),
+            )
+            conditions.append(current.c.page_path == page_path)
+        matches = connection.execute(
+            select(func.count(func.distinct(steps[0].c.session_id_hash)))
+            .select_from(from_clause)
+            .where(*conditions)
+        ).scalar_one()
+        return population, int(matches or 0)
 
     def dashboard_summary(
         self,
         *,
         range_values: dict[str, object],
         granularity: str = "day",
-        chart_metric: str = "both",
+        chart_metric: str = "views_sessions",
         page_filter: str = "all",
         journey_start: str = "filter",
+        journey_depth: int = JOURNEY_DEPTH_INCREMENT,
+        journey_pages: list[str] | None = None,
     ) -> dict[str, object]:
         """Return aggregate analytics for the selected Pacific-time range and filters."""
         if granularity not in GRANULARITIES:
             granularity = "day"
-        if chart_metric not in {"both", "page_views", "clicks"}:
-            chart_metric = "both"
+        if chart_metric == "both":
+            chart_metric = "views_clicks"
+        allowed_metrics = {
+            "views_sessions", "page_views", "sessions", "clicks", "all", "views_clicks",
+        }
+        if chart_metric not in allowed_metrics:
+            chart_metric = "views_sessions"
+        try:
+            journey_depth = int(journey_depth)
+        except (TypeError, ValueError):
+            journey_depth = JOURNEY_DEPTH_INCREMENT
+        journey_depth = min(
+            MAX_JOURNEY_DEPTH,
+            max(JOURNEY_DEPTH_INCREMENT, math.ceil(journey_depth / JOURNEY_DEPTH_INCREMENT)
+                * JOURNEY_DEPTH_INCREMENT),
+        )
+        journey_pages = journey_pages or []
 
         start_date = range_values["start_date"]
         end_date = range_values["end_date"]
@@ -498,6 +708,7 @@ class SiteAnalytics:
         events = site_analytics_events
         is_page_view = events.c.event_type == "page_view"
         is_click = events.c.event_type == "click"
+        is_tracked_activity = or_(is_page_view, is_click)
         time_conditions = [events.c.occurred_at >= start_at, events.c.occurred_at < end_at]
         page_paths: list[str]
 
@@ -524,6 +735,11 @@ class SiteAnalytics:
                 candidate_start = normalize_page_path(journey_start[5:]) if journey_start.startswith("path:") else None
                 journey_start = f"path:{candidate_start}" if candidate_start in page_paths else "filter"
 
+            journey_pages = [
+                path for path in journey_pages[:MAX_JOURNEY_FILTER_PAGES]
+                if normalize_page_path(path) in page_paths
+            ]
+
             page_views = connection.execute(
                 select(func.count()).select_from(events).where(*scoped_conditions, is_page_view)
             ).scalar_one()
@@ -544,9 +760,12 @@ class SiteAnalytics:
                         event_bucket.label("event_bucket"),
                         func.sum(case((is_page_view, 1), else_=0)).label("page_views"),
                         func.sum(case((is_click, 1), else_=0)).label("clicks"),
-                        func.count(func.distinct(events.c.session_id_hash)).label("sessions"),
+                        func.count(func.distinct(case(
+                            (is_page_view, events.c.session_id_hash),
+                            else_=None,
+                        ))).label("sessions"),
                     )
-                    .where(*scoped_conditions)
+                    .where(*scoped_conditions, is_tracked_activity)
                     .group_by(event_bucket)
                     .order_by(event_bucket)
                 ).all()
@@ -562,7 +781,7 @@ class SiteAnalytics:
             else:
                 chart_rows = connection.execute(
                     select(events.c.occurred_at, events.c.event_type, events.c.session_id_hash)
-                    .where(*scoped_conditions)
+                    .where(*scoped_conditions, is_tracked_activity)
                 ).all()
                 chart_accumulator: dict[str, dict[str, object]] = {}
                 for row in chart_rows:
@@ -572,7 +791,8 @@ class SiteAnalytics:
                         {"page_views": 0, "clicks": 0, "sessions": set()},
                     )
                     bucket["page_views" if row.event_type == "page_view" else "clicks"] += 1
-                    bucket["sessions"].add(row.session_id_hash)
+                    if row.event_type == "page_view":
+                        bucket["sessions"].add(row.session_id_hash)
                 chart_lookup = {
                     key: {
                         "page_views": int(bucket["page_views"]),
@@ -666,30 +886,111 @@ class SiteAnalytics:
                     .limit(20)
                 ).all()
 
+            request_status = site_request_status_daily_counts
+            request_conditions = [
+                request_status.c.event_date >= start_date,
+                request_status.c.event_date <= end_date,
+            ]
+            request_page_clause = _request_page_filter_clause(request_status, page_filter)
+            if request_page_clause is not None:
+                request_conditions.append(request_page_clause)
+            request_status_rows = connection.execute(
+                select(
+                    request_status.c.status_code,
+                    func.sum(request_status.c.request_count).label("count"),
+                )
+                .where(*request_conditions)
+                .group_by(request_status.c.status_code)
+            ).all()
+            request_status_counts = {200: 0, 404: 0}
+            for row in request_status_rows:
+                request_status_counts[int(row.status_code)] = int(row.count or 0)
+            not_found_rows = connection.execute(
+                select(
+                    request_status.c.page_path,
+                    func.sum(request_status.c.request_count).label("count"),
+                )
+                .where(*request_conditions, request_status.c.status_code == 404)
+                .group_by(request_status.c.page_path)
+                .order_by(func.sum(request_status.c.request_count).desc(), request_status.c.page_path)
+                .limit(8)
+            ).all()
+
+            checkout_is_in_scope = page_filter in {"all", "cart", "path:/checkout"}
+            checkout_conditions = [*time_conditions, events.c.page_path == "/checkout"]
+            checkout_sessions = 0
+            checkout_durations: list[int] = []
+            checkout_field_counts: dict[str, int] = {}
+            if checkout_is_in_scope:
+                checkout_sessions = int(connection.execute(
+                    select(func.count(func.distinct(events.c.session_id_hash)))
+                    .where(*checkout_conditions, is_page_view)
+                ).scalar_one() or 0)
+                duration_rows = connection.execute(
+                    select(
+                        events.c.session_id_hash,
+                        func.sum(events.c.duration_seconds).label("duration_seconds"),
+                    )
+                    .where(
+                        *checkout_conditions,
+                        events.c.event_type == "page_duration",
+                    )
+                    .group_by(events.c.session_id_hash)
+                ).all()
+                checkout_durations = [
+                    min(MAX_PAGE_DURATION_SECONDS, int(row.duration_seconds or 0))
+                    for row in duration_rows if row.duration_seconds
+                ]
+                field_rows = connection.execute(
+                    select(
+                        events.c.field_key,
+                        func.count(func.distinct(events.c.session_id_hash)).label("sessions"),
+                    )
+                    .where(*checkout_conditions, events.c.event_type == "checkout_field")
+                    .group_by(events.c.field_key)
+                ).all()
+                checkout_field_counts = {
+                    str(row.field_key): int(row.sessions or 0) for row in field_rows
+                }
+
             journey_edges = self._journey_edges(
                 connection,
                 time_conditions=time_conditions,
                 page_filter=page_filter,
                 journey_start=journey_start,
+                max_depth=journey_depth,
+            )
+            journey_population, journey_match_count = self._journey_sequence_metrics(
+                connection,
+                time_conditions=time_conditions,
+                page_filter=page_filter,
+                journey_start=journey_start,
+                journey_pages=journey_pages,
             )
 
         last_day = end_exclusive - timedelta(days=1)
         bucket_date = _bucket_start(start_date, granularity)
         final_bucket = _bucket_start(last_day, granularity)
         chart = []
+        metric_fields = {
+            "views_sessions": ("page_views", "sessions"),
+            "page_views": ("page_views",),
+            "sessions": ("sessions",),
+            "clicks": ("clicks",),
+            "views_clicks": ("page_views", "clicks"),
+            "all": ("page_views", "sessions", "clicks"),
+        }[chart_metric]
         while bucket_date <= final_bucket:
             counts = chart_lookup.get(bucket_date.isoformat(), {})
-            page_count = counts.get("page_views", 0)
-            click_count = counts.get("clicks", 0)
-            if (
-                (chart_metric == "both" and (page_count or click_count))
-                or (chart_metric == "page_views" and page_count)
-                or (chart_metric == "clicks" and click_count)
-            ):
+            bucket_counts = {
+                "page_views": int(counts.get("page_views", 0)),
+                "sessions": int(counts.get("sessions", 0)),
+                "clicks": int(counts.get("clicks", 0)),
+            }
+            if any(bucket_counts[field] for field in metric_fields):
                 chart.append({
                     "label": f"{bucket_date.month}/{bucket_date.day}",
-                    "page_views": page_count,
-                    "clicks": click_count,
+                    **bucket_counts,
                 })
             bucket_date = _next_bucket(bucket_date, granularity)
 
@@ -699,15 +1000,10 @@ class SiteAnalytics:
                 index == 0 or index == len(chart) - 1 or index % label_interval == 0
             )
 
-        if chart_metric == "page_views":
-            top_peak = max((row["page_views"] for row in chart), default=1) or 1
-        elif chart_metric == "clicks":
-            top_peak = max((row["clicks"] for row in chart), default=1) or 1
-        else:
-            top_peak = max(
-                (max(row["page_views"], row["clicks"]) for row in chart),
-                default=1,
-            ) or 1
+        top_peak = max(
+            (max(row[field] for field in metric_fields) for row in chart),
+            default=1,
+        ) or 1
         page_filter_options = [
             {"value": "all", "label": "All pages"},
             {"value": "home", "label": "Homepage only"},
@@ -735,9 +1031,12 @@ class SiteAnalytics:
             "granularity_label": {"day": "Daily", "week": "Weekly", "month": "Monthly"}[granularity],
             "chart_metric": chart_metric,
             "chart_metric_label": {
-                "both": "Page views and clicks",
+                "views_sessions": "Page views and sessions",
                 "page_views": "Page views",
+                "sessions": "Sessions",
                 "clicks": "Clicks",
+                "views_clicks": "Page views and clicks",
+                "all": "Page views, sessions, and clicks",
             }[chart_metric],
             "page_filter": page_filter,
             "page_filter_label": _page_filter_label(page_filter),
@@ -746,6 +1045,58 @@ class SiteAnalytics:
             "journey_start": journey_start,
             "journey_start_options": journey_start_options,
             "journey_flow": journey_edges,
+            "journey_depth": journey_depth,
+            "journey_depth_limit": MAX_JOURNEY_DEPTH,
+            "journey_pages": journey_pages,
+            "journey_population_sessions": journey_population,
+            "journey_match_count": journey_match_count,
+            "journey_match_percent": (
+                round(journey_match_count * 100 / journey_population, 1)
+                if journey_match_count is not None and journey_population else 0
+            ),
+            "request_status": {
+                "success_count": request_status_counts[200],
+                "not_found_count": request_status_counts[404],
+                "total": request_status_counts[200] + request_status_counts[404],
+                "success_percent": round(
+                    request_status_counts[200] * 100
+                    / max(1, request_status_counts[200] + request_status_counts[404]),
+                    1,
+                ),
+                "not_found_percent": round(
+                    request_status_counts[404] * 100
+                    / max(1, request_status_counts[200] + request_status_counts[404]),
+                    1,
+                ),
+                "not_found_pages": [
+                    {"path": row.page_path, "count": int(row.count or 0)}
+                    for row in not_found_rows
+                ],
+            },
+            "checkout_insights": {
+                "in_scope": checkout_is_in_scope,
+                "sessions": checkout_sessions,
+                "timed_sessions": len(checkout_durations),
+                "average_duration": _format_duration(
+                    round(sum(checkout_durations) / len(checkout_durations))
+                    if checkout_durations else None
+                ),
+                "median_duration": _format_duration(
+                    round(median(checkout_durations)) if checkout_durations else None
+                ),
+                "field_progress": [
+                    {
+                        "key": key,
+                        "label": label,
+                        "sessions": checkout_field_counts.get(key, 0),
+                        "percent": round(
+                            checkout_field_counts.get(key, 0) * 100 / checkout_sessions,
+                            1,
+                        ) if checkout_sessions else 0,
+                    }
+                    for key, label in CHECKOUT_FIELDS.items()
+                ],
+            },
             "top_pages": [
                 {"path": row.page_path, "count": int(row.count)} for row in page_rows
             ],
