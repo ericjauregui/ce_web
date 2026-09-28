@@ -1,14 +1,5 @@
-async function postJson(url, payload) {
-  const response = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload || {}),
-  });
-  return response.json();
-}
-
 function clampQty(qty) {
-  return Math.max(0, Math.min(999, Number(qty) || 0));
+  return Math.max(0, Math.min(999, Math.trunc(Number(qty) || 0)));
 }
 
 function updateCartBadge(totalItems) {
@@ -55,10 +46,14 @@ async function setQtyOnServer(card, nextQty) {
   if (!code) return;
 
   const safeQty = clampQty(nextQty);
-  const response = await postJson("/api/cart/set", { code, qty: safeQty });
+  const restore = () => setDetailQty(card, card.dataset.qty || 0);
+  if (safeQty === 0 && Number(card.dataset.qty) > 0 && !window.confirm(`Remove ${code} and its notes from your order?`)) { restore(); return; }
+  return CEOrder.run(async () => {
+    const response = await CEOrder.post("/api/cart/set", {code, qty: safeQty});
+    updateCartBadge(response.total_items);
+    setDetailQty(card, response.qty);
+  }, restore);
 
-  updateCartBadge(response.total_items || 0);
-  setDetailQty(card, safeQty);
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -122,11 +117,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     event.preventDefault();
 
-    const currentQty = clampQty(card.dataset.qty || 0);
-    const nextQty = currentQty + 1;
-    const response = await postJson("/api/cart/add", { code, qty: 1 });
-    updateCartBadge(response.total_items || 0);
-    setDetailQty(card, nextQty);
+    await CEOrder.run(async () => {
+      const response = await CEOrder.post("/api/cart/add", {code, qty: 1});
+      updateCartBadge(response.total_items);
+      setDetailQty(card, response.qty);
+    });
   });
 
   document.addEventListener("click", async (event) => {
@@ -160,7 +155,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!qtyInput || !card.contains(qtyInput) || event.key !== "Enter") return;
 
     event.preventDefault();
-    await setQtyOnServer(card, qtyInput.value);
     qtyInput.blur();
   });
 });

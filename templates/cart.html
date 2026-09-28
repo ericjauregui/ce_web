@@ -21,12 +21,10 @@
   </div>
 
   <div class="mt-3 card bg-dark border-gold p-3" id="cartContentCard">
-    {% if items|length == 0 %}
-      <div id="cartEmptyState" class="cart-empty-state">
+      <div id="cartEmptyState" class="cart-empty-state" {% if items %}hidden{% endif %}>
         <p class="text-gold-70 mb-0 cart-empty-message">Your showcase is waiting. Browse the catalog and start building your next order.</p>
       </div>
-    {% else %}
-      <div class="table-responsive" id="cartTableWrap">
+      <div class="table-responsive" id="cartTableWrap" {% if not items %}hidden{% endif %}>
         <table class="table table-dark align-middle mb-0 minimal-items-table cart-items-table">
           <thead>
             <tr>
@@ -38,54 +36,26 @@
             </tr>
           </thead>
           <tbody id="cartTableBody">
-            {% for row in items %}
-            <tr>
-              <td class="cell-item" data-label="Item">
-                <div class="d-flex align-items-center">
-                  <a class="cart-product-link cart-product-thumb-link" href="{{ url_for('product_detail', product_code=row.product.code) }}" aria-label="View {{ row.product.code }} product details">
-                    <img src="{{ asset_url('product_images/' ~ row.product.image) }}" {{ product_image_attributes('product_images/' ~ row.product.image, 'cart')|xmlattr }} class="cart-thumb" alt="" loading="lazy" decoding="async" width="56" height="56">
-                  </a>
-                </div>
-              </td>
-              <td class="cell-code" data-label="Code"><a class="code-badge cart-product-link cart-product-code-link" href="{{ url_for('product_detail', product_code=row.product.code) }}">{{ row.product.code }}</a></td>
-              <td class="cell-qty" data-label="Quantity">
-                <div class="qty-control" data-code="{{ row.product.code }}">
-                  <button class="btn btn-outline-gold qty-adjust-btn qty-minus" type="button">−</button>
-                  <input class="form-control bg-black text-light border-gold qty-input product-qty-input" value="{{ row.qty }}" inputmode="numeric">
-                  <button class="btn btn-outline-gold qty-adjust-btn qty-plus" type="button">+</button>
-                </div>
-              </td>
-              <td class="cell-notes" data-label="Item Notes">
-                <div class="item-note-shell is-collapsed" data-compact-label="Note">
-                  <textarea class="form-control form-control-sm bg-black text-light border-gold item-note-input"
-                    data-code="{{ row.product.code }}" rows="1" maxlength="500"
-                    placeholder="Note for this item (optional)" aria-label="Item Notes">{{ row.note }}</textarea>
-                </div>
-                </td>
-                <td class="cell-remove" data-label="">
-                <button class="btn btn-outline-gold qty-remove" type="button" data-code="{{ row.product.code }}">Remove</button>
-              </td>
-            </tr>
-            {% endfor %}
+            {% include 'partials/cart_rows.html' %}
           </tbody>
         </table>
       </div>
 
-      <div class="cart-summary-bar mt-3" id="cartSummaryBar">
+      <div id="cartUndoClear"></div>
+      <div class="cart-summary-bar mt-3" id="cartSummaryBar" {% if not items %}hidden{% endif %}>
         <div class="cart-summary-bar__left">
           <button type="button" class="btn btn-outline-gold" id="clearOrderBtn">Clear Order</button>
         </div>
         <div class="cart-summary-bar__center">
           <div class="d-flex align-items-center flex-wrap gap-2 cart-summary-metrics">
-            <div class="text-gold-70 small">Total Items:<span id="cartLineItemCount">{{ items|length }}</span></div>
+            <div class="text-gold-70 small">Styles:<span id="cartLineItemCount">{{ items|length }}</span></div>
             <div class="text-gold-70 small">Total Quantity:<span id="cartTotalQty">{{ total_items }}</span></div>
           </div>
         </div>
         <div class="cart-summary-bar__right">
-          <a class="btn btn-outline-gold cart-checkout-btn summary-submit-btn--highlight" href="{{ url_for('checkout') }}">Submit Order</a>
+          <a class="btn btn-outline-gold cart-checkout-btn summary-submit-btn--highlight" href="{{ url_for('checkout') }}">Checkout</a>
         </div>
       </div>
-    {% endif %}
   </div>
 </section>
 {% if items|length == 0 and latest_reels %}
@@ -97,271 +67,7 @@
 {% endblock %}
 
 {% block body_end %}
-<script>
-async function postJson(url, payload){
-  const res = await fetch(url, {
-    method: "POST",
-    headers: {"Content-Type":"application/json"},
-    body: JSON.stringify(payload || {})
-  });
-  return res.json();
-}
-function clampQty(q){
-  q = parseInt(q || "0", 10);
-  if (isNaN(q) || q < 0) q = 0;
-  if (q > 999) q = 999;
-  return q;
-}
-
-function autoResizeNoteInput(input) {
-  if (!input) return;
-  const minHeight = 36;
-  const maxHeight = Math.min(180, Math.round(window.innerHeight * 0.42));
-  const noteValue = (input.value || "").trim();
-
-  const noteShell = input.closest(".item-note-shell");
-  if (noteShell && noteShell.classList.contains("is-collapsed")) {
-    input.style.height = `${minHeight}px`;
-    input.style.overflowY = "hidden";
-    return;
-  }
-
-  if (!noteValue) {
-    input.style.height = `${minHeight}px`;
-    input.style.overflowY = "hidden";
-    return;
-  }
-
-  input.style.height = "auto";
-  const nextHeight = Math.max(minHeight, input.scrollHeight);
-  input.style.height = `${Math.min(nextHeight, maxHeight)}px`;
-  input.style.overflowY = nextHeight > maxHeight ? "auto" : "hidden";
-}
-
-function syncCompactCartNoteInput(input) {
-  if (!input) return;
-  const shell = input.closest(".item-note-shell");
-  if (!shell) return;
-
-  const hasValue = Boolean((input.value || "").trim());
-  const isFocused = document.activeElement === input;
-
-  shell.classList.toggle("has-value", hasValue);
-  shell.classList.toggle("is-expanded", isFocused);
-  shell.classList.toggle("is-collapsed", !isFocused);
-}
-
-function setCheckoutVisibility(hasItems) {
-  document.querySelectorAll(".cart-checkout-btn").forEach((button) => {
-    button.style.display = hasItems ? "" : "none";
-  });
-}
-
-function setCartIntroVisibility(hasItems) {
-  const introCard = document.getElementById("cartIntroCard");
-  if (!introCard) return;
-  introCard.style.display = hasItems ? "" : "none";
-}
-
-      function getLineItemCount() {
-        const tbody = document.getElementById("cartTableBody");
-        if (!tbody) return 0;
-        return tbody.querySelectorAll("tr").length;
-      }
-
-  let noteSaveTimers = {};
-
-  async function persistItemNote(noteInput) {
-    const code = noteInput.getAttribute("data-code");
-    if (!code) return;
-    const note = (noteInput.value || "").trim().slice(0, 500);
-    noteInput.value = note;
-    await postJson("/api/cart/note", { code, note });
-  }
-
-    function renderEmptyCartState() {
-    const tableWrap = document.getElementById("cartTableWrap");
-    if (tableWrap) tableWrap.remove();
-
-    const summaryBar = document.getElementById("cartSummaryBar");
-    if (summaryBar) summaryBar.remove();
-
-    const lineCountEl = document.getElementById("cartLineItemCount");
-    if (lineCountEl) lineCountEl.textContent = "0";
-    const totalQtyEl = document.getElementById("cartTotalQty");
-    if (totalQtyEl) totalQtyEl.textContent = "0";
-
-    setCheckoutVisibility(false);
-    setCartIntroVisibility(false);
-
-    const card = document.getElementById("cartContentCard");
-    if (!card || card.querySelector("#cartEmptyState")) return;
-
-    const emptyState = document.createElement("div");
-    emptyState.id = "cartEmptyState";
-    emptyState.className = "cart-empty-state";
-
-    const empty = document.createElement("p");
-    empty.className = "text-gold-70 mb-0 cart-empty-message";
-    empty.textContent = "Your showcase is waiting. Browse the catalog and start building your next order.";
-    emptyState.appendChild(empty);
-    card.appendChild(emptyState);
-
-    window.location.assign("{{ url_for('cart') }}");
-  }
-
-  function removeRowAndUpdateEmptyState(row) {
-    if (row) row.remove();
-
-    const lineCountEl = document.getElementById("cartLineItemCount");
-    if (lineCountEl) {
-      lineCountEl.textContent = getLineItemCount();
-    }
-
-    const tbody = document.getElementById("cartTableBody");
-    if (!tbody || tbody.querySelector("tr")) return;
-    renderEmptyCartState();
-  }
-async function refreshCartCount(){
-  const data = await fetch("/api/cart/count").then(r => r.json());
-  const totalItems = Number(data.total_items) || 0;
-  const badge = document.getElementById("cartCountBadge");
-  if (badge){
-    badge.textContent = totalItems;
-    badge.style.display = totalItems > 0 ? "inline-block" : "none";
-  }
-  const totalQty = document.getElementById("cartTotalQty");
-  if (totalQty) totalQty.textContent = totalItems;
-  const lineCountEl = document.getElementById("cartLineItemCount");
-  const lineItemCount = getLineItemCount();
-  if (lineCountEl) lineCountEl.textContent = lineItemCount;
-
-  const hasItems = totalItems > 0 && lineItemCount > 0;
-  setCheckoutVisibility(hasItems);
-  setCartIntroVisibility(hasItems);
-}
-document.addEventListener("DOMContentLoaded", () => {
-  const totalQtyEl = document.getElementById("cartTotalQty");
-  const totalQty = totalQtyEl ? clampQty(totalQtyEl.textContent) : 0;
-  const lineItemCount = getLineItemCount();
-  const hasItems = totalQty > 0 && lineItemCount > 0;
-  setCheckoutVisibility(hasItems);
-  setCartIntroVisibility(hasItems);
-
-  document.querySelectorAll(".item-note-input").forEach((input) => {
-    syncCompactCartNoteInput(input);
-    autoResizeNoteInput(input);
-  });
-});
-document.addEventListener("focusin", (e) => {
-  const input = e.target.closest(".item-note-input");
-  if (!input) return;
-  syncCompactCartNoteInput(input);
-  autoResizeNoteInput(input);
-}, true);
-document.addEventListener("keydown", (e) => {
-  const input = e.target.closest(".item-note-input");
-  if (!input || e.key !== "Escape") return;
-
-  e.preventDefault();
-  input.blur();
-}, true);
-document.addEventListener("click", async (e) => {
-  const minus = e.target.closest(".qty-minus");
-  const plus = e.target.closest(".qty-plus");
-  const remove = e.target.closest(".qty-remove");
-  const clear = e.target.closest("#clearOrderBtn");
-
-  if (clear) {
-    await postJson("/api/cart/clear", {});
-    await refreshCartCount();
-    renderEmptyCartState();
-    return;
-  }
-
-  if (minus || plus){
-    const wrap = e.target.closest(".qty-control");
-    const code = wrap.getAttribute("data-code");
-    const input = wrap.querySelector(".qty-input");
-    const row = wrap.closest("tr");
-    let q = clampQty(input.value);
-    q = minus ? Math.max(0, q - 1) : Math.min(999, q + 1);
-    input.value = q;
-    await postJson("/api/cart/set", {code, qty: q});
-    await refreshCartCount();
-    if (q === 0) {
-      removeRowAndUpdateEmptyState(row);
-    }
-  }
-  if (remove){
-    const code = remove.getAttribute("data-code");
-    const row = remove.closest("tr");
-    await postJson("/api/cart/remove", {code});
-    await refreshCartCount();
-    removeRowAndUpdateEmptyState(row);
-  }
-});
-document.addEventListener("change", async (e) => {
-  const input = e.target.closest(".qty-input");
-  if (!input) return;
-  const wrap = input.closest(".qty-control");
-  const code = wrap.getAttribute("data-code");
-  const row = wrap.closest("tr");
-  const q = clampQty(input.value);
-  input.value = q;
-  await postJson("/api/cart/set", {code, qty: q});
-  await refreshCartCount();
-  if (q === 0) {
-    removeRowAndUpdateEmptyState(row);
-  }
-});
-
-  document.addEventListener("input", (e) => {
-    const input = e.target.closest(".item-note-input");
-    if (!input) return;
-
-    syncCompactCartNoteInput(input);
-    autoResizeNoteInput(input);
-
-    const code = input.getAttribute("data-code") || "";
-    const nextValue = (input.value || "").trim();
-    if (!nextValue) {
-      input.value = "";
-      if (code && noteSaveTimers[code]) {
-        window.clearTimeout(noteSaveTimers[code]);
-        delete noteSaveTimers[code];
-      }
-      input.blur();
-      return;
-    }
-
-    if (!code) return;
-
-    if (noteSaveTimers[code]) {
-      window.clearTimeout(noteSaveTimers[code]);
-    }
-
-    noteSaveTimers[code] = window.setTimeout(async () => {
-      await persistItemNote(input);
-      delete noteSaveTimers[code];
-    }, 350);
-  });
-
-  document.addEventListener("blur", async (e) => {
-    const input = e.target.closest(".item-note-input");
-    if (!input) return;
-
-    const code = input.getAttribute("data-code") || "";
-    if (code && noteSaveTimers[code]) {
-      window.clearTimeout(noteSaveTimers[code]);
-      delete noteSaveTimers[code];
-    }
-
-    syncCompactCartNoteInput(input);
-    autoResizeNoteInput(input);
-    await persistItemNote(input);
-  }, true);
-</script>
+<script src="{{ asset_url('js/cart.js') }}"></script>
 {% if items|length == 0 and latest_reels %}
 <script src="{{ asset_url('js/inline_reels.js') }}"></script>
 <script src="{{ asset_url('js/home_reels.js') }}"></script>

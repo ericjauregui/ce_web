@@ -44,7 +44,7 @@ def install_rate_limiting(app: Flask) -> Limiter:
     cart_limit = limiter.shared_limit(
         lambda: app.config["CART_RATE_LIMIT"], scope="cart-writes", methods=["POST"]
     )
-    for endpoint in ("api_cart_add", "api_cart_set", "api_cart_remove", "api_cart_clear", "api_cart_note"):
+    for endpoint in ("api_cart_add", "api_cart_set", "api_cart_remove", "api_cart_clear", "api_cart_note", "api_cart_undo"):
         app.view_functions[endpoint] = cart_limit(app.view_functions[endpoint])
     app.view_functions["connect_event"] = limiter.limit(
         lambda: app.config["CONNECT_EVENT_RATE_LIMIT"], methods=["POST"]

@@ -66,7 +66,7 @@
 .trade-show-hero__inner {
   width: 100%;
   display: grid;
-  grid-template-columns: minmax(0, 1.45fr) minmax(300px, .62fr);
+  grid-template-columns: minmax(0, 1.3fr) minmax(360px, .8fr);
   align-items: center;
   gap: clamp(2rem, 4vw, 4rem);
   padding-block: clamp(2.5rem, 5vw, 4rem);
@@ -419,6 +419,18 @@
   }
 }
 
+@media (min-width: 992px) {
+  .trade-show-hero__inner { padding-block: clamp(1.5rem, 3vw, 2.5rem); }
+  .trade-show-hero__lead { margin-top: 1rem; }
+  .trade-show-proof { margin-top: 1.25rem; }
+  .trade-show-actions { margin-top: 1.25rem; }
+  .trade-show-event-card { padding: 1.5rem; }
+  .trade-show-event-card > img { margin-bottom: .75rem; }
+  .trade-show-event-card dl > div { padding: .65rem 0; }
+  .trade-show-detail-actions { margin-top: .75rem; }
+  .trade-show-hero + .trade-show-content { padding-top: clamp(1.25rem, 2vw, 2rem); }
+}
+
 @media (max-width: 991.98px) {
   .trade-show-hero__inner {
     grid-template-columns: minmax(0, 1fr) minmax(260px, .58fr);
@@ -461,8 +473,8 @@
 
   .trade-show-hero__inner {
     grid-template-columns: 1fr;
-    gap: 1.5rem;
-    padding: 2rem 1rem;
+    gap: 1rem;
+    padding: 1rem;
   }
 
   .trade-show-hero h1 {
@@ -487,7 +499,13 @@
   .trade-show-event-card {
     width: min(100%, 430px);
     margin-inline: auto;
+    padding: .875rem;
   }
+
+  .trade-show-event-card > img { max-height: 72px; margin-bottom: .5rem; }
+  .trade-show-event-card dl > div { padding: .5rem 0; }
+  .trade-show-event-card dt { margin-bottom: .2rem; }
+  .trade-show-detail-actions { margin-top: .5rem; }
 
   .trade-show-content {
     padding-inline: 1rem;
@@ -524,12 +542,12 @@
 
   .trade-show-video-copy { padding: 1.25rem; order: -1; }
   .trade-show-video-copy > p:last-child { margin-bottom: 0; }
-  .trade-show-proof { flex-wrap: nowrap; justify-content: space-between; gap: .375rem; margin-top: 1.25rem; }
+  .trade-show-proof { flex-wrap: nowrap; justify-content: space-between; gap: .375rem; margin-top: .875rem; }
   .trade-show-proof span { gap: .25rem; font-size: clamp(.75rem, 3.1vw, .8125rem); white-space: nowrap; }
   .trade-show-proof svg { width: .875rem; height: .875rem; }
   .trade-show-eyebrow { letter-spacing: .12em; font-size: .68rem; }
-  .trade-show-hero__lead { font-size: 1rem; margin-top: 1rem; }
-  .trade-show-actions { margin-top: 1rem; }
+  .trade-show-hero__lead { font-size: 1rem; margin-top: .75rem; }
+  .trade-show-actions { margin-top: .75rem; }
   .trade-show-benefit-grid article { display: grid; grid-template-columns: 36px 1fr; gap: .25rem .8rem; padding: 1rem; }
   .trade-show-benefit-icon { grid-row: 1 / 3; width: 34px; height: 34px; margin: 0; }
   .trade-show-benefit-grid p { grid-column: 2; margin: 0; }

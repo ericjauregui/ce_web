@@ -13,7 +13,7 @@
 <section class="container py-5 product-detail-page">
   <div class="product-detail-top-actions mb-3">
     <a class="btn btn-outline-gold product-detail-top-action product-detail-top-action--catalog" href="{{ url_for('index') }}#section-{{ product.collection }}">← Catalog</a>
-    <button type="button" class="btn btn-outline-gold add-to-cart-btn product-detail-top-action product-detail-top-add-btn product-detail-top-action--add" data-code="{{ product.code }}">
+    <button type="button" class="btn btn-gold add-to-cart-btn product-detail-top-action product-detail-top-add-btn product-detail-top-action--add" data-code="{{ product.code }}">
       Add to Order
     </button>
     <a class="btn btn-outline-gold product-detail-top-action product-detail-top-action--contact" href="{{ url_for('contact') }}">Contact Us</a>
@@ -54,11 +54,11 @@
 
         <div class="product-actions mt-auto d-grid gap-2">
           <div class="product-qty-control {% if initial_qty <= 0 %}d-none{% endif %}" data-code="{{ product.code }}" aria-label="Inline quantity controls">
-            <button type="button" class="btn btn-outline-gold btn-sm rounded-pill qty-clear-btn" aria-label="Clear item from cart">×</button>
+            <button type="button" class="btn btn-outline-gold btn-sm rounded-pill qty-clear-btn" aria-label="Remove {{ product.code }} from order">×</button>
             <div class="qty-center-group" aria-hidden="false">
-              <button type="button" class="btn btn-outline-gold btn-sm rounded-pill qty-adjust-btn" data-delta="-1" aria-label="Decrease quantity">−</button>
-              <input type="number" min="0" max="999" step="1" inputmode="numeric" class="product-qty-pill product-qty-input" value="{{ initial_qty if initial_qty > 0 else 1 }}" aria-label="Quantity" />
-              <button type="button" class="btn btn-outline-gold btn-sm rounded-pill qty-adjust-btn" data-delta="1" aria-label="Increase quantity">+</button>
+              <button type="button" class="btn btn-outline-gold btn-sm rounded-pill qty-adjust-btn" data-delta="-1" aria-label="Decrease quantity for {{ product.code }}">−</button>
+              <input type="number" min="0" max="999" step="1" inputmode="numeric" class="product-qty-pill product-qty-input" value="{{ initial_qty if initial_qty > 0 else 1 }}" aria-label="Quantity for {{ product.code }}" />
+              <button type="button" class="btn btn-outline-gold btn-sm rounded-pill qty-adjust-btn" data-delta="1" aria-label="Increase quantity for {{ product.code }}">+</button>
             </div>
           </div>
         </div>

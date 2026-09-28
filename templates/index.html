@@ -63,7 +63,7 @@
         </div>
         <div class="home-row-actions">
           {% include "partials/home_jump_top.html" %}
-          <button class="home-collections-toggle" type="button" aria-expanded="true" aria-controls="homeCollectionNavigation" aria-label="Collapse catalog collections">
+          <button class="home-collections-toggle home-row-button" type="button" aria-expanded="true" aria-controls="homeCollectionNavigation" aria-label="Collapse catalog collections">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 14 6-6 6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </button>
         </div>
@@ -102,7 +102,7 @@
         </h2>
         <div class="section-header-cats" aria-hidden="true"></div>
         <div class="section-header-jump d-flex gap-3 align-items-center">
-          <a class="chip" href="{{ url_for('index') }}#section-studs">← Full Catalog</a>
+          <a class="home-row-button" href="{{ url_for('index') }}#section-studs">← Full Catalog</a>
         </div>
       </div>
     </div>
@@ -118,6 +118,17 @@
     {% endif %}
     <div class="container{% if not loop.last %} mb-3{% endif %}">
     <div class="row row-cols-2 row-cols-md-3 row-cols-xl-4 g-4 product-grid-row">
+      {% if q and section.items|length == 0 %}
+      <div class="col-12 search-empty-state">
+        <div class="card bg-dark border-gold p-3">
+          <p class="text-gold mb-2" role="status">No items found for “{{ q }}”.</p>
+          <p class="text-gold-70 mb-3">Try a product code or collection name, or browse the full catalog.</p>
+          <div class="d-flex justify-content-end">
+            <a class="home-row-button" href="{{ url_for('index') }}#section-studs">Clear Search</a>
+          </div>
+        </div>
+      </div>
+      {% endif %}
       {% for p in section.items %}
       {% include "partials/product_card.html" %}
       {% endfor %}
@@ -151,8 +162,8 @@
       </span>
     </a>
     <div class="catalog-mini-cart__actions" id="catalogMiniCartActions">
-      <a class="btn btn-outline-gold catalog-mini-cart__review" href="{{ url_for('cart') }}">Review order</a>
-      <a class="btn btn-gold catalog-mini-cart__submit" href="{{ url_for('checkout') }}">Submit order</a>
+      <a class="btn btn-outline-gold catalog-mini-cart__review" href="{{ url_for('cart') }}">Review Order</a>
+      <a class="btn btn-gold catalog-mini-cart__submit" href="{{ url_for('checkout') }}">Checkout</a>
     </div>
   </aside>
 

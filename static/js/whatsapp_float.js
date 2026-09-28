@@ -117,16 +117,19 @@
     }
   }
 
+  function resetDefaultPosition() {
+    ['left', 'top', 'right', 'bottom'].forEach(property => bubble.style.removeProperty(property));
+    pendingPosition = null;
+  }
+
   function normalizeInitialPosition() {
     syncBubbleMetrics();
     if (loadSavedPosition()) {
       return;
     }
 
-    // Snap to bottom-right corner on initial load
-    const bottomRightLeft = window.innerWidth - bubbleWidth - 20;
-    const bottomRightTop = window.innerHeight - bubbleHeight - 20;
-    applyPosition(bottomRightLeft, bottomRightTop);
+    // Let the shared CSS reserve space above the order bar until manually moved.
+    resetDefaultPosition();
   }
 
   function beginDrag(event) {
@@ -273,9 +276,7 @@
         }
       } else {
         // If not manually moved, always snap to bottom-right and do not persist.
-        const bottomRightLeft = window.innerWidth - bubbleWidth - 20;
-        const bottomRightTop = window.innerHeight - bubbleHeight - 20;
-        applyPosition(bottomRightLeft, bottomRightTop);
+        resetDefaultPosition();
         clearSavedPosition();
       }
     },

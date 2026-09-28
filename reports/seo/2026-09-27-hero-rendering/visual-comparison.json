@@ -1,0 +1,14 @@
+[
+  {
+    "width": 390,
+    "before_png_sha256": "06f3d027489c65a87fa7a413029f49b5d4572e75f51c1eb314ba0d05c52c9c13",
+    "after_png_sha256": "06f3d027489c65a87fa7a413029f49b5d4572e75f51c1eb314ba0d05c52c9c13",
+    "identical_png_bytes": true
+  },
+  {
+    "width": 1280,
+    "before_png_sha256": "6cbc8db40b89f791b27139102452bdef900905b6b5b664b63ea675cabb5324cc",
+    "after_png_sha256": "6cbc8db40b89f791b27139102452bdef900905b6b5b664b63ea675cabb5324cc",
+    "identical_png_bytes": true
+  }
+]

@@ -1,0 +1,90 @@
+{
+  "checked_at_utc": "2026-09-28T00:38:00Z",
+  "site": "https://californiaearrings.com",
+  "search_console": {
+    "status": "unavailable",
+    "reason": "Current signed-in account showed setup screen; user confirmed Search Console has never been set up. No clicks, impressions, query positions, or indexing reports verified."
+  },
+  "google_crux": {
+    "mobile": "No Data",
+    "desktop": "No Data",
+    "source": "https://pagespeed.web.dev/analysis/https-californiaearrings-com/funh2yhzxm"
+  },
+  "lighthouse": {
+    "captured_at": "2026-09-27 17:34 PDT",
+    "scope": "Homepage; single simulated run per device, not real-user metrics",
+    "mobile": {
+      "performance": 68,
+      "seo": 100,
+      "fcp_seconds": 2.2,
+      "lcp_seconds": 8,
+      "tbt_ms": 60,
+      "cls": 0.019,
+      "speed_index_seconds": 5.9
+    },
+    "desktop": {
+      "performance": 95,
+      "seo": 100,
+      "fcp_seconds": 0.5,
+      "lcp_seconds": 1.2,
+      "tbt_ms": 30,
+      "cls": 0.085,
+      "speed_index_seconds": 1.3
+    }
+  },
+  "cloudflare_rum": {
+    "source": "Authorized Cloudflare GraphQL Analytics API; rumWebVitalsEventsAdaptiveGroups",
+    "start_utc": "2026-09-21T07:37:00Z",
+    "end_exclusive_utc": "2026-09-28T00:38:00Z",
+    "filters": {
+      "requestHost": "californiaearrings.com",
+      "bot": 0,
+      "metric_values": "Nonnegative values selected separately for each metric"
+    },
+    "statistic": "75th percentile",
+    "count_definition": "API count for records matching each metric filter; not unique users. Adaptive dataset counts may be estimates.",
+    "homepage": {
+      "mobile": {
+        "lcp_seconds": 0.744,
+        "lcp_count": 54,
+        "inp_ms": 96,
+        "inp_count": 11,
+        "cls": 0,
+        "cls_count": 1
+      },
+      "desktop": {
+        "lcp_seconds": 2.12,
+        "lcp_count": 22,
+        "inp_ms": 80,
+        "inp_count": 16,
+        "cls": 0.031,
+        "cls_count": 32
+      }
+    },
+    "all_pages": {
+      "mobile": {
+        "lcp_seconds": 0.656,
+        "lcp_count": 90,
+        "inp_ms": 96,
+        "inp_count": 12,
+        "cls": 0,
+        "cls_count": 2
+      },
+      "desktop": {
+        "lcp_seconds": 2.756,
+        "lcp_count": 338,
+        "inp_ms": 80,
+        "inp_count": 20,
+        "cls": 0.006,
+        "cls_count": 339
+      }
+    },
+    "limitations": [
+      "Short observation window",
+      "Very small mobile CLS and INP samples",
+      "Not Google's 28-day CrUX population",
+      "Staff/development visits not separately excluded",
+      "Metrics use different valid-record populations"
+    ]
+  }
+}

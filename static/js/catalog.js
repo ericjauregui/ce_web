@@ -1,12 +1,3 @@
-async function postJson(url, payload) {
-  const response = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload || {}),
-  });
-  return response.json();
-}
-
 const CARD_INTERACTIVE_SELECTOR =
   ".add-to-cart-btn, .product-qty-control, .product-qty-input, .product-detail-link";
 
@@ -190,16 +181,17 @@ async function setCardQtyOnServer(card, nextQty) {
     card.querySelector(".add-to-cart-btn")?.getAttribute("data-code");
   if (!code) return;
 
-  const response = await postJson("/api/cart/set", { code, qty: nextQty });
-  const safeQty = Math.max(0, Math.min(999, Number(nextQty) || 0));
+  const restore = () => setCardQty(card, Number(card.dataset.qty || 0));
+  const safeQty = Math.max(0, Math.min(999, Math.trunc(Number(nextQty) || 0)));
+  if (safeQty === 0 && Number(card.dataset.qty) > 0 && !window.confirm(`Remove ${code} and its notes from your order?`)) { restore(); return; }
+  return CEOrder.run(async () => {
+    const response = await CEOrder.post("/api/cart/set", {code, qty: safeQty});
+    updateCartBadge(response.total_items, response.distinct_items);
+    setCardQty(card, response.qty);
+    setAddButtonLabel(card, response.qty);
+    if (response.qty <= 0) setCardExpanded(card, false);
+  }, restore);
 
-  updateCartBadge(response.total_items || 0, response.distinct_items || 0);
-  setCardQty(card, safeQty);
-  setAddButtonLabel(card, safeQty);
-
-  if (safeQty <= 0) {
-    setCardExpanded(card, false);
-  }
 }
 
 document.addEventListener("click", (event) => {
@@ -432,17 +424,12 @@ document.addEventListener("click", async (event) => {
   if (!card) return;
 
   const code = button.getAttribute("data-code");
-  const currentQty = Number(card.dataset.qty || 0);
-  const nextQty = currentQty + 1;
-  const response = await postJson("/api/cart/add", { code, qty: 1 });
-
-  updateCartBadge(
-    response.total_items || 0,
-    response.distinct_items || 0,
-    true,
-  );
-  setCardQty(card, nextQty);
-  setAddButtonLabel(card, nextQty);
+  await CEOrder.run(async () => {
+    const response = await CEOrder.post("/api/cart/add", {code, qty: 1});
+    updateCartBadge(response.total_items, response.distinct_items, true);
+    setCardQty(card, response.qty);
+    setAddButtonLabel(card, response.qty);
+  });
 });
 
 document.addEventListener("click", async (event) => {
@@ -530,8 +517,6 @@ document.addEventListener("keydown", async (event) => {
   const card = qtyInput.closest(".product-card");
   if (!card) return;
 
-  const nextQty = Math.max(0, Math.min(999, Number(qtyInput.value) || 0));
-  await setCardQtyOnServer(card, nextQty);
   qtyInput.blur();
 });
 

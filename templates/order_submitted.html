@@ -85,7 +85,7 @@ copy and contact us with any follow-up details.{% endblock %}
       <div class="checkout-summary-bar__left"></div>
       <div class="checkout-summary-bar__center">
         <div class="d-flex align-items-center flex-wrap gap-2 checkout-summary-metrics">
-          <div class="text-gold-70" style="font-size: 1rem;">Total Items:<span class="text-gold" style="font-size: 1.1rem; font-weight: bold;">{{ order_rows|length }}</span></div>
+          <div class="text-gold-70" style="font-size: 1rem;">Styles:<span class="text-gold" style="font-size: 1.1rem; font-weight: bold;">{{ order_rows|length }}</span></div>
           <div class="text-gold-70" style="font-size: 1rem;">Total Quantity:<span class="text-gold" style="font-size: 1.1rem; font-weight: bold;">{{ order_rows|sum(attribute='quantity') }}</span></div>
         </div>
       </div>

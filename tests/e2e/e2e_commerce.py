@@ -177,7 +177,7 @@ class CommerceE2ETests(BaseE2ETest):
         self.assertIn("2", self.page.locator(".checkout-summary-metrics").inner_text())
         self.goto("/cart")
         self.page.locator("#clearOrderBtn").click()
-        self.page.get_by_text("Your showcase is waiting.", exact=False).wait_for()
+        self.page.get_by_role("button", name="Undo clear order").wait_for()
         self.assertEqual(self.context.request.get(f"{self.base_url}/api/cart/count").json()["total_items"], 0)
         rejected_note = self._post_json("/api/cart/note", {"code": self.valid_code, "note": "orphan"})
         self.assertEqual(rejected_note.status, 400)

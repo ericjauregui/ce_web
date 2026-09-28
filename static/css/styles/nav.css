@@ -425,3 +425,15 @@ body::-webkit-scrollbar-corner,
 *::-webkit-scrollbar-corner {
   background: rgba(13, 13, 13, 0.95);
 }
+
+@media (max-width: 767.98px) {
+  .navbar .cart-link,
+  .navbar .navbar-toggler,
+  .navbar .nav-search-trigger {
+    min-width: 44px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+}

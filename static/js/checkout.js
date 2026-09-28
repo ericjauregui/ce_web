@@ -865,7 +865,22 @@
   syncCountryKey();
   initializeCheckoutAddressAutocomplete();
 
+  const requiredTextFields = [
+    [document.getElementById('checkoutName'), document.getElementById('checkoutNameError'), 'Please enter your name.'],
+    [document.getElementById('checkoutCompany'), document.getElementById('checkoutCompanyError'), 'Please enter your company name.'],
+  ];
+  function validateRequiredText() {
+    requiredTextFields.forEach(([input, error, message]) => setFieldError(input, error, input.value.trim() ? '' : message));
+  }
+  requiredTextFields.forEach(([input, error, message]) => {
+    input.addEventListener('blur', () => setFieldError(input, error, input.value.trim() ? '' : message));
+    input.addEventListener('input', () => {
+      if (input.getAttribute('aria-invalid') === 'true') setFieldError(input, error, input.value.trim() ? '' : message);
+    });
+  });
+
   form.addEventListener("submit", function (event) {
+    validateRequiredText();
     const requiredFields = form.querySelectorAll("input[required]");
     let missingRequired = false;
     requiredFields.forEach(function (field) {
@@ -893,28 +908,10 @@
       countryComboboxController.close();
       stateComboboxController.close();
 
-      if (!phoneValid) {
-        if (!phoneCountryCodeInput.value.trim()) {
-          phoneCountryInput.focus();
-          return;
-        }
-        phoneInput.focus();
-        return;
-      }
-      if (!cityValid) {
-        cityInput.focus();
-        return;
-      }
-      if (!stateValid) {
-        stateInput.focus();
-        return;
-      }
-      if (!countryValid) {
-        countryInput.focus();
-        return;
-      }
-      if (!emailValid) {
-        emailInput.focus();
+      const firstInvalid = form.querySelector('[aria-invalid="true"]');
+      if (firstInvalid) {
+        firstInvalid.focus({preventScroll: true});
+        firstInvalid.scrollIntoView({block: 'center', behavior: 'instant'});
       }
     }
   });

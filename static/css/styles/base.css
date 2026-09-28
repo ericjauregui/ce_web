@@ -1054,3 +1054,21 @@ body .dbc-button {
     --cta-btn-min-height: 38px;
   }
 }
+
+/* Primary action: shared by product detail and search recovery. */
+.btn-gold {
+  --bs-btn-color: #101010;
+  --bs-btn-bg: var(--gold);
+  --bs-btn-border-color: var(--gold);
+  --bs-btn-hover-color: #101010;
+  --bs-btn-hover-bg: #ead69b;
+  --bs-btn-hover-border-color: #ead69b;
+  --bs-btn-active-color: #101010;
+  --bs-btn-active-bg: #ead69b;
+  --bs-btn-active-border-color: #ead69b;
+  --bs-btn-disabled-color: #101010;
+  --bs-btn-disabled-bg: var(--gold);
+  --bs-btn-disabled-border-color: var(--gold);
+  font-weight: 700;
+}
+.btn-gold:focus-visible { outline: 2px solid #fff0c2; outline-offset: 3px; }

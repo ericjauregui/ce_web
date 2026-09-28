@@ -114,7 +114,7 @@
 {% set current_q = request.args.get('q', '') %}
 <div class="nav-search nav-search-center">
   <button type="button" class="nav-search-trigger" aria-controls="navSearchForm"
-    aria-expanded="false">
+    aria-expanded="false" aria-label="Search Inventory">
     <svg class="nav-search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
       <circle cx="11" cy="11" r="7"></circle>
       <path d="M20 20l-3.5-3.5"></path>
@@ -123,7 +123,7 @@
   </button>
 
   <form id="navSearchForm" class="nav-search-form" action="{{ url_for('index') }}" method="get" role="search">
-    <input class="form-control nav-search-input border-gold" type="search" name="q" placeholder="Search Inventory"
+    <input class="form-control nav-search-input border-gold" type="search" name="q" aria-label="Search Inventory" placeholder="Search Inventory"
       value="{{ current_q }}" autocomplete="off" />
   </form>
 </div>
@@ -225,6 +225,11 @@
   {% endif %}
   {% if request.endpoint != 'site_analytics_dashboard' %}
   <script defer src="{{ asset_url('js/site_analytics.js') }}"></script>
+  {% endif %}
+  {% if request.endpoint in ['index', 'product_detail', 'cart'] %}
+  <div id="orderFeedback" class="order-feedback" role="alert" hidden></div>
+  <div id="orderStatus" class="visually-hidden" role="status" aria-live="polite"></div>
+  <script src="{{ asset_url('js/order_actions.js') }}"></script>
   {% endif %}
   {% block body_end %}{% endblock %}
   <script>
@@ -436,21 +441,25 @@
               let rafId = 0;
 
               function syncNavMetrics() {
-                document.documentElement.style.setProperty("--nav-actual-height", `${Math.max(1, nav.offsetHeight)}px`);
+                const navHeight = Math.max(1, nav.offsetHeight);
 
                 const topRowNodes = [
                   nav.querySelector(".brand-lockup"),
                   nav.querySelector(".nav-actions"),
                 ].filter(Boolean);
 
-                if (!topRowNodes.length) return;
+                let centerOffset = null;
+                if (topRowNodes.length) {
+                  const rowTop = Math.min(...topRowNodes.map((node) => node.getBoundingClientRect().top));
+                  const rowBottom = Math.max(...topRowNodes.map((node) => node.getBoundingClientRect().bottom));
+                  const containerTop = navContainer.getBoundingClientRect().top;
+                  centerOffset = Math.max(1, ((rowTop + rowBottom) / 2) - containerTop);
+                }
 
-                const rowTop = Math.min(...topRowNodes.map((node) => node.getBoundingClientRect().top));
-                const rowBottom = Math.max(...topRowNodes.map((node) => node.getBoundingClientRect().bottom));
-                const containerTop = navContainer.getBoundingClientRect().top;
-                const centerOffset = Math.max(1, ((rowTop + rowBottom) / 2) - containerTop);
-
-                document.documentElement.style.setProperty("--nav-search-top", `${centerOffset}px`);
+                document.documentElement.style.setProperty("--nav-actual-height", `${navHeight}px`);
+                if (centerOffset !== null) {
+                  document.documentElement.style.setProperty("--nav-search-top", `${centerOffset}px`);
+                }
               }
 
               function queueSyncNavMetrics() {

@@ -1,0 +1,2841 @@
+[
+  {
+    "lcp": [],
+    "longtasks": [
+      {
+        "time": 155.10000002384186,
+        "duration": 58
+      },
+      {
+        "time": 248.69999998807907,
+        "duration": 64
+      },
+      {
+        "time": 889.3999999761581,
+        "duration": 85
+      },
+      {
+        "time": 1866.800000011921,
+        "duration": 73
+      }
+    ],
+    "navigation": {
+      "name": "http://127.0.0.1:60437/",
+      "entryType": "navigation",
+      "startTime": 0,
+      "duration": 1937.199999988079,
+      "initiatorType": "navigation",
+      "deliveryType": "",
+      "nextHopProtocol": "http/1.0",
+      "renderBlockingStatus": "non-blocking",
+      "contentEncoding": "",
+      "workerStart": 0,
+      "workerRouterEvaluationStart": 0,
+      "workerCacheLookupStart": 0,
+      "workerMatchedSourceType": "",
+      "workerFinalSourceType": "",
+      "redirectStart": 0,
+      "redirectEnd": 0,
+      "fetchStart": 0.30000001192092896,
+      "domainLookupStart": 0.30000001192092896,
+      "domainLookupEnd": 0.30000001192092896,
+      "connectStart": 0.30000001192092896,
+      "secureConnectionStart": 0,
+      "connectEnd": 0.30000001192092896,
+      "requestStart": 0.8999999761581421,
+      "responseStart": 55,
+      "firstInterimResponseStart": 0,
+      "finalResponseHeadersStart": 55,
+      "responseEnd": 57.80000001192093,
+      "transferSize": 1372197,
+      "encodedBodySize": 1371897,
+      "decodedBodySize": 1371897,
+      "responseStatus": 200,
+      "serverTiming": [],
+      "unloadEventStart": 0,
+      "unloadEventEnd": 0,
+      "domInteractive": 345.39999997615814,
+      "domContentLoadedEventStart": 1869.5,
+      "domContentLoadedEventEnd": 1873.300000011921,
+      "domComplete": 1933.6000000238419,
+      "loadEventStart": 1934.300000011921,
+      "loadEventEnd": 1937.199999988079,
+      "type": "navigate",
+      "redirectCount": 0,
+      "activationStart": 0,
+      "criticalCHRestart": 0,
+      "notRestoredReasons": null,
+      "confidence": {
+        "randomizedTriggerRate": 0.4994798,
+        "value": "high"
+      }
+    },
+    "hero": {
+      "x": 0,
+      "y": 65,
+      "width": 390,
+      "height": 295.78125,
+      "top": 65,
+      "right": 390,
+      "bottom": 360.78125,
+      "left": 0
+    },
+    "resources": [
+      {
+        "url": "/static/optimized/heroes/hero_bg_mobile_compact.png.webp",
+        "start": 78.39999997615814,
+        "end": 86.19999998807907
+      },
+      {
+        "url": "/static/css/styles/inline_reels.css",
+        "start": 79.89999997615814,
+        "end": 93
+      },
+      {
+        "url": "/static/css/styles/home_reels.css",
+        "start": 79.89999997615814,
+        "end": 94.5
+      },
+      {
+        "url": "/static/js/inline_reels.js",
+        "start": 320.89999997615814,
+        "end": 336.80000001192093
+      },
+      {
+        "url": "/static/js/home_reels.js",
+        "start": 321,
+        "end": 337.5
+      },
+      {
+        "url": "/static/reels/posters/v12044gd0000cunr8lvog65v8frvi1h0.MP4.701c276b70f688d7.160.webp",
+        "start": 3452.600000023842,
+        "end": 3463.800000011921
+      },
+      {
+        "url": "/static/reels/posters/v15044gf0000d6b47nfog65hdd6irec0.MP4.f9bf17e80f367c34.160.webp",
+        "start": 3452.600000023842,
+        "end": 3464.699999988079
+      },
+      {
+        "url": "/static/reels/posters/v15044gf0000d1rv5ovog65u4kubpal0.MP4.4531a616f8d7e3f3.160.webp",
+        "start": 3453.399999976158,
+        "end": 3465.399999976158
+      }
+    ],
+    "width": 390,
+    "run": 0,
+    "cpu": 4,
+    "metrics": [
+      {
+        "name": "Timestamp",
+        "value": 278679.859796
+      },
+      {
+        "name": "AudioHandlers",
+        "value": 0
+      },
+      {
+        "name": "AudioWorkletProcessors",
+        "value": 0
+      },
+      {
+        "name": "Documents",
+        "value": 9
+      },
+      {
+        "name": "Frames",
+        "value": 4
+      },
+      {
+        "name": "JSEventListeners",
+        "value": 276
+      },
+      {
+        "name": "LayoutObjects",
+        "value": 5928
+      },
+      {
+        "name": "MediaKeySessions",
+        "value": 0
+      },
+      {
+        "name": "MediaKeys",
+        "value": 0
+      },
+      {
+        "name": "Nodes",
+        "value": 23129
+      },
+      {
+        "name": "Resources",
+        "value": 49
+      },
+      {
+        "name": "ContextLifecycleStateObservers",
+        "value": 72
+      },
+      {
+        "name": "V8PerContextDatas",
+        "value": 4
+      },
+      {
+        "name": "WorkerGlobalScopes",
+        "value": 0
+      },
+      {
+        "name": "UACSSResources",
+        "value": 0
+      },
+      {
+        "name": "RTCPeerConnections",
+        "value": 0
+      },
+      {
+        "name": "ResourceFetchers",
+        "value": 9
+      },
+      {
+        "name": "AdSubframes",
+        "value": 0
+      },
+      {
+        "name": "DetachedScriptStates",
+        "value": 2
+      },
+      {
+        "name": "ArrayBufferContents",
+        "value": 0
+      },
+      {
+        "name": "LayoutCount",
+        "value": 11
+      },
+      {
+        "name": "RecalcStyleCount",
+        "value": 12
+      },
+      {
+        "name": "LayoutDuration",
+        "value": 0.119785
+      },
+      {
+        "name": "RecalcStyleDuration",
+        "value": 0.134858
+      },
+      {
+        "name": "DevToolsCommandDuration",
+        "value": 0.006636
+      },
+      {
+        "name": "ScriptDuration",
+        "value": 0.046866
+      },
+      {
+        "name": "V8CompileDuration",
+        "value": 0.001426
+      },
+      {
+        "name": "TaskDuration",
+        "value": 0.680923
+      },
+      {
+        "name": "TaskOtherDuration",
+        "value": 0.371352
+      },
+      {
+        "name": "ThreadTime",
+        "value": 3.212863
+      },
+      {
+        "name": "ProcessTime",
+        "value": 3.431582
+      },
+      {
+        "name": "JSHeapUsedSize",
+        "value": 2214280
+      },
+      {
+        "name": "JSHeapTotalSize",
+        "value": 3932160
+      },
+      {
+        "name": "FirstMeaningfulPaint",
+        "value": 0
+      },
+      {
+        "name": "DomContentLoaded",
+        "value": 278677.755007
+      },
+      {
+        "name": "NavigationStart",
+        "value": 278675.885411
+      }
+    ]
+  },
+  {
+    "lcp": [
+      {
+        "time": 2444,
+        "url": "http://127.0.0.1:60437/static/optimized/heroes/hero_bg_mobile_compact.png.webp?v=fcac7316addf2dd3",
+        "element": "hero d-flex align-items-center text-center"
+      }
+    ],
+    "longtasks": [
+      {
+        "time": 109.59999996423721,
+        "duration": 89
+      },
+      {
+        "time": 1989.5999999642372,
+        "duration": 67
+      }
+    ],
+    "navigation": {
+      "name": "http://127.0.0.1:60437/",
+      "entryType": "navigation",
+      "startTime": 0,
+      "duration": 2054.800000011921,
+      "initiatorType": "navigation",
+      "deliveryType": "",
+      "nextHopProtocol": "http/1.0",
+      "renderBlockingStatus": "non-blocking",
+      "contentEncoding": "",
+      "workerStart": 0,
+      "workerRouterEvaluationStart": 0,
+      "workerCacheLookupStart": 0,
+      "workerMatchedSourceType": "",
+      "workerFinalSourceType": "",
+      "redirectStart": 0,
+      "redirectEnd": 0,
+      "fetchStart": 0.5999999642372131,
+      "domainLookupStart": 0.5999999642372131,
+      "domainLookupEnd": 0.5999999642372131,
+      "connectStart": 0.5999999642372131,
+      "secureConnectionStart": 0,
+      "connectEnd": 0.5999999642372131,
+      "requestStart": 0.8999999761581421,
+      "responseStart": 36.5,
+      "firstInterimResponseStart": 0,
+      "finalResponseHeadersStart": 36.5,
+      "responseEnd": 37.09999996423721,
+      "transferSize": 1372117,
+      "encodedBodySize": 1371817,
+      "decodedBodySize": 1371817,
+      "responseStatus": 200,
+      "serverTiming": [],
+      "unloadEventStart": 0,
+      "unloadEventEnd": 0,
+      "domInteractive": 353.19999998807907,
+      "domContentLoadedEventStart": 1992.5,
+      "domContentLoadedEventEnd": 1996.5999999642372,
+      "domComplete": 2051.399999976158,
+      "loadEventStart": 2051.5,
+      "loadEventEnd": 2054.800000011921,
+      "type": "navigate",
+      "redirectCount": 0,
+      "activationStart": 0,
+      "criticalCHRestart": 0,
+      "notRestoredReasons": null,
+      "confidence": {
+        "randomizedTriggerRate": 0.4994798,
+        "value": "high"
+      }
+    },
+    "hero": {
+      "x": 0,
+      "y": 65,
+      "width": 390,
+      "height": 295.78125,
+      "top": 65,
+      "right": 390,
+      "bottom": 360.78125,
+      "left": 0
+    },
+    "resources": [
+      {
+        "url": "/static/optimized/heroes/hero_bg_mobile_compact.png.webp",
+        "start": 59.30000001192093,
+        "end": 75
+      },
+      {
+        "url": "/static/css/styles/inline_reels.css",
+        "start": 60.69999998807907,
+        "end": 81.80000001192093
+      },
+      {
+        "url": "/static/css/styles/home_reels.css",
+        "start": 60.69999998807907,
+        "end": 82.69999998807907
+      },
+      {
+        "url": "/static/js/inline_reels.js",
+        "start": 334.19999998807907,
+        "end": 337.39999997615814
+      },
+      {
+        "url": "/static/js/home_reels.js",
+        "start": 334.19999998807907,
+        "end": 338.5999999642372
+      },
+      {
+        "url": "/static/reels/posters/v15044gf0000d50r7qnog65r95ovpn70.MP4.306913a44cbf8141.160.webp",
+        "start": 2473.300000011921,
+        "end": 2478.399999976158
+      },
+      {
+        "url": "/static/reels/posters/v15044gf0000d45r0vfog65i6q1gvahg.MP4.f016da2c67fcd44f.160.webp",
+        "start": 2473.300000011921,
+        "end": 2481.899999976158
+      },
+      {
+        "url": "/static/reels/posters/v15044gf0000d0j2hnnog65tq17pmop0.MP4.6f5a4bdbec819b53.160.webp",
+        "start": 2473.300000011921,
+        "end": 2483.099999964237
+      },
+      {
+        "url": "/static/reels/v15044gf0000d50r7qnog65r95ovpn70.MP4",
+        "start": 2497.399999976158,
+        "end": 2512.599999964237
+      }
+    ],
+    "width": 390,
+    "run": 1,
+    "cpu": 4,
+    "metrics": [
+      {
+        "name": "Timestamp",
+        "value": 278685.612164
+      },
+      {
+        "name": "AudioHandlers",
+        "value": 0
+      },
+      {
+        "name": "AudioWorkletProcessors",
+        "value": 0
+      },
+      {
+        "name": "Documents",
+        "value": 4
+      },
+      {
+        "name": "Frames",
+        "value": 4
+      },
+      {
+        "name": "JSEventListeners",
+        "value": 266
+      },
+      {
+        "name": "LayoutObjects",
+        "value": 5199
+      },
+      {
+        "name": "MediaKeySessions",
+        "value": 0
+      },
+      {
+        "name": "MediaKeys",
+        "value": 0
+      },
+      {
+        "name": "Nodes",
+        "value": 23036
+      },
+      {
+        "name": "Resources",
+        "value": 44
+      },
+      {
+        "name": "ContextLifecycleStateObservers",
+        "value": 65
+      },
+      {
+        "name": "V8PerContextDatas",
+        "value": 2
+      },
+      {
+        "name": "WorkerGlobalScopes",
+        "value": 0
+      },
+      {
+        "name": "UACSSResources",
+        "value": 0
+      },
+      {
+        "name": "RTCPeerConnections",
+        "value": 0
+      },
+      {
+        "name": "ResourceFetchers",
+        "value": 4
+      },
+      {
+        "name": "AdSubframes",
+        "value": 0
+      },
+      {
+        "name": "DetachedScriptStates",
+        "value": 2
+      },
+      {
+        "name": "ArrayBufferContents",
+        "value": 0
+      },
+      {
+        "name": "LayoutCount",
+        "value": 15
+      },
+      {
+        "name": "RecalcStyleCount",
+        "value": 22
+      },
+      {
+        "name": "LayoutDuration",
+        "value": 0.122775
+      },
+      {
+        "name": "RecalcStyleDuration",
+        "value": 0.13417
+      },
+      {
+        "name": "DevToolsCommandDuration",
+        "value": 0.004954
+      },
+      {
+        "name": "ScriptDuration",
+        "value": 0.054578
+      },
+      {
+        "name": "V8CompileDuration",
+        "value": 0.000629
+      },
+      {
+        "name": "TaskDuration",
+        "value": 0.64331
+      },
+      {
+        "name": "TaskOtherDuration",
+        "value": 0.326204
+      },
+      {
+        "name": "ThreadTime",
+        "value": 3.309756
+      },
+      {
+        "name": "ProcessTime",
+        "value": 3.561449
+      },
+      {
+        "name": "JSHeapUsedSize",
+        "value": 1508468
+      },
+      {
+        "name": "JSHeapTotalSize",
+        "value": 3145728
+      },
+      {
+        "name": "FirstMeaningfulPaint",
+        "value": 278683.954096
+      },
+      {
+        "name": "DomContentLoaded",
+        "value": 278683.504302
+      },
+      {
+        "name": "NavigationStart",
+        "value": 278681.511758
+      }
+    ]
+  },
+  {
+    "lcp": [
+      {
+        "time": 452,
+        "url": "http://127.0.0.1:60437/static/optimized/heroes/hero_bg_mobile_compact.png.webp?v=fcac7316addf2dd3",
+        "element": "hero d-flex align-items-center text-center"
+      }
+    ],
+    "longtasks": [
+      {
+        "time": 92.5,
+        "duration": 108
+      },
+      {
+        "time": 213.69999998807907,
+        "duration": 55
+      },
+      {
+        "time": 439.30000001192093,
+        "duration": 67
+      },
+      {
+        "time": 1745.1000000238419,
+        "duration": 61
+      }
+    ],
+    "navigation": {
+      "name": "http://127.0.0.1:60437/",
+      "entryType": "navigation",
+      "startTime": 0,
+      "duration": 1804.6000000238419,
+      "initiatorType": "navigation",
+      "deliveryType": "",
+      "nextHopProtocol": "http/1.0",
+      "renderBlockingStatus": "non-blocking",
+      "contentEncoding": "",
+      "workerStart": 0,
+      "workerRouterEvaluationStart": 0,
+      "workerCacheLookupStart": 0,
+      "workerMatchedSourceType": "",
+      "workerFinalSourceType": "",
+      "redirectStart": 0,
+      "redirectEnd": 0,
+      "fetchStart": 0.40000003576278687,
+      "domainLookupStart": 0.40000003576278687,
+      "domainLookupEnd": 0.40000003576278687,
+      "connectStart": 0.40000003576278687,
+      "secureConnectionStart": 0,
+      "connectEnd": 0.40000003576278687,
+      "requestStart": 0.800000011920929,
+      "responseStart": 31.900000035762787,
+      "firstInterimResponseStart": 0,
+      "finalResponseHeadersStart": 31.900000035762787,
+      "responseEnd": 32.5,
+      "transferSize": 1372197,
+      "encodedBodySize": 1371897,
+      "decodedBodySize": 1371897,
+      "responseStatus": 200,
+      "serverTiming": [],
+      "unloadEventStart": 0,
+      "unloadEventEnd": 0,
+      "domInteractive": 329.30000001192093,
+      "domContentLoadedEventStart": 1747.699999988079,
+      "domContentLoadedEventEnd": 1751.5,
+      "domComplete": 1801.9000000357628,
+      "loadEventStart": 1802,
+      "loadEventEnd": 1804.6000000238419,
+      "type": "navigate",
+      "redirectCount": 0,
+      "activationStart": 0,
+      "criticalCHRestart": 0,
+      "notRestoredReasons": null,
+      "confidence": {
+        "randomizedTriggerRate": 0.4994798,
+        "value": "high"
+      }
+    },
+    "hero": {
+      "x": 0,
+      "y": 65,
+      "width": 390,
+      "height": 295.78125,
+      "top": 65,
+      "right": 390,
+      "bottom": 360.78125,
+      "left": 0
+    },
+    "resources": [
+      {
+        "url": "/static/optimized/heroes/hero_bg_mobile_compact.png.webp",
+        "start": 48.30000001192093,
+        "end": 53.69999998807907
+      },
+      {
+        "url": "/static/css/styles/inline_reels.css",
+        "start": 48.5,
+        "end": 61.69999998807907
+      },
+      {
+        "url": "/static/css/styles/home_reels.css",
+        "start": 48.5,
+        "end": 63.10000002384186
+      },
+      {
+        "url": "/static/js/inline_reels.js",
+        "start": 292.5,
+        "end": 297.60000002384186
+      },
+      {
+        "url": "/static/js/home_reels.js",
+        "start": 292.5,
+        "end": 298.5
+      },
+      {
+        "url": "/static/reels/posters/v15044gf0000d1rv5ovog65u4kubpal0.MP4.4531a616f8d7e3f3.160.webp",
+        "start": 1845.199999988079,
+        "end": 1847.699999988079
+      },
+      {
+        "url": "/static/reels/posters/v15044gf0000d1cst1fog65mdcljpo0g.MP4.e937a76bc9c99666.160.webp",
+        "start": 1845.800000011921,
+        "end": 1848.9000000357628
+      },
+      {
+        "url": "/static/reels/v15044gf0000d2025s7og65i88e78l00.MP4",
+        "start": 1881.199999988079,
+        "end": 1883.199999988079
+      }
+    ],
+    "width": 390,
+    "run": 2,
+    "cpu": 4,
+    "metrics": [
+      {
+        "name": "Timestamp",
+        "value": 278689.922944
+      },
+      {
+        "name": "AudioHandlers",
+        "value": 0
+      },
+      {
+        "name": "AudioWorkletProcessors",
+        "value": 0
+      },
+      {
+        "name": "Documents",
+        "value": 4
+      },
+      {
+        "name": "Frames",
+        "value": 4
+      },
+      {
+        "name": "JSEventListeners",
+        "value": 268
+      },
+      {
+        "name": "LayoutObjects",
+        "value": 5199
+      },
+      {
+        "name": "MediaKeySessions",
+        "value": 0
+      },
+      {
+        "name": "MediaKeys",
+        "value": 0
+      },
+      {
+        "name": "Nodes",
+        "value": 23035
+      },
+      {
+        "name": "Resources",
+        "value": 45
+      },
+      {
+        "name": "ContextLifecycleStateObservers",
+        "value": 65
+      },
+      {
+        "name": "V8PerContextDatas",
+        "value": 2
+      },
+      {
+        "name": "WorkerGlobalScopes",
+        "value": 0
+      },
+      {
+        "name": "UACSSResources",
+        "value": 0
+      },
+      {
+        "name": "RTCPeerConnections",
+        "value": 0
+      },
+      {
+        "name": "ResourceFetchers",
+        "value": 4
+      },
+      {
+        "name": "AdSubframes",
+        "value": 0
+      },
+      {
+        "name": "DetachedScriptStates",
+        "value": 2
+      },
+      {
+        "name": "ArrayBufferContents",
+        "value": 0
+      },
+      {
+        "name": "LayoutCount",
+        "value": 15
+      },
+      {
+        "name": "RecalcStyleCount",
+        "value": 173
+      },
+      {
+        "name": "LayoutDuration",
+        "value": 0.131816
+      },
+      {
+        "name": "RecalcStyleDuration",
+        "value": 0.157841
+      },
+      {
+        "name": "DevToolsCommandDuration",
+        "value": 0.006099
+      },
+      {
+        "name": "ScriptDuration",
+        "value": 0.045678
+      },
+      {
+        "name": "V8CompileDuration",
+        "value": 0.001674
+      },
+      {
+        "name": "TaskDuration",
+        "value": 1.081466
+      },
+      {
+        "name": "TaskOtherDuration",
+        "value": 0.738358
+      },
+      {
+        "name": "ThreadTime",
+        "value": 3.277032
+      },
+      {
+        "name": "ProcessTime",
+        "value": 3.546847
+      },
+      {
+        "name": "JSHeapUsedSize",
+        "value": 1516132
+      },
+      {
+        "name": "JSHeapTotalSize",
+        "value": 3145728
+      },
+      {
+        "name": "FirstMeaningfulPaint",
+        "value": 278686.46249
+      },
+      {
+        "name": "DomContentLoaded",
+        "value": 278687.759843
+      },
+      {
+        "name": "NavigationStart",
+        "value": 278686.012197
+      }
+    ]
+  },
+  {
+    "lcp": [
+      {
+        "time": 560,
+        "url": "http://127.0.0.1:60437/static/optimized/heroes/hero_bg_mobile_compact.png.webp?v=fcac7316addf2dd3",
+        "element": "hero d-flex align-items-center text-center"
+      }
+    ],
+    "longtasks": [
+      {
+        "time": 101.5,
+        "duration": 55
+      },
+      {
+        "time": 548.1999999880791,
+        "duration": 62
+      },
+      {
+        "time": 1717.6000000238419,
+        "duration": 58
+      }
+    ],
+    "navigation": {
+      "name": "http://127.0.0.1:60437/",
+      "entryType": "navigation",
+      "startTime": 0,
+      "duration": 1774.1000000238419,
+      "initiatorType": "navigation",
+      "deliveryType": "",
+      "nextHopProtocol": "http/1.0",
+      "renderBlockingStatus": "non-blocking",
+      "contentEncoding": "",
+      "workerStart": 0,
+      "workerRouterEvaluationStart": 0,
+      "workerCacheLookupStart": 0,
+      "workerMatchedSourceType": "",
+      "workerFinalSourceType": "",
+      "redirectStart": 0,
+      "redirectEnd": 0,
+      "fetchStart": 0.19999998807907104,
+      "domainLookupStart": 0.19999998807907104,
+      "domainLookupEnd": 0.19999998807907104,
+      "connectStart": 0.19999998807907104,
+      "secureConnectionStart": 0,
+      "connectEnd": 0.19999998807907104,
+      "requestStart": 0.800000011920929,
+      "responseStart": 37.19999998807907,
+      "firstInterimResponseStart": 0,
+      "finalResponseHeadersStart": 37.19999998807907,
+      "responseEnd": 40.19999998807907,
+      "transferSize": 1372197,
+      "encodedBodySize": 1371897,
+      "decodedBodySize": 1371897,
+      "responseStatus": 200,
+      "serverTiming": [],
+      "unloadEventStart": 0,
+      "unloadEventEnd": 0,
+      "domInteractive": 328.69999998807907,
+      "domContentLoadedEventStart": 1719.8999999761581,
+      "domContentLoadedEventEnd": 1722.300000011921,
+      "domComplete": 1772.1000000238419,
+      "loadEventStart": 1772.1000000238419,
+      "loadEventEnd": 1774.1000000238419,
+      "type": "navigate",
+      "redirectCount": 0,
+      "activationStart": 0,
+      "criticalCHRestart": 0,
+      "notRestoredReasons": null,
+      "confidence": {
+        "randomizedTriggerRate": 0.4994798,
+        "value": "high"
+      }
+    },
+    "hero": {
+      "x": 0,
+      "y": 65,
+      "width": 390,
+      "height": 295.78125,
+      "top": 65,
+      "right": 390,
+      "bottom": 360.78125,
+      "left": 0
+    },
+    "resources": [
+      {
+        "url": "/static/optimized/heroes/hero_bg_mobile_compact.png.webp",
+        "start": 64.10000002384186,
+        "end": 73.69999998807907
+      },
+      {
+        "url": "/static/css/styles/inline_reels.css",
+        "start": 65.19999998807907,
+        "end": 79
+      },
+      {
+        "url": "/static/css/styles/home_reels.css",
+        "start": 65.19999998807907,
+        "end": 79.69999998807907
+      },
+      {
+        "url": "/static/js/inline_reels.js",
+        "start": 288.10000002384186,
+        "end": 296.60000002384186
+      },
+      {
+        "url": "/static/js/home_reels.js",
+        "start": 288.19999998807907,
+        "end": 297.69999998807907
+      },
+      {
+        "url": "/static/reels/posters/v12044gd0000cuifp3nog65rafeal6g0.MP4.36933178b86a2fba.160.webp",
+        "start": 1816.199999988079,
+        "end": 1818.1000000238419
+      },
+      {
+        "url": "/static/reels/posters/v15044gf0000d45r0vfog65i6q1gvahg.MP4.f016da2c67fcd44f.160.webp",
+        "start": 1816.699999988079,
+        "end": 1820
+      },
+      {
+        "url": "/static/reels/v12044gd0000cvrai5vog65kn7hsruq0.MP4",
+        "start": 1840.199999988079,
+        "end": 1843.5
+      }
+    ],
+    "width": 390,
+    "run": 3,
+    "cpu": 4,
+    "metrics": [
+      {
+        "name": "Timestamp",
+        "value": 278693.972288
+      },
+      {
+        "name": "AudioHandlers",
+        "value": 0
+      },
+      {
+        "name": "AudioWorkletProcessors",
+        "value": 0
+      },
+      {
+        "name": "Documents",
+        "value": 4
+      },
+      {
+        "name": "Frames",
+        "value": 4
+      },
+      {
+        "name": "JSEventListeners",
+        "value": 277
+      },
+      {
+        "name": "LayoutObjects",
+        "value": 5574
+      },
+      {
+        "name": "MediaKeySessions",
+        "value": 0
+      },
+      {
+        "name": "MediaKeys",
+        "value": 0
+      },
+      {
+        "name": "Nodes",
+        "value": 23067
+      },
+      {
+        "name": "Resources",
+        "value": 48
+      },
+      {
+        "name": "ContextLifecycleStateObservers",
+        "value": 65
+      },
+      {
+        "name": "V8PerContextDatas",
+        "value": 2
+      },
+      {
+        "name": "WorkerGlobalScopes",
+        "value": 0
+      },
+      {
+        "name": "UACSSResources",
+        "value": 0
+      },
+      {
+        "name": "RTCPeerConnections",
+        "value": 0
+      },
+      {
+        "name": "ResourceFetchers",
+        "value": 4
+      },
+      {
+        "name": "AdSubframes",
+        "value": 0
+      },
+      {
+        "name": "DetachedScriptStates",
+        "value": 2
+      },
+      {
+        "name": "ArrayBufferContents",
+        "value": 0
+      },
+      {
+        "name": "LayoutCount",
+        "value": 19
+      },
+      {
+        "name": "RecalcStyleCount",
+        "value": 206
+      },
+      {
+        "name": "LayoutDuration",
+        "value": 0.109122
+      },
+      {
+        "name": "RecalcStyleDuration",
+        "value": 0.164588
+      },
+      {
+        "name": "DevToolsCommandDuration",
+        "value": 0.006064
+      },
+      {
+        "name": "ScriptDuration",
+        "value": 0.042605
+      },
+      {
+        "name": "V8CompileDuration",
+        "value": 0.000761
+      },
+      {
+        "name": "TaskDuration",
+        "value": 1.19712
+      },
+      {
+        "name": "TaskOtherDuration",
+        "value": 0.87398
+      },
+      {
+        "name": "ThreadTime",
+        "value": 3.247407
+      },
+      {
+        "name": "ProcessTime",
+        "value": 3.533117
+      },
+      {
+        "name": "JSHeapUsedSize",
+        "value": 1659440
+      },
+      {
+        "name": "JSHeapTotalSize",
+        "value": 3670016
+      },
+      {
+        "name": "FirstMeaningfulPaint",
+        "value": 278690.870803
+      },
+      {
+        "name": "DomContentLoaded",
+        "value": 278691.86535
+      },
+      {
+        "name": "NavigationStart",
+        "value": 278690.145501
+      }
+    ]
+  },
+  {
+    "lcp": [
+      {
+        "time": 332,
+        "url": "http://127.0.0.1:60437/static/optimized/heroes/hero_bg_mobile_compact.png.webp?v=fcac7316addf2dd3",
+        "element": "hero d-flex align-items-center text-center"
+      }
+    ],
+    "longtasks": [
+      {
+        "time": 200.4000000357628,
+        "duration": 61
+      },
+      {
+        "time": 372.4000000357628,
+        "duration": 63
+      },
+      {
+        "time": 1815.1000000238419,
+        "duration": 67
+      }
+    ],
+    "navigation": {
+      "name": "http://127.0.0.1:60437/",
+      "entryType": "navigation",
+      "startTime": 0,
+      "duration": 1879.800000011921,
+      "initiatorType": "navigation",
+      "deliveryType": "",
+      "nextHopProtocol": "http/1.0",
+      "renderBlockingStatus": "non-blocking",
+      "contentEncoding": "",
+      "workerStart": 0,
+      "workerRouterEvaluationStart": 0,
+      "workerCacheLookupStart": 0,
+      "workerMatchedSourceType": "",
+      "workerFinalSourceType": "",
+      "redirectStart": 0,
+      "redirectEnd": 0,
+      "fetchStart": 0.20000004768371582,
+      "domainLookupStart": 0.20000004768371582,
+      "domainLookupEnd": 0.20000004768371582,
+      "connectStart": 0.20000004768371582,
+      "secureConnectionStart": 0,
+      "connectEnd": 0.20000004768371582,
+      "requestStart": 0.800000011920929,
+      "responseStart": 35,
+      "firstInterimResponseStart": 0,
+      "finalResponseHeadersStart": 35,
+      "responseEnd": 35.60000002384186,
+      "transferSize": 1372197,
+      "encodedBodySize": 1371897,
+      "decodedBodySize": 1371897,
+      "responseStatus": 200,
+      "serverTiming": [],
+      "unloadEventStart": 0,
+      "unloadEventEnd": 0,
+      "domInteractive": 365.9000000357628,
+      "domContentLoadedEventStart": 1818,
+      "domContentLoadedEventEnd": 1821.1000000238419,
+      "domComplete": 1876.800000011921,
+      "loadEventStart": 1876.9000000357628,
+      "loadEventEnd": 1879.800000011921,
+      "type": "navigate",
+      "redirectCount": 0,
+      "activationStart": 0,
+      "criticalCHRestart": 0,
+      "notRestoredReasons": null,
+      "confidence": {
+        "randomizedTriggerRate": 0.4994798,
+        "value": "high"
+      }
+    },
+    "hero": {
+      "x": 0,
+      "y": 65,
+      "width": 390,
+      "height": 295.78125,
+      "top": 65,
+      "right": 390,
+      "bottom": 360.78125,
+      "left": 0
+    },
+    "resources": [
+      {
+        "url": "/static/optimized/heroes/hero_bg_mobile_compact.png.webp",
+        "start": 57.5,
+        "end": 63.40000003576279
+      },
+      {
+        "url": "/static/css/styles/inline_reels.css",
+        "start": 58.200000047683716,
+        "end": 71.40000003576279
+      },
+      {
+        "url": "/static/css/styles/home_reels.css",
+        "start": 58.200000047683716,
+        "end": 72.70000004768372
+      },
+      {
+        "url": "/static/js/inline_reels.js",
+        "start": 333.5,
+        "end": 339.4000000357628
+      },
+      {
+        "url": "/static/js/home_reels.js",
+        "start": 333.5,
+        "end": 340.4000000357628
+      },
+      {
+        "url": "/static/reels/posters/v15044gf0000d6b47nfog65hdd6irec0.MP4.f9bf17e80f367c34.160.webp",
+        "start": 1926.300000011921,
+        "end": 1929.7000000476837
+      },
+      {
+        "url": "/static/reels/posters/v15044gf0000d5juq57og65o4t1hugpg.MP4.e3a333e75abd660e.160.webp",
+        "start": 1926.300000011921,
+        "end": 1930.9000000357628
+      },
+      {
+        "url": "/static/reels/v12044gd0000cumetknog65rafathfn0.MP4",
+        "start": 1947,
+        "end": 1949.300000011921
+      }
+    ],
+    "width": 390,
+    "run": 4,
+    "cpu": 4,
+    "metrics": [
+      {
+        "name": "Timestamp",
+        "value": 278698.138428
+      },
+      {
+        "name": "AudioHandlers",
+        "value": 0
+      },
+      {
+        "name": "AudioWorkletProcessors",
+        "value": 0
+      },
+      {
+        "name": "Documents",
+        "value": 4
+      },
+      {
+        "name": "Frames",
+        "value": 4
+      },
+      {
+        "name": "JSEventListeners",
+        "value": 281
+      },
+      {
+        "name": "LayoutObjects",
+        "value": 5598
+      },
+      {
+        "name": "MediaKeySessions",
+        "value": 0
+      },
+      {
+        "name": "MediaKeys",
+        "value": 0
+      },
+      {
+        "name": "Nodes",
+        "value": 23069
+      },
+      {
+        "name": "Resources",
+        "value": 48
+      },
+      {
+        "name": "ContextLifecycleStateObservers",
+        "value": 65
+      },
+      {
+        "name": "V8PerContextDatas",
+        "value": 2
+      },
+      {
+        "name": "WorkerGlobalScopes",
+        "value": 0
+      },
+      {
+        "name": "UACSSResources",
+        "value": 0
+      },
+      {
+        "name": "RTCPeerConnections",
+        "value": 0
+      },
+      {
+        "name": "ResourceFetchers",
+        "value": 4
+      },
+      {
+        "name": "AdSubframes",
+        "value": 0
+      },
+      {
+        "name": "DetachedScriptStates",
+        "value": 2
+      },
+      {
+        "name": "ArrayBufferContents",
+        "value": 0
+      },
+      {
+        "name": "LayoutCount",
+        "value": 20
+      },
+      {
+        "name": "RecalcStyleCount",
+        "value": 219
+      },
+      {
+        "name": "LayoutDuration",
+        "value": 0.120568
+      },
+      {
+        "name": "RecalcStyleDuration",
+        "value": 0.176541
+      },
+      {
+        "name": "DevToolsCommandDuration",
+        "value": 0.006734
+      },
+      {
+        "name": "ScriptDuration",
+        "value": 0.04777
+      },
+      {
+        "name": "V8CompileDuration",
+        "value": 0.000903
+      },
+      {
+        "name": "TaskDuration",
+        "value": 1.205777
+      },
+      {
+        "name": "TaskOtherDuration",
+        "value": 0.853261
+      },
+      {
+        "name": "ThreadTime",
+        "value": 3.335095
+      },
+      {
+        "name": "ProcessTime",
+        "value": 3.62834
+      },
+      {
+        "name": "JSHeapUsedSize",
+        "value": 1676720
+      },
+      {
+        "name": "JSHeapTotalSize",
+        "value": 3670016
+      },
+      {
+        "name": "FirstMeaningfulPaint",
+        "value": 278694.529126
+      },
+      {
+        "name": "DomContentLoaded",
+        "value": 278696.015879
+      },
+      {
+        "name": "NavigationStart",
+        "value": 278694.197844
+      }
+    ]
+  },
+  {
+    "lcp": [
+      {
+        "time": 896,
+        "url": "http://127.0.0.1:60437/static/optimized/heroes/hero_bg_wide.png.webp?v=3e1734dbcf640aaf",
+        "element": "hero d-flex align-items-center text-center"
+      }
+    ],
+    "longtasks": [
+      {
+        "time": 198.39999997615814,
+        "duration": 61
+      },
+      {
+        "time": 355.89999997615814,
+        "duration": 81
+      },
+      {
+        "time": 1714.5,
+        "duration": 60
+      }
+    ],
+    "navigation": {
+      "name": "http://127.0.0.1:60437/",
+      "entryType": "navigation",
+      "startTime": 0,
+      "duration": 1772.6000000238419,
+      "initiatorType": "navigation",
+      "deliveryType": "",
+      "nextHopProtocol": "http/1.0",
+      "renderBlockingStatus": "non-blocking",
+      "contentEncoding": "",
+      "workerStart": 0,
+      "workerRouterEvaluationStart": 0,
+      "workerCacheLookupStart": 0,
+      "workerMatchedSourceType": "",
+      "workerFinalSourceType": "",
+      "redirectStart": 0,
+      "redirectEnd": 0,
+      "fetchStart": 0.10000002384185791,
+      "domainLookupStart": 0.10000002384185791,
+      "domainLookupEnd": 0.10000002384185791,
+      "connectStart": 0.10000002384185791,
+      "secureConnectionStart": 0,
+      "connectEnd": 0.10000002384185791,
+      "requestStart": 0.6000000238418579,
+      "responseStart": 31.5,
+      "firstInterimResponseStart": 0,
+      "finalResponseHeadersStart": 31.5,
+      "responseEnd": 32.19999998807907,
+      "transferSize": 1372117,
+      "encodedBodySize": 1371817,
+      "decodedBodySize": 1371817,
+      "responseStatus": 200,
+      "serverTiming": [],
+      "unloadEventStart": 0,
+      "unloadEventEnd": 0,
+      "domInteractive": 312.80000001192093,
+      "domContentLoadedEventStart": 1717.1000000238419,
+      "domContentLoadedEventEnd": 1720,
+      "domComplete": 1770.5,
+      "loadEventStart": 1770.5,
+      "loadEventEnd": 1772.6000000238419,
+      "type": "navigate",
+      "redirectCount": 0,
+      "activationStart": 0,
+      "criticalCHRestart": 0,
+      "notRestoredReasons": null,
+      "confidence": {
+        "randomizedTriggerRate": 0.4994798,
+        "value": "high"
+      }
+    },
+    "hero": {
+      "x": 0,
+      "y": 77,
+      "width": 1280,
+      "height": 448.984375,
+      "top": 77,
+      "right": 1280,
+      "bottom": 525.984375,
+      "left": 0
+    },
+    "resources": [
+      {
+        "url": "/static/optimized/heroes/hero_bg_wide.png.webp",
+        "start": 55,
+        "end": 60.30000001192093
+      },
+      {
+        "url": "/static/css/styles/inline_reels.css",
+        "start": 56.30000001192093,
+        "end": 67.69999998807907
+      },
+      {
+        "url": "/static/css/styles/home_reels.css",
+        "start": 56.30000001192093,
+        "end": 68.39999997615814
+      },
+      {
+        "url": "/static/js/inline_reels.js",
+        "start": 281.10000002384186,
+        "end": 286.5
+      },
+      {
+        "url": "/static/js/home_reels.js",
+        "start": 281.80000001192093,
+        "end": 293
+      },
+      {
+        "url": "/static/reels/posters/v12044gd0000culp7p7og65rmhnq69hg.MP4.e731437f402c90ae.320.webp",
+        "start": 1895.800000011921,
+        "end": 1898.6000000238419
+      },
+      {
+        "url": "/static/reels/posters/v15044gf0000d201pa7og65gk4t9v8c0.MP4.07b52fe82623e81b.320.webp",
+        "start": 1895.800000011921,
+        "end": 1900.199999988079
+      },
+      {
+        "url": "/static/reels/posters/v12044gd0000cv31ff7og65v4aj4vg8g.MP4.da1f97a14410ce44.320.webp",
+        "start": 1895.800000011921,
+        "end": 1901.199999988079
+      },
+      {
+        "url": "/static/reels/posters/owner-welcome-v2.mp4.a0a4f8c70ee55ee5.320.webp",
+        "start": 1895.8999999761581,
+        "end": 1902.5
+      },
+      {
+        "url": "/static/reels/posters/v15044gf0000d28k8pnog65o08bn9iug.MP4.96d5b318817abdda.320.webp",
+        "start": 1895.8999999761581,
+        "end": 1903.5
+      },
+      {
+        "url": "/static/reels/posters/v12044gd0000cvdk3hfog65urc6s4vug.MP4.ce2857e7ac70be92.320.webp",
+        "start": 1895.8999999761581,
+        "end": 1904.5
+      },
+      {
+        "url": "/static/reels/v12044gd0000culp7p7og65rmhnq69hg.MP4",
+        "start": 2017,
+        "end": 2021.6000000238419
+      }
+    ],
+    "width": 1280,
+    "run": 0,
+    "cpu": 4,
+    "metrics": [
+      {
+        "name": "Timestamp",
+        "value": 278702.715947
+      },
+      {
+        "name": "AudioHandlers",
+        "value": 0
+      },
+      {
+        "name": "AudioWorkletProcessors",
+        "value": 0
+      },
+      {
+        "name": "Documents",
+        "value": 4
+      },
+      {
+        "name": "Frames",
+        "value": 4
+      },
+      {
+        "name": "JSEventListeners",
+        "value": 282
+      },
+      {
+        "name": "LayoutObjects",
+        "value": 5600
+      },
+      {
+        "name": "MediaKeySessions",
+        "value": 0
+      },
+      {
+        "name": "MediaKeys",
+        "value": 0
+      },
+      {
+        "name": "Nodes",
+        "value": 23079
+      },
+      {
+        "name": "Resources",
+        "value": 56
+      },
+      {
+        "name": "ContextLifecycleStateObservers",
+        "value": 65
+      },
+      {
+        "name": "V8PerContextDatas",
+        "value": 2
+      },
+      {
+        "name": "WorkerGlobalScopes",
+        "value": 0
+      },
+      {
+        "name": "UACSSResources",
+        "value": 0
+      },
+      {
+        "name": "RTCPeerConnections",
+        "value": 0
+      },
+      {
+        "name": "ResourceFetchers",
+        "value": 4
+      },
+      {
+        "name": "AdSubframes",
+        "value": 0
+      },
+      {
+        "name": "DetachedScriptStates",
+        "value": 2
+      },
+      {
+        "name": "ArrayBufferContents",
+        "value": 0
+      },
+      {
+        "name": "LayoutCount",
+        "value": 13
+      },
+      {
+        "name": "RecalcStyleCount",
+        "value": 26
+      },
+      {
+        "name": "LayoutDuration",
+        "value": 0.112947
+      },
+      {
+        "name": "RecalcStyleDuration",
+        "value": 0.134352
+      },
+      {
+        "name": "DevToolsCommandDuration",
+        "value": 0.005211
+      },
+      {
+        "name": "ScriptDuration",
+        "value": 0.048676
+      },
+      {
+        "name": "V8CompileDuration",
+        "value": 0.001105
+      },
+      {
+        "name": "TaskDuration",
+        "value": 0.742011
+      },
+      {
+        "name": "TaskOtherDuration",
+        "value": 0.43972
+      },
+      {
+        "name": "ThreadTime",
+        "value": 3.075646
+      },
+      {
+        "name": "ProcessTime",
+        "value": 3.328351
+      },
+      {
+        "name": "JSHeapUsedSize",
+        "value": 1667888
+      },
+      {
+        "name": "JSHeapTotalSize",
+        "value": 3670016
+      },
+      {
+        "name": "FirstMeaningfulPaint",
+        "value": 278700.412422
+      },
+      {
+        "name": "DomContentLoaded",
+        "value": 278700.636592
+      },
+      {
+        "name": "NavigationStart",
+        "value": 278698.919437
+      }
+    ]
+  },
+  {
+    "lcp": [
+      {
+        "time": 540,
+        "url": "http://127.0.0.1:60437/static/optimized/heroes/hero_bg_wide.png.webp?v=3e1734dbcf640aaf",
+        "element": "hero d-flex align-items-center text-center"
+      }
+    ],
+    "longtasks": [
+      {
+        "time": 96.5,
+        "duration": 81
+      },
+      {
+        "time": 525.7000000476837,
+        "duration": 63
+      },
+      {
+        "time": 1833.800000011921,
+        "duration": 60
+      }
+    ],
+    "navigation": {
+      "name": "http://127.0.0.1:60437/",
+      "entryType": "navigation",
+      "startTime": 0,
+      "duration": 1892.300000011921,
+      "initiatorType": "navigation",
+      "deliveryType": "",
+      "nextHopProtocol": "http/1.0",
+      "renderBlockingStatus": "non-blocking",
+      "contentEncoding": "",
+      "workerStart": 0,
+      "workerRouterEvaluationStart": 0,
+      "workerCacheLookupStart": 0,
+      "workerMatchedSourceType": "",
+      "workerFinalSourceType": "",
+      "redirectStart": 0,
+      "redirectEnd": 0,
+      "fetchStart": 0.40000003576278687,
+      "domainLookupStart": 0.40000003576278687,
+      "domainLookupEnd": 0.40000003576278687,
+      "connectStart": 0.40000003576278687,
+      "secureConnectionStart": 0,
+      "connectEnd": 0.40000003576278687,
+      "requestStart": 0.9000000357627869,
+      "responseStart": 29.600000023841858,
+      "firstInterimResponseStart": 0,
+      "finalResponseHeadersStart": 29.600000023841858,
+      "responseEnd": 30.100000023841858,
+      "transferSize": 1372117,
+      "encodedBodySize": 1371817,
+      "decodedBodySize": 1371817,
+      "responseStatus": 200,
+      "serverTiming": [],
+      "unloadEventStart": 0,
+      "unloadEventEnd": 0,
+      "domInteractive": 324.2000000476837,
+      "domContentLoadedEventStart": 1836.7000000476837,
+      "domContentLoadedEventEnd": 1839.9000000357628,
+      "domComplete": 1889.5,
+      "loadEventStart": 1889.5,
+      "loadEventEnd": 1892.300000011921,
+      "type": "navigate",
+      "redirectCount": 0,
+      "activationStart": 0,
+      "criticalCHRestart": 0,
+      "notRestoredReasons": null,
+      "confidence": {
+        "randomizedTriggerRate": 0.4994798,
+        "value": "high"
+      }
+    },
+    "hero": {
+      "x": 0,
+      "y": 77,
+      "width": 1280,
+      "height": 448.984375,
+      "top": 77,
+      "right": 1280,
+      "bottom": 525.984375,
+      "left": 0
+    },
+    "resources": [
+      {
+        "url": "/static/optimized/heroes/hero_bg_wide.png.webp",
+        "start": 51.30000001192093,
+        "end": 54.700000047683716
+      },
+      {
+        "url": "/static/css/styles/inline_reels.css",
+        "start": 52.30000001192093,
+        "end": 59.60000002384186
+      },
+      {
+        "url": "/static/css/styles/home_reels.css",
+        "start": 52.30000001192093,
+        "end": 60.200000047683716
+      },
+      {
+        "url": "/static/js/inline_reels.js",
+        "start": 309.4000000357628,
+        "end": 318.2000000476837
+      },
+      {
+        "url": "/static/js/home_reels.js",
+        "start": 309.4000000357628,
+        "end": 319.60000002384186
+      },
+      {
+        "url": "/static/reels/posters/v12044gd0000cun3j37og65q8nvdj890.MP4.0f13140e5cbb72f2.320.webp",
+        "start": 1937.7000000476837,
+        "end": 1941.4000000357628
+      },
+      {
+        "url": "/static/reels/posters/owner-welcome-v2.mp4.a0a4f8c70ee55ee5.320.webp",
+        "start": 1938.2000000476837,
+        "end": 1943.1000000238419
+      },
+      {
+        "url": "/static/reels/posters/v15044gf0000d201pa7og65gk4t9v8c0.MP4.07b52fe82623e81b.320.webp",
+        "start": 1938.2000000476837,
+        "end": 1945.300000011921
+      },
+      {
+        "url": "/static/reels/posters/v12044gd0000cun8jj7og65snob23e2g.MP4.9ae90ba44425f986.320.webp",
+        "start": 1938.2000000476837,
+        "end": 1947.2000000476837
+      },
+      {
+        "url": "/static/reels/posters/v15044gf0000d457pkvog65upffgcrmg.MP4.22203bd9cc7d97f9.320.webp",
+        "start": 1938.2000000476837,
+        "end": 1948.2000000476837
+      },
+      {
+        "url": "/static/reels/v15044gf0000d28k8pnog65o08bn9iug.MP4",
+        "start": 2054.400000035763,
+        "end": 2060.300000011921
+      }
+    ],
+    "width": 1280,
+    "run": 1,
+    "cpu": 4,
+    "metrics": [
+      {
+        "name": "Timestamp",
+        "value": 278707.24783
+      },
+      {
+        "name": "AudioHandlers",
+        "value": 0
+      },
+      {
+        "name": "AudioWorkletProcessors",
+        "value": 0
+      },
+      {
+        "name": "Documents",
+        "value": 4
+      },
+      {
+        "name": "Frames",
+        "value": 4
+      },
+      {
+        "name": "JSEventListeners",
+        "value": 273
+      },
+      {
+        "name": "LayoutObjects",
+        "value": 5199
+      },
+      {
+        "name": "MediaKeySessions",
+        "value": 0
+      },
+      {
+        "name": "MediaKeys",
+        "value": 0
+      },
+      {
+        "name": "Nodes",
+        "value": 23047
+      },
+      {
+        "name": "Resources",
+        "value": 52
+      },
+      {
+        "name": "ContextLifecycleStateObservers",
+        "value": 65
+      },
+      {
+        "name": "V8PerContextDatas",
+        "value": 2
+      },
+      {
+        "name": "WorkerGlobalScopes",
+        "value": 0
+      },
+      {
+        "name": "UACSSResources",
+        "value": 0
+      },
+      {
+        "name": "RTCPeerConnections",
+        "value": 0
+      },
+      {
+        "name": "ResourceFetchers",
+        "value": 4
+      },
+      {
+        "name": "AdSubframes",
+        "value": 0
+      },
+      {
+        "name": "DetachedScriptStates",
+        "value": 2
+      },
+      {
+        "name": "ArrayBufferContents",
+        "value": 0
+      },
+      {
+        "name": "LayoutCount",
+        "value": 14
+      },
+      {
+        "name": "RecalcStyleCount",
+        "value": 35
+      },
+      {
+        "name": "LayoutDuration",
+        "value": 0.111085
+      },
+      {
+        "name": "RecalcStyleDuration",
+        "value": 0.135623
+      },
+      {
+        "name": "DevToolsCommandDuration",
+        "value": 0.006288
+      },
+      {
+        "name": "ScriptDuration",
+        "value": 0.046374
+      },
+      {
+        "name": "V8CompileDuration",
+        "value": 0.000196
+      },
+      {
+        "name": "TaskDuration",
+        "value": 0.754116
+      },
+      {
+        "name": "TaskOtherDuration",
+        "value": 0.45455
+      },
+      {
+        "name": "ThreadTime",
+        "value": 3.196316
+      },
+      {
+        "name": "ProcessTime",
+        "value": 3.458991
+      },
+      {
+        "name": "JSHeapUsedSize",
+        "value": 1527344
+      },
+      {
+        "name": "JSHeapTotalSize",
+        "value": 3145728
+      },
+      {
+        "name": "FirstMeaningfulPaint",
+        "value": 278703.837403
+      },
+      {
+        "name": "DomContentLoaded",
+        "value": 278705.13659
+      },
+      {
+        "name": "NavigationStart",
+        "value": 278703.299947
+      }
+    ]
+  },
+  {
+    "lcp": [
+      {
+        "time": 632,
+        "url": "http://127.0.0.1:60437/static/optimized/heroes/hero_bg_wide.png.webp?v=3e1734dbcf640aaf",
+        "element": "hero d-flex align-items-center text-center"
+      }
+    ],
+    "longtasks": [
+      {
+        "time": 105.39999997615814,
+        "duration": 70
+      },
+      {
+        "time": 615.3999999761581,
+        "duration": 68
+      },
+      {
+        "time": 1857.8999999761581,
+        "duration": 62
+      }
+    ],
+    "navigation": {
+      "name": "http://127.0.0.1:60437/",
+      "entryType": "navigation",
+      "startTime": 0,
+      "duration": 1917.800000011921,
+      "initiatorType": "navigation",
+      "deliveryType": "",
+      "nextHopProtocol": "http/1.0",
+      "renderBlockingStatus": "non-blocking",
+      "contentEncoding": "",
+      "workerStart": 0,
+      "workerRouterEvaluationStart": 0,
+      "workerCacheLookupStart": 0,
+      "workerMatchedSourceType": "",
+      "workerFinalSourceType": "",
+      "redirectStart": 0,
+      "redirectEnd": 0,
+      "fetchStart": 0.30000001192092896,
+      "domainLookupStart": 0.30000001192092896,
+      "domainLookupEnd": 0.30000001192092896,
+      "connectStart": 0.30000001192092896,
+      "secureConnectionStart": 0,
+      "connectEnd": 0.30000001192092896,
+      "requestStart": 0.699999988079071,
+      "responseStart": 40.89999997615814,
+      "firstInterimResponseStart": 0,
+      "finalResponseHeadersStart": 40.89999997615814,
+      "responseEnd": 41.5,
+      "transferSize": 1372197,
+      "encodedBodySize": 1371897,
+      "decodedBodySize": 1371897,
+      "responseStatus": 200,
+      "serverTiming": [],
+      "unloadEventStart": 0,
+      "unloadEventEnd": 0,
+      "domInteractive": 346.60000002384186,
+      "domContentLoadedEventStart": 1860.300000011921,
+      "domContentLoadedEventEnd": 1864.199999988079,
+      "domComplete": 1915.6000000238419,
+      "loadEventStart": 1915.6000000238419,
+      "loadEventEnd": 1917.800000011921,
+      "type": "navigate",
+      "redirectCount": 0,
+      "activationStart": 0,
+      "criticalCHRestart": 0,
+      "notRestoredReasons": null,
+      "confidence": {
+        "randomizedTriggerRate": 0.4994798,
+        "value": "high"
+      }
+    },
+    "hero": {
+      "x": 0,
+      "y": 77,
+      "width": 1280,
+      "height": 448.984375,
+      "top": 77,
+      "right": 1280,
+      "bottom": 525.984375,
+      "left": 0
+    },
+    "resources": [
+      {
+        "url": "/static/optimized/heroes/hero_bg_wide.png.webp",
+        "start": 63,
+        "end": 68.19999998807907
+      },
+      {
+        "url": "/static/css/styles/inline_reels.css",
+        "start": 64.19999998807907,
+        "end": 74.60000002384186
+      },
+      {
+        "url": "/static/css/styles/home_reels.css",
+        "start": 64.19999998807907,
+        "end": 75.19999998807907
+      },
+      {
+        "url": "/static/js/inline_reels.js",
+        "start": 312.5,
+        "end": 317.89999997615814
+      },
+      {
+        "url": "/static/js/home_reels.js",
+        "start": 312.60000002384186,
+        "end": 318.89999997615814
+      },
+      {
+        "url": "/static/reels/posters/v15044gf0000d50r7qnog65r95ovpn70.MP4.306913a44cbf8141.320.webp",
+        "start": 1955.5,
+        "end": 1959.1000000238419
+      },
+      {
+        "url": "/static/reels/posters/v15044gf0000d2dn5kfog65lkc1l9ve0.MP4.425a0fa1d4ce1e3c.320.webp",
+        "start": 1955.5,
+        "end": 1961.6000000238419
+      },
+      {
+        "url": "/static/reels/posters/v12044gd0000cumekmvog65iuaocgfq0.MP4.9869c3d21ec66c13.320.webp",
+        "start": 1956.199999988079,
+        "end": 1962.800000011921
+      },
+      {
+        "url": "/static/reels/posters/v15044gf0000d367o0nog65j0r7qetg0.MP4.f0b4306e8164ccf2.320.webp",
+        "start": 1956.300000011921,
+        "end": 1963.5
+      },
+      {
+        "url": "/static/reels/posters/v15044gf0000d6g8stfog65rqbs15g40.MP4.5c729ddc2e2cc438.320.webp",
+        "start": 1956.300000011921,
+        "end": 1964.5
+      },
+      {
+        "url": "/static/reels/posters/v15044gf0000d6celhvog65hp28gmueg.MP4.1e89bc3ffec35a31.320.webp",
+        "start": 1956.300000011921,
+        "end": 1966.1000000238419
+      },
+      {
+        "url": "/static/reels/v15044gf0000d50r7qnog65r95ovpn70.MP4",
+        "start": 2016.300000011921,
+        "end": 2038.3999999761581
+      }
+    ],
+    "width": 1280,
+    "run": 2,
+    "cpu": 4,
+    "metrics": [
+      {
+        "name": "Timestamp",
+        "value": 278711.882798
+      },
+      {
+        "name": "AudioHandlers",
+        "value": 0
+      },
+      {
+        "name": "AudioWorkletProcessors",
+        "value": 0
+      },
+      {
+        "name": "Documents",
+        "value": 4
+      },
+      {
+        "name": "Frames",
+        "value": 4
+      },
+      {
+        "name": "JSEventListeners",
+        "value": 274
+      },
+      {
+        "name": "LayoutObjects",
+        "value": 5199
+      },
+      {
+        "name": "MediaKeySessions",
+        "value": 0
+      },
+      {
+        "name": "MediaKeys",
+        "value": 0
+      },
+      {
+        "name": "Nodes",
+        "value": 23046
+      },
+      {
+        "name": "Resources",
+        "value": 52
+      },
+      {
+        "name": "ContextLifecycleStateObservers",
+        "value": 65
+      },
+      {
+        "name": "V8PerContextDatas",
+        "value": 2
+      },
+      {
+        "name": "WorkerGlobalScopes",
+        "value": 0
+      },
+      {
+        "name": "UACSSResources",
+        "value": 0
+      },
+      {
+        "name": "RTCPeerConnections",
+        "value": 0
+      },
+      {
+        "name": "ResourceFetchers",
+        "value": 4
+      },
+      {
+        "name": "AdSubframes",
+        "value": 0
+      },
+      {
+        "name": "DetachedScriptStates",
+        "value": 2
+      },
+      {
+        "name": "ArrayBufferContents",
+        "value": 0
+      },
+      {
+        "name": "LayoutCount",
+        "value": 17
+      },
+      {
+        "name": "RecalcStyleCount",
+        "value": 34
+      },
+      {
+        "name": "LayoutDuration",
+        "value": 0.117075
+      },
+      {
+        "name": "RecalcStyleDuration",
+        "value": 0.138324
+      },
+      {
+        "name": "DevToolsCommandDuration",
+        "value": 0.005494
+      },
+      {
+        "name": "ScriptDuration",
+        "value": 0.047173
+      },
+      {
+        "name": "V8CompileDuration",
+        "value": 0.001555
+      },
+      {
+        "name": "TaskDuration",
+        "value": 0.713088
+      },
+      {
+        "name": "TaskOtherDuration",
+        "value": 0.403467
+      },
+      {
+        "name": "ThreadTime",
+        "value": 3.224483
+      },
+      {
+        "name": "ProcessTime",
+        "value": 3.486483
+      },
+      {
+        "name": "JSHeapUsedSize",
+        "value": 1531308
+      },
+      {
+        "name": "JSHeapTotalSize",
+        "value": 3145728
+      },
+      {
+        "name": "FirstMeaningfulPaint",
+        "value": 278708.537438
+      },
+      {
+        "name": "DomContentLoaded",
+        "value": 278709.768779
+      },
+      {
+        "name": "NavigationStart",
+        "value": 278707.908557
+      }
+    ]
+  },
+  {
+    "lcp": [
+      {
+        "time": 516,
+        "url": "http://127.0.0.1:60437/static/optimized/heroes/hero_bg_wide.png.webp?v=3e1734dbcf640aaf",
+        "element": "hero d-flex align-items-center text-center"
+      }
+    ],
+    "longtasks": [
+      {
+        "time": 500,
+        "duration": 68
+      },
+      {
+        "time": 1835.5999999642372,
+        "duration": 65
+      }
+    ],
+    "navigation": {
+      "name": "http://127.0.0.1:60437/",
+      "entryType": "navigation",
+      "startTime": 0,
+      "duration": 1897.7999999523163,
+      "initiatorType": "navigation",
+      "deliveryType": "",
+      "nextHopProtocol": "http/1.0",
+      "renderBlockingStatus": "non-blocking",
+      "contentEncoding": "",
+      "workerStart": 0,
+      "workerRouterEvaluationStart": 0,
+      "workerCacheLookupStart": 0,
+      "workerMatchedSourceType": "",
+      "workerFinalSourceType": "",
+      "redirectStart": 0,
+      "redirectEnd": 0,
+      "fetchStart": 0.3999999761581421,
+      "domainLookupStart": 0.3999999761581421,
+      "domainLookupEnd": 0.3999999761581421,
+      "connectStart": 0.3999999761581421,
+      "secureConnectionStart": 0,
+      "connectEnd": 0.3999999761581421,
+      "requestStart": 0.8999999761581421,
+      "responseStart": 47.19999998807907,
+      "firstInterimResponseStart": 0,
+      "finalResponseHeadersStart": 47.19999998807907,
+      "responseEnd": 47.799999952316284,
+      "transferSize": 1372197,
+      "encodedBodySize": 1371897,
+      "decodedBodySize": 1371897,
+      "responseStatus": 200,
+      "serverTiming": [],
+      "unloadEventStart": 0,
+      "unloadEventEnd": 0,
+      "domInteractive": 322.89999997615814,
+      "domContentLoadedEventStart": 1838,
+      "domContentLoadedEventEnd": 1842,
+      "domComplete": 1895.3999999761581,
+      "loadEventStart": 1895.3999999761581,
+      "loadEventEnd": 1897.7999999523163,
+      "type": "navigate",
+      "redirectCount": 0,
+      "activationStart": 0,
+      "criticalCHRestart": 0,
+      "notRestoredReasons": null,
+      "confidence": {
+        "randomizedTriggerRate": 0.4994798,
+        "value": "low"
+      }
+    },
+    "hero": {
+      "x": 0,
+      "y": 77,
+      "width": 1280,
+      "height": 448.984375,
+      "top": 77,
+      "right": 1280,
+      "bottom": 525.984375,
+      "left": 0
+    },
+    "resources": [
+      {
+        "url": "/static/optimized/heroes/hero_bg_wide.png.webp",
+        "start": 69.39999997615814,
+        "end": 73.19999998807907
+      },
+      {
+        "url": "/static/css/styles/inline_reels.css",
+        "start": 70.69999998807907,
+        "end": 78.39999997615814
+      },
+      {
+        "url": "/static/css/styles/home_reels.css",
+        "start": 70.69999998807907,
+        "end": 79
+      },
+      {
+        "url": "/static/js/inline_reels.js",
+        "start": 287.69999998807907,
+        "end": 294.39999997615814
+      },
+      {
+        "url": "/static/js/home_reels.js",
+        "start": 287.7999999523163,
+        "end": 295.2999999523163
+      },
+      {
+        "url": "/static/reels/posters/v15044gf0000d28k8pnog65o08bn9iug.MP4.96d5b318817abdda.320.webp",
+        "start": 1948.699999988079,
+        "end": 1950.5999999642372
+      },
+      {
+        "url": "/static/reels/posters/v15044gf0000d472o77og65lji51fev0.MP4.0d9307550518c7ec.320.webp",
+        "start": 1948.7999999523163,
+        "end": 1951.699999988079
+      },
+      {
+        "url": "/static/reels/posters/v12044gd0000cunr8lvog65v8frvi1h0.MP4.701c276b70f688d7.320.webp",
+        "start": 1948.7999999523163,
+        "end": 1952.5
+      },
+      {
+        "url": "/static/reels/posters/v12044gd0000cun3j37og65q8nvdj890.MP4.0f13140e5cbb72f2.320.webp",
+        "start": 1948.7999999523163,
+        "end": 1956.2999999523163
+      },
+      {
+        "url": "/static/reels/posters/v12044gd0000cumiuonog65rafb3fmcg.MP4.bbf5f54b9ec3488f.320.webp",
+        "start": 1948.7999999523163,
+        "end": 1957.0999999642372
+      },
+      {
+        "url": "/static/reels/v15044gf0000d0j2hnnog65tq17pmop0.MP4",
+        "start": 2063.199999988079,
+        "end": 2071.7999999523163
+      }
+    ],
+    "width": 1280,
+    "run": 3,
+    "cpu": 4,
+    "metrics": [
+      {
+        "name": "Timestamp",
+        "value": 278716.211737
+      },
+      {
+        "name": "AudioHandlers",
+        "value": 0
+      },
+      {
+        "name": "AudioWorkletProcessors",
+        "value": 0
+      },
+      {
+        "name": "Documents",
+        "value": 4
+      },
+      {
+        "name": "Frames",
+        "value": 4
+      },
+      {
+        "name": "JSEventListeners",
+        "value": 287
+      },
+      {
+        "name": "LayoutObjects",
+        "value": 5600
+      },
+      {
+        "name": "MediaKeySessions",
+        "value": 0
+      },
+      {
+        "name": "MediaKeys",
+        "value": 0
+      },
+      {
+        "name": "Nodes",
+        "value": 23085
+      },
+      {
+        "name": "Resources",
+        "value": 55
+      },
+      {
+        "name": "ContextLifecycleStateObservers",
+        "value": 65
+      },
+      {
+        "name": "V8PerContextDatas",
+        "value": 2
+      },
+      {
+        "name": "WorkerGlobalScopes",
+        "value": 0
+      },
+      {
+        "name": "UACSSResources",
+        "value": 0
+      },
+      {
+        "name": "RTCPeerConnections",
+        "value": 0
+      },
+      {
+        "name": "ResourceFetchers",
+        "value": 4
+      },
+      {
+        "name": "AdSubframes",
+        "value": 0
+      },
+      {
+        "name": "DetachedScriptStates",
+        "value": 2
+      },
+      {
+        "name": "ArrayBufferContents",
+        "value": 0
+      },
+      {
+        "name": "LayoutCount",
+        "value": 14
+      },
+      {
+        "name": "RecalcStyleCount",
+        "value": 35
+      },
+      {
+        "name": "LayoutDuration",
+        "value": 0.102849
+      },
+      {
+        "name": "RecalcStyleDuration",
+        "value": 0.137816
+      },
+      {
+        "name": "DevToolsCommandDuration",
+        "value": 0.00634
+      },
+      {
+        "name": "ScriptDuration",
+        "value": 0.055418
+      },
+      {
+        "name": "V8CompileDuration",
+        "value": 0.000946
+      },
+      {
+        "name": "TaskDuration",
+        "value": 0.766309
+      },
+      {
+        "name": "TaskOtherDuration",
+        "value": 0.46294
+      },
+      {
+        "name": "ThreadTime",
+        "value": 3.203018
+      },
+      {
+        "name": "ProcessTime",
+        "value": 3.459282
+      },
+      {
+        "name": "JSHeapUsedSize",
+        "value": 1671948
+      },
+      {
+        "name": "JSHeapTotalSize",
+        "value": 3670016
+      },
+      {
+        "name": "FirstMeaningfulPaint",
+        "value": 278713.129018
+      },
+      {
+        "name": "DomContentLoaded",
+        "value": 278714.09568
+      },
+      {
+        "name": "NavigationStart",
+        "value": 278712.257671
+      }
+    ]
+  },
+  {
+    "lcp": [
+      {
+        "time": 540,
+        "url": "http://127.0.0.1:60437/static/optimized/heroes/hero_bg_wide.png.webp?v=3e1734dbcf640aaf",
+        "element": "hero d-flex align-items-center text-center"
+      }
+    ],
+    "longtasks": [
+      {
+        "time": 94.19999998807907,
+        "duration": 80
+      },
+      {
+        "time": 522,
+        "duration": 62
+      },
+      {
+        "time": 2093.5,
+        "duration": 61
+      }
+    ],
+    "navigation": {
+      "name": "http://127.0.0.1:60437/",
+      "entryType": "navigation",
+      "startTime": 0,
+      "duration": 2152.2999999523163,
+      "initiatorType": "navigation",
+      "deliveryType": "",
+      "nextHopProtocol": "http/1.0",
+      "renderBlockingStatus": "non-blocking",
+      "contentEncoding": "",
+      "workerStart": 0,
+      "workerRouterEvaluationStart": 0,
+      "workerCacheLookupStart": 0,
+      "workerMatchedSourceType": "",
+      "workerFinalSourceType": "",
+      "redirectStart": 0,
+      "redirectEnd": 0,
+      "fetchStart": 0.2999999523162842,
+      "domainLookupStart": 0.2999999523162842,
+      "domainLookupEnd": 0.2999999523162842,
+      "connectStart": 0.2999999523162842,
+      "secureConnectionStart": 0,
+      "connectEnd": 0.2999999523162842,
+      "requestStart": 0.699999988079071,
+      "responseStart": 29.799999952316284,
+      "firstInterimResponseStart": 0,
+      "finalResponseHeadersStart": 29.799999952316284,
+      "responseEnd": 30.599999964237213,
+      "transferSize": 1372197,
+      "encodedBodySize": 1371897,
+      "decodedBodySize": 1371897,
+      "responseStatus": 200,
+      "serverTiming": [],
+      "unloadEventStart": 0,
+      "unloadEventEnd": 0,
+      "domInteractive": 313.19999998807907,
+      "domContentLoadedEventStart": 2095.7999999523163,
+      "domContentLoadedEventEnd": 2099.399999976158,
+      "domComplete": 2149.2999999523163,
+      "loadEventStart": 2150,
+      "loadEventEnd": 2152.2999999523163,
+      "type": "navigate",
+      "redirectCount": 0,
+      "activationStart": 0,
+      "criticalCHRestart": 0,
+      "notRestoredReasons": null,
+      "confidence": {
+        "randomizedTriggerRate": 0.4994798,
+        "value": "high"
+      }
+    },
+    "hero": {
+      "x": 0,
+      "y": 77,
+      "width": 1280,
+      "height": 448.984375,
+      "top": 77,
+      "right": 1280,
+      "bottom": 525.984375,
+      "left": 0
+    },
+    "resources": [
+      {
+        "url": "/static/optimized/heroes/hero_bg_wide.png.webp",
+        "start": 50.5,
+        "end": 53.799999952316284
+      },
+      {
+        "url": "/static/css/styles/inline_reels.css",
+        "start": 52,
+        "end": 58.89999997615814
+      },
+      {
+        "url": "/static/css/styles/home_reels.css",
+        "start": 52,
+        "end": 59.5
+      },
+      {
+        "url": "/static/js/inline_reels.js",
+        "start": 296.5,
+        "end": 299.2999999523163
+      },
+      {
+        "url": "/static/js/home_reels.js",
+        "start": 296.5,
+        "end": 300.0999999642372
+      },
+      {
+        "url": "/static/reels/posters/v15044gf0000d5ukplfog65o1bq60710.MP4.ce98a2d39380219a.320.webp",
+        "start": 2189.2999999523163,
+        "end": 2191.399999976158
+      },
+      {
+        "url": "/static/reels/posters/v15044gf0000d45r0vfog65i6q1gvahg.MP4.f016da2c67fcd44f.320.webp",
+        "start": 2189.2999999523163,
+        "end": 2193.5
+      },
+      {
+        "url": "/static/reels/posters/v15044gf0000d4fng17og65lcs9cf0gg.MP4.0ec25da55930cc2d.320.webp",
+        "start": 2189.2999999523163,
+        "end": 2194.5
+      },
+      {
+        "url": "/static/reels/posters/v15044gf0000d201pa7og65gk4t9v8c0.MP4.07b52fe82623e81b.320.webp",
+        "start": 2189.2999999523163,
+        "end": 2197.699999988079
+      },
+      {
+        "url": "/static/reels/posters/v15044gf0000d0j2hnnog65tq17pmop0.MP4.6f5a4bdbec819b53.320.webp",
+        "start": 2189.2999999523163,
+        "end": 2199.899999976158
+      },
+      {
+        "url": "/static/reels/posters/v12044gd0000cunp72vog65m5bf950a0.MP4.00965557f39ac53b.320.webp",
+        "start": 2189.399999976158,
+        "end": 2201.099999964237
+      },
+      {
+        "url": "/static/reels/v15044gf0000d5ukplfog65o1bq60710.MP4",
+        "start": 2341.2999999523163,
+        "end": 2692.699999988079
+      }
+    ],
+    "width": 1280,
+    "run": 4,
+    "cpu": 4,
+    "metrics": [
+      {
+        "name": "Timestamp",
+        "value": 278720.760967
+      },
+      {
+        "name": "AudioHandlers",
+        "value": 0
+      },
+      {
+        "name": "AudioWorkletProcessors",
+        "value": 0
+      },
+      {
+        "name": "Documents",
+        "value": 4
+      },
+      {
+        "name": "Frames",
+        "value": 4
+      },
+      {
+        "name": "JSEventListeners",
+        "value": 268
+      },
+      {
+        "name": "LayoutObjects",
+        "value": 5199
+      },
+      {
+        "name": "MediaKeySessions",
+        "value": 0
+      },
+      {
+        "name": "MediaKeys",
+        "value": 0
+      },
+      {
+        "name": "Nodes",
+        "value": 23043
+      },
+      {
+        "name": "Resources",
+        "value": 51
+      },
+      {
+        "name": "ContextLifecycleStateObservers",
+        "value": 65
+      },
+      {
+        "name": "V8PerContextDatas",
+        "value": 2
+      },
+      {
+        "name": "WorkerGlobalScopes",
+        "value": 0
+      },
+      {
+        "name": "UACSSResources",
+        "value": 0
+      },
+      {
+        "name": "RTCPeerConnections",
+        "value": 0
+      },
+      {
+        "name": "ResourceFetchers",
+        "value": 4
+      },
+      {
+        "name": "AdSubframes",
+        "value": 0
+      },
+      {
+        "name": "DetachedScriptStates",
+        "value": 2
+      },
+      {
+        "name": "ArrayBufferContents",
+        "value": 0
+      },
+      {
+        "name": "LayoutCount",
+        "value": 14
+      },
+      {
+        "name": "RecalcStyleCount",
+        "value": 31
+      },
+      {
+        "name": "LayoutDuration",
+        "value": 0.108171
+      },
+      {
+        "name": "RecalcStyleDuration",
+        "value": 0.129118
+      },
+      {
+        "name": "DevToolsCommandDuration",
+        "value": 0.006133
+      },
+      {
+        "name": "ScriptDuration",
+        "value": 0.045156
+      },
+      {
+        "name": "V8CompileDuration",
+        "value": 0.002198
+      },
+      {
+        "name": "TaskDuration",
+        "value": 0.777032
+      },
+      {
+        "name": "TaskOtherDuration",
+        "value": 0.486256
+      },
+      {
+        "name": "ThreadTime",
+        "value": 3.394036
+      },
+      {
+        "name": "ProcessTime",
+        "value": 3.654031
+      },
+      {
+        "name": "JSHeapUsedSize",
+        "value": 1528528
+      },
+      {
+        "name": "JSHeapTotalSize",
+        "value": 3145728
+      },
+      {
+        "name": "FirstMeaningfulPaint",
+        "value": 278717.08317
+      },
+      {
+        "name": "DomContentLoaded",
+        "value": 278718.642407
+      },
+      {
+        "name": "NavigationStart",
+        "value": 278716.546609
+      }
+    ]
+  }
+]

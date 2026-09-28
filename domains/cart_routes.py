@@ -7,6 +7,7 @@ import os
 import re
 import secrets
 import threading
+import time
 from pathlib import Path
 from typing import Any, Callable
 
@@ -170,6 +171,21 @@ def register_cart_routes(
 
     def _download_serializer() -> URLSafeTimedSerializer:
         return URLSafeTimedSerializer(app.secret_key, salt="order-download-v1")
+
+    def _undo_serializer() -> URLSafeTimedSerializer:
+        return URLSafeTimedSerializer(app.secret_key, salt="cart-undo-v1")
+
+    def _undo_snapshot(cart_data: dict, notes: dict) -> dict:
+        if not cart_data:
+            return {}
+        if not session.get("cart_undo_scope"):
+            session["cart_undo_scope"] = secrets.token_urlsafe(24)
+        return {
+            "undo_token": _undo_serializer().dumps({
+                "scope": session["cart_undo_scope"], "cart": cart_data, "notes": notes,
+            }),
+            "undo_seconds": 60,
+        }
 
     def _signed_download_token(order: Any) -> str:
         return _download_serializer().dumps(
@@ -517,6 +533,7 @@ def register_cart_routes(
         if not created.created:
             session["cart"] = {}
             session["cart_notes"] = {}
+            session.pop("cart_undo_scope", None)
             delivery_state = True if order.email_status == "sent" else False if order.email_status == "failed" else None
             return _render_saved_order(order, email_sent=delivery_state)
 
@@ -549,6 +566,7 @@ def register_cart_routes(
 
         session["cart"] = {}
         session["cart_notes"] = {}
+        session.pop("cart_undo_scope", None)
         return _render_saved_order(
             order,
             email_sent=email_sent,
@@ -622,7 +640,7 @@ def register_cart_routes(
         cart_data = get_cart()
         cart_data[code] = max(1, min(999, cart_data.get(code, 0) + qty))
         session["cart"] = cart_data
-        return jsonify({"ok": True, "total_items": cart_total_items(cart_data), "distinct_items": len(cart_data)})
+        return jsonify({"ok": True, "qty": cart_data.get(code, 0), "total_items": cart_total_items(cart_data), "distinct_items": len(cart_data)})
 
     @app.route("/api/cart/set", methods=["POST"])
     def api_cart_set():
@@ -640,14 +658,17 @@ def register_cart_routes(
 
         cart_data = get_cart()
         notes_by_code = get_cart_notes(session, cart_data)
+        undo = {}
         if qty == 0:
+            if code in cart_data and payload.get("allow_undo"):
+                undo = _undo_snapshot({code: cart_data[code]}, {code: notes_by_code.get(code, "")})
             cart_data.pop(code, None)
             notes_by_code.pop(code, None)
         else:
             cart_data[code] = qty
         session["cart"] = cart_data
         session["cart_notes"] = notes_by_code
-        return jsonify({"ok": True, "total_items": cart_total_items(cart_data), "distinct_items": len(cart_data)})
+        return jsonify({"ok": True, "qty": cart_data.get(code, 0), "total_items": cart_total_items(cart_data), "distinct_items": len(cart_data), **undo})
 
     @app.route("/api/cart/remove", methods=["POST"])
     def api_cart_remove():
@@ -664,9 +685,50 @@ def register_cart_routes(
 
     @app.route("/api/cart/clear", methods=["POST"])
     def api_cart_clear():
+        payload = request.get_json(silent=True) or {}
+        cart_data = get_cart()
+        notes = get_cart_notes(session, cart_data)
+        undo = _undo_snapshot(cart_data, notes) if isinstance(payload, dict) and payload.get("allow_undo") else {}
         session["cart"] = {}
         session["cart_notes"] = {}
-        return jsonify({"ok": True, "total_items": 0, "distinct_items": 0})
+        return jsonify({"ok": True, "total_items": 0, "distinct_items": 0, **undo})
+
+    @app.route("/api/cart/undo", methods=["POST"])
+    def api_cart_undo():
+        payload = request.get_json(silent=True) or {}
+        token = payload.get("token") if isinstance(payload, dict) else None
+        if not isinstance(token, str):
+            return jsonify(ok=False, error="invalid_undo"), 400
+        try:
+            snapshot, issued = _undo_serializer().loads(token, max_age=60, return_timestamp=True)
+        except SignatureExpired:
+            return jsonify(ok=False, error="undo_expired"), 410
+        except BadSignature:
+            return jsonify(ok=False, error="invalid_undo"), 400
+        seconds_left = issued.timestamp() + 60 - time.time()
+        if seconds_left <= 0:
+            return jsonify(ok=False, error="undo_expired"), 410
+        if not secrets.compare_digest(str(snapshot.get("scope", "")), str(session.get("cart_undo_scope", ""))):
+            return jsonify(ok=False, error="invalid_undo_session"), 403
+        cart_data = get_cart()
+        notes = get_cart_notes(session, cart_data)
+        pmap = products_by_code(load_products())
+        missing = {code: qty for code, qty in snapshot["cart"].items() if code not in cart_data and code in pmap}
+        saved_notes = {code: snapshot["notes"].get(code, "") for code in missing}
+        if payload.get("preview"):
+            rows = cart_items(pmap, missing, saved_notes)
+        else:
+            # Restores are idempotent and never overwrite edits made after removal.
+            cart_data.update(missing)
+            notes.update({code: note for code, note in saved_notes.items() if note})
+            session["cart"] = cart_data
+            session["cart_notes"] = notes
+            rows = cart_items(pmap, cart_data, notes)
+        return jsonify(
+            ok=True, total_items=cart_total_items(cart_data), distinct_items=len(cart_data),
+            rows_html=render_template("partials/cart_rows.html", items=rows),
+            undo_seconds=seconds_left,
+        )
 
     @app.route("/api/cart/note", methods=["POST"])
     def api_cart_note():
