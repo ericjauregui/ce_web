@@ -17,7 +17,25 @@
     if (!preload) return resolve();
     const hero = new Image();
     hero.fetchPriority = 'high';
-    hero.onload = hero.onerror = resolve;
+    function allowHeroPaint() {
+      // A completed download can still need decoding and a rendering frame.
+      // Yield through a paint opportunity before starting speculative media.
+      // Background tabs may suspend animation frames, so don't hold them up.
+      if (document.hidden) return resolve();
+      const fallback = setTimeout(resolve, 250);
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        clearTimeout(fallback);
+        resolve();
+      }));
+    }
+    hero.onload = () => {
+      if (typeof hero.decode === 'function') {
+        hero.decode().catch(() => {}).then(allowHeroPaint);
+      } else {
+        allowHeroPaint();
+      }
+    };
+    hero.onerror = allowHeroPaint;
     hero.src = preload.href; // Reuses the existing preload, including in-flight requests.
   });
   if (!('IntersectionObserver' in window)) {

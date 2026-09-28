@@ -1,7 +1,7 @@
 <div class="col">
   {% set drawer_id = 'drawer-' ~ p.code|lower|replace(' ', '-')|replace('/', '-') %}
   {% set initial_qty = p.initial_qty|default(0, true)|int %}
-  <article class="card product product-card shadow-sm bg-dark border-0"
+  <article class="card product product-card shadow-sm bg-dark border-0{% if initial_qty > 0 %} is-in-cart{% endif %}"
        role="button"
       tabindex="0"
       data-qty="{{ initial_qty }}"
@@ -43,7 +43,7 @@
             <button type="button" class="btn btn-outline-gold btn-sm rounded-pill qty-adjust-btn" data-delta="-1"
               aria-label="Decrease quantity">−</button>
             <input type="number" min="0" max="999" step="1" inputmode="numeric" class="product-qty-pill product-qty-input"
-              value="{{ initial_qty if initial_qty > 0 else 1 }}" aria-label="Quantity" />
+              value="{{ initial_qty }}" aria-label="Quantity" />
             <button type="button" class="btn btn-outline-gold btn-sm rounded-pill qty-adjust-btn" data-delta="1"
               aria-label="Increase quantity">+</button>
           </div>

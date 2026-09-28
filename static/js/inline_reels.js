@@ -1179,18 +1179,25 @@
 
     setTrackStatus(defaultStatus);
     setupViewportPauseGuard();
-    // Keep visible autoplay, but do not start an offscreen track during page load.
-    if (typeof IntersectionObserver === "function") {
-      const startThreshold = pauseWhenOutOfView ? 0.2 : 0.01;
-      const startObserver = new IntersectionObserver((entries) => {
-        if (!entries.some((entry) => entry.isIntersecting && entry.intersectionRatio >= startThreshold)) return;
-        if (!activeCard) autoActivateFirstCard();
-        startObserver.disconnect();
-      }, { threshold: startThreshold });
-      startObserver.observe(track);
-    } else {
-      autoActivateFirstCard();
+    function startVisibleAutoplay() {
+      // Observe current visibility after the hero is ready, rather than acting
+      // on an earlier observation if the visitor has already scrolled away.
+      if (activeCard) return;
+      if (typeof IntersectionObserver === "function") {
+        const startThreshold = pauseWhenOutOfView ? 0.2 : 0.01;
+        const startObserver = new IntersectionObserver((entries) => {
+          if (!entries.some((entry) => entry.isIntersecting && entry.intersectionRatio >= startThreshold)) return;
+          if (!activeCard) autoActivateFirstCard();
+          startObserver.disconnect();
+        }, { threshold: startThreshold });
+        startObserver.observe(track);
+      } else {
+        autoActivateFirstCard();
+      }
     }
+    // Explicit play controls above stay available during a slow hero download.
+    if (window.catalogHeroReady) window.catalogHeroReady.then(startVisibleAutoplay);
+    else startVisibleAutoplay();
     queueScrollCueRefresh();
   }
 

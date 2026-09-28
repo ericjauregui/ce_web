@@ -193,9 +193,9 @@
 {% endblock %}
 
 {% block body_end %}
-<script src="{{ asset_url('js/scroll_cue.js') }}"></script>
-<script src="{{ asset_url('js/catalog.js') }}"></script>
-<script src="{{ asset_url('js/whatsapp_float.js') }}"></script>
+<script src="{{ asset_url('js/scroll_cue.js') }}" defer></script>
+<script src="{{ asset_url('js/catalog.js') }}" defer></script>
+<script src="{{ asset_url('js/whatsapp_float.js') }}" defer></script>
 {% if latest_reels %}
 <script src="{{ asset_url('js/inline_reels.js') }}" defer></script>
 <script src="{{ asset_url('js/home_reels.js') }}" defer></script>

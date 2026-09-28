@@ -343,12 +343,12 @@ function initializeCatalogScrollTracking() {
     }
     previousScrollY = window.scrollY;
     const headerHeight = header.getBoundingClientRect().height;
-    document.documentElement.style.setProperty("--catalog-header-height", `${headerHeight}px`);
     const readingLine = navHeight + headerHeight + 12;
     let nextIndex = 0;
     sections.forEach((section, index) => {
       if (section && section.getBoundingClientRect().top <= readingLine) nextIndex = index;
     });
+    document.documentElement.style.setProperty("--catalog-header-height", `${headerHeight}px`);
     if (nextIndex === activeIndex) return;
     activeIndex = nextIndex;
     const focused = header.contains(document.activeElement) ? document.activeElement : null;
@@ -374,7 +374,8 @@ function initializeCatalogScrollTracking() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  initializeCatalogCards();
+  // The server renders initial quantities, labels and drawer state. Rewriting
+  // every card here invalidates styles while the hero is trying to render.
   initializeCatalogScrollTracking();
 
   const miniCart = document.getElementById("catalogMiniCart");
