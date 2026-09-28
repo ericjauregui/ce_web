@@ -161,8 +161,9 @@ class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
             self.assertIn("This public report displays aggregate counts only", response.text())
             self.assertNotIn("Shared reporting", response.text())
             self.assertNotIn("UTC", response.text())
-            self.assertIn("Previous calendar month", response.text())
+            self.assertIn("custom date range", response.text())
             self.assertIn("complete weeks", response.text())
+            self.assertIn("complete years", response.text())
             self.assertIn("Team pages", response.text())
             self.assertIn("/team", response.text())
             robots = anonymous_client.get(f"{self.base_url}/robots.txt")
@@ -241,9 +242,16 @@ class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
 
         more_filters = self.page.locator("#analytics-more-filters")
         self.assertIsNone(more_filters.get_attribute("open"))
-        self.assertTrue(self.page.locator("#analytics-range-mode").is_visible())
+        period_unit = self.page.locator("#analytics-period-unit")
+        self.assertTrue(period_unit.is_visible())
         self.assertTrue(self.page.locator("#analytics-page-filter").is_visible())
         self.assertFalse(self.page.locator("#analytics-metric").is_visible())
+        period_unit.select_option("custom")
+        self.assertTrue(self.page.locator("#analytics-date-from").is_visible())
+        self.assertTrue(self.page.locator("#analytics-date-to").is_visible())
+        self.assertFalse(self.page.locator("#analytics-period-count").is_visible())
+        period_unit.select_option("days")
+        self.assertTrue(self.page.locator("#analytics-period-count").is_visible())
         self.page.locator("#analytics-more-filters > summary").click()
         self.page.locator("#analytics-metric").select_option("clicks")
         self.page.locator("#analytics-more-filters > summary").click()
@@ -299,16 +307,32 @@ class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
 
         fixture_day = self.fixture_date.isoformat()
         custom_response = self.goto(
-            f"/admin/analytics?range=custom&date_from={fixture_day}&date_to={fixture_day}"
+            f"/admin/analytics?unit=custom&date_from={fixture_day}&date_to={fixture_day}"
             "&granularity=month&metric=both&page_filter=all&journey_start=all"
         )
         self.assertEqual(custom_response.status, 200)
-        self.assertEqual(self.page.locator("#analytics-range-mode").input_value(), "custom")
+        self.assertEqual(self.page.locator("#analytics-period-unit").input_value(), "custom")
         self.assertEqual(self.page.locator("#analytics-date-from").input_value(), fixture_day)
         self.assertEqual(self.page.locator("#analytics-date-to").input_value(), fixture_day)
         self.assertEqual(self.page.locator(".metric-card").nth(1).locator("strong").inner_text(), "11")
         self.assertEqual(self.page.locator(".metric-card").nth(2).locator("strong").inner_text(), "5")
         self.assertEqual(self.page.locator(".analytics-bucket").count(), 1)
+
+        hourly_response = self.goto(
+            "/admin/analytics?range=rolling&count=7&unit=days&granularity=hour"
+            "&metric=views_sessions&page_filter=all&journey_start=filter"
+        )
+        self.assertEqual(hourly_response.status, 200)
+        self.assertEqual(self.page.locator("#analytics-granularity").input_value(), "hour")
+        self.assertEqual(self.page.locator(".analytics-bucket").count(), 24)
+        self.assertEqual(
+            self.page.locator(".analytics-bucket > small").all_inner_texts(),
+            [f"{hour:02}:00" for hour in range(24)],
+        )
+        self.assertIn(
+            "hour-of-day totals across selected dates",
+            self.page.locator("main.analytics-dashboard").inner_text(),
+        )
 
     def test_click_tracking_uses_action_and_product_card_labels(self) -> None:
         self.page.add_init_script("""

@@ -12,7 +12,7 @@ from zoneinfo import ZoneInfo
 from flask import Flask, Response, g, request
 from sqlalchemy import (
     CheckConstraint, Column, Date, DateTime, Index, Integer, MetaData, String,
-    Table, and_, case, func, inspect, literal, or_, select,
+    Table, and_, case, extract, func, inspect, literal, or_, select,
 )
 from sqlalchemy.engine import Engine
 from sqlalchemy.dialects.postgresql import insert as postgres_insert
@@ -52,8 +52,8 @@ CHECKOUT_FIELDS = {
     "country": "Country",
 }
 PACIFIC_TIME = ZoneInfo("America/Los_Angeles")
-GRANULARITIES = frozenset({"day", "week", "month"})
-PERIOD_UNITS = frozenset({"days", "weeks", "months"})
+GRANULARITIES = frozenset({"hour", "day", "week", "month"})
+PERIOD_UNITS = frozenset({"days", "weeks", "months", "years"})
 MAX_CUSTOM_RANGE_DAYS = 1825
 MAX_JOURNEY_DEPTH = 20
 JOURNEY_DEPTH_INCREMENT = 5
@@ -75,31 +75,36 @@ def resolve_dashboard_range(query_args, *, today: date | None = None) -> dict[st
     """Resolve complete Pacific-time periods or an inclusive custom date range."""
     today = today or datetime.now(PACIFIC_TIME).date()
     latest_complete_date = today - timedelta(days=1)
-    mode = query_args.get("range", "rolling")
     unit = query_args.get("unit", "days")
-    if unit not in PERIOD_UNITS:
+    legacy_mode = query_args.get("range")
+    if unit not in PERIOD_UNITS and unit != "custom":
         unit = "days"
 
     legacy_days = query_args.get("days")
-    if "range" not in query_args and legacy_days in {"7", "30", "90"}:
+    if legacy_mode is None and legacy_days in {"7", "30", "90"}:
         mode = "rolling"
         unit = "days"
         count_value = legacy_days
+    elif legacy_mode == "previous_month":
+        mode = "rolling"
+        unit = "months"
+        count_value = "1"
     else:
-        count_value = query_args.get("count", "30")
+        mode = "custom" if legacy_mode == "custom" or unit == "custom" else "rolling"
+        if mode == "custom":
+            unit = "custom"
+        count_value = query_args.get("count")
+        if count_value is None:
+            count_value = {"days": "30", "weeks": "4", "months": "4", "years": "1"}.get(unit, "30")
 
-    max_count = {"days": 365, "weeks": 104, "months": 60}[unit]
+    max_count = {"days": 365, "weeks": 104, "months": 60, "years": 5}.get(unit, 365)
     try:
         count = int(count_value)
     except (TypeError, ValueError):
-        count = 30 if unit == "days" else 4
+        count = {"days": 30, "weeks": 4, "months": 4, "years": 1}.get(unit, 30)
     count = min(max(count, 1), max_count)
 
-    if mode == "previous_month":
-        end_exclusive = date(today.year, today.month, 1)
-        start_date = _shift_months(end_exclusive, -1)
-        description = "Previous calendar month"
-    elif mode == "custom":
+    if mode == "custom":
         try:
             start_date = date.fromisoformat(query_args.get("date_from", ""))
             end_date = date.fromisoformat(query_args.get("date_to", ""))
@@ -123,6 +128,10 @@ def resolve_dashboard_range(query_args, *, today: date | None = None) -> dict[st
             end_exclusive = today - timedelta(days=today.weekday())
             start_date = end_exclusive - timedelta(weeks=count)
             unit_label = "week"
+        elif unit == "years":
+            end_exclusive = date(today.year, 1, 1)
+            start_date = date(today.year - count, 1, 1)
+            unit_label = "year"
         else:
             end_exclusive = date(today.year, today.month, 1)
             start_date = _shift_months(end_exclusive, -count)
@@ -167,6 +176,16 @@ def _pacific_bucket(value: datetime, granularity: str) -> date:
     if value.tzinfo is None:
         value = value.replace(tzinfo=timezone.utc)
     return _bucket_start(value.astimezone(PACIFIC_TIME).date(), granularity)
+
+
+def _pacific_hour(value: datetime) -> int:
+    if value.tzinfo is None:
+        value = value.replace(tzinfo=timezone.utc)
+    return value.astimezone(PACIFIC_TIME).hour
+
+
+def _format_hour(hour: int) -> str:
+    return f"{hour:02d}:00"
 
 metadata = MetaData()
 site_analytics_events = Table(
@@ -758,7 +777,11 @@ class SiteAnalytics:
 
             if self.engine.dialect.name == "postgresql":
                 local_event_time = func.timezone("America/Los_Angeles", events.c.occurred_at)
-                event_bucket = func.date_trunc(granularity, local_event_time)
+                event_bucket = (
+                    extract("hour", local_event_time)
+                    if granularity == "hour"
+                    else func.date_trunc(granularity, local_event_time)
+                )
                 chart_rows = connection.execute(
                     select(
                         event_bucket.label("event_bucket"),
@@ -775,9 +798,13 @@ class SiteAnalytics:
                 ).all()
                 chart_lookup = {}
                 for row in chart_rows:
-                    bucket = row.event_bucket
-                    bucket_date = bucket.date() if isinstance(bucket, datetime) else bucket
-                    chart_lookup[bucket_date.isoformat()] = {
+                    if granularity == "hour":
+                        bucket_key = str(int(row.event_bucket))
+                    else:
+                        bucket = row.event_bucket
+                        bucket_date = bucket.date() if isinstance(bucket, datetime) else bucket
+                        bucket_key = bucket_date.isoformat()
+                    chart_lookup[bucket_key] = {
                         "page_views": int(row.page_views or 0),
                         "clicks": int(row.clicks or 0),
                         "sessions": int(row.sessions or 0),
@@ -789,9 +816,13 @@ class SiteAnalytics:
                 ).all()
                 chart_accumulator: dict[str, dict[str, object]] = {}
                 for row in chart_rows:
-                    bucket_date = _pacific_bucket(row.occurred_at, granularity)
+                    bucket_key = (
+                        str(_pacific_hour(row.occurred_at))
+                        if granularity == "hour"
+                        else _pacific_bucket(row.occurred_at, granularity).isoformat()
+                    )
                     bucket = chart_accumulator.setdefault(
-                        bucket_date.isoformat(),
+                        bucket_key,
                         {"page_views": 0, "clicks": 0, "sessions": set()},
                     )
                     bucket["page_views" if row.event_type == "page_view" else "clicks"] += 1
@@ -972,9 +1003,6 @@ class SiteAnalytics:
                 journey_pages=journey_pages,
             )
 
-        last_day = end_exclusive - timedelta(days=1)
-        bucket_date = _bucket_start(start_date, granularity)
-        final_bucket = _bucket_start(last_day, granularity)
         chart = []
         metric_fields = {
             "views_sessions": ("page_views", "sessions"),
@@ -984,21 +1012,39 @@ class SiteAnalytics:
             "views_clicks": ("page_views", "clicks"),
             "all": ("page_views", "sessions", "clicks"),
         }[chart_metric]
-        while bucket_date <= final_bucket:
-            counts = chart_lookup.get(bucket_date.isoformat(), {})
-            bucket_counts = {
-                "page_views": int(counts.get("page_views", 0)),
-                "sessions": int(counts.get("sessions", 0)),
-                "clicks": int(counts.get("clicks", 0)),
-            }
-            if any(bucket_counts[field] for field in metric_fields):
-                chart.append({
-                    "label": f"{bucket_date.month}/{bucket_date.day}",
-                    **bucket_counts,
-                })
-            bucket_date = _next_bucket(bucket_date, granularity)
+        if granularity == "hour":
+            has_selected_activity = any(
+                any(int(counts.get(field, 0)) for field in metric_fields)
+                for counts in chart_lookup.values()
+            )
+            if has_selected_activity:
+                for hour in range(24):
+                    counts = chart_lookup.get(str(hour), {})
+                    chart.append({
+                        "label": _format_hour(hour),
+                        "page_views": int(counts.get("page_views", 0)),
+                        "sessions": int(counts.get("sessions", 0)),
+                        "clicks": int(counts.get("clicks", 0)),
+                    })
+        else:
+            last_day = end_exclusive - timedelta(days=1)
+            bucket_date = _bucket_start(start_date, granularity)
+            final_bucket = _bucket_start(last_day, granularity)
+            while bucket_date <= final_bucket:
+                counts = chart_lookup.get(bucket_date.isoformat(), {})
+                bucket_counts = {
+                    "page_views": int(counts.get("page_views", 0)),
+                    "sessions": int(counts.get("sessions", 0)),
+                    "clicks": int(counts.get("clicks", 0)),
+                }
+                if any(bucket_counts[field] for field in metric_fields):
+                    chart.append({
+                        "label": f"{bucket_date.month}/{bucket_date.day}",
+                        **bucket_counts,
+                    })
+                bucket_date = _next_bucket(bucket_date, granularity)
 
-        label_interval = max(1, math.ceil(len(chart) / 14))
+        label_interval = 1 if granularity == "hour" else max(1, math.ceil(len(chart) / 14))
         for index, bucket in enumerate(chart):
             bucket["show_label"] = (
                 index == 0 or index == len(chart) - 1 or index % label_interval == 0
@@ -1008,6 +1054,11 @@ class SiteAnalytics:
             (max(row[field] for field in metric_fields) for row in chart),
             default=1,
         ) or 1
+        chart_note = "Populated periods only"
+        if granularity == "hour":
+            chart_note = "Hour-of-day totals across selected dates"
+            if "sessions" in metric_fields:
+                chart_note += "; a session may appear in multiple hours"
         page_filter_options = [
             {"value": "all", "label": "All pages"},
             {"value": "home", "label": "Homepage only"},
@@ -1032,7 +1083,13 @@ class SiteAnalytics:
             "chart": chart,
             "chart_peak": top_peak,
             "granularity": granularity,
-            "granularity_label": {"day": "Daily", "week": "Weekly", "month": "Monthly"}[granularity],
+            "granularity_label": {
+                "hour": "Hourly",
+                "day": "Daily",
+                "week": "Weekly",
+                "month": "Monthly",
+            }[granularity],
+            "chart_note": chart_note,
             "chart_metric": chart_metric,
             "chart_metric_label": {
                 "views_sessions": "Page views and sessions",

@@ -20,44 +20,37 @@
     )
   ) %}
   <form class="analytics-card analytics-filters" method="get" action="{{ url_for('site_analytics_dashboard') }}">
-    <div class="analytics-filter-field">
-      <label for="analytics-range-mode">Date range</label>
-      <select id="analytics-range-mode" name="range" class="form-select">
-        <option value="rolling" {{ 'selected' if analytics.mode == 'rolling' else '' }}>Last X complete periods</option>
-        <option value="previous_month" {{ 'selected' if analytics.mode == 'previous_month' else '' }}>Previous calendar month</option>
-        <option value="custom" {{ 'selected' if analytics.mode == 'custom' else '' }}>Custom dates</option>
-      </select>
-    </div>
-
-    <div class="analytics-filter-field analytics-period-fields" data-range-fields="rolling"
-      {% if analytics.mode != 'rolling' %}hidden{% endif %}>
-      <label for="analytics-period-count">Last</label>
-      <div class="analytics-inline-fields">
-        <input id="analytics-period-count" class="form-control" name="count" type="number"
-          min="1" max="{{ analytics.max_count }}" value="{{ analytics.count }}" inputmode="numeric"
-          {% if analytics.mode != 'rolling' %}disabled{% endif %}>
-        <select name="unit" class="form-select" aria-label="Complete period unit"
-          {% if analytics.mode != 'rolling' %}disabled{% endif %}>
+    <div class="analytics-filter-field analytics-date-range-field">
+      <label for="analytics-period-unit">Date range</label>
+      <div class="analytics-inline-fields analytics-range-controls">
+        <div class="analytics-inline-fields analytics-period-count" data-range-fields="period"
+          {% if analytics.unit == 'custom' %}hidden{% endif %}>
+          <label for="analytics-period-count">Last</label>
+          <input id="analytics-period-count" class="form-control" name="count" type="number"
+            min="1" max="{{ analytics.max_count }}" value="{{ analytics.count }}" inputmode="numeric">
+        </div>
+        <select id="analytics-period-unit" name="unit" class="form-select" aria-label="Date range period">
           <option value="days" {{ 'selected' if analytics.unit == 'days' else '' }}>complete days</option>
           <option value="weeks" {{ 'selected' if analytics.unit == 'weeks' else '' }}>complete weeks</option>
           <option value="months" {{ 'selected' if analytics.unit == 'months' else '' }}>complete months</option>
+          <option value="years" {{ 'selected' if analytics.unit == 'years' else '' }}>complete years</option>
+          <option value="custom" {{ 'selected' if analytics.unit == 'custom' else '' }}>custom date range</option>
         </select>
       </div>
+      <fieldset class="analytics-custom-fields" data-range-fields="custom"
+        {% if analytics.unit != 'custom' %}disabled hidden{% endif %}>
+        <legend class="visually-hidden">Custom date range</legend>
+        <div class="analytics-inline-fields">
+          <label class="visually-hidden" for="analytics-date-from">From</label>
+          <input id="analytics-date-from" class="form-control" name="date_from" type="date"
+            value="{{ analytics.date_from }}" max="{{ analytics.latest_complete_date }}">
+          <span aria-hidden="true">to</span>
+          <label class="visually-hidden" for="analytics-date-to">Through</label>
+          <input id="analytics-date-to" class="form-control" name="date_to" type="date"
+            value="{{ analytics.date_to }}" max="{{ analytics.latest_complete_date }}">
+        </div>
+      </fieldset>
     </div>
-
-    <fieldset class="analytics-filter-field analytics-custom-fields" data-range-fields="custom"
-      {% if analytics.mode != 'custom' %}disabled hidden{% endif %}>
-      <legend>Custom dates</legend>
-      <div class="analytics-inline-fields">
-        <label class="visually-hidden" for="analytics-date-from">From</label>
-        <input id="analytics-date-from" class="form-control" name="date_from" type="date"
-          value="{{ analytics.date_from }}" max="{{ analytics.latest_complete_date }}">
-        <span aria-hidden="true">to</span>
-        <label class="visually-hidden" for="analytics-date-to">Through</label>
-        <input id="analytics-date-to" class="form-control" name="date_to" type="date"
-          value="{{ analytics.date_to }}" max="{{ analytics.latest_complete_date }}">
-      </div>
-    </fieldset>
 
     <div class="analytics-filter-field">
       <label for="analytics-page-filter">Page filter</label>
@@ -84,6 +77,7 @@
         <div class="analytics-filter-field">
           <label for="analytics-granularity">Graph grouping</label>
           <select id="analytics-granularity" name="granularity" class="form-select">
+            <option value="hour" {{ 'selected' if analytics.granularity == 'hour' else '' }}>Hour of day</option>
             <option value="day" {{ 'selected' if analytics.granularity == 'day' else '' }}>Daily</option>
             <option value="week" {{ 'selected' if analytics.granularity == 'week' else '' }}>Weekly</option>
             <option value="month" {{ 'selected' if analytics.granularity == 'month' else '' }}>Monthly</option>
@@ -143,7 +137,7 @@
     <div class="analytics-section-heading">
       <div>
         <h2 id="activity-title">Activity over time</h2>
-        <p>{{ analytics.granularity_label }} {{ analytics.chart_metric_label|lower }} · populated periods only</p>
+        <p>{{ analytics.granularity_label }} {{ analytics.chart_metric_label|lower }} · {{ analytics.chart_note|lower }}</p>
       </div>
       {% if analytics.chart %}
       <div class="analytics-legend">
