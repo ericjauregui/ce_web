@@ -197,13 +197,22 @@ class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
         )
         self.assertNotIn("Shared reporting", self.page.locator("main.analytics-dashboard").inner_text())
         self.assertNotIn("Pacific", self.page.locator("main.analytics-dashboard").inner_text())
-        self.assertEqual(self.page.locator(".analytics-bucket").count(), 1)
-        self.assertRegex(self.page.locator(".analytics-bucket > small").inner_text(), r"^\d{1,2}/\d{1,2}$")
-        self.assertEqual(self.page.locator(".bar-views").count(), 1)
-        self.assertEqual(self.page.locator(".bar-sessions").count(), 1)
-        self.assertEqual(self.page.locator(".bar-clicks").count(), 0)
-        self.assertEqual(self.page.locator(".analytics-bar-value").count(), 2)
-        self.assertIn("80.0%", self.page.locator("#request-status-title").locator("xpath=../../..")
+        self.assertEqual(self.page.locator("#analytics-line-chart").count(), 1)
+        self.assertEqual(self.page.locator(".analytics-line--page_views").count(), 1)
+        self.assertEqual(self.page.locator(".analytics-line--sessions").count(), 1)
+        self.assertEqual(self.page.locator(".analytics-line--clicks").count(), 0)
+        self.assertEqual(self.page.locator(".analytics-line-point").count(), 2)
+        self.assertCountEqual(
+            self.page.locator(".analytics-data-label").evaluate_all(
+                "elements => elements.map(element => element.textContent)"
+            ),
+            ["11", "3"],
+        )
+        first_x_label = self.page.locator(".analytics-x-label").first.evaluate(
+            "element => element.textContent"
+        )
+        self.assertRegex(first_x_label, r"^\d{1,2}/\d{1,2}$")
+        self.assertIn("80%", self.page.locator("#request-status-title").locator("xpath=../../..")
                       .inner_text())
         checkout_card = self.page.locator("#checkout-insights-title").locator("xpath=../../..")
         self.assertIn("1m 15s", checkout_card.inner_text())
@@ -215,8 +224,11 @@ class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
         sources_card = self.page.locator("#sources-title").locator("xpath=../../..")
         campaigns_card = self.page.locator("#campaigns-title").locator("xpath=../../..")
         clicks_card = self.page.locator("#clicks-title").locator("xpath=../../..")
+        contexts_card = self.page.locator("#context-title").locator("xpath=../../..")
         self.assertIn("/connect", pages_card.inner_text())
+        self.assertIn("18%", pages_card.inner_text())
         self.assertIn("Add to order", clicks_card.inner_text())
+        self.assertIn("20%", clicks_card.inner_text())
         self.assertIn("Toggle menu button", clicks_card.inner_text())
         self.assertIn("Click reel card 1", clicks_card.inner_text())
         self.assertIn("Turn video sound on", clicks_card.inner_text())
@@ -224,9 +236,18 @@ class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
         self.assertIn("Click reel card 1 records a click on that card", clicks_card.inner_text())
         self.assertNotIn("Play video 1", clicks_card.inner_text())
         self.assertIn("newsletter.example", sources_card.inner_text())
+        self.assertIn("33%", sources_card.inner_text())
         self.assertIn("fall-launch", campaigns_card.inner_text())
-        self.assertIn("JIS Miami", self.page.locator("#connect-actions-title")
-                      .locator("xpath=../../..").inner_text())
+        self.assertIn("33%", campaigns_card.inner_text())
+        self.assertIn("9%", contexts_card.inner_text())
+        self.assertIn("20%", contexts_card.inner_text())
+        connect_actions_card = self.page.locator("#connect-actions-title").locator("xpath=../../..")
+        self.assertIn("JIS Miami", connect_actions_card.inner_text())
+        self.assertIn("50%", connect_actions_card.inner_text())
+        self.assertIn("100%", self.page.locator("#request-status-title").locator("xpath=../../..")
+                      .inner_text())
+        self.assertIn("67% of filtered sessions", checkout_card.inner_text())
+        self.assertIn("50%", checkout_card.inner_text())
         self.assertEqual(self.page.locator("script[src*='site_analytics.js']").count(), 0)
         self.assertEqual(self.page.locator("script[src*='cloudflareinsights.com']").count(), 0)
         self.assertFalse(any("cloudflareinsights.com/beacon" in url for url in tracked_requests))
@@ -274,10 +295,11 @@ class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
         self.assertEqual(self.page.locator("#analytics-page-filter").input_value(), "path:/connect")
         self.assertEqual(self.page.locator("#analytics-granularity").input_value(), "week")
         self.assertEqual(self.page.locator("#analytics-metric").input_value(), "clicks")
-        self.assertEqual(self.page.locator(".analytics-bucket").count(), 1)
-        self.assertEqual(self.page.locator(".bar-views").count(), 0)
-        self.assertEqual(self.page.locator(".bar-sessions").count(), 0)
-        self.assertGreater(self.page.locator(".bar-clicks").count(), 0)
+        self.assertEqual(self.page.locator(".analytics-line").count(), 1)
+        self.assertEqual(self.page.locator(".analytics-line--clicks").count(), 1)
+        self.assertEqual(self.page.locator(".analytics-line--page_views").count(), 0)
+        self.assertEqual(self.page.locator(".analytics-line--sessions").count(), 0)
+        self.assertEqual(self.page.locator(".analytics-line-point--clicks").count(), 1)
         self.assertEqual(self.page.locator("#analytics-sankey .sankey-link").count(), 1)
         self.assertEqual(self.context.cookies(), [])
 
@@ -316,7 +338,7 @@ class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
         self.assertEqual(self.page.locator("#analytics-date-to").input_value(), fixture_day)
         self.assertEqual(self.page.locator(".metric-card").nth(1).locator("strong").inner_text(), "11")
         self.assertEqual(self.page.locator(".metric-card").nth(2).locator("strong").inner_text(), "5")
-        self.assertEqual(self.page.locator(".analytics-bucket").count(), 1)
+        self.assertEqual(self.page.locator(".analytics-line-point").count(), 2)
 
         hourly_response = self.goto(
             "/admin/analytics?range=rolling&count=7&unit=days&granularity=hour"
@@ -324,15 +346,75 @@ class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
         )
         self.assertEqual(hourly_response.status, 200)
         self.assertEqual(self.page.locator("#analytics-granularity").input_value(), "hour")
-        self.assertEqual(self.page.locator(".analytics-bucket").count(), 24)
+        self.assertEqual(self.page.locator(".analytics-line-point").count(), 48)
         self.assertEqual(
-            self.page.locator(".analytics-bucket > small").all_inner_texts(),
-            [f"{hour:02}:00" for hour in range(24)],
+            self.page.locator(".analytics-x-label").evaluate_all(
+                "elements => elements.map(element => element.textContent)"
+            ),
+            [f"{hour:02}h" for hour in range(24)],
         )
         self.assertIn(
             "hourly totals across selected dates",
             self.page.locator("main.analytics-dashboard").inner_text(),
         )
+        self.page.set_viewport_size({"width": 390, "height": 844})
+        self.assertEqual(self.page.locator(".analytics-chart-scroll-hint").count(), 0)
+        self.assertLessEqual(
+            self.page.evaluate("document.documentElement.scrollWidth"),
+            390,
+            "The analytics dashboard should not overflow the mobile viewport.",
+        )
+        chart_scroll = self.page.locator(".analytics-chart-scroll")
+        self.assertLessEqual(
+            chart_scroll.evaluate("element => element.scrollWidth"),
+            chart_scroll.evaluate("element => element.clientWidth") + 1,
+            "The hourly chart should fit inside its card on narrow screens.",
+        )
+        mobile_hour_labels = self.page.locator(".analytics-x-label--hour").evaluate_all(
+            "elements => elements.filter(element => getComputedStyle(element).display !== 'none')"
+            ".map(element => element.textContent)"
+        )
+        self.assertEqual(mobile_hour_labels, ["00h", "04h", "08h", "12h", "16h", "20h", "23h"])
+        chart_scroll.scroll_into_view_if_needed()
+        self.page.screenshot(
+            path=str(self._artifact_dir() / "analytics-chart-mobile.png"),
+            animations="disabled",
+        )
+
+        chart_widths = {}
+        for width in (320, 390, 767, 768, 1280):
+            self.page.set_viewport_size({"width": width, "height": 844})
+            chart_widths[width] = self.page.locator("#analytics-line-chart").evaluate(
+                "element => element.getBoundingClientRect().width"
+            )
+            spacing = self.page.evaluate("""() => {
+              const cart = document.querySelector('#cartLink svg');
+              const toggler = document.querySelector('.navbar-toggler');
+              const menu = document.querySelector('.navbar-toggler-icon');
+              if (!cart || !toggler || !menu) return null;
+              const cartRect = cart.getBoundingClientRect();
+              const togglerRect = toggler.getBoundingClientRect();
+              const menuRect = menu.getBoundingClientRect();
+              const dividerX = togglerRect.left +
+                parseFloat(getComputedStyle(toggler).borderLeftWidth || '0');
+              return {
+                cartGap: dividerX - cartRect.right,
+                menuGap: menuRect.left - dividerX,
+                visible: cartRect.width > 0 && menuRect.width > 0 &&
+                  getComputedStyle(toggler).display !== 'none'
+              };
+            }""")
+            self.assertIsNotNone(spacing, f"Navbar controls should exist at {width}px.")
+            self.assertTrue(spacing["visible"], f"Navbar controls should be visible at {width}px.")
+            self.assertAlmostEqual(
+                spacing["cartGap"], spacing["menuGap"], delta=1,
+                msg=f"Cart and menu icon should sit equally from the divider at {width}px: {spacing}",
+            )
+        self.assertGreater(
+            chart_widths[1280], chart_widths[390] + 500,
+            f"The chart should expand with the wider page: {chart_widths}",
+        )
+        self.page.set_viewport_size({"width": 390, "height": 844})
 
     def test_click_tracking_uses_action_and_product_card_labels(self) -> None:
         self.page.add_init_script("""

@@ -52,8 +52,22 @@
   will-change: transform;
 }
 
+.navbar .cart-link {
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
 #cartCountBadge {
-  transform: translate(-70%, -56%);
+  top: 0;
+  right: 0;
+  min-width: 20px;
+  min-height: 20px;
+  padding: 2px 4px;
+  font-size: .75rem;
+  line-height: 14px;
 }
 .cart-link:focus-visible svg {
   animation: cart-shake 420ms ease-in-out;
@@ -75,30 +89,32 @@
 
 /* Navbar expandable search */
 .nav-actions {
-  gap: .4rem;
-  }
-  
-  .nav-actions .cart-link {
-    margin-left: .35rem !important;
-    margin-right: .55rem !important;
-  }
-  
-  .navbar .navbar-toggler {
-    border: 0;
-    border-left: 1px solid var(--gold-outline);
-    border-radius: 0;
-    margin-left: .3rem;
-    padding: .3rem 0 .3rem .75rem;
-    box-shadow: none;
-  }
-  
-  .navbar .navbar-toggler:focus,
-  .navbar .navbar-toggler:focus-visible {
-    box-shadow: none;
-    border-left-color: var(--gold-outline-strong);
-  }
-  
-  .navbar .navbar-toggler-icon {
+  gap: 0;
+}
+
+.nav-actions .cart-link {
+  margin: 0 2px 0 0 !important;
+}
+
+.navbar .navbar-toggler {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  border: 0;
+  border-left: 1px solid var(--gold-outline);
+  border-radius: 0;
+  margin-left: 0;
+  padding: .3rem 0 .3rem .75rem;
+  box-shadow: none;
+}
+
+.navbar .navbar-toggler:focus,
+.navbar .navbar-toggler:focus-visible {
+  box-shadow: none;
+  border-left-color: var(--gold-outline-strong);
+}
+
+.navbar .navbar-toggler-icon {
     width: 1.35rem;
     height: 1.35rem;
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(215, 192, 122, 0.95)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
@@ -434,6 +450,14 @@ body::-webkit-scrollbar-corner,
     min-height: 44px;
     display: inline-flex;
     align-items: center;
+  }
+
+  .navbar .cart-link,
+  .navbar .nav-search-trigger {
     justify-content: center;
+  }
+
+  .navbar .navbar-toggler {
+    justify-content: flex-start;
   }
 }

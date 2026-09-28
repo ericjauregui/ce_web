@@ -3740,17 +3740,12 @@
 .search-empty-state { padding-block: 1.5rem; }
 
 @media (max-width: 767.98px) {
-  .product-card .product-qty-control,
   .product-detail-page .product-qty-control {
     flex-wrap: wrap;
     justify-content: center;
     gap: 4px;
   }
-  .product-card .qty-center-group,
   .product-detail-page .qty-center-group { gap: 4px; }
-  .product-card .qty-adjust-btn,
-  .product-card .qty-clear-btn,
-  .product-card .product-qty-input,
   .product-detail-page .qty-adjust-btn,
   .product-detail-page .qty-clear-btn,
   .product-detail-page .product-qty-input {
@@ -3761,7 +3756,6 @@
     flex: 0 0 44px;
     padding: 0;
   }
-  .product-card .add-to-cart-btn,
   .product-detail-top-actions .product-detail-top-action,
   .checkout-page .checkout-summary-bar .btn,
   .page-back-btn,
@@ -3771,23 +3765,47 @@
 }
 
 @media (max-width: 767.98px) {
-  .product-card .product-qty-control {
-    padding: 0;
-    overflow: visible;
-    flex-direction: column;
-    flex-wrap: nowrap;
-  }
-  .product-card .qty-center-group { order: 1; max-width: none; gap: 2px; }
-  .product-card .qty-clear-btn { position: static; order: 2; }
-  .product-detail-page .product-qty-control { padding-inline: 48px; }
-}
-
-@media (max-width: 767.98px) {
+  .product-card .card-body { padding: .65rem; }
   .product-card .product-actions { grid-template-columns: minmax(0, 1fr); }
-  .product-card .product-qty-control { min-width: 0; }
-}
-@media (max-width: 359.98px) {
-  .product-card .qty-center-group { gap: 0; }
+  .product-card .add-to-cart-btn { min-height: 36px; font-size: .8rem; }
+  .product-card.is-in-cart .product-actions {
+    grid-template-columns: minmax(0, 1fr) 24px;
+    column-gap: 4px !important;
+  }
+  .product-card.is-in-cart .add-to-cart-btn {
+    padding-inline: 0;
+    font-size: clamp(.65rem, 6.5cqw, .8rem);
+    white-space: nowrap;
+  }
+  .product-card .product-qty-control { display: contents; }
+  .product-card .qty-center-group {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    min-width: 0;
+    width: 100%;
+  }
+  .product-card .qty-adjust-btn,
+  .product-card .qty-clear-btn,
+  .product-card .product-qty-input {
+    min-width: 0;
+    width: 32px;
+    flex: 0 0 32px;
+    height: 32px;
+    min-height: 32px;
+    padding: 0;
+    font-size: .8rem;
+  }
+  .product-card .qty-clear-btn {
+    position: static;
+    grid-column: 2;
+    grid-row: 1;
+    width: 24px;
+    height: 36px;
+  }
+  .product-detail-page .product-qty-control { padding-inline: 48px; }
 }
 
 /* Keep the compact cart header on one centered line, including narrow phones. */

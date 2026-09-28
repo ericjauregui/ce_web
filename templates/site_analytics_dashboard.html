@@ -148,33 +148,40 @@
       {% endif %}
     </div>
     {% if analytics.chart %}
-    <div class="analytics-chart" role="img"
-      aria-label="{{ analytics.granularity_label }} {{ analytics.chart_metric_label|lower }} from {{ analytics.range_label }}">
-      {% for bucket in analytics.chart %}
-      <div class="analytics-bucket" title="{{ bucket.label }}: {{ bucket.page_views }} page views, {{ bucket.sessions }} sessions, {{ bucket.clicks }} clicks">
-        <div class="analytics-bars">
-          {% if analytics.chart_metric in ['views_sessions', 'page_views', 'views_clicks', 'all'] %}
-          <span class="analytics-bar-column" style="--bar-height: {{ (bucket.page_views * 85 / analytics.chart_peak)|round|int }}%" aria-label="{{ bucket.page_views }} page views">
-            <small class="analytics-bar-value">{{ bucket.page_views }}</small>
-            <span class="analytics-bar bar-views"></span>
-          </span>
-          {% endif %}
-          {% if analytics.chart_metric in ['views_sessions', 'sessions', 'all'] %}
-          <span class="analytics-bar-column" style="--bar-height: {{ (bucket.sessions * 85 / analytics.chart_peak)|round|int }}%" aria-label="{{ bucket.sessions }} sessions">
-            <small class="analytics-bar-value">{{ bucket.sessions }}</small>
-            <span class="analytics-bar bar-sessions"></span>
-          </span>
-          {% endif %}
-          {% if analytics.chart_metric in ['clicks', 'views_clicks', 'all'] %}
-          <span class="analytics-bar-column" style="--bar-height: {{ (bucket.clicks * 85 / analytics.chart_peak)|round|int }}%" aria-label="{{ bucket.clicks }} clicks">
-            <small class="analytics-bar-value">{{ bucket.clicks }}</small>
-            <span class="analytics-bar bar-clicks"></span>
-          </span>
-          {% endif %}
-        </div>
-        {% if bucket.show_label %}<small>{{ bucket.label }}</small>{% else %}<small aria-hidden="true">&nbsp;</small>{% endif %}
-      </div>
-      {% endfor %}
+    <div class="analytics-chart-scroll">
+      <svg id="analytics-line-chart" class="analytics-line-chart" viewBox="0 0 1000 320"
+        role="img" aria-labelledby="analytics-chart-title analytics-chart-description">
+        <title id="analytics-chart-title">{{ analytics.granularity_label }} {{ analytics.chart_metric_label|lower }}</title>
+        <desc id="analytics-chart-description">Counts are labeled at selected points. Hover points for exact values; selected points are keyboard focusable.</desc>
+        {% for tick in analytics.chart_y_ticks %}
+        <line class="analytics-grid-line" x1="66" y1="{{ tick.y }}" x2="984" y2="{{ tick.y }}"></line>
+        <text class="analytics-y-label" x="56" y="{{ tick.y + 4 }}" text-anchor="end">{{ tick.label }}</text>
+        {% endfor %}
+        <line class="analytics-axis-line" x1="66" y1="250" x2="984" y2="250"></line>
+        {% for bucket in analytics.chart %}
+        {% if bucket.show_label %}
+        {% set hourly_label = analytics.granularity == 'hour' %}
+        <text class="analytics-x-label{% if hourly_label %} analytics-x-label--hour{% endif %}{% if hourly_label and (loop.index0 % 2 == 0 or loop.first or loop.last) %} analytics-x-label--hour-tablet{% endif %}{% if hourly_label and (loop.index0 % 4 == 0 or loop.last) %} analytics-x-label--hour-mobile{% endif %}" x="{{ bucket.x }}" y="292"
+          text-anchor="{{ 'start' if loop.first else ('end' if loop.last else 'middle') }}">{{ bucket.label }}</text>
+        {% endif %}
+        {% endfor %}
+        {% for series in analytics.chart_series %}
+        <polyline class="analytics-line analytics-line--{{ series.key }}" points="{{ series.points }}"></polyline>
+        {% for bucket in analytics.chart %}
+        {% set point = bucket.line_points[series.key] %}
+        <circle class="analytics-line-point analytics-line-point--{{ series.key }}"
+          cx="{{ bucket.x }}" cy="{{ point.y }}" r="4"
+          tabindex="{{ '0' if bucket.show_value_label else '-1' }}"
+          aria-label="{{ bucket.label }} {{ series.label }}: {{ '{:,}'.format(point.value) }}">
+          <title>{{ bucket.label }} · {{ series.label }}: {{ '{:,}'.format(point.value) }}</title>
+        </circle>
+        {% if bucket.show_value_label %}
+        <text class="analytics-data-label analytics-data-label--{{ series.key }}"
+          x="{{ bucket.x }}" y="{{ point.label_y }}" text-anchor="middle">{{ '{:,}'.format(point.value) }}</text>
+        {% endif %}
+        {% endfor %}
+        {% endfor %}
+      </svg>
     </div>
     {% else %}
     <p class="analytics-empty">No selected graph metric has activity in this date range.</p>
@@ -185,27 +192,30 @@
     <section class="analytics-card" aria-labelledby="pages-title">
       <div class="analytics-section-heading"><div><h2 id="pages-title">Top pages</h2><p>Page views in this range</p></div></div>
       {% if analytics.top_pages %}
-      <ol class="analytics-ranked-list">
-        {% for page in analytics.top_pages %}<li><span class="analytics-path">{{ page.path }}</span><strong>{{ '{:,}'.format(page.count) }}</strong></li>{% endfor %}
-      </ol>
+      <div class="analytics-table-wrap"><table class="analytics-table">
+        <thead><tr><th>Page</th><th class="analytics-number">Views</th><th class="analytics-number">% of views</th></tr></thead>
+        <tbody>{% for page in analytics.top_pages %}<tr><td class="analytics-path">{{ page.path }}</td><td class="analytics-number">{{ '{:,}'.format(page.count) }}</td><td class="analytics-number analytics-percent">{{ page.percent }}%</td></tr>{% endfor %}</tbody>
+      </table></div>
       {% else %}<p class="analytics-empty">No page views recorded in this range.</p>{% endif %}
     </section>
 
     <section class="analytics-card" aria-labelledby="clicks-title">
       <div class="analytics-section-heading"><div><h2 id="clicks-title">Clicked links and actions</h2><p>Toggle menu button opens or closes the navigation menu; Click reel card 1 records a click on that card; reels autoplay muted, while Turn video sound on is a separate click. Open homepage goes to /.</p></div></div>
       {% if analytics.top_clicks %}
-      <ol class="analytics-ranked-list">
-        {% for item in analytics.top_clicks %}<li><span>{{ item.target }}</span><strong>{{ '{:,}'.format(item.count) }}</strong></li>{% endfor %}
-      </ol>
+      <div class="analytics-table-wrap"><table class="analytics-table">
+        <thead><tr><th>Link or action</th><th class="analytics-number">Clicks</th><th class="analytics-number">% of clicks</th></tr></thead>
+        <tbody>{% for item in analytics.top_clicks %}<tr><td>{{ item.target }}</td><td class="analytics-number">{{ '{:,}'.format(item.count) }}</td><td class="analytics-number analytics-percent">{{ item.percent }}%</td></tr>{% endfor %}</tbody>
+      </table></div>
       {% else %}<p class="analytics-empty">No clicks recorded in this range.</p>{% endif %}
     </section>
 
     <section class="analytics-card" aria-labelledby="sources-title">
       <div class="analytics-section-heading"><div><h2 id="sources-title">Referrer hosts</h2><p>Distinct sessions attributed to a referrer</p></div></div>
       {% if analytics.referrers %}
-      <ol class="analytics-ranked-list">
-        {% for source in analytics.referrers %}<li><span>{{ source.host }}</span><strong>{{ '{:,}'.format(source.sessions) }}</strong></li>{% endfor %}
-      </ol>
+      <div class="analytics-table-wrap"><table class="analytics-table">
+        <thead><tr><th>Host</th><th class="analytics-number">Sessions</th><th class="analytics-number">% of sessions</th></tr></thead>
+        <tbody>{% for source in analytics.referrers %}<tr><td>{{ source.host }}</td><td class="analytics-number">{{ '{:,}'.format(source.sessions) }}</td><td class="analytics-number analytics-percent">{{ source.percent }}%</td></tr>{% endfor %}</tbody>
+      </table></div>
       {% else %}<p class="analytics-empty">No external referrers recorded in this range.</p>{% endif %}
     </section>
 
@@ -213,8 +223,8 @@
       <div class="analytics-section-heading"><div><h2 id="campaigns-title">Campaigns</h2><p>Sessions grouped by saved UTM tags</p></div></div>
       {% if analytics.campaigns %}
       <div class="analytics-table-wrap"><table class="analytics-table">
-        <thead><tr><th>Source</th><th>Medium</th><th>Campaign</th><th>Sessions</th></tr></thead>
-        <tbody>{% for campaign in analytics.campaigns %}<tr><td>{{ campaign.source or '—' }}</td><td>{{ campaign.medium or '—' }}</td><td>{{ campaign.campaign or '—' }}</td><td>{{ '{:,}'.format(campaign.sessions) }}</td></tr>{% endfor %}</tbody>
+        <thead><tr><th>Source</th><th>Medium</th><th>Campaign</th><th class="analytics-number">Sessions</th><th class="analytics-number">% of sessions</th></tr></thead>
+        <tbody>{% for campaign in analytics.campaigns %}<tr><td>{{ campaign.source or '—' }}</td><td>{{ campaign.medium or '—' }}</td><td>{{ campaign.campaign or '—' }}</td><td class="analytics-number">{{ '{:,}'.format(campaign.sessions) }}</td><td class="analytics-number analytics-percent">{{ campaign.percent }}%</td></tr>{% endfor %}</tbody>
       </table></div>
       {% else %}<p class="analytics-empty">No tagged campaign visits recorded in this range.</p>{% endif %}
     </section>
@@ -222,9 +232,10 @@
     {% if analytics.contexts %}
     <section class="analytics-card" aria-labelledby="context-title">
       <div class="analytics-section-heading"><div><h2 id="context-title">Page contexts</h2><p>Trade show or page-specific activity</p></div></div>
-      <ol class="analytics-ranked-list">
-        {% for context in analytics.contexts %}<li><span>{{ context.name }}</span><strong>{{ context.page_views }} views · {{ context.clicks }} clicks</strong></li>{% endfor %}
-      </ol>
+      <div class="analytics-table-wrap"><table class="analytics-table">
+        <thead><tr><th>Context</th><th class="analytics-number">Views</th><th class="analytics-number">% of views</th><th class="analytics-number">Clicks</th><th class="analytics-number">% of clicks</th></tr></thead>
+        <tbody>{% for context in analytics.contexts %}<tr><td>{{ context.name }}</td><td class="analytics-number">{{ '{:,}'.format(context.page_views) }}</td><td class="analytics-number analytics-percent">{{ context.page_views_percent }}%</td><td class="analytics-number">{{ '{:,}'.format(context.clicks) }}</td><td class="analytics-number analytics-percent">{{ context.clicks_percent }}%</td></tr>{% endfor %}</tbody>
+      </table></div>
     </section>
     {% endif %}
 
@@ -233,15 +244,19 @@
         <div><h2 id="request-status-title">Page response status</h2><p>HTML page requests only</p></div>
       </div>
       {% if analytics.request_status.total %}
-      <div class="analytics-status-grid">
-        <div><span>Successful (200)</span><strong>{{ '{:,}'.format(analytics.request_status.success_count) }}</strong><small>{{ analytics.request_status.success_percent }}%</small></div>
-        <div><span>Not found (404)</span><strong>{{ '{:,}'.format(analytics.request_status.not_found_count) }}</strong><small>{{ analytics.request_status.not_found_percent }}%</small></div>
-      </div>
+      <div class="analytics-table-wrap"><table class="analytics-table">
+        <thead><tr><th>Response</th><th class="analytics-number">Requests</th><th class="analytics-number">% of requests</th></tr></thead>
+        <tbody>
+          <tr><td>Successful (200)</td><td class="analytics-number">{{ '{:,}'.format(analytics.request_status.success_count) }}</td><td class="analytics-number analytics-percent">{{ analytics.request_status.success_percent }}%</td></tr>
+          <tr><td>Not found (404)</td><td class="analytics-number">{{ '{:,}'.format(analytics.request_status.not_found_count) }}</td><td class="analytics-number analytics-percent">{{ analytics.request_status.not_found_percent }}%</td></tr>
+        </tbody>
+      </table></div>
       {% if analytics.request_status.not_found_pages %}
       <h3 class="analytics-subheading">Most requested missing pages</h3>
-      <ol class="analytics-ranked-list">
-        {% for page in analytics.request_status.not_found_pages %}<li><span class="analytics-path">{{ page.path }}</span><strong>{{ '{:,}'.format(page.count) }}</strong></li>{% endfor %}
-      </ol>
+      <div class="analytics-table-wrap"><table class="analytics-table">
+        <thead><tr><th>Page</th><th class="analytics-number">404s</th><th class="analytics-number">% of 404s</th></tr></thead>
+        <tbody>{% for page in analytics.request_status.not_found_pages %}<tr><td class="analytics-path">{{ page.path }}</td><td class="analytics-number">{{ '{:,}'.format(page.count) }}</td><td class="analytics-number analytics-percent">{{ page.percent }}%</td></tr>{% endfor %}</tbody>
+      </table></div>
       {% endif %}
       {% else %}<p class="analytics-empty">No page response counts are available for this range yet.</p>{% endif %}
     </section>
@@ -252,16 +267,19 @@
       </div>
       {% if analytics.checkout_insights.in_scope %}
       <div class="analytics-status-grid">
-        <div><span>Checkout sessions</span><strong>{{ '{:,}'.format(analytics.checkout_insights.sessions) }}</strong></div>
+        <div><span>Checkout sessions</span><strong>{{ '{:,}'.format(analytics.checkout_insights.sessions) }}</strong><small>{{ analytics.checkout_insights.session_percent }}% of filtered sessions</small></div>
         <div><span>Average active time</span><strong>{{ analytics.checkout_insights.average_duration }}</strong><small>Median {{ analytics.checkout_insights.median_duration }}</small></div>
       </div>
       {% if analytics.checkout_insights.sessions %}
       <h3 class="analytics-subheading">Fields filled in</h3>
-      <ol class="analytics-ranked-list">
+      <div class="analytics-table-wrap"><table class="analytics-table">
+        <thead><tr><th>Checkout field</th><th class="analytics-number">Sessions</th><th class="analytics-number">% of checkout sessions</th></tr></thead>
+        <tbody>
         {% for field in analytics.checkout_insights.field_progress %}
-        {% if field.sessions %}<li><span>{{ field.label }}</span><strong>{{ '{:,}'.format(field.sessions) }} · {{ field.percent }}%</strong></li>{% endif %}
+        {% if field.sessions %}<tr><td>{{ field.label }}</td><td class="analytics-number">{{ '{:,}'.format(field.sessions) }}</td><td class="analytics-number analytics-percent">{{ field.percent }}%</td></tr>{% endif %}
         {% endfor %}
-      </ol>
+        </tbody>
+      </table></div>
       {% endif %}
       {% if analytics.checkout_insights.timed_sessions %}<p class="analytics-small-note">Average based on {{ analytics.checkout_insights.timed_sessions }} sessions with time data.</p>{% endif %}
       <p class="analytics-small-note">Active time counts only while this page is visible. Field totals show whether a field was filled; text is never collected.</p>
@@ -272,8 +290,8 @@
     <section class="analytics-card" aria-labelledby="connect-actions-title">
       <div class="analytics-section-heading"><div><h2 id="connect-actions-title">Connect-page actions</h2><p>Existing aggregate counts by show and action</p></div></div>
       <div class="analytics-table-wrap"><table class="analytics-table">
-        <thead><tr><th>Trade show</th><th>Booth</th><th>Action</th><th>Events</th></tr></thead>
-        <tbody>{% for item in analytics.connect_actions %}<tr><td>{{ item.show or item.key }}</td><td>{{ item.booth or '—' }}</td><td>{{ item.action|replace('_', ' ')|title }}</td><td>{{ '{:,}'.format(item.count) }}</td></tr>{% endfor %}</tbody>
+        <thead><tr><th>Trade show</th><th>Booth</th><th>Action</th><th class="analytics-number">Events</th><th class="analytics-number">% of events</th></tr></thead>
+        <tbody>{% for item in analytics.connect_actions %}<tr><td>{{ item.show or item.key }}</td><td>{{ item.booth or '—' }}</td><td>{{ item.action|replace('_', ' ')|title }}</td><td class="analytics-number">{{ '{:,}'.format(item.count) }}</td><td class="analytics-number analytics-percent">{{ item.percent }}%</td></tr>{% endfor %}</tbody>
       </table></div>
     </section>
     {% endif %}

@@ -297,86 +297,100 @@
   border-radius: 50%;
 }
 
-.legend-views,
-.bar-views {
+.legend-views {
   background: var(--gold);
 }
 
-.legend-sessions,
-.bar-sessions {
+.legend-sessions {
   background: #89acd3;
 }
 
-.legend-clicks,
-.bar-clicks {
+.legend-clicks {
   background: #75b9b2;
 }
 
-.analytics-chart {
-  display: flex;
-  min-height: 210px;
-  align-items: stretch;
-  gap: 0.35rem;
-  overflow-x: auto;
-  padding: 0.25rem 0 0;
-  scrollbar-color: var(--gold-outline) transparent;
-}
-
-.analytics-bucket {
-  display: flex;
-  min-width: 38px;
-  flex: 1 0 38px;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 0.45rem;
-}
-
-.analytics-bars {
-  display: flex;
+.analytics-chart-scroll {
   width: 100%;
-  height: 174px;
-  align-items: flex-end;
-  justify-content: center;
-  gap: 2px;
-  border-bottom: 1px solid rgb(255 255 255 / 0.13);
+  overflow: visible;
+  padding: 0.25rem 0 0.5rem;
 }
 
-.analytics-bar-column {
-  position: relative;
-  display: flex;
-  width: 31%;
-  height: 100%;
-  align-items: flex-end;
-  justify-content: center;
+.analytics-line-chart {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  height: auto;
   overflow: visible;
 }
 
-.analytics-bar-value {
-  position: absolute;
-  z-index: 1;
-  bottom: calc(var(--bar-height, 0%) + 3px);
-  color: rgb(255 255 255 / 0.8);
-  font-size: 0.55rem;
-  line-height: 1;
+.analytics-grid-line {
+  stroke: rgb(255 255 255 / 0.1);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.analytics-axis-line {
+  stroke: rgb(255 255 255 / 0.24);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.analytics-line {
+  fill: none;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.analytics-line--page_views,
+.analytics-line-point--page_views {
+  stroke: var(--gold);
+}
+
+.analytics-line--sessions,
+.analytics-line-point--sessions {
+  stroke: #89acd3;
+}
+
+.analytics-line--clicks,
+.analytics-line-point--clicks {
+  stroke: #75b9b2;
+}
+
+.analytics-line-point {
+  fill: #17150f;
+  stroke-width: 2.5;
+  cursor: help;
+  vector-effect: non-scaling-stroke;
+}
+
+.analytics-line-point:focus-visible {
+  outline: none;
+  filter: drop-shadow(0 0 4px rgb(255 255 255 / 0.9));
+  transform: scale(1.35);
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.analytics-x-label,
+.analytics-y-label {
+  fill: rgb(255 255 255 / 0.58);
+  font-size: 12px;
   font-variant-numeric: tabular-nums;
-  white-space: nowrap;
+  pointer-events: none;
 }
 
-.analytics-bar {
-  display: block;
-  width: min(100%, 11px);
-  height: var(--bar-height, 0%);
-  flex: 0 0 auto;
-  border-radius: 4px 4px 0 0;
-  opacity: 0.9;
-}
-
-.analytics-bucket > small {
-  min-height: 1rem;
-  color: rgb(255 255 255 / 0.5);
-  font-size: 0.62rem;
-  white-space: nowrap;
+.analytics-data-label {
+  fill: #fff;
+  font-size: 12px;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  paint-order: stroke;
+  stroke: #17150f;
+  stroke-linejoin: round;
+  stroke-width: 3px;
+  pointer-events: none;
 }
 
 .analytics-grid {
@@ -594,6 +608,17 @@
   font-weight: 650;
 }
 
+.analytics-table th.analytics-number,
+.analytics-table td.analytics-number {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.analytics-table td.analytics-percent {
+  color: var(--gold-70);
+  font-weight: 650;
+}
+
 .analytics-table td:last-child,
 .analytics-table th:last-child {
   text-align: right;
@@ -707,6 +732,34 @@
 }
 
 @media (max-width: 767.98px) {
+  .analytics-x-label--hour:not(.analytics-x-label--hour-tablet) {
+    display: none;
+  }
+
+  .analytics-x-label,
+  .analytics-y-label {
+    font-size: 20px;
+  }
+
+  .analytics-data-label {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .analytics-x-label--hour:not(.analytics-x-label--hour-mobile) {
+    display: none;
+  }
+
+  .analytics-x-label,
+  .analytics-y-label {
+    font-size: 28px;
+  }
+
+  .analytics-data-label {
+    font-size: 22px;
+  }
+
   .analytics-heading {
     align-items: stretch;
     flex-direction: column;

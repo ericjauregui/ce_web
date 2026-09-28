@@ -134,7 +134,7 @@
     {% set cart_icon_class = 'nav-cart-icon' %}
     {% include "partials/cart_icon.html" %}
         <span id="cartCountBadge"
-          class="position-absolute top-0 start-100 translate-middle badge rounded-pill text-bg-dark border border-gold"
+          class="position-absolute badge rounded-pill text-bg-dark border border-gold"
           {% if cart_item_count <= 0 %}style="display:none;"{% endif %}>{{ cart_item_count }}</span>
       </a>
 <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#nav" aria-controls="nav" aria-expanded="false"

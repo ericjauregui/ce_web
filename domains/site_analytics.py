@@ -185,7 +185,17 @@ def _pacific_hour(value: datetime) -> int:
 
 
 def _format_hour(hour: int) -> str:
-    return f"{hour:02d}:00"
+    return f"{hour:02d}h"
+
+
+def _format_percentage(part: int, total: int) -> str:
+    if part <= 0 or total <= 0:
+        return "0"
+    percentage = part * 100 / total
+    if percentage < 1:
+        return "<0.1" if percentage < 0.05 else f"{percentage:.1f}"
+    return str(math.floor(percentage + 0.5))
+
 
 metadata = MetaData()
 site_analytics_events = Table(
@@ -895,10 +905,17 @@ class SiteAnalytics:
             ).all()
 
             connect_rows = []
+            connect_total = 0
             if (
                 page_filter in {"all", "trade-shows", "path:/connect"}
                 and inspect(connection).has_table(connect_event_counts.name)
             ):
+                connect_total = int(connection.execute(
+                    select(func.sum(connect_event_counts.c.count)).where(
+                        connect_event_counts.c.event_date >= start_date,
+                        connect_event_counts.c.event_date <= end_date,
+                    )
+                ).scalar_one() or 0)
                 connect_rows = connection.execute(
                     select(
                         connect_event_counts.c.trade_show_key,
@@ -1045,15 +1062,72 @@ class SiteAnalytics:
                 bucket_date = _next_bucket(bucket_date, granularity)
 
         label_interval = 1 if granularity == "hour" else max(1, math.ceil(len(chart) / 14))
+        value_label_interval = max(1, math.ceil(len(chart) / 8))
         for index, bucket in enumerate(chart):
             bucket["show_label"] = (
                 index == 0 or index == len(chart) - 1 or index % label_interval == 0
+            )
+            bucket["show_value_label"] = (
+                index == 0 or index == len(chart) - 1 or index % value_label_interval == 0
             )
 
         top_peak = max(
             (max(row[field] for field in metric_fields) for row in chart),
             default=1,
         ) or 1
+
+        chart_plot_left = 66
+        chart_plot_right = 984
+        chart_plot_top = 50
+        chart_plot_bottom = 250
+        chart_series_config = (
+            {"key": "page_views", "label": "Page views", "label_offset": -12},
+            {"key": "sessions", "label": "Sessions", "label_offset": 17},
+            {"key": "clicks", "label": "Clicks", "label_offset": -24},
+        )
+        chart_series = [
+            dict(series) for series in chart_series_config if series["key"] in metric_fields
+        ]
+        for index, bucket in enumerate(chart):
+            if len(chart) == 1:
+                point_x = (chart_plot_left + chart_plot_right) / 2
+            else:
+                point_x = chart_plot_left + (
+                    (chart_plot_right - chart_plot_left) * index / (len(chart) - 1)
+                )
+            bucket["x"] = round(point_x, 2)
+            bucket["line_points"] = {}
+            for series in chart_series:
+                value = int(bucket[series["key"]])
+                point_y = chart_plot_bottom - (
+                    value / top_peak * (chart_plot_bottom - chart_plot_top)
+                )
+                label_y = min(
+                    chart_plot_bottom + 16,
+                    max(chart_plot_top - 18, point_y + series["label_offset"]),
+                )
+                bucket["line_points"][series["key"]] = {
+                    "y": round(point_y, 2),
+                    "label_y": round(label_y, 2),
+                    "value": value,
+                }
+        for series in chart_series:
+            series["points"] = " ".join(
+                f"{bucket['x']},{bucket['line_points'][series['key']]['y']}"
+                for bucket in chart
+            )
+
+        chart_y_ticks = []
+        for tick_value in sorted({round(top_peak * step / 4) for step in range(5)}):
+            tick_y = chart_plot_bottom - (
+                tick_value / top_peak * (chart_plot_bottom - chart_plot_top)
+            )
+            chart_y_ticks.append({
+                "value": tick_value,
+                "label": f"{tick_value:,}",
+                "y": round(tick_y, 2),
+            })
+
         chart_note = "Populated periods only"
         if granularity == "hour":
             chart_note = "Hourly totals across selected dates"
@@ -1082,6 +1156,8 @@ class SiteAnalytics:
             "pages_per_session": round(page_views / sessions, 1) if sessions else 0,
             "chart": chart,
             "chart_peak": top_peak,
+            "chart_series": chart_series,
+            "chart_y_ticks": chart_y_ticks,
             "granularity": granularity,
             "granularity_label": {
                 "hour": "Hourly",
@@ -1111,32 +1187,34 @@ class SiteAnalytics:
             "journey_pages": journey_pages,
             "journey_population_sessions": journey_population,
             "journey_match_count": journey_match_count,
-            "journey_match_percent": (
-                round(journey_match_count * 100 / journey_population, 1)
-                if journey_match_count is not None and journey_population else 0
+            "journey_match_percent": _format_percentage(
+                journey_match_count or 0, journey_population
             ),
             "request_status": {
                 "success_count": request_status_counts[200],
                 "not_found_count": request_status_counts[404],
                 "total": request_status_counts[200] + request_status_counts[404],
-                "success_percent": round(
-                    request_status_counts[200] * 100
-                    / max(1, request_status_counts[200] + request_status_counts[404]),
-                    1,
+                "success_percent": _format_percentage(
+                    request_status_counts[200],
+                    request_status_counts[200] + request_status_counts[404],
                 ),
-                "not_found_percent": round(
-                    request_status_counts[404] * 100
-                    / max(1, request_status_counts[200] + request_status_counts[404]),
-                    1,
+                "not_found_percent": _format_percentage(
+                    request_status_counts[404],
+                    request_status_counts[200] + request_status_counts[404],
                 ),
                 "not_found_pages": [
-                    {"path": row.page_path, "count": int(row.count or 0)}
+                    {
+                        "path": row.page_path,
+                        "count": int(row.count or 0),
+                        "percent": _format_percentage(int(row.count or 0), request_status_counts[404]),
+                    }
                     for row in not_found_rows
                 ],
             },
             "checkout_insights": {
                 "in_scope": checkout_is_in_scope,
                 "sessions": checkout_sessions,
+                "session_percent": _format_percentage(checkout_sessions, int(sessions)),
                 "timed_sessions": len(checkout_durations),
                 "average_duration": _format_duration(
                     round(sum(checkout_durations) / len(checkout_durations))
@@ -1150,23 +1228,35 @@ class SiteAnalytics:
                         "key": key,
                         "label": label,
                         "sessions": checkout_field_counts.get(key, 0),
-                        "percent": round(
-                            checkout_field_counts.get(key, 0) * 100 / checkout_sessions,
-                            1,
-                        ) if checkout_sessions else 0,
+                        "percent": _format_percentage(
+                            checkout_field_counts.get(key, 0), checkout_sessions
+                        ),
                     }
                     for key, label in CHECKOUT_FIELDS.items()
                 ],
             },
             "top_pages": [
-                {"path": row.page_path, "count": int(row.count)} for row in page_rows
+                {
+                    "path": row.page_path,
+                    "count": int(row.count),
+                    "percent": _format_percentage(int(row.count), int(page_views)),
+                }
+                for row in page_rows
             ],
             "top_clicks": [
-                {"target": _click_target_label(row.click_target), "count": int(row.count)}
+                {
+                    "target": _click_target_label(row.click_target),
+                    "count": int(row.count),
+                    "percent": _format_percentage(int(row.count), int(clicks)),
+                }
                 for row in click_rows
             ],
             "referrers": [
-                {"host": row.referrer_host, "sessions": int(row.sessions)}
+                {
+                    "host": row.referrer_host,
+                    "sessions": int(row.sessions),
+                    "percent": _format_percentage(int(row.sessions), int(sessions)),
+                }
                 for row in referrer_rows
             ],
             "campaigns": [
@@ -1175,6 +1265,7 @@ class SiteAnalytics:
                     "medium": row.utm_medium,
                     "campaign": row.utm_campaign,
                     "sessions": int(row.sessions),
+                    "percent": _format_percentage(int(row.sessions), int(sessions)),
                 }
                 for row in campaign_rows
             ],
@@ -1182,7 +1273,9 @@ class SiteAnalytics:
                 {
                     "name": row.page_context,
                     "page_views": int(row.page_views or 0),
+                    "page_views_percent": _format_percentage(int(row.page_views or 0), int(page_views)),
                     "clicks": int(row.clicks or 0),
+                    "clicks_percent": _format_percentage(int(row.clicks or 0), int(clicks)),
                 }
                 for row in context_rows
             ],
@@ -1193,6 +1286,7 @@ class SiteAnalytics:
                     "booth": row.booth,
                     "action": row.action,
                     "count": int(row.count or 0),
+                    "percent": _format_percentage(int(row.count or 0), connect_total),
                 }
                 for row in connect_rows
             ],

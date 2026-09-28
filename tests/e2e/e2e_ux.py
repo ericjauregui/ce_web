@@ -188,8 +188,8 @@ class UXE2ETests(BaseE2ETest):
                 if width < 768 and path in ('/', f'/product/{code}'):
                     for control in self.page.locator('.qty-adjust-btn:visible, .qty-clear-btn:visible, .product-qty-input:visible').all():
                         box = control.bounding_box()
-                        self.assertGreaterEqual(box['width'], 44)
-                        self.assertGreaterEqual(box['height'], 44)
+                        self.assertGreaterEqual(box['width'], 24 if path == '/' else 44)
+                        self.assertGreaterEqual(box['height'], 32 if path == '/' else 44)
                         self.assertTrue(control.get_attribute('aria-label'))
                 if path == '/':
                     self.page.locator('.product-card.is-in-cart .product-qty-control').evaluate(
@@ -198,6 +198,107 @@ class UXE2ETests(BaseE2ETest):
                     self.page.locator('.product-qty-control').evaluate(
                         "element => element.scrollIntoView({block: 'center'})")
                 self.page.screenshot(path=str(self._artifact_dir_for_capture() / f'{path.strip("/").replace("/", "-")}-{width}.png'))
+
+    def test_mobile_catalog_controls_and_nav_badge_stay_compact(self):
+        self.page.route(re.compile(r'/static/reels/[^?]+\.mp4(?:\?.*)?$', re.I), lambda r: r.fulfill(status=204, body=''))
+        self.add_first_catalog_item_to_cart()
+        card = self.page.locator('.product-card.is-in-cart').first
+        for width in (320, 360, 390, 414, 575, 767):
+            self.page.set_viewport_size({'width': width, 'height': 844})
+            card.scroll_into_view_if_needed()
+            boxes = card.locator('.qty-adjust-btn, .product-qty-input').evaluate_all(
+                'es => es.map(e => e.getBoundingClientRect().toJSON()).sort((a,b) => a.left-b.left)')
+            self.assertLessEqual(max(b['top'] for b in boxes) - min(b['top'] for b in boxes), 1)
+            self.assertLessEqual(max(b['height'] for b in boxes), 36)
+            for left, right in zip(boxes, boxes[1:]):
+                self.assertLessEqual(left['right'], right['left'])
+            self.assertTrue(card.evaluate('''card => {
+              const label = card.querySelector('.add-to-cart-btn').getBoundingClientRect();
+              const remove = card.querySelector('.qty-clear-btn').getBoundingClientRect();
+              const qty = card.querySelector('.qty-center-group').getBoundingClientRect();
+              const body = card.querySelector('.card-body').getBoundingClientRect();
+              return Math.abs(label.top + label.height / 2 - remove.top - remove.height / 2) <= 1 &&
+                label.right <= remove.left && remove.bottom <= qty.top &&
+                Math.abs(qty.left + qty.width / 2 - body.left - body.width / 2) <= 1;
+            }'''))
+            for label in ('1 item in order', '999 items in order'):
+                card.locator('.add-to-cart-btn').evaluate('(e, text) => e.textContent = text', label)
+                label_geometry = card.locator('.add-to-cart-btn').evaluate('''e => {
+                  const text = document.createRange(); text.selectNodeContents(e);
+                  return {lines: text.getClientRects().length, scrollWidth: e.scrollWidth,
+                    clientWidth: e.clientWidth, font: getComputedStyle(e).fontSize};
+                }''')
+                self.assertEqual(label_geometry['lines'], 1, (width, label, label_geometry))
+                self.assertLessEqual(label_geometry['scrollWidth'], label_geometry['clientWidth'] + 1, (width, label, label_geometry))
+            card.locator('.add-to-cart-btn').evaluate('e => e.textContent = "1 item in order"')
+            for count in ('1', '99', '9999'):
+                self.page.locator('#cartCountBadge').evaluate('(e, count) => e.textContent = count', count)
+                self.assertTrue(self.page.locator('#cartLink').evaluate('''e => {
+                  const b = e.querySelector('#cartCountBadge').getBoundingClientRect();
+                  const i = e.querySelector('svg').getBoundingClientRect();
+                  const n = e.closest('nav').getBoundingClientRect();
+                  return b.top >= n.top && b.left >= 0 && b.right <= innerWidth &&
+                    b.bottom >= i.top && b.right <= i.right + 12;
+                }'''))
+            self.page.locator('#cartCountBadge').evaluate('e => e.textContent = "1"')
+            card.locator('.qty-center-group').evaluate("e => e.scrollIntoView({block: 'center', behavior: 'instant'})")
+            self.page.wait_for_timeout(250)
+            self.page.screenshot(path=str(self._artifact_dir_for_capture() / f'mobile-catalog-{width}.png'))
+        self.page.set_viewport_size({'width': 390, 'height': 844})
+        card.locator('.qty-adjust-btn[data-delta="1"]').click()
+        expect(card.locator('.product-qty-input')).to_have_value('2')
+        expect(self.page.locator('#cartCountBadge')).to_have_text('2')
+        card.locator('.qty-adjust-btn[data-delta="-1"]').click()
+        expect(card.locator('.product-qty-input')).to_have_value('1')
+        self.page.once('dialog', lambda dialog: dialog.accept())
+        card.locator('.qty-clear-btn').click()
+        expect(self.page.locator('#cartCountBadge')).to_be_hidden()
+        first = self.page.locator('.product-card').first
+        expect(first.locator('.qty-clear-btn')).to_be_hidden()
+        self.assertTrue(first.locator('.add-to-cart-btn').evaluate('e => Math.abs(e.getBoundingClientRect().width - e.parentElement.getBoundingClientRect().width) <= 1'))
+        first.locator('.add-to-cart-btn').click()
+        expect(first.locator('.qty-clear-btn')).to_be_visible()
+
+    def test_mobile_collections_auto_collapse_and_manual_arrow_reopens(self):
+        # Playback has its own journeys; keep this scroll-direction check deterministic.
+        self.page.route(re.compile(r'/static/reels/[^?]+\.mp4(?:\?.*)?$', re.I), lambda r: r.fulfill(status=204, body=''))
+        self.goto('/', wait_until='load')
+        self.page.evaluate('document.fonts.ready')
+        toggle = self.page.locator('.home-collections-toggle')
+        navigation = self.page.locator('#homeCollectionNavigation')
+        expect(toggle).to_have_attribute('aria-expanded', 'true')
+        expanded_height = self.page.locator('.home-collections').bounding_box()['height']
+        self.page.mouse.wheel(0, 1100)
+        expect(toggle).to_have_attribute('aria-expanded', 'false')
+        expect(navigation).to_be_hidden()
+        self.assertLess(self.page.locator('.home-collections').bounding_box()['height'], expanded_height - 50)
+        self.page.wait_for_function("getComputedStyle(document.querySelector('.home-collections-toggle svg')).transform.startsWith('matrix(-1,')")
+        self.page.screenshot(path=str(self._artifact_dir_for_capture() / 'collections-auto-collapsed.png'))
+        toggle.click()
+        expect(navigation).to_be_visible()
+        expect(toggle).to_have_attribute('aria-label', 'Collapse catalog collections')
+        self.page.wait_for_timeout(250)
+        expect(navigation).to_be_visible()
+        self.page.mouse.wheel(0, 180)
+        expect(navigation).to_be_hidden()
+        self.page.wait_for_timeout(250)
+        self.page.mouse.wheel(0, -100)
+        expect(navigation).to_be_visible()
+        expect(toggle).to_have_attribute('aria-expanded', 'true')
+        self.page.wait_for_function("['none', 'matrix(1, 0, 0, 1, 0, 0)'].includes(getComputedStyle(document.querySelector('.home-collections-toggle svg')).transform)")
+        self.page.screenshot(path=str(self._artifact_dir_for_capture() / 'collections-scroll-up-expanded.png'))
+        self.page.wait_for_timeout(250)
+        self.page.mouse.wheel(0, 180)
+        expect(navigation).to_be_hidden()
+        self.page.evaluate('window.scrollTo(0, 0)')
+        expect(navigation).to_be_visible()
+        self.page.set_viewport_size({'width': 1280, 'height': 900})
+        self.page.locator('.home-collections').evaluate('e => window.scrollTo(0, e.getBoundingClientRect().top + scrollY + 160)')
+        expect(navigation).to_be_visible()
+        toggle.click()
+        expect(navigation).to_be_hidden()
+        toggle.click()
+        expect(navigation).to_be_visible()
 
     def test_cart_keeps_compact_rows_and_single_line_centered_heading(self):
         self.add_first_catalog_item_to_cart()

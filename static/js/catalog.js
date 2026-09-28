@@ -306,12 +306,31 @@ function initializeCatalogScrollTracking() {
   const navigation = header.querySelector(".home-collection-navigation");
   let nudged = false;
   let previousScrollY = window.scrollY;
-  toggle.addEventListener("click", () => {
-    const expanded = toggle.getAttribute("aria-expanded") !== "true";
+  let downwardTravel = 0;
+  let upwardTravel = 0;
+  let settleUntil = 0;
+  let autoCollapsed = false;
+  const mobile = window.matchMedia("(max-width: 767.98px)");
+
+  function setExpanded(expanded) {
+    if (!expanded && navigation.contains(document.activeElement)) {
+      toggle.focus({ preventScroll: true });
+    }
     toggle.setAttribute("aria-expanded", String(expanded));
     toggle.setAttribute("aria-label", `${expanded ? "Collapse" : "Expand"} catalog collections`);
     navigation.hidden = !expanded;
     toggle.classList.remove("is-nudging");
+    // Ignore scroll anchoring caused by the row changing height.
+    downwardTravel = 0;
+    upwardTravel = 0;
+    settleUntil = performance.now() + 220;
+  }
+
+  toggle.addEventListener("click", () => {
+    setExpanded(toggle.getAttribute("aria-expanded") !== "true");
+    autoCollapsed = false;
+    downwardTravel = 0;
+    previousScrollY = window.scrollY;
     nudged = true;
     scheduleUpdate();
   });
@@ -328,12 +347,29 @@ function initializeCatalogScrollTracking() {
     const styles = getComputedStyle(document.documentElement);
     const navHeight = parseFloat(styles.getPropertyValue("--nav-actual-height")) ||
       parseFloat(styles.getPropertyValue("--nav-height")) || 50;
-    if (!nudged && window.scrollY > previousScrollY + 4 &&
-        header.getBoundingClientRect().top <= navHeight + 2) {
+    const scrollY = Math.max(0, window.scrollY);
+    const delta = scrollY - previousScrollY;
+    if (performance.now() >= settleUntil) {
+      downwardTravel = delta < 0 ? 0 : downwardTravel + delta;
+      upwardTravel = delta > 0 ? 0 : upwardTravel - delta;
+    }
+    const pinnedToNav = header.getBoundingClientRect().top <= navHeight + 2;
+    if (autoCollapsed && (!mobile.matches || !pinnedToNav)) {
+      setExpanded(true);
+      autoCollapsed = false;
+      downwardTravel = 0;
+    } else if (mobile.matches && upwardTravel > 16 && navigation.hidden) {
+      setExpanded(true);
+      autoCollapsed = false;
+    } else if (mobile.matches && pinnedToNav && downwardTravel > 16 && !navigation.hidden) {
+      setExpanded(false);
+      autoCollapsed = true;
+      downwardTravel = 0;
+    } else if (!mobile.matches && !nudged && delta > 4 && pinnedToNav) {
       toggle.classList.add("is-nudging");
       nudged = true;
     }
-    previousScrollY = window.scrollY;
+    previousScrollY = scrollY;
     const headerHeight = header.getBoundingClientRect().height;
     const readingLine = navHeight + headerHeight + 12;
     let nextIndex = 0;

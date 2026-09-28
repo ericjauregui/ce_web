@@ -35,6 +35,12 @@
   const addJourneyPage = document.getElementById("analytics-add-journey-page");
   const journeyStatus = document.getElementById("analytics-journey-expand-status");
 
+  function formatPercentage(value) {
+    if (!(value > 0)) return "0";
+    if (value < 1) return value < 0.05 ? "<0.1" : value.toFixed(1);
+    return String(Math.floor(value + 0.5));
+  }
+
   function journeyPageSelects() {
     return [...(journeyPages?.querySelectorAll("select[name='journey_page']") || [])];
   }
@@ -259,7 +265,7 @@
     path.setAttribute("role", "button");
     path.setAttribute("tabindex", "0");
     const previousCount = link.previousStepCount;
-    const share = previousCount ? (link.count * 100 / previousCount).toFixed(1) : "0.0";
+    const share = formatPercentage(previousCount ? link.count * 100 / previousCount : 0);
     const action = link.isMorePages ? "Click to show the next pages." : "Click to filter this ordered path.";
     const description = `${link.source.label} → ${link.target.label}: ${link.count.toLocaleString()} sessions, ${share}% of the previous step (${previousCount.toLocaleString()} sessions). ${action}`;
     path.setAttribute("aria-label", description);
