@@ -1,13 +1,12 @@
 (() => {
-  const rangeMode = document.getElementById("analytics-range-mode");
+  const periodUnit = document.getElementById("analytics-period-unit");
   const rangeFields = document.querySelectorAll("[data-range-fields]");
   const periodCount = document.getElementById("analytics-period-count");
-  const periodUnit = document.querySelector("[name='unit']");
   const moreFilters = document.getElementById("analytics-more-filters");
   const moreFiltersState = document.getElementById("analytics-more-filters-state");
 
   function updateRangeFields() {
-    const mode = rangeMode?.value || "rolling";
+    const mode = periodUnit?.value === "custom" ? "custom" : "period";
     rangeFields.forEach((field) => {
       const active = field.dataset.rangeFields === mode;
       field.hidden = !active;
@@ -17,11 +16,12 @@
       });
     });
     if (periodCount && periodUnit) {
-      periodCount.max = ({ days: "365", weeks: "104", months: "60" })[periodUnit.value] || "365";
+      const maxCount = ({ days: "365", weeks: "104", months: "60", years: "5" })[periodUnit.value] || "365";
+      periodCount.max = maxCount;
+      if (Number(periodCount.value) > Number(maxCount)) periodCount.value = maxCount;
     }
   }
 
-  rangeMode?.addEventListener("change", updateRangeFields);
   periodUnit?.addEventListener("change", updateRangeFields);
   moreFilters?.addEventListener("toggle", () => {
     if (moreFiltersState) moreFiltersState.value = moreFilters.open ? "1" : "0";
