@@ -1056,7 +1056,7 @@ class SiteAnalytics:
         ) or 1
         chart_note = "Populated periods only"
         if granularity == "hour":
-            chart_note = "Hour-of-day totals across selected dates"
+            chart_note = "Hourly totals across selected dates"
             if "sessions" in metric_fields:
                 chart_note += "; a session may appear in multiple hours"
         page_filter_options = [
