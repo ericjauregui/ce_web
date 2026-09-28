@@ -330,7 +330,7 @@ class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
             [f"{hour:02}:00" for hour in range(24)],
         )
         self.assertIn(
-            "hour-of-day totals across selected dates",
+            "hourly totals across selected dates",
             self.page.locator("main.analytics-dashboard").inner_text(),
         )
 
