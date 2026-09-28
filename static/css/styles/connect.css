@@ -3,6 +3,27 @@ body.connect-view::before { opacity: .34; }
 body.connect-view .page-shell > footer { margin-top: 0 !important; }
 body.connect-view .footer-social a:hover { color: #fff; }
 
+/* /connect skips layout.css, so restore its shared footer icon treatment here. */
+body.connect-view .footer-social .team-inline-icon {
+  border: 1px solid var(--gold-outline);
+  border-radius: 999px;
+  color: var(--gold);
+  background: transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+body.connect-view .footer-social .team-inline-icon svg {
+  stroke: currentColor;
+}
+
+body.connect-view .footer-social .team-inline-icon:focus-visible {
+  color: #fff;
+  background: rgba(215, 192, 122, 0.12);
+}
+
 .connect-page {
   width: min(100%, 600px);
   min-height: calc(100vh - var(--nav-actual-height, var(--nav-height)));
