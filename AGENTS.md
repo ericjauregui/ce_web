@@ -5,3 +5,13 @@
 - If you must test a system in isolation, first write down all the ways it could fail, then write the code.
 
 Run the browser suite with `UV_CACHE_DIR=/tmp/ce-web-uv-cache uv run python -m tests.run e2e`. It requires Playwright and browser binaries. Each test writes a screenshot, rendered HTML, browser events, and a SHA-256 evidence record. The runner writes `.test-artifacts/e2e/run-manifest.json`; verify it with `UV_CACHE_DIR=/tmp/ce-web-uv-cache uv run python -m tests.verify_e2e_artifacts`. Use `standard` only for narrowly justified isolated checks whose failure cannot be observed reliably in an E2E workflow. Keep E2E data local and synthetic; never submit live orders or send real email from tests.
+
+# Production release workflow
+
+For every production release, follow this branch order:
+
+1. Commit the verified changes on `dev` and push `dev` to `origin` first.
+2. Check out `main`, fast-forward merge `dev` with `git merge --ff-only dev`, and push `main` to `origin`.
+3. Check out `dev` again and confirm the working tree is clean and local and remote `dev` and `main` point to the release commit.
+
+A successful push does not prove deployment. Verify the live site after the production update propagates before reporting the change as deployed.
