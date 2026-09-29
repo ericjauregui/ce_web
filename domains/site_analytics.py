@@ -346,6 +346,7 @@ def _page_filter_clause(events, page_filter: str):
                 "action:add-to-order",
                 "action:add-to-cart",
                 "action:open-cart",
+                "action:order-bar-checkout",
             )),
         )
     if page_filter == "team":
@@ -421,6 +422,7 @@ def _click_target_label(target: str) -> str:
         "action:open-cart": "Open cart",
         "action:order-summary-open-bar": "Open Order Summary from order bar",
         "action:order-summary-open-button": "Open Order Summary from Review Order button",
+        "action:order-bar-checkout": "Checkout from order bar",
         "action:order-summary-close": "Close Order Summary",
         "action:order-summary-retry": "Retry Order Summary",
         "action:order-summary-quantity-minus": "Decrease quantity in Order Summary",

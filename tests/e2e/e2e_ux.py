@@ -345,23 +345,42 @@ class UXE2ETests(BaseE2ETest):
         self.page.route(re.compile(r'/static/reels/[^?]+\.mp4(?:\?.*)?$', re.I), lambda r: r.fulfill(status=204, body=''))
         self.add_first_catalog_item_to_cart()
         bar = self.page.locator('#catalogMiniCart')
-        checkout = bar.get_by_role('button', name='Review Order', exact=True)
-        for width in (320, 390, 767, 768, 1280):
+        review = bar.get_by_role('button', name='Review Order', exact=True)
+        checkout = bar.get_by_role('link', name='Checkout', exact=True)
+        expect(checkout).to_have_attribute('href', '/checkout')
+        expect(checkout).to_have_attribute('data-analytics-target', 'action:order-bar-checkout')
+        for width in (280, 320, 360, 375, 390, 414, 480, 575, 767, 768, 1280):
             self.page.set_viewport_size({'width': width, 'height': 844})
             self.page.evaluate('() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))')
             self.page.screenshot(path=str(self._artifact_dir_for_capture() / f'order-bar-initial-{width}.png'))
+            expect(review).to_be_visible()
             expect(checkout).to_be_visible()
             self.assertTrue(bar.evaluate('''bar => {
               const r = bar.getBoundingClientRect();
               const cart = bar.querySelector('.catalog-mini-cart__toggle').getBoundingClientRect();
-              const checkout = bar.querySelector('.catalog-mini-cart__submit').getBoundingClientRect();
-              return cart.right <= checkout.left && checkout.right <= r.right - 4 &&
-                Math.abs(cart.top + cart.height / 2 - checkout.top - checkout.height / 2) <= 1 &&
-                r.left >= 0 && r.right <= innerWidth;
-            }'''))
+              const review = bar.querySelector('.catalog-mini-cart__review');
+              const checkout = bar.querySelector('.catalog-mini-cart__checkout');
+              const reviewRect = review.getBoundingClientRect();
+              const checkoutRect = checkout.getBoundingClientRect();
+              const textFits = [review, checkout].every(button => {
+                const range = document.createRange();
+                range.selectNodeContents(button);
+                return range.getClientRects().length === 1 && button.scrollWidth <= button.clientWidth + 1;
+              });
+              const summary = bar.querySelector('.catalog-mini-cart__title');
+              const summaryFits = getComputedStyle(summary).display === 'none' ||
+                summary.scrollWidth <= summary.clientWidth + 1;
+              const center = box => box.top + box.height / 2;
+              return cart.right <= reviewRect.left && reviewRect.right <= checkoutRect.left &&
+                checkoutRect.right <= r.right - 4 &&
+                Math.abs(center(cart) - center(reviewRect)) <= 2 &&
+                Math.abs(center(reviewRect) - center(checkoutRect)) <= 1 &&
+                r.left >= 0 && r.right <= innerWidth && textFits && summaryFits;
+            }'''), width)
             initial_height = bar.bounding_box()['height']
             self.page.mouse.wheel(0, 900)
             self.page.wait_for_timeout(550)
+            expect(review).to_be_visible()
             expect(checkout).to_be_visible()
             self.assertAlmostEqual(bar.bounding_box()['height'], initial_height, delta=1)
             self.page.mouse.wheel(0, -120)
@@ -380,10 +399,12 @@ class UXE2ETests(BaseE2ETest):
         expect(self.page.locator('#cartDrawer')).to_have_class(re.compile(r'\bshow\b'))
         self.page.get_by_role('button', name='Close order').click()
         expect(self.page.locator('#cartDrawer')).not_to_have_class(re.compile(r'\bshow\b'))
-        self.page.locator('#catalogMiniCart .catalog-mini-cart__submit').focus()
+        self.page.locator('#catalogMiniCart .catalog-mini-cart__review').focus()
         self.page.keyboard.press('Enter')
         expect(self.page.locator('#cartDrawer')).to_have_class(re.compile(r'\bshow\b'))
-        self.page.locator('#cartDrawer').get_by_role('link', name='Checkout', exact=True).click()
+        self.page.get_by_role('button', name='Close order').click()
+        expect(self.page.locator('#cartDrawer')).not_to_have_class(re.compile(r'\bshow\b'))
+        checkout.click()
         self.page.wait_for_url('**/checkout')
 
     def test_removal_never_prompts_on_catalog_product_or_cart(self):

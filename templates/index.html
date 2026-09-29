@@ -162,7 +162,10 @@
           <span data-mini-cart-piece-label>{% if cart_item_count == 1 %}piece{% else %}pieces{% endif %}</span> in order</span>
       </span>
     </button>
-    <button type="button" class="btn btn-gold catalog-mini-cart__submit" data-cart-drawer-open data-analytics-target="action:order-summary-open-button" aria-haspopup="dialog" aria-controls="cartDrawer" aria-expanded="false">Review Order</button>
+    <div class="catalog-mini-cart__actions">
+      <button type="button" class="btn btn-outline-gold catalog-mini-cart__action catalog-mini-cart__review" data-cart-drawer-open data-analytics-target="action:order-summary-open-button" aria-haspopup="dialog" aria-controls="cartDrawer" aria-expanded="false">Review Order</button>
+      <a class="btn btn-gold catalog-mini-cart__action catalog-mini-cart__checkout" href="{{ url_for('checkout') }}" data-analytics-target="action:order-bar-checkout">Checkout</a>
+    </div>
   </aside>
 
   <div class="offcanvas offcanvas-end cart-drawer cart-page" tabindex="-1" id="cartDrawer" aria-labelledby="cartDrawerTitle">
