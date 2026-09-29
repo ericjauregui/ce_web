@@ -33,7 +33,7 @@
     if (pageContext) payload.page_context = pageContext;
     if (clickTarget) payload.click_target = clickTarget;
     if (extra && typeof extra === "object") Object.assign(payload, extra);
-    if (eventType === "page_view") {
+    if (eventType === "page_view" && payload.page_path === window.location.pathname) {
       const referrerHost = externalReferrerHost();
       if (referrerHost) payload.referrer_host = referrerHost;
       for (const key of campaignKeys) {
@@ -84,6 +84,16 @@
       return explicitTarget;
     }
 
+    if (element.closest("#cartDrawer")) {
+      if (element.matches(".qty-minus")) return "action:order-summary-quantity-minus";
+      if (element.matches(".qty-plus")) return "action:order-summary-quantity-plus";
+      if (element.matches(".qty-remove")) return "action:order-summary-remove-item";
+      if (element.matches(".cart-undo-btn")) return element.closest(".cart-undo-clear")
+        ? "action:order-summary-undo-clear" : "action:order-summary-undo-removal";
+      if (element.matches("#clearOrderBtn")) return "action:order-summary-clear";
+      if (element.matches(".cart-checkout-btn")) return "action:order-summary-checkout";
+    }
+
     const productCard = element.closest(".product-card");
     if (productCard && !element.closest(".add-to-cart-btn, .qty-adjust-btn, .qty-clear-btn")) {
       return "component:product-card";
@@ -132,6 +142,10 @@
   }
 
   send("page_view");
+
+  document.getElementById("cartDrawer")?.addEventListener("shown.bs.offcanvas", () => {
+    send("page_view", null, { page_path: "/order-summary" });
+  });
 
   if (window.location.pathname === "/checkout") {
     let activeSince = performance.now();

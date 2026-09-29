@@ -54,6 +54,7 @@ function initializeRows() {
   for (const row of cartBody.querySelectorAll('tr:not(.is-removed)')) {
     row.dataset.code = rowCode(row);
     const input = row.querySelector('.item-note-input');
+    if (isDrawer) input.placeholder = 'Note (optional)';
     input.dataset.savedNote = input.value.trim();
     syncCompactCartNoteInput(input);
     autoResizeNoteInput(input);

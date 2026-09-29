@@ -8,6 +8,7 @@ class UXE2ETests(BaseE2ETest):
     viewport = {"width": 390, "height": 844}
 
     def test_checkout_names_validation_and_action_wording(self):
+        self.page.route(re.compile(r'/static/reels/[^?]+\.mp4(?:\?.*)?$', re.I), lambda r: r.fulfill(status=204, body=''))
         self.add_first_catalog_item_to_cart()
         self.goto('/cart')
         self.page.get_by_role('link', name='Checkout', exact=True).click()
@@ -104,6 +105,7 @@ class UXE2ETests(BaseE2ETest):
         expect(self.page.locator('.checkout-items-table')).not_to_contain_text('Synthetic note to preserve')
 
     def test_clear_order_failure_and_undo(self):
+        self.page.route(re.compile(r'/static/reels/[^?]+\.mp4(?:\?.*)?$', re.I), lambda r: r.fulfill(status=204, body=''))
         self.add_first_catalog_item_to_cart()
         self.goto('/cart')
         self.page.route('**/api/cart/clear', lambda r: r.fulfill(status=429, json={'ok': False}))

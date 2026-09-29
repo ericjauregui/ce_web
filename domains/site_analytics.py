@@ -338,7 +338,8 @@ def _page_filter_clause(events, page_filter: str):
         return events.c.page_path == "/"
     if page_filter == "cart":
         return or_(
-            events.c.page_path.in_(("/cart", "/checkout")),
+            events.c.page_path.in_(("/cart", "/checkout", "/order-summary")),
+            events.c.click_target.like("action:order-summary-%"),
             events.c.click_target.in_((
                 "internal:/cart",
                 "internal:/checkout",
@@ -369,7 +370,7 @@ def _page_filter_label(page_filter: str) -> str:
         "trade-shows": "Trade-show pages",
     }
     if page_filter.startswith("path:"):
-        return page_filter[5:]
+        return "Order Summary" if page_filter[5:] == "/order-summary" else page_filter[5:]
     return labels.get(page_filter, "All pages")
 
 
@@ -418,6 +419,17 @@ def _click_target_label(target: str) -> str:
         "action:add-to-order": "Add to order",
         "action:add-to-cart": "Add to cart",
         "action:open-cart": "Open cart",
+        "action:order-summary-open-bar": "Open Order Summary from order bar",
+        "action:order-summary-open-button": "Open Order Summary from Review Order button",
+        "action:order-summary-close": "Close Order Summary",
+        "action:order-summary-retry": "Retry Order Summary",
+        "action:order-summary-quantity-minus": "Decrease quantity in Order Summary",
+        "action:order-summary-quantity-plus": "Increase quantity in Order Summary",
+        "action:order-summary-remove-item": "Remove item in Order Summary",
+        "action:order-summary-undo-removal": "Undo item removal in Order Summary",
+        "action:order-summary-undo-clear": "Undo Clear Order in Order Summary",
+        "action:order-summary-clear": "Clear Order in Order Summary",
+        "action:order-summary-checkout": "Checkout from Order Summary",
         "component:product-card": "Product card",
     }
     if target in labels:
@@ -1139,12 +1151,12 @@ class SiteAnalytics:
             {"value": "cart", "label": "Cart-related events"},
             {"value": "team", "label": "Team pages"},
             {"value": "trade-shows", "label": "Trade-show pages"},
-            *({"value": f"path:{path}", "label": path} for path in page_paths),
+            *({"value": f"path:{path}", "label": _page_filter_label(f"path:{path}")} for path in page_paths),
         ]
         journey_start_options = [
             {"value": "filter", "label": f"Match page filter: {_page_filter_label(page_filter)}"},
             {"value": "all", "label": "Any entry page"},
-            *({"value": f"path:{path}", "label": path} for path in page_paths),
+            *({"value": f"path:{path}", "label": _page_filter_label(f"path:{path}")} for path in page_paths),
         ]
 
         return {
