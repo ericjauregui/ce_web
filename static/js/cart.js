@@ -1,3 +1,8 @@
+(() => {
+const cartRoot = document.getElementById('cartContentCard');
+if (!cartRoot) return;
+const isDrawer = Boolean(cartRoot.closest('#cartDrawer'));
+
 function autoResizeNoteInput(input) {
   if (!input) return;
   const minHeight = 36;
@@ -38,6 +43,7 @@ function syncCompactCartNoteInput(input) {
 
 
 const undoStorageKey = 'ceCartUndoV1';
+const undoDurationMs = 30000;
 const undoEntries = new Map();
 const noteTimers = new Map();
 const cartBody = document.getElementById('cartTableBody');
@@ -62,7 +68,8 @@ function renderCartState() {
   const hasRows = cartBody.children.length > 0;
   document.getElementById('cartTableWrap').hidden = !hasRows;
   document.getElementById('cartEmptyState').hidden = hasRows;
-  document.getElementById('cartIntroCard').hidden = !hasRows;
+  const intro = document.getElementById('cartIntroCard');
+  if (intro) intro.hidden = !hasRows;
   document.getElementById('cartSummaryBar').hidden = totalQuantity === 0;
   const reels = document.getElementById('cartEmptyReelsSection');
   if (reels) reels.hidden = hasRows;
@@ -75,6 +82,9 @@ function updateTotals(data) {
   document.getElementById('cartTotalQty').textContent = data.total_items;
   document.getElementById('cartLineItemCount').textContent = data.distinct_items;
   renderCartState();
+  const quantities = Object.fromEntries([...cartBody.querySelectorAll('tr:not(.is-removed) .qty-control')]
+    .map(wrap => [wrap.dataset.code, Number(wrap.dataset.qty)]));
+  document.dispatchEvent(new CustomEvent('ce:cart-updated', {detail: {...data, quantities}}));
 }
 function undoControl(entry, label, accessibleName) {
   const control = document.createElement('div');
@@ -89,7 +99,7 @@ function undoControl(entry, label, accessibleName) {
   timer.className = 'cart-undo-timer';
   timer.dataset.undoId = entry.id;
   timer.setAttribute('aria-hidden', 'true');
-  timer.innerHTML = '<svg viewBox="0 0 36 36" focusable="false"><circle class="cart-undo-ring-track" cx="18" cy="18" r="15"/><circle class="cart-undo-ring-progress" cx="18" cy="18" r="15" pathLength="100" stroke-dasharray="100" stroke-dashoffset="0"/></svg><span class="cart-undo-seconds">60s</span>';
+  timer.innerHTML = `<svg viewBox="0 0 36 36" focusable="false"><circle class="cart-undo-ring-track" cx="18" cy="18" r="15"/><circle class="cart-undo-ring-progress" cx="18" cy="18" r="15" pathLength="100" stroke-dasharray="100" stroke-dashoffset="0"/></svg><span class="cart-undo-seconds">${undoDurationMs / 1000}s</span>`;
   control.append(button, timer);
   return control;
 }
@@ -157,7 +167,7 @@ function tickUndo() {
     for (const timer of document.querySelectorAll(`.cart-undo-timer[data-undo-id="${entry.id}"]`)) {
       timer.querySelector('.cart-undo-seconds').textContent = `${seconds}s`;
       const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      const progress = Math.min(1, (reducedMotion ? seconds * 1000 : remaining) / 60000);
+      const progress = Math.min(1, (reducedMotion ? seconds * 1000 : remaining) / undoDurationMs);
       timer.querySelector('.cart-undo-ring-progress').setAttribute('stroke-dashoffset', String(100 * (1 - progress)));
     }
   }
@@ -205,7 +215,7 @@ function saveNote(input) {
   }, () => {}, 'Item note saved.');
 }
 CEOrder.flush = async () => {
-  const results = await Promise.all([...document.querySelectorAll('tr:not(.is-removed) .item-note-input')]
+  const results = await Promise.all([...cartRoot.querySelectorAll('tr:not(.is-removed) .item-note-input')]
     .filter(input => input.value.trim() !== input.dataset.savedNote).map(saveNote));
   return results.every(Boolean);
 };
@@ -235,10 +245,11 @@ async function hydrateUndo() {
   }
   persistUndo();
 }
-hydrateUndo();
+if (!isDrawer) hydrateUndo();
 setInterval(tickUndo, 250);
 document.addEventListener('visibilitychange', tickUndo);
 document.addEventListener('click', async event => {
+  if (!cartRoot.contains(event.target)) return;
   const undo = event.target.closest('.cart-undo-btn');
   if (undo) { const entry = undoEntries.get(undo.dataset.undoId); if (entry) await restore(entry); return; }
   const clear = event.target.closest('#clearOrderBtn');
@@ -249,7 +260,7 @@ document.addEventListener('click', async event => {
       const data = await CEOrder.post('/api/cart/clear', {allow_undo: true});
       rememberRemoval(data, rows, 'clear');
       updateTotals(data);
-    }, () => {}, 'Order cleared. Undo is available for 60 seconds.');
+    }, () => {}, 'Order cleared. Undo is available for 30 seconds.');
     return;
   }
   const remove = event.target.closest('.qty-remove');
@@ -270,13 +281,15 @@ async function changeQuantity(wrap, next) {
     if (data.qty === 0) rememberRemoval(data, [wrap.closest('tr')], 'item');
     else { wrap.dataset.qty = String(data.qty); input.value = data.qty; }
     updateTotals(data);
-  }, rollback, next === 0 ? 'Item removed. Undo is available for 60 seconds.' : 'Order updated.');
+  }, rollback, next === 0 ? 'Item removed. Undo is available for 30 seconds.' : 'Order updated.');
 }
 document.addEventListener('change', event => {
+  if (!cartRoot.contains(event.target)) return;
   const input = event.target.closest('.qty-input');
   if (input && !input.closest('.is-removed')) changeQuantity(input.closest('.qty-control'), clampQty(input.value));
 });
 document.addEventListener('input', event => {
+  if (!cartRoot.contains(event.target)) return;
   const input = event.target.closest('.item-note-input');
   if (!input || input.closest('.is-removed')) return;
   syncCompactCartNoteInput(input); autoResizeNoteInput(input);
@@ -284,10 +297,12 @@ document.addEventListener('input', event => {
   noteTimers.set(input, setTimeout(() => saveNote(input), 350));
 });
 document.addEventListener('focusin', event => {
+  if (!cartRoot.contains(event.target)) return;
   const input = event.target.closest('.item-note-input');
   if (input) { syncCompactCartNoteInput(input); autoResizeNoteInput(input); }
 });
 document.addEventListener('blur', event => {
+  if (!cartRoot.contains(event.target)) return;
   const input = event.target.closest('.item-note-input');
   if (!input || input.closest('.is-removed')) return;
   syncCompactCartNoteInput(input); autoResizeNoteInput(input);
@@ -297,7 +312,37 @@ document.addEventListener('keydown', event => {
   if (event.key === 'Escape' && event.target.matches('.item-note-input')) event.target.blur();
 });
 window.addEventListener('beforeunload', event => {
-  const unsaved = [...document.querySelectorAll('tr:not(.is-removed) .item-note-input')]
+  const unsaved = [...cartRoot.querySelectorAll('tr:not(.is-removed) .item-note-input')]
     .some(input => input.value.trim() !== input.dataset.savedNote);
   if (unsaved) { event.preventDefault(); event.returnValue = ''; }
 });
+
+window.CECart = {
+  async refresh() {
+    if (!await CEOrder.flush()) return false;
+    const loaded = await CEOrder.run(async () => {
+      let data;
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 15000);
+      try {
+        const response = await fetch('/api/cart/view', {cache: 'no-store', signal: controller.signal});
+        if (!response.ok) throw new Error();
+        data = await response.json();
+        if (data.ok !== true || typeof data.rows_html !== 'string' ||
+            !Number.isInteger(data.total_items) || !Number.isInteger(data.distinct_items)) throw new Error();
+      } catch (_) {
+        throw new Error('We couldn’t load your order. Please try again.');
+      } finally {
+        clearTimeout(timeout);
+      }
+      cartBody.replaceChildren(...serverRows(data.rows_html));
+      document.getElementById('cartUndoClear').replaceChildren();
+      undoEntries.clear();
+      initializeRows();
+      updateTotals(data);
+    }, () => {}, 'Order loaded.');
+    if (loaded) await hydrateUndo();
+    return loaded;
+  },
+};
+})();

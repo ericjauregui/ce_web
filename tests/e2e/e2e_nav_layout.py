@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from playwright.sync_api import expect
 from tests.e2e.common import BaseE2ETest
 
 
@@ -92,7 +93,7 @@ class NavLayoutE2ETests(BaseE2ETest):
         self.assertGreater(self.page.locator(".home-collection-option").count(), 1)
         toggle.click()
         self.assertEqual(toggle.get_attribute("aria-expanded"), "false")
-        self.assertFalse(navigation.is_visible())
+        expect(navigation).to_be_hidden()
         toggle.click()
         self.assertEqual(toggle.get_attribute("aria-expanded"), "true")
         self.assertTrue(navigation.is_visible())

@@ -53,6 +53,7 @@ SendOrderEmail = Callable[..., dict[str, Any]]
 CanonicalBaseUrl = Callable[[], str]
 MAX_VALIDATED_ORDER_QUANTITY = 999
 MAX_ORDER_DOWNLOAD_AGE_SECONDS = 60 * 60 * 24 * 30
+CART_UNDO_SECONDS = 30
 CHECKOUT_FIELD_LIMITS = {
     "name": 160,
     "company": 200,
@@ -184,7 +185,7 @@ def register_cart_routes(
             "undo_token": _undo_serializer().dumps({
                 "scope": session["cart_undo_scope"], "cart": cart_data, "notes": notes,
             }),
-            "undo_seconds": 60,
+            "undo_seconds": CART_UNDO_SECONDS,
         }
 
     def _signed_download_token(order: Any) -> str:
@@ -623,6 +624,15 @@ def register_cart_routes(
         cart_data = get_cart()
         return jsonify({"total_items": cart_total_items(cart_data), "distinct_items": len(cart_data)})
 
+    @app.route("/api/cart/view")
+    def api_cart_view():
+        cart_data = get_cart()
+        items = cart_items(products_by_code(load_products()), cart_data, get_cart_notes(session, cart_data))
+        return jsonify(
+            ok=True, total_items=cart_total_items(cart_data), distinct_items=len(cart_data),
+            rows_html=render_template("partials/cart_rows.html", items=items),
+        )
+
     @app.route("/api/cart/add", methods=["POST"])
     def api_cart_add():
         payload = request.get_json(force=True, silent=True) or {}
@@ -700,12 +710,12 @@ def register_cart_routes(
         if not isinstance(token, str):
             return jsonify(ok=False, error="invalid_undo"), 400
         try:
-            snapshot, issued = _undo_serializer().loads(token, max_age=60, return_timestamp=True)
+            snapshot, issued = _undo_serializer().loads(token, max_age=CART_UNDO_SECONDS, return_timestamp=True)
         except SignatureExpired:
             return jsonify(ok=False, error="undo_expired"), 410
         except BadSignature:
             return jsonify(ok=False, error="invalid_undo"), 400
-        seconds_left = issued.timestamp() + 60 - time.time()
+        seconds_left = issued.timestamp() + CART_UNDO_SECONDS - time.time()
         if seconds_left <= 0:
             return jsonify(ok=False, error="undo_expired"), 410
         if not secrets.compare_digest(str(snapshot.get("scope", "")), str(session.get("cart_undo_scope", ""))):

@@ -47,7 +47,6 @@ async function setQtyOnServer(card, nextQty) {
 
   const safeQty = clampQty(nextQty);
   const restore = () => setDetailQty(card, card.dataset.qty || 0);
-  if (safeQty === 0 && Number(card.dataset.qty) > 0 && !window.confirm(`Remove ${code} and its notes from your order?`)) { restore(); return; }
   return CEOrder.run(async () => {
     const response = await CEOrder.post("/api/cart/set", {code, qty: safeQty});
     updateCartBadge(response.total_items);

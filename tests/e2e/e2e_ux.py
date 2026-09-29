@@ -64,6 +64,9 @@ class UXE2ETests(BaseE2ETest):
                 expect(qty).to_have_value('1')
 
     def test_network_and_bad_response_add_failures_are_recoverable(self):
+        # Streaming a reel can delay this request on the single-threaded local
+        # server. Playback has separate coverage; retry still uses the real API.
+        self.page.route(re.compile(r'/static/reels/[^?]+\.mp4(?:\?.*)?$', re.I), lambda r: r.fulfill(status=204, body=''))
         self.goto('/')
         button = self.page.locator('.add-to-cart-btn').first
         self.page.route('**/api/cart/add', lambda r: r.abort('internetdisconnected'))
@@ -250,7 +253,6 @@ class UXE2ETests(BaseE2ETest):
         expect(self.page.locator('#cartCountBadge')).to_have_text('2')
         card.locator('.qty-adjust-btn[data-delta="-1"]').click()
         expect(card.locator('.product-qty-input')).to_have_value('1')
-        self.page.once('dialog', lambda dialog: dialog.accept())
         card.locator('.qty-clear-btn').click()
         expect(self.page.locator('#cartCountBadge')).to_be_hidden()
         first = self.page.locator('.product-card').first
@@ -277,17 +279,18 @@ class UXE2ETests(BaseE2ETest):
         toggle.click()
         expect(navigation).to_be_visible()
         expect(toggle).to_have_attribute('aria-label', 'Collapse catalog collections')
-        self.page.wait_for_timeout(250)
+        self.page.wait_for_function("document.querySelector('.home-collection-panel').getAnimations().every(a => a.playState === 'finished')")
+        self.page.wait_for_timeout(120)
         expect(navigation).to_be_visible()
         self.page.mouse.wheel(0, 180)
         expect(navigation).to_be_hidden()
-        self.page.wait_for_timeout(250)
+        self.page.wait_for_timeout(120)
         self.page.mouse.wheel(0, -100)
         expect(navigation).to_be_visible()
         expect(toggle).to_have_attribute('aria-expanded', 'true')
         self.page.wait_for_function("['none', 'matrix(1, 0, 0, 1, 0, 0)'].includes(getComputedStyle(document.querySelector('.home-collections-toggle svg')).transform)")
         self.page.screenshot(path=str(self._artifact_dir_for_capture() / 'collections-scroll-up-expanded.png'))
-        self.page.wait_for_timeout(250)
+        self.page.wait_for_timeout(120)
         self.page.mouse.wheel(0, 180)
         expect(navigation).to_be_hidden()
         self.page.evaluate('window.scrollTo(0, 0)')
@@ -299,6 +302,112 @@ class UXE2ETests(BaseE2ETest):
         expect(navigation).to_be_hidden()
         toggle.click()
         expect(navigation).to_be_visible()
+
+    def test_collections_transition_smoothly_and_respect_reduced_motion(self):
+        self.page.route(re.compile(r'/static/reels/[^?]+\.mp4(?:\?.*)?$', re.I), lambda r: r.fulfill(status=204, body=''))
+        self.goto('/', wait_until='load')
+        self.page.evaluate('document.fonts.ready')
+        toggle = self.page.locator('.home-collections-toggle')
+        panel = self.page.locator('.home-collection-panel')
+        navigation = self.page.locator('#homeCollectionNavigation')
+        expanded_height = panel.bounding_box()['height']
+        self.page.screenshot(path=str(self._artifact_dir_for_capture() / 'collections-before-collapse.png'))
+        toggle.click()
+        self.page.screenshot(path=str(self._artifact_dir_for_capture() / 'collections-collapse-start.png'))
+        self.page.wait_for_function('(height) => { const r = document.querySelector(".home-collection-panel").getBoundingClientRect(); return r.height > 1 && r.height < height - 1; }', arg=expanded_height)
+        mid_height = panel.bounding_box()['height']
+        self.assertGreater(mid_height, 1)
+        self.assertLess(mid_height, expanded_height - 1)
+        self.page.screenshot(path=str(self._artifact_dir_for_capture() / 'collections-mid-collapse.png'))
+        expect(navigation).to_be_hidden()
+        toggle.click()
+        self.page.screenshot(path=str(self._artifact_dir_for_capture() / 'collections-expand-start.png'))
+        self.page.wait_for_function('(height) => { const r = document.querySelector(".home-collection-panel").getBoundingClientRect(); return r.height > 1 && r.height < height - 1; }', arg=expanded_height)
+        self.assertGreater(panel.bounding_box()['height'], 1)
+        self.assertLess(panel.bounding_box()['height'], expanded_height - 1)
+        # Reverse a transition with the same control; it should finish in the requested state.
+        toggle.click()
+        expect(navigation).to_be_hidden()
+        toggle.click()
+        self.page.wait_for_function("document.querySelector('.home-collection-panel').getAnimations().length === 0")
+        expect(navigation).to_be_visible()
+        self.assertAlmostEqual(panel.bounding_box()['height'], expanded_height, delta=1)
+        self.page.emulate_media(reduced_motion='reduce')
+        toggle.click()
+        expect(navigation).to_be_hidden()
+        self.assertLessEqual(panel.bounding_box()['height'], 1)
+        toggle.click()
+        expect(navigation).to_be_visible()
+
+    def test_sticky_order_bar_keeps_review_inline_and_opens_drawer(self):
+        self.page.route(re.compile(r'/static/reels/[^?]+\.mp4(?:\?.*)?$', re.I), lambda r: r.fulfill(status=204, body=''))
+        self.add_first_catalog_item_to_cart()
+        bar = self.page.locator('#catalogMiniCart')
+        checkout = bar.get_by_role('button', name='Review Order', exact=True)
+        for width in (320, 390, 767, 768, 1280):
+            self.page.set_viewport_size({'width': width, 'height': 844})
+            self.page.evaluate('() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))')
+            self.page.screenshot(path=str(self._artifact_dir_for_capture() / f'order-bar-initial-{width}.png'))
+            expect(checkout).to_be_visible()
+            self.assertTrue(bar.evaluate('''bar => {
+              const r = bar.getBoundingClientRect();
+              const cart = bar.querySelector('.catalog-mini-cart__toggle').getBoundingClientRect();
+              const checkout = bar.querySelector('.catalog-mini-cart__submit').getBoundingClientRect();
+              return cart.right <= checkout.left && checkout.right <= r.right - 4 &&
+                Math.abs(cart.top + cart.height / 2 - checkout.top - checkout.height / 2) <= 1 &&
+                r.left >= 0 && r.right <= innerWidth;
+            }'''))
+            initial_height = bar.bounding_box()['height']
+            self.page.mouse.wheel(0, 900)
+            self.page.wait_for_timeout(550)
+            expect(checkout).to_be_visible()
+            self.assertAlmostEqual(bar.bounding_box()['height'], initial_height, delta=1)
+            self.page.mouse.wheel(0, -120)
+            self.page.wait_for_timeout(550)
+            self.assertAlmostEqual(bar.bounding_box()['height'], initial_height, delta=1)
+            self.page.screenshot(path=str(self._artifact_dir_for_capture() / f'order-bar-{width}.png'))
+        self.page.set_viewport_size({'width': 390, 'height': 844})
+        # The review control also covers the bar padding.
+        box = bar.bounding_box()
+        self.page.mouse.click(box['x'] + 3, box['y'] + box['height'] / 2)
+        expect(self.page.locator('#cartDrawer')).to_have_class(re.compile(r'\bshow\b'))
+        self.page.get_by_role('button', name='Close order').click()
+        expect(self.page.locator('#cartDrawer')).not_to_have_class(re.compile(r'\bshow\b'))
+        self.page.locator('#catalogMiniCart .catalog-mini-cart__toggle').focus()
+        self.page.keyboard.press('Enter')
+        expect(self.page.locator('#cartDrawer')).to_have_class(re.compile(r'\bshow\b'))
+        self.page.get_by_role('button', name='Close order').click()
+        expect(self.page.locator('#cartDrawer')).not_to_have_class(re.compile(r'\bshow\b'))
+        self.page.locator('#catalogMiniCart .catalog-mini-cart__submit').focus()
+        self.page.keyboard.press('Enter')
+        expect(self.page.locator('#cartDrawer')).to_have_class(re.compile(r'\bshow\b'))
+        self.page.locator('#cartDrawer').get_by_role('link', name='Checkout', exact=True).click()
+        self.page.wait_for_url('**/checkout')
+
+    def test_removal_never_prompts_on_catalog_product_or_cart(self):
+        self.page.route(re.compile(r'/static/reels/[^?]+\.mp4(?:\?.*)?$', re.I), lambda r: r.fulfill(status=204, body=''))
+        dialogs = []
+        def dismiss_dialog(dialog):
+            dialogs.append(dialog.message)
+            dialog.dismiss()
+        self.page.on('dialog', dismiss_dialog)
+        for surface, action in (('/', 'remove'), ('/', 'decrement'), ('/', 'zero'),
+                                ('product', 'remove'), ('product', 'decrement'), ('product', 'zero'), ('/cart', 'remove')):
+            with self.subTest(surface=surface, action=action):
+                self.add_first_catalog_item_to_cart()
+                code = self.page.locator('.add-to-cart-btn').first.get_attribute('data-code')
+                self.goto(f'/product/{code}' if surface == 'product' else surface)
+                item = self.page.locator('.product-card.is-in-cart' if surface == '/' else
+                                         '.product-detail-meta-card' if surface == 'product' else '#cartTableBody tr').first
+                if action == 'remove':
+                    item.locator('.qty-remove' if surface == '/cart' else '.qty-clear-btn').click()
+                elif action == 'decrement':
+                    item.locator('.qty-adjust-btn[data-delta="-1"]').click()
+                else:
+                    item.locator('.product-qty-input').fill('0')
+                    item.locator('.product-qty-input').blur()
+                expect(self.page.locator('#cartCountBadge')).to_be_hidden()
+                self.assertEqual(dialogs, [])
 
     def test_cart_keeps_compact_rows_and_single_line_centered_heading(self):
         self.add_first_catalog_item_to_cart()

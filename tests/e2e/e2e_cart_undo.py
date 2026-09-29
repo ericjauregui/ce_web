@@ -45,7 +45,9 @@ class CartUndoE2ETests(BaseE2ETest):
         self.goto('/cart')
         with self.page.expect_response('**/api/cart/clear') as response:
             self.page.locator('#clearOrderBtn').click()
-        token = response.value.json()['undo_token']
+        clear_result = response.value.json()
+        self.assertEqual(clear_result['undo_seconds'], 30)
+        token = clear_result['undo_token']
         expect(self.page.locator('.cart-undo-clear')).to_be_visible()
         expect(self.page.locator('.cart-undo-clear .cart-undo-ring-progress')).to_be_visible()
         expect(self.page.locator('#cartTableBody tr.is-removed')).to_have_count(2)
@@ -92,19 +94,19 @@ class CartUndoE2ETests(BaseE2ETest):
         expect(self.page.locator('.qty-input')).to_have_value('2')
         expect(self.page.locator('.item-note-input')).to_have_value('Synthetic item note')
 
-    def test_last_removed_item_expires_after_sixty_seconds(self):
+    def test_last_removed_item_expires_after_thirty_seconds(self):
         self.seed()
         self.goto('/cart')
         self.page.clock.install()
         self.page.locator('.qty-remove').click()
         expect(self.page.locator('.cart-undo-item')).to_be_visible()
-        expect(self.page.locator('.cart-undo-seconds')).to_have_text('60s')
+        expect(self.page.locator('.cart-undo-seconds')).to_have_text('30s')
         ring = self.page.locator('.cart-undo-ring-progress')
         self.assertLess(float(ring.get_attribute('stroke-dashoffset')), 2)
-        self.page.clock.fast_forward(30000)
-        expect(self.page.locator('.cart-undo-seconds')).to_have_text('30s')
+        self.page.clock.fast_forward(15000)
+        expect(self.page.locator('.cart-undo-seconds')).to_have_text('15s')
         self.assertAlmostEqual(float(ring.get_attribute('stroke-dashoffset')), 50, delta=2)
-        self.page.clock.fast_forward(29000)
+        self.page.clock.fast_forward(14000)
         expect(self.page.locator('.cart-undo-seconds')).to_have_text('1s')
         expect(self.page.locator('.cart-undo-item')).to_be_visible()
         self.page.clock.fast_forward(2000)
@@ -134,8 +136,9 @@ class CartUndoE2ETests(BaseE2ETest):
         self.goto('/cart')
         with self.page.expect_response('**/api/cart/set') as response:
             self.page.locator('.qty-remove').click()
+        self.assertEqual(response.value.json()['undo_seconds'], 30)
         serializer = URLSafeTimedSerializer(webapp.app.secret_key, salt='cart-undo-v1')
         snapshot = serializer.loads(response.value.json()['undo_token'])
-        with patch('itsdangerous.timed.TimestampSigner.get_timestamp', return_value=int(time.time()) - 65):
+        with patch('itsdangerous.timed.TimestampSigner.get_timestamp', return_value=int(time.time()) - 35):
             token = serializer.dumps(snapshot)
         self.assertEqual(self.context.request.post(f'{self.base_url}/api/cart/undo', data={'token': token}).status, 410)

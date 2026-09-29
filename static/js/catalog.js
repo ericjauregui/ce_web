@@ -5,28 +5,12 @@ function isCardInteractiveTarget(target) {
   return !!target.closest(CARD_INTERACTIVE_SELECTOR);
 }
 
-function setCatalogMiniCartExpanded(expanded) {
-  const miniCart = document.getElementById("catalogMiniCart");
-  if (!miniCart) return;
-
-  const desktop = window.matchMedia("(min-width: 768px)").matches;
-  const shouldExpand = desktop || expanded;
-  miniCart.classList.toggle("is-expanded", shouldExpand);
-  const actions = miniCart.querySelector(".catalog-mini-cart__actions");
-  if (actions) actions.inert = !shouldExpand;
-  document.body.classList.toggle(
-    "is-mini-cart-expanded",
-    !miniCart.hidden && shouldExpand,
-  );
-}
-
-function updateCatalogMiniCart(totalItems, distinctItems, reveal = false) {
+function updateCatalogMiniCart(totalItems, distinctItems) {
   const miniCart = document.getElementById("catalogMiniCart");
   if (!miniCart) return;
 
   const total = Math.max(0, Number(totalItems) || 0);
   const distinct = Math.max(0, Number(distinctItems) || 0);
-  const wasHidden = miniCart.hidden;
 
   miniCart.dataset.totalItems = String(total);
   miniCart.dataset.distinctItems = String(distinct);
@@ -36,37 +20,24 @@ function updateCatalogMiniCart(totalItems, distinctItems, reveal = false) {
   miniCart.querySelectorAll("[data-mini-cart-total]").forEach((element) => {
     element.textContent = String(total);
   });
-  miniCart.querySelectorAll("[data-mini-cart-distinct]").forEach((element) => {
-    element.textContent = String(distinct);
-  });
   miniCart
     .querySelectorAll("[data-mini-cart-piece-label]")
     .forEach((element) => {
       element.textContent = total === 1 ? "piece" : "pieces";
     });
-  miniCart
-    .querySelectorAll("[data-mini-cart-style-label]")
-    .forEach((element) => {
-      element.textContent = distinct === 1 ? "style" : "styles";
-    });
 
   const count = miniCart.querySelector(".catalog-mini-cart__count");
   if (count) count.textContent = String(total);
 
-  if (total > 0 && (reveal || wasHidden)) {
-    setCatalogMiniCartExpanded(true);
-  } else {
-    setCatalogMiniCartExpanded(miniCart.classList.contains("is-expanded"));
-  }
 }
 
-function updateCartBadge(totalItems, distinctItems, revealMiniCart = false) {
+function updateCartBadge(totalItems, distinctItems) {
   const badge = document.getElementById("cartCountBadge");
   if (badge) {
     badge.textContent = totalItems || 0;
     badge.style.display = (totalItems || 0) > 0 ? "inline-block" : "none";
   }
-  updateCatalogMiniCart(totalItems, distinctItems, revealMiniCart);
+  updateCatalogMiniCart(totalItems, distinctItems);
 }
 
 function setAddButtonLabel(card, cardQty) {
@@ -91,6 +62,19 @@ function setCardQty(card, qty) {
   control.classList.toggle("d-none", safeQty <= 0);
   card.classList.toggle("is-in-cart", safeQty > 0);
 }
+
+document.addEventListener('ce:cart-updated', event => {
+  const data = event.detail;
+  updateCartBadge(data.total_items, data.distinct_items);
+  for (const card of document.querySelectorAll('.product-card')) {
+    const code = card.querySelector('.add-to-cart-btn')?.dataset.code;
+    const qty = data.quantities[code] || 0;
+    if (Number(card.dataset.qty || 0) === qty) continue;
+    setCardQty(card, qty);
+    setAddButtonLabel(card, qty);
+    if (!qty) setCardExpanded(card, false);
+  }
+});
 
 function syncDrawerHeight(card) {
   const drawer = card.querySelector(".product-drawer");
@@ -183,7 +167,6 @@ async function setCardQtyOnServer(card, nextQty) {
 
   const restore = () => setCardQty(card, Number(card.dataset.qty || 0));
   const safeQty = Math.max(0, Math.min(999, Math.trunc(Number(nextQty) || 0)));
-  if (safeQty === 0 && Number(card.dataset.qty) > 0 && !window.confirm(`Remove ${code} and its notes from your order?`)) { restore(); return; }
   return CEOrder.run(async () => {
     const response = await CEOrder.post("/api/cart/set", {code, qty: safeQty});
     updateCartBadge(response.total_items, response.distinct_items);
@@ -304,6 +287,7 @@ function initializeCatalogScrollTracking() {
   if (!header) return;
   const toggle = header.querySelector(".home-collections-toggle");
   const navigation = header.querySelector(".home-collection-navigation");
+  const panel = header.querySelector(".home-collection-panel");
   let nudged = false;
   let previousScrollY = window.scrollY;
   let downwardTravel = 0;
@@ -313,18 +297,34 @@ function initializeCatalogScrollTracking() {
   const mobile = window.matchMedia("(max-width: 767.98px)");
 
   function setExpanded(expanded) {
+    if ((toggle.getAttribute("aria-expanded") === "true") === expanded) return;
     if (!expanded && navigation.contains(document.activeElement)) {
       toggle.focus({ preventScroll: true });
     }
     toggle.setAttribute("aria-expanded", String(expanded));
     toggle.setAttribute("aria-label", `${expanded ? "Collapse" : "Expand"} catalog collections`);
-    navigation.hidden = !expanded;
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    navigation.hidden = false;
+    navigation.inert = !expanded;
+    // Establish the collapsed grid before revealing its natural height.
+    if (expanded) panel.getBoundingClientRect();
+    panel.classList.toggle("is-collapsed", !expanded);
+    if (!expanded && (reducedMotion || panel.getAnimations().length === 0)) navigation.hidden = true;
     toggle.classList.remove("is-nudging");
     // Ignore scroll anchoring caused by the row changing height.
     downwardTravel = 0;
     upwardTravel = 0;
-    settleUntil = performance.now() + 220;
+    settleUntil = performance.now() + (reducedMotion ? 50 : 500);
+    window.setTimeout(scheduleUpdate, reducedMotion ? 50 : 500);
   }
+
+  function finishCollapse() {
+    if (toggle.getAttribute("aria-expanded") === "false") navigation.hidden = true;
+    scheduleUpdate();
+  }
+  panel.addEventListener("transitionend", (event) => {
+    if (event.target === panel && event.propertyName === "grid-template-rows") finishCollapse();
+  });
 
   toggle.addEventListener("click", () => {
     setExpanded(toggle.getAttribute("aria-expanded") !== "true");
@@ -344,6 +344,15 @@ function initializeCatalogScrollTracking() {
 
   function update() {
     frame = 0;
+    if (document.body.classList.contains('has-cart-drawer')) {
+      previousScrollY = Math.max(0, window.scrollY);
+      return;
+    }
+    // Let CSS finish resizing the row without restyling every catalog card each frame.
+    if (performance.now() < settleUntil || panel.getAnimations().some(animation => animation.playState !== "finished")) {
+      previousScrollY = Math.max(0, window.scrollY);
+      return;
+    }
     const styles = getComputedStyle(document.documentElement);
     const navHeight = parseFloat(styles.getPropertyValue("--nav-actual-height")) ||
       parseFloat(styles.getPropertyValue("--nav-height")) || 50;
@@ -354,14 +363,15 @@ function initializeCatalogScrollTracking() {
       upwardTravel = delta > 0 ? 0 : upwardTravel - delta;
     }
     const pinnedToNav = header.getBoundingClientRect().top <= navHeight + 2;
+    const expanded = toggle.getAttribute("aria-expanded") === "true";
     if (autoCollapsed && (!mobile.matches || !pinnedToNav)) {
       setExpanded(true);
       autoCollapsed = false;
       downwardTravel = 0;
-    } else if (mobile.matches && upwardTravel > 16 && navigation.hidden) {
+    } else if (mobile.matches && upwardTravel > 16 && !expanded) {
       setExpanded(true);
       autoCollapsed = false;
-    } else if (mobile.matches && pinnedToNav && downwardTravel > 16 && !navigation.hidden) {
+    } else if (mobile.matches && pinnedToNav && downwardTravel > 16 && expanded) {
       setExpanded(false);
       autoCollapsed = true;
       downwardTravel = 0;
@@ -376,7 +386,10 @@ function initializeCatalogScrollTracking() {
     sections.forEach((section, index) => {
       if (section && section.getBoundingClientRect().top <= readingLine) nextIndex = index;
     });
-    document.documentElement.style.setProperty("--catalog-header-height", `${headerHeight}px`);
+    const headerHeightValue = `${headerHeight}px`;
+    if (document.documentElement.style.getPropertyValue("--catalog-header-height") !== headerHeightValue) {
+      document.documentElement.style.setProperty("--catalog-header-height", headerHeightValue);
+    }
     if (nextIndex === activeIndex) return;
     activeIndex = nextIndex;
     const focused = header.contains(document.activeElement) ? document.activeElement : null;
@@ -462,7 +475,7 @@ document.addEventListener("click", async (event) => {
   const code = button.getAttribute("data-code");
   await CEOrder.run(async () => {
     const response = await CEOrder.post("/api/cart/add", {code, qty: 1});
-    updateCartBadge(response.total_items, response.distinct_items, true);
+    updateCartBadge(response.total_items, response.distinct_items);
     setCardQty(card, response.qty);
     setAddButtonLabel(card, response.qty);
   });
@@ -503,45 +516,6 @@ document.addEventListener("click", (event) => {
   event.stopPropagation();
   qtyInput.select();
 });
-
-let miniCartLastScrollY = window.scrollY;
-let miniCartScrollRafId = 0;
-
-window.addEventListener(
-  "scroll",
-  () => {
-    if (miniCartScrollRafId) return;
-    miniCartScrollRafId = window.requestAnimationFrame(() => {
-      miniCartScrollRafId = 0;
-      const currentScrollY = window.scrollY;
-      const scrollDelta = currentScrollY - miniCartLastScrollY;
-      miniCartLastScrollY = currentScrollY;
-
-      const miniCart = document.getElementById("catalogMiniCart");
-      if (!miniCart || miniCart.hidden) return;
-      if (window.matchMedia("(min-width: 768px)").matches) {
-        setCatalogMiniCartExpanded(true);
-        return;
-      }
-      if (currentScrollY < 80 || scrollDelta < -6) {
-        setCatalogMiniCartExpanded(true);
-      } else if (scrollDelta > 8) {
-        setCatalogMiniCartExpanded(false);
-      }
-    });
-  },
-  { passive: true },
-);
-
-window.addEventListener(
-  "resize",
-  () => {
-    if (window.matchMedia("(min-width: 768px)").matches) {
-      setCatalogMiniCartExpanded(true);
-    }
-  },
-  { passive: true },
-);
 
 document.addEventListener("keydown", async (event) => {
   const qtyInput = event.target.closest(".product-qty-input");

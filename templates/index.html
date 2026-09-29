@@ -11,6 +11,7 @@
 <noscript><style>img[data-catalog-src] { display: none; } .product-img-wrap > noscript, .home-collection-option > noscript { display: contents; }</style></noscript>
 <script src="{{ asset_url('js/catalog_images.js') }}" defer></script>
 <link href="{{ asset_url('css/styles/home_catalog.css') }}" rel="stylesheet">
+<link href="{{ asset_url('css/styles/cart_drawer.css') }}" rel="stylesheet">
 {% if latest_reels %}
   <link href="{{ asset_url('css/styles/inline_reels.css') }}" rel="stylesheet">
   <link href="{{ asset_url('css/styles/home_reels.css') }}" rel="stylesheet">
@@ -68,6 +69,7 @@
           </button>
         </div>
       </div>
+      <div class="home-collection-panel"><div class="home-collection-clip">
       <nav id="homeCollectionNavigation" class="home-collection-navigation" aria-label="Catalog collections">
         <div class="home-collection-current"></div>
         <div class="home-collection-track">
@@ -87,6 +89,7 @@
         {% endfor %}
         </div>
       </nav>
+      </div></div>
     </div>
   </div>
   {% endif %}
@@ -143,12 +146,12 @@
 {% endif %}
 
   <aside id="catalogMiniCart"
-    class="catalog-mini-cart is-expanded"
+    class="catalog-mini-cart"
     data-total-items="{{ cart_item_count }}"
     data-distinct-items="{{ cart_distinct_item_count }}"
     aria-label="Current order"
     {% if cart_item_count <= 0 %}hidden{% endif %}>
-    <a class="catalog-mini-cart__toggle" href="{{ url_for('cart') }}" aria-label="View your cart">
+    <button type="button" class="catalog-mini-cart__toggle" data-cart-drawer-open aria-label="Review your order" aria-haspopup="dialog" aria-controls="cartDrawer" aria-expanded="false">
       <span class="catalog-mini-cart__icon-wrap" aria-hidden="true">
         {% set cart_icon_class = 'catalog-mini-cart__cart-icon' %}
         {% include "partials/cart_icon.html" %}
@@ -156,16 +159,26 @@
       </span>
       <span class="catalog-mini-cart__summary">
         <span class="catalog-mini-cart__title"><span data-mini-cart-total>{{ cart_item_count }}</span>
-          <span data-mini-cart-piece-label>{% if cart_item_count == 1 %}piece{% else %}pieces{% endif %}</span> in your order</span>
-        <span class="catalog-mini-cart__detail"><span data-mini-cart-distinct>{{ cart_distinct_item_count }}</span>
-          <span data-mini-cart-style-label>{% if cart_distinct_item_count == 1 %}style{% else %}styles{% endif %}</span> · Saved as you shop</span>
+          <span data-mini-cart-piece-label>{% if cart_item_count == 1 %}piece{% else %}pieces{% endif %}</span> in order</span>
       </span>
-    </a>
-    <div class="catalog-mini-cart__actions" id="catalogMiniCartActions">
-      <a class="btn btn-outline-gold catalog-mini-cart__review" href="{{ url_for('cart') }}">Review Order</a>
-      <a class="btn btn-gold catalog-mini-cart__submit" href="{{ url_for('checkout') }}">Checkout</a>
-    </div>
+    </button>
+    <button type="button" class="btn btn-gold catalog-mini-cart__submit" data-cart-drawer-open aria-haspopup="dialog" aria-controls="cartDrawer" aria-expanded="false">Review Order</button>
   </aside>
+
+  <div class="offcanvas offcanvas-end cart-drawer cart-page" tabindex="-1" id="cartDrawer" aria-labelledby="cartDrawerTitle">
+    <div class="offcanvas-header cart-drawer__header">
+      <h2 class="text-gold mb-0" id="cartDrawerTitle">Review Order</h2>
+      <button type="button" class="btn btn-outline-gold cart-drawer__close" data-bs-dismiss="offcanvas" aria-label="Close order">×</button>
+    </div>
+    <div class="cart-drawer__feedback" data-order-feedback role="alert" hidden></div>
+    <div class="cart-drawer__loading" role="status" hidden>
+      <span>Loading your order…</span>
+      <button type="button" class="btn btn-outline-gold" data-cart-drawer-retry hidden>Retry</button>
+    </div>
+    <div class="offcanvas-body cart-drawer__body">
+      {% with items=[], total_items=0 %}{% include 'partials/cart_order.html' %}{% endwith %}
+    </div>
+  </div>
 
   <a class="whatsapp-float"
     href="https://wa.me/18183319292?text=Hello%20I%27d%20like%20more%20information"
@@ -206,6 +219,8 @@
 {% block body_end %}
 <script src="{{ asset_url('js/scroll_cue.js') }}" defer></script>
 <script src="{{ asset_url('js/catalog.js') }}" defer></script>
+<script src="{{ asset_url('js/cart.js') }}" defer></script>
+<script src="{{ asset_url('js/cart_drawer.js') }}" defer></script>
 <script src="{{ asset_url('js/whatsapp_float.js') }}" defer></script>
 {% if latest_reels %}
 <script src="{{ asset_url('js/inline_reels.js') }}" defer></script>

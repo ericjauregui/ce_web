@@ -3,13 +3,14 @@
   let queue = Promise.resolve(true);
   let pending = 0;
   let locked = [];
-  const feedback = () => document.getElementById('orderFeedback');
+  const feedback = () => (document.body.classList.contains('has-cart-drawer') && document.querySelector('#cartDrawer [data-order-feedback]')) || document.getElementById('orderFeedback');
   function showError(message) {
     const element = feedback();
     if (element) { element.hidden = false; element.textContent = message; }
   }
   function lock() {
     locked = [...document.querySelectorAll('.add-to-cart-btn, .qty-adjust-btn, .qty-clear-btn, .qty-remove, .cart-undo-btn, #clearOrderBtn, .product-qty-input')]
+      .filter(element => !element.closest('[inert]'))
       .map(element => ({element, disabled: element.disabled, readOnly: element.readOnly}));
     locked.forEach(({element}) => {
       if (element.tagName === 'INPUT') element.readOnly = true;
@@ -29,7 +30,7 @@
     }
     if (!response.ok) {
       const error = new Error(response.status === 410
-        ? 'The 60-second Undo window has ended.'
+        ? 'The 30-second Undo window has ended.'
         : response.status === 429
         ? 'Please wait a moment, then try again. Your update was not saved.'
         : 'We couldn’t save your update. Please try again.');
@@ -71,7 +72,7 @@
       } finally {
         if (--pending === 0) {
           locked.forEach(({element, disabled, readOnly}) => {
-            element.disabled = disabled || Boolean(element.closest('[inert]'));
+            element.disabled = disabled || Boolean(element.closest('tr[inert]'));
             if (element.tagName === 'INPUT') element.readOnly = readOnly;
           });
           locked = [];

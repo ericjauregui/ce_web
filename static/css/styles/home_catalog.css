@@ -20,12 +20,15 @@
 .home-row-button { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; height: 40px; min-height: 40px; padding: 0 .75rem; border: 1px solid rgb(var(--gold-rgb) / .5); border-radius: 6px; color: var(--gold); background: rgba(13,13,13,.7); font: inherit; font-size: .875rem; font-weight: 600; line-height: 1.2; white-space: nowrap; text-decoration: none; }
 .home-row-button:hover { color: #fff; background: #272319; }
 .home-collections-toggle { flex: 0 0 40px; width: 40px; padding: 0; }
-.home-collections-toggle svg { width: 24px; height: 24px; transition: transform 180ms ease; }
+.home-collections-toggle svg { width: 24px; height: 24px; transition: transform 400ms cubic-bezier(.22, .61, .36, 1); }
 .home-collections-toggle[aria-expanded="false"] svg { transform: rotate(180deg); }
 .home-collections-toggle:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 .home-collections-toggle.is-nudging svg { animation: collection-chevron-nudge 650ms ease 2; }
 @keyframes collection-chevron-nudge { 0%, 100% { transform: translateY(0); } 45% { transform: translateY(-3px); } }
 .home-collection-navigation[hidden] { display: none; }
+.home-collection-panel { display: grid; grid-template-rows: 1fr; opacity: 1; transition: grid-template-rows 400ms cubic-bezier(.22, .61, .36, 1), opacity 240ms ease; }
+.home-collection-panel.is-collapsed { grid-template-rows: 0fr; opacity: 0; pointer-events: none; }
+.home-collection-clip { min-height: 0; min-width: 0; overflow: hidden; }
 .home-collections .home-row-actions { gap: .4rem; }
 .home-reels-heading { margin-bottom: .5rem !important; }
 .home-reels-heading .section-header-row.py-3 { padding-block: .4rem !important; }
@@ -33,6 +36,7 @@
 .home-reels-heading .home-view-all { min-height: 34px; }
 @media (prefers-reduced-motion: reduce) {
   .home-collections-toggle svg { transition: none; }
+  .home-collection-panel { transition: none; }
   .home-collections-toggle.is-nudging svg { animation: none; }
 }
 @media (max-width: 767.98px) {
