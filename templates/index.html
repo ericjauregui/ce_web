@@ -72,7 +72,8 @@
       <div class="home-collection-panel"><div class="home-collection-clip">
       <nav id="homeCollectionNavigation" class="home-collection-navigation" aria-label="Catalog collections">
         <div class="home-collection-current"></div>
-        <div class="home-collection-track">
+        <div class="home-collection-track-shell scroll-cue-shell scroll-cue-shell--collections">
+        <div class="home-collection-track scroll-cue-track">
         {% for other in sections %}
         <a href="#section-{{ other.key }}" class="home-collection-option section-chip-btn"
           data-target="section-{{ other.key }}" data-collection-title="{{ other.title }}">
@@ -87,6 +88,7 @@
           <span>{{ other.title }}</span>
         </a>
         {% endfor %}
+        </div>
         </div>
       </nav>
       </div></div>

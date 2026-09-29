@@ -17,6 +17,10 @@
       return `Scroll categories ${directionLabel}`;
     }
 
+    if (shell.classList.contains("scroll-cue-shell--collections")) {
+      return `Scroll collections ${directionLabel}`;
+    }
+
     if (shell.classList.contains("scroll-cue-shell--reels")) {
       return `Scroll content ${directionLabel}`;
     }

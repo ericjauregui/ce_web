@@ -1,3 +1,10 @@
+/* Browsing sections fill the viewport while their own gutters preserve spacing. */
+:where(.page-shell main) .container,
+:where(.page-shell main) .container-xl {
+  max-width: none;
+  --bs-gutter-x: clamp(1.5rem, 4vw, 3rem);
+}
+
 /* Sticky section header */
 .sticky-section-header {
   position: sticky;
@@ -417,6 +424,16 @@
   width: var(--scroll-cue-size);
   min-width: 0;
   font-size: clamp(.95rem, 1.9vw, 1.12rem);
+}
+
+.scroll-cue-shell--collections {
+  --scroll-cue-size: 2rem;
+  --scroll-cue-fade-width: 2.5rem;
+  --scroll-cue-track-end-pad: 0;
+}
+
+.scroll-cue-shell--collections.is-overflowing {
+  --scroll-cue-track-end-pad: 2rem;
 }
 
 .scroll-cue-shell--reels .scroll-cue-button {
@@ -2556,7 +2573,7 @@
     overflow: hidden;
 }
 .team-page {
-  width: min(94%, 1600px);
+  width: 100%;
   max-width: none;
 }
 
