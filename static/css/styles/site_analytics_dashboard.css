@@ -277,6 +277,26 @@
   font-size: 0.76rem;
 }
 
+#request-status-card > summary {
+  display: list-item;
+  margin-bottom: 0;
+  cursor: pointer;
+}
+
+#request-status-card > summary > div {
+  display: inline-block;
+  vertical-align: top;
+}
+
+#request-status-card[open] > summary {
+  margin-bottom: 1.1rem;
+}
+
+/* Hide open nested details consistently when the outer report is collapsed. */
+#request-status-card:not([open]) > :not(summary) {
+  display: none;
+}
+
 .analytics-legend {
   display: flex;
   flex-wrap: wrap;

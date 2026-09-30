@@ -239,14 +239,21 @@
     </section>
     {% endif %}
 
-    <section class="analytics-card" id="request-status-card" aria-labelledby="request-status-title"
+    <details class="analytics-card" id="request-status-card" aria-labelledby="request-status-title"
+      {% if 'request_page' in request.args %}open{% endif %}
       data-all-requests="{{ analytics.request_status.all_total }}"
       data-all-success="{{ analytics.request_status.all_success_count }}"
       data-all-not-found="{{ analytics.request_status.all_not_found_count }}"
       data-probe-requests="{{ analytics.request_status.probe_total }}">
-      <div class="analytics-section-heading">
-        <div><h2 id="request-status-title">Page response status</h2><p>HTML GET requests; likely scanner probes excluded from the percentages below</p></div>
-      </div>
+      <summary class="analytics-section-heading">
+        <div>
+          <h2 id="request-status-title">Page response status</h2>
+          <p><strong>{{ '{:,}'.format(analytics.request_status.all_total) }}</strong> requests · <strong>{{ '{:,}'.format(analytics.request_status.all_success_count) }}</strong> successful · <strong>{{ '{:,}'.format(analytics.request_status.all_not_found_count) }}</strong> not found (404)</p>
+          <p><strong>{{ '{:,}'.format(analytics.request_status.probe_total) }}</strong> likely probes · <strong>{{ '{:,}'.format(analytics.request_status.probe_groups[0].count) }}</strong> sensitive-file probes</p>
+          <p>View request details</p>
+        </div>
+      </summary>
+      <p class="analytics-empty">HTML GET requests; likely scanner probes excluded from the percentages below.</p>
       <p class="analytics-empty">These are server requests, not a count of human visitors. Probe labels are based on recognizable URL patterns; other requests may also include bots.</p>
       {% if analytics.request_status.all_total %}
       {% if analytics.request_status.total %}
@@ -295,7 +302,7 @@
       </details>
       {% else %}<p class="analytics-empty">No page response counts are available for this range yet.</p>{% endif %}
       <p class="analytics-empty">This report covers only HTML GET responses with status 200 or 404. It does not include POST attempts, other response types or statuses, query parameters, or requests blocked before reaching the site.</p>
-    </section>
+    </details>
 
     <section class="analytics-card" aria-labelledby="checkout-insights-title">
       <div class="analytics-section-heading">

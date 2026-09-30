@@ -292,14 +292,24 @@ def classify_request_path(path: str) -> tuple[str, str]:
     lower = path.lower().rstrip('/')
     segments = lower.split('/')[1:]
     filename = segments[-1] if segments else ''
-    if any(segment in {'.git', '.svn', '.hg'} for segment in segments):
+    if any(segment in {'.svn', '.hg'} or re.fullmatch(
+            r'(?:[a-z0-9_-]+)?\.git(?:\.(?:bak|old|backup))?', segment)
+            for segment in segments):
         return 'sensitive_probe', 'Source-control metadata'
-    if any(segment in {'.aws', '.ssh', '.docker'} for segment in segments):
+    if (any(segment in {'.aws', '.ssh', '.docker', '.kube'} for segment in segments)
+        or filename in {'.git-credentials', '.amplifyrc', '.boto', '.s3cfg', 'auth.json',
+                        'application_default_credentials.json', 'client_secrets.json',
+                        'google-api-private-key.json', 'server.key', 'id_rsa', 'id_dsa',
+                        'id_ecdsa', 'id_ed25519'}
+        or re.fullmatch(r'(?:credentials|secrets)(?:\.(?:ini|json|xml|ya?ml|env))?', filename)):
         return 'sensitive_probe', 'Credentials or private keys'
-    if (filename == '.env' or filename.startswith('.env.')
-        or filename in {'.npmrc', '.pypirc', 'id_rsa', 'id_ed25519'}
-        or re.fullmatch(r'(?:wp-config\.php|config(?:\.inc)?\.(?:php|json|ya?ml|ini)|'
-                        r'configuration\.php|settings\.py|database\.ya?ml|web\.config|'
+    if (re.fullmatch(r'\.?env(?:[._~-][a-z0-9._~-]*)?', filename)
+        or filename.endswith('.env') or filename == '.environment'
+        or re.fullmatch(r'(?:\.npmrc|\.pypirc)(?:\.bak)?', filename)
+        or re.fullmatch(r'(?:wp-config\.(?:php|bak|old)|config(?:\.inc)?\.(?:php|json|js|ya?ml|ini)|'
+                        r'configuration\.(?:php|json|xml|ya?ml)|settings(?:\.local)?\.(?:py|json)|'
+                        r'(?:aws|parameters)\.(?:ya?ml|json)|database\.(?:ya?ml|config)|web\.config|'
+                        r'runtime-config\.js|claude_desktop_config\.json|'
                         r'appsettings(?:\.[a-z0-9_-]+)?\.json|application\.(?:ya?ml|properties))'
                         r'(?:\.(?:bak|old|save|orig|txt))?', filename)):
         return 'sensitive_probe', 'Secrets or configuration files'
@@ -307,16 +317,33 @@ def classify_request_path(path: str) -> tuple[str, str]:
         or re.fullmatch(r'(?:backup|backups|dump|database|site|www|wwwroot)'
                         r'\.(?:zip|tar|tar\.gz|tgz|bak)', filename)):
         return 'sensitive_probe', 'Database or backup files'
-    if lower in {'/actuator/env', '/actuator/configprops', '/actuator/heapdump'}:
+    if (lower in {'/actuator/env', '/actuator/configprops', '/actuator/heapdump',
+                   '/debug/default/view', '/frontend/web/debug/default/view'}
+        or any(segment in {'phpinfo', '_profiler', '_ignition', 'telescope'} for segment in segments)
+        or filename in {'app.log', 'debug.log', 'error.log', 'laravel.log', 'php_error.log',
+                        'php_errors.log', 'php.ini'}):
         return 'sensitive_probe', 'Application diagnostics'
-    if segments and segments[0] in {'wp', 'wordpress', 'wp-admin', 'wp-content', 'wp-includes'}:
+    if (filename.endswith('.js.map') or filename in {
+            '.gitmodules', '.gitlab-ci.yml', 'dockerfile', 'terraform.tfstate',
+            'composer.json', 'composer.lock', 'package.json', 'package-lock.json',
+            '.package-lock.json', 'yarn.lock', 'pnpm-lock.yaml', 'bun.lock', 'requirements.txt',
+            'pipfile.lock', 'gemfile.lock', 'go.sum'}
+        or re.fullmatch(r'docker-compose\.ya?ml(?:\.bak)?', filename)
+        or lower.startswith(('/.github/workflows/', '/.circleci/', '/vendor/composer/'))):
+        return 'sensitive_probe', 'Deployment or source files'
+    if (segments and segments[0] in {'wp', 'wordpress'}
+        or any(segment in {'wp-admin', 'wp-content', 'wp-includes', 'wp-json'} for segment in segments)
+        or lower.startswith('/blog/wp/v2/') or filename in {'wp-login.php', 'xmlrpc.php'}):
         return 'scanner_probe', 'WordPress paths'
     if re.search(r'\.(?:php\d?|phtml|asp|aspx)(?:\.[a-z0-9_-]+)?$', filename):
         return 'scanner_probe', 'PHP or legacy script paths'
     if (segments and segments[0] in {'phpmyadmin', 'pma', 'cgi-bin', 'actuator', 'solr',
                                      'jenkins', 'boaform', 'hnap1', 'owa', 'ecp'}
         or lower in {'/server-status', '/server-info', '/manager/html',
-                     '/autodiscover/autodiscover.xml'}
+                     '/autodiscover/autodiscover.xml', '/livewire/update', '/magento_version',
+                     '/rest/settings', '/rest/workflows', '/access/api/v1/system/ping',
+                     '/admin/controller/extension/extension', '/sites/default/files',
+                     '/node_modules', '/vendor'}
         or lower.startswith('/vendor/phpunit/') or filename == '.ds_store'):
         return 'scanner_probe', 'Other software probes'
     if lower in {'/download/order/file.pdf', '/download/order/file.csv'}:

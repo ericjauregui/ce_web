@@ -186,6 +186,14 @@ class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
             before = list(connection.execute(select(site_request_status_daily_counts)).mappings())
         self.goto('/admin/analytics?count=7&unit=days&metric=clicks')
         card = self.page.locator('#request-status-card')
+        self.assertEqual(card.evaluate('element => element.tagName'), 'DETAILS')
+        self.assertIsNone(card.get_attribute('open'))
+        for total in ('66 requests', '7 successful', '59 not found (404)',
+                      '31 likely probes', '27 sensitive-file probes'):
+            self.assertIn(total, card.locator(':scope > summary').inner_text())
+        self.assertFalse(self.page.locator('#request-status-summary').is_visible())
+        card.locator(':scope > summary').click()
+        self.assertTrue(self.page.locator('#request-status-summary').is_visible())
         self.assertEqual(card.get_attribute('data-all-requests'), '66')
         self.assertEqual(card.get_attribute('data-all-success'), '7')
         self.assertEqual(card.get_attribute('data-all-not-found'), '59')
@@ -229,6 +237,7 @@ class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
                 for path in ('/wordpress/', '/.env.production')
             ])
         self.goto('/admin/analytics')
+        self.page.locator('#request-status-card > summary').click()
         self.assertEqual(self.page.locator('#request-status-card').get_attribute('data-probe-requests'), '2')
         self.assertEqual(self.page.locator('#request-status-summary').count(), 0)
         self.assertIn('All recorded requests in this range match likely probe patterns',
@@ -236,6 +245,7 @@ class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
         with self.analytics.engine.begin() as connection:
             connection.execute(site_request_status_daily_counts.delete())
         self.goto('/admin/analytics')
+        self.page.locator('#request-status-card > summary').click()
         self.assertIn('No page response counts', self.page.locator('#request-status-card').inner_text())
         root = self._artifact_dir()
         root.mkdir(parents=True, exist_ok=True)
@@ -257,6 +267,45 @@ class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
         self.goto('/admin/analytics?request_page=invalid')
         self.assertIn('Page 1 of 1', self.page.locator('#request-review-details').inner_text())
         self.assertIn('/missing-fixture', self.page.locator('#request-other-missing').inner_text())
+        self.page.set_viewport_size({'width': 390, 'height': 844})
+        self.assertLessEqual(self.page.evaluate('document.documentElement.scrollWidth'), 390)
+
+    def test_request_review_covers_observed_credential_and_software_probe_variants(self) -> None:
+        """Live review exposed explicit variants; ambiguous URLs must stay unclassified."""
+        sensitive_paths = ('/.env~', '/.env_backup', '/.git-credentials', '/.git.bak/config',
+            '/www.git/HEAD', '/credentials.json', '/sendgrid.env', '/secrets.yaml',
+            '/config/aws.yml', '/docker-compose.yml', '/terraform.tfstate',
+            '/assets/index.js.map', '/storage/logs/laravel.log', '/app_dev.php/_profiler/phpinfo')
+        scanner_paths = ('/wp-json/wp/v2/users', '/blog/wp/v2/users',
+            '/2019/wp-includes/wlwmanifest.xml', '/livewire/update', '/magento_version')
+        other_paths = ('/apple-touch-icon.png', '/contact-us', '/blog/', '/security.txt', '/assets/app.js')
+        with self.analytics.engine.begin() as connection:
+            connection.execute(site_request_status_daily_counts.delete())
+        client = self._playwright_context.request.new_context()
+        try:
+            for path in (*sensitive_paths, *scanner_paths, *other_paths):
+                self.assertEqual(client.get(self.base_url + path).status, 404)
+        finally:
+            client.dispose()
+        with self.analytics.engine.begin() as connection:
+            connection.execute(site_request_status_daily_counts.update().values(event_date=self.fixture_date))
+        self.goto('/admin/analytics')
+        self.page.locator('#request-status-card > summary').click()
+        self.page.locator('#request-review-details > summary').click()
+        rows = self.page.locator('#request-review tbody tr')
+        self.assertEqual(rows.count(), 24)
+        for paths, kind in ((sensitive_paths, 'sensitive_probe'),
+                            (scanner_paths, 'scanner_probe'), (other_paths, 'other')):
+            for path in paths:
+                row = rows.filter(has=self.page.get_by_role('cell', name=path, exact=True))
+                self.assertEqual(row.get_attribute('data-request-kind'), kind, path)
+        self.assertEqual(self.page.locator('#request-status-card').get_attribute('data-probe-requests'), '19')
+        self.assertEqual(self.page.locator('#request-status-summary tbody tr').nth(1)
+                         .locator('td').nth(1).inner_text(), '5')
+        self.page.locator('#request-status-card > summary').click()
+        self.assertFalse(self.page.locator('#request-review').is_visible())
+        self.page.locator('#request-status-card > summary').click()
+        self.assertTrue(self.page.locator('#request-review').is_visible())
         self.page.set_viewport_size({'width': 390, 'height': 844})
         self.assertLessEqual(self.page.evaluate('document.documentElement.scrollWidth'), 390)
 
@@ -333,6 +382,7 @@ class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
             "element => element.textContent"
         )
         self.assertRegex(first_x_label, r"^\d{1,2}/\d{1,2}$")
+        self.page.locator('#request-status-card > summary').click()
         self.assertIn("80%", self.page.locator("#request-status-title").locator("xpath=../../..")
                       .inner_text())
         checkout_card = self.page.locator("#checkout-insights-title").locator("xpath=../../..")
