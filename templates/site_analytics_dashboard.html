@@ -239,26 +239,62 @@
     </section>
     {% endif %}
 
-    <section class="analytics-card" aria-labelledby="request-status-title">
+    <section class="analytics-card" id="request-status-card" aria-labelledby="request-status-title"
+      data-all-requests="{{ analytics.request_status.all_total }}"
+      data-all-success="{{ analytics.request_status.all_success_count }}"
+      data-all-not-found="{{ analytics.request_status.all_not_found_count }}"
+      data-probe-requests="{{ analytics.request_status.probe_total }}">
       <div class="analytics-section-heading">
-        <div><h2 id="request-status-title">Page response status</h2><p>HTML page requests only</p></div>
+        <div><h2 id="request-status-title">Page response status</h2><p>HTML GET requests; likely scanner probes excluded from the percentages below</p></div>
       </div>
+      <p class="analytics-empty">These are server requests, not a count of human visitors. Probe labels are based on recognizable URL patterns; other requests may also include bots.</p>
+      {% if analytics.request_status.all_total %}
       {% if analytics.request_status.total %}
-      <div class="analytics-table-wrap"><table class="analytics-table">
+      <div class="analytics-table-wrap"><table class="analytics-table" id="request-status-summary">
         <thead><tr><th>Response</th><th class="analytics-number">Requests</th><th class="analytics-number">% of requests</th></tr></thead>
         <tbody>
           <tr><td>Successful (200)</td><td class="analytics-number">{{ '{:,}'.format(analytics.request_status.success_count) }}</td><td class="analytics-number analytics-percent">{{ analytics.request_status.success_percent }}%</td></tr>
-          <tr><td>Not found (404)</td><td class="analytics-number">{{ '{:,}'.format(analytics.request_status.not_found_count) }}</td><td class="analytics-number analytics-percent">{{ analytics.request_status.not_found_percent }}%</td></tr>
+          <tr><td>Other not found (404)</td><td class="analytics-number">{{ '{:,}'.format(analytics.request_status.not_found_count) }}</td><td class="analytics-number analytics-percent">{{ analytics.request_status.not_found_percent }}%</td></tr>
         </tbody>
       </table></div>
+      {% else %}<p class="analytics-empty">All recorded requests in this range match likely probe patterns.</p>{% endif %}
+      <p class="analytics-empty" id="request-status-all">All recorded HTML requests: {{ '{:,}'.format(analytics.request_status.all_total) }} · {{ '{:,}'.format(analytics.request_status.all_success_count) }} successful · {{ '{:,}'.format(analytics.request_status.all_not_found_count) }} not found. Counts are retained, including {{ '{:,}'.format(analytics.request_status.probe_total) }} likely probe requests.</p>
       {% if analytics.request_status.not_found_pages %}
-      <h3 class="analytics-subheading">Most requested missing pages</h3>
-      <div class="analytics-table-wrap"><table class="analytics-table">
-        <thead><tr><th>Page</th><th class="analytics-number">404s</th><th class="analytics-number">% of 404s</th></tr></thead>
+      <h3 class="analytics-subheading">Other missing pages to review</h3>
+      <div class="analytics-table-wrap"><table class="analytics-table" id="request-other-missing">
+        <thead><tr><th>Page</th><th class="analytics-number">404s</th><th class="analytics-number">% of other 404s</th></tr></thead>
         <tbody>{% for page in analytics.request_status.not_found_pages %}<tr><td class="analytics-path">{{ page.path }}</td><td class="analytics-number">{{ '{:,}'.format(page.count) }}</td><td class="analytics-number analytics-percent">{{ page.percent }}%</td></tr>{% endfor %}</tbody>
       </table></div>
       {% endif %}
+      <h3 class="analytics-subheading">Likely scanner probes</h3>
+      {% if analytics.request_status.probe_total %}
+      <p class="analytics-empty">Sensitive-file probes look for secrets, source-control metadata, backups, or application diagnostics. These labels describe requested paths, not confirmed attacks or exposure.</p>
+      <div class="analytics-table-wrap"><table class="analytics-table" id="request-probe-summary">
+        <thead><tr><th>Probe type</th><th class="analytics-number">Requests</th><th class="analytics-number">404s</th><th class="analytics-number">200s</th></tr></thead>
+        <tbody>{% for group in analytics.request_status.probe_groups %}<tr><td>{{ group.label }}</td><td class="analytics-number">{{ '{:,}'.format(group.count) }}</td><td class="analytics-number">{{ '{:,}'.format(group.not_found) }}</td><td class="analytics-number">{{ '{:,}'.format(group.success) }}</td></tr>{% endfor %}</tbody>
+      </table></div>
+      {% if analytics.request_status.probe_success_count %}
+      <p role="status">{{ '{:,}'.format(analytics.request_status.probe_success_count) }} probe requests returned 200. Review these paths: a successful HTML response does not prove that sensitive data was exposed.</p>
+      {% else %}<p class="analytics-empty">No recognized probe paths returned a successful HTML response in this range.</p>{% endif %}
+      <div class="analytics-table-wrap"><table class="analytics-table" id="request-probe-pages">
+        <thead><tr><th>Most requested probe paths</th><th>Pattern</th><th class="analytics-number">404s</th><th class="analytics-number">200s</th></tr></thead>
+        <tbody>{% for page in analytics.request_status.probe_pages %}<tr><td class="analytics-path">{{ page.path }}</td><td>{{ page.reason }}</td><td class="analytics-number">{{ '{:,}'.format(page.not_found) }}</td><td class="analytics-number">{{ '{:,}'.format(page.success) }}</td></tr>{% endfor %}</tbody>
+      </table></div>
+      {% else %}<p class="analytics-empty">No likely scanner probes were recognized in this range.</p>{% endif %}
+      <details id="request-review-details" {% if 'request_page' in request.args %}open{% endif %}>
+        <summary>Review all missing pages and probe paths ({{ '{:,}'.format(analytics.request_status.review.path_count) }} paths)</summary>
+        <p class="analytics-empty">Page {{ analytics.request_status.review.page }} of {{ analytics.request_status.review.page_count }}. Includes every recorded 404 path and any recognized probe path returning 200, within the selected filters.</p>
+        <div class="analytics-table-wrap"><table class="analytics-table" id="request-review">
+          <thead><tr><th>Page</th><th>Pattern</th><th class="analytics-number">404s</th><th class="analytics-number">200s</th></tr></thead>
+          <tbody>{% for page in analytics.request_status.review.rows %}<tr data-request-kind="{{ page.kind }}"><td class="analytics-path">{{ page.path }}</td><td>{{ page.reason }}</td><td class="analytics-number">{{ '{:,}'.format(page.not_found) }}</td><td class="analytics-number">{{ '{:,}'.format(page.success) }}</td></tr>{% endfor %}</tbody>
+        </table></div>
+        <nav class="analytics-filter-actions" aria-label="Request review pages">
+          {% if analytics.request_status.review.previous_url %}<a class="btn btn-outline-light" data-request-page="previous" href="{{ analytics.request_status.review.previous_url }}">Previous paths</a>{% endif %}
+          {% if analytics.request_status.review.next_url %}<a class="btn btn-outline-light" data-request-page="next" href="{{ analytics.request_status.review.next_url }}">Next paths</a>{% endif %}
+        </nav>
+      </details>
       {% else %}<p class="analytics-empty">No page response counts are available for this range yet.</p>{% endif %}
+      <p class="analytics-empty">This report covers only HTML GET responses with status 200 or 404. It does not include POST attempts, other response types or statuses, query parameters, or requests blocked before reaching the site.</p>
     </section>
 
     <section class="analytics-card" aria-labelledby="checkout-insights-title">

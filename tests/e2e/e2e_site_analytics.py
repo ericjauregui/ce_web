@@ -153,6 +153,113 @@ class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
             webapp.app.extensions["connect_analytics"] = self.prior_connect_analytics
         self.analytics.engine.dispose()
 
+    def test_request_review_separates_probes_without_hiding_other_missing_pages(self) -> None:
+        """Old/new probes, unexpected 200s, pagination and filters must preserve counts.
+
+        Unknown paths and private-download failures cannot be assumed to be bots.
+        Browser evidence must also show that the report contains no private tokens.
+        """
+        with self.analytics.engine.begin() as connection:
+            connection.execute(site_request_status_daily_counts.delete())
+        client = self._playwright_context.request.new_context()
+        try:
+            for path in ('/.env', '/wp-login.php', '/.git/config', '/backup.sql',
+                         '/phpmyadmin/', '/actuator/env', '/unknown-missing',
+                         '/product/missing', '/download/order/synthetic-audit-token.pdf'):
+                response = client.get(f'{self.base_url}{path}?private-query=not-recorded')
+                self.assertEqual(response.status, 404, path)
+            for path in ('/', '/about'):
+                self.assertEqual(client.get(f'{self.base_url}{path}').status, 200)
+        finally:
+            client.dispose()
+        with self.analytics.engine.begin() as connection:
+            connection.execute(site_request_status_daily_counts.update().values(event_date=self.fixture_date))
+            # Historical rows must be classified without rewriting stored counts.
+            connection.execute(site_request_status_daily_counts.insert(), [
+                dict(event_date=self.fixture_date, page_path=path, status_code=status, request_count=count)
+                for path, status, count in [
+                    ('/.env.production', 404, 20), ('/wp-login.php', 200, 2),
+                    ('/config.json', 200, 3),
+                    *[(f'/missing-review-{index:02}', 404, 1) for index in range(30)],
+                ]
+            ])
+            before = list(connection.execute(select(site_request_status_daily_counts)).mappings())
+        self.goto('/admin/analytics?count=7&unit=days&metric=clicks')
+        card = self.page.locator('#request-status-card')
+        self.assertEqual(card.get_attribute('data-all-requests'), '66')
+        self.assertEqual(card.get_attribute('data-all-success'), '7')
+        self.assertEqual(card.get_attribute('data-all-not-found'), '59')
+        self.assertEqual(card.get_attribute('data-probe-requests'), '31')
+        summary = self.page.locator('#request-status-summary')
+        self.assertEqual(summary.locator('tbody tr').nth(0).locator('td').nth(1).inner_text(), '2')
+        self.assertEqual(summary.locator('tbody tr').nth(1).locator('td').nth(1).inner_text(), '33')
+        probes = self.page.locator('#request-probe-summary')
+        self.assertIn('Sensitive-file probes', probes.inner_text())
+        self.assertEqual(probes.locator('tbody tr').nth(0).locator('td').nth(1).inner_text(), '27')
+        self.assertEqual(probes.locator('tbody tr').nth(1).locator('td').nth(1).inner_text(), '4')
+        self.assertIn('5 probe requests returned 200', card.inner_text())
+        self.assertIn('does not prove', card.inner_text())
+        self.assertIn('not a count of human visitors', card.inner_text())
+        other_missing = self.page.locator('#request-other-missing')
+        self.assertNotIn('/wp-login.php', other_missing.inner_text())
+        self.assertNotIn('/.env', other_missing.inner_text())
+        self.assertIn('/download/order/file.pdf', other_missing.inner_text())
+        self.assertNotIn('synthetic-audit-token', self.page.content())
+        self.assertNotIn('not-recorded', self.page.content())
+        self.page.locator('#request-review-details > summary').click()
+        self.assertIn('Private download: denied or missing', card.inner_text())
+        self.assertEqual(self.page.locator('#request-review tbody tr').count(), 25)
+        first_paths = self.page.locator('#request-review tbody tr td:first-child').all_text_contents()
+        self.page.locator('a[data-request-page="next"]').click()
+        self.assertIn('count=7', self.page.url)
+        self.assertIn('metric=clicks', self.page.url)
+        self.assertIn('request_page=2', self.page.url)
+        self.assertEqual(self.page.locator('#request-review tbody tr').count(), 16)
+        second_paths = self.page.locator('#request-review tbody tr td:first-child').all_text_contents()
+        self.assertEqual(len(set(first_paths + second_paths)), 41)
+        with self.analytics.engine.connect() as connection:
+            after = list(connection.execute(select(site_request_status_daily_counts)).mappings())
+        self.assertEqual(before, after)
+        self.page.set_viewport_size({'width': 390, 'height': 844})
+        self.assertLessEqual(self.page.evaluate('document.documentElement.scrollWidth'), 390)
+        with self.analytics.engine.begin() as connection:
+            connection.execute(site_request_status_daily_counts.delete())
+            connection.execute(site_request_status_daily_counts.insert(), [
+                dict(event_date=self.fixture_date, page_path=path, status_code=404, request_count=1)
+                for path in ('/wordpress/', '/.env.production')
+            ])
+        self.goto('/admin/analytics')
+        self.assertEqual(self.page.locator('#request-status-card').get_attribute('data-probe-requests'), '2')
+        self.assertEqual(self.page.locator('#request-status-summary').count(), 0)
+        self.assertIn('All recorded requests in this range match likely probe patterns',
+                      self.page.locator('#request-status-card').inner_text())
+        with self.analytics.engine.begin() as connection:
+            connection.execute(site_request_status_daily_counts.delete())
+        self.goto('/admin/analytics')
+        self.assertIn('No page response counts', self.page.locator('#request-status-card').inner_text())
+        root = self._artifact_dir()
+        root.mkdir(parents=True, exist_ok=True)
+        (root / 'request-review.json').write_text(json.dumps({
+            'all_requests': 66, 'successful': 7, 'not_found': 59,
+            'likely_probes': 31, 'other_not_found': 33,
+            'reviewed_paths': sorted(first_paths + second_paths),
+            'stored_counts_unchanged': before == after,
+        }, indent=2) + '\n')
+
+    def test_request_review_does_not_reclassify_unrecognized_or_filtered_traffic_as_human(self) -> None:
+        self.goto('/admin/analytics?page_filter=home&request_page=999999')
+        card = self.page.locator('#request-status-card')
+        self.assertEqual(card.get_attribute('data-all-requests'), '4')
+        self.assertEqual(card.get_attribute('data-probe-requests'), '0')
+        self.assertEqual(self.page.locator('#request-review tbody tr').count(), 0)
+        self.assertIn('No likely scanner probes', card.inner_text())
+        self.assertNotIn('human traffic', card.inner_text())
+        self.goto('/admin/analytics?request_page=invalid')
+        self.assertIn('Page 1 of 1', self.page.locator('#request-review-details').inner_text())
+        self.assertIn('/missing-fixture', self.page.locator('#request-other-missing').inner_text())
+        self.page.set_viewport_size({'width': 390, 'height': 844})
+        self.assertLessEqual(self.page.evaluate('document.documentElement.scrollWidth'), 390)
+
     def test_public_dashboard_shows_aggregates_without_session_identifiers(self) -> None:
         dashboard_query = (
             "range=rolling&count=7&unit=days&granularity=day&metric=views_sessions"

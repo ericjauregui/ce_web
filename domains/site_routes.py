@@ -4,6 +4,7 @@ import io
 from pathlib import Path
 from threading import Lock
 from typing import Any, Callable
+from urllib.parse import urlencode
 
 from flask import Flask, abort, redirect, render_template, request, send_file, url_for
 from sqlalchemy.exc import SQLAlchemyError
@@ -347,6 +348,7 @@ def register_site_routes(
                 journey_start=journey_start,
                 journey_depth=journey_depth,
                 journey_pages=journey_pages,
+                request_page=request.args.get('request_page', '1'),
             )
         except DatabaseConfigurationError:
             app.logger.warning("Site analytics dashboard is unavailable without database configuration")
@@ -355,6 +357,17 @@ def register_site_routes(
             app.logger.warning("Site analytics dashboard could not read its data")
             return "Analytics are temporarily unavailable", 503
 
+        review = summary['request_status']['review']
+        # Preserve repeated journey filters while replacing just the review page.
+        review_args = [(key, value) for key, value in request.args.items(multi=True)
+                       if key != 'request_page']
+        for direction, page_number in (('previous_url', review['page'] - 1),
+                                       ('next_url', review['page'] + 1)):
+            review[direction] = (
+                url_for('site_analytics_dashboard') + '?'
+                + urlencode([*review_args, ('request_page', page_number)]) + '#request-status-title'
+                if 1 <= page_number <= review['page_count'] else None
+            )
         response = app.make_response(
             render_template("site_analytics_dashboard.html", analytics=summary)
         )

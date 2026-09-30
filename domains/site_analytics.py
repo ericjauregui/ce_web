@@ -59,6 +59,7 @@ MAX_JOURNEY_DEPTH = 20
 JOURNEY_DEPTH_INCREMENT = 5
 MAX_JOURNEY_FILTER_PAGES = 8
 MAX_PAGE_DURATION_SECONDS = 1800
+REQUEST_REVIEW_PAGE_SIZE = 25
 
 
 def _shift_months(value: date, offset: int) -> date:
@@ -280,6 +281,103 @@ def normalize_page_path(value: object) -> str | None:
     if download:
         return f"/download/order/file.{download.group(1)}"
     return path
+
+
+def classify_request_path(path: str) -> tuple[str, str]:
+    """Recognize likely probes by path, without asserting visitor identity or intent.
+
+    Unknown paths stay in the ordinary 404 count. No IP, user agent, query string,
+    or new tracking data is needed; classification also applies to historical rows.
+    """
+    lower = path.lower().rstrip('/')
+    segments = lower.split('/')[1:]
+    filename = segments[-1] if segments else ''
+    if any(segment in {'.git', '.svn', '.hg'} for segment in segments):
+        return 'sensitive_probe', 'Source-control metadata'
+    if any(segment in {'.aws', '.ssh', '.docker'} for segment in segments):
+        return 'sensitive_probe', 'Credentials or private keys'
+    if (filename == '.env' or filename.startswith('.env.')
+        or filename in {'.npmrc', '.pypirc', 'id_rsa', 'id_ed25519'}
+        or re.fullmatch(r'(?:wp-config\.php|config(?:\.inc)?\.(?:php|json|ya?ml|ini)|'
+                        r'configuration\.php|settings\.py|database\.ya?ml|web\.config|'
+                        r'appsettings(?:\.[a-z0-9_-]+)?\.json|application\.(?:ya?ml|properties))'
+                        r'(?:\.(?:bak|old|save|orig|txt))?', filename)):
+        return 'sensitive_probe', 'Secrets or configuration files'
+    if (re.search(r'\.(?:sql|sqlite3?|db)(?:\.(?:gz|zip|bak))?$', filename)
+        or re.fullmatch(r'(?:backup|backups|dump|database|site|www|wwwroot)'
+                        r'\.(?:zip|tar|tar\.gz|tgz|bak)', filename)):
+        return 'sensitive_probe', 'Database or backup files'
+    if lower in {'/actuator/env', '/actuator/configprops', '/actuator/heapdump'}:
+        return 'sensitive_probe', 'Application diagnostics'
+    if segments and segments[0] in {'wp', 'wordpress', 'wp-admin', 'wp-content', 'wp-includes'}:
+        return 'scanner_probe', 'WordPress paths'
+    if re.search(r'\.(?:php\d?|phtml|asp|aspx)(?:\.[a-z0-9_-]+)?$', filename):
+        return 'scanner_probe', 'PHP or legacy script paths'
+    if (segments and segments[0] in {'phpmyadmin', 'pma', 'cgi-bin', 'actuator', 'solr',
+                                     'jenkins', 'boaform', 'hnap1', 'owa', 'ecp'}
+        or lower in {'/server-status', '/server-info', '/manager/html',
+                     '/autodiscover/autodiscover.xml'}
+        or lower.startswith('/vendor/phpunit/') or filename == '.ds_store'):
+        return 'scanner_probe', 'Other software probes'
+    if lower in {'/download/order/file.pdf', '/download/order/file.csv'}:
+        return 'other', 'Private download: denied or missing'
+    return 'other', 'Other missing page'
+
+
+def _request_status_summary(rows, *, review_page: object) -> dict[str, object]:
+    """Keep raw totals, separate recognized probes, and paginate every review path."""
+    counts = {200: 0, 404: 0}
+    other_counts = {200: 0, 404: 0}
+    groups = {
+        'sensitive_probe': {'label': 'Sensitive-file probes', 'success': 0, 'not_found': 0},
+        'scanner_probe': {'label': 'Other scanner probes', 'success': 0, 'not_found': 0},
+    }
+    paths = {}
+    for row in rows:
+        count = int(row.count or 0)
+        status = int(row.status_code)
+        # Defense in depth for historical download paths; counts are never removed.
+        path = normalize_page_path(row.page_path) or '[Unreportable path]'
+        kind, reason = classify_request_path(path)
+        counts[status] += count
+        if kind == 'other':
+            other_counts[status] += count
+        else:
+            groups[kind]['success' if status == 200 else 'not_found'] += count
+        if status == 404 or kind != 'other':
+            entry = paths.setdefault(path, {'path': path, 'kind': kind, 'reason': reason,
+                'success': 0, 'not_found': 0, 'count': 0})
+            entry['success' if status == 200 else 'not_found'] += count
+            entry['count'] += count
+    ordered = sorted(paths.values(), key=lambda entry: (-entry['count'], entry['path']))
+    other_missing = sorted((entry for entry in ordered if entry['kind'] == 'other'),
+                           key=lambda entry: (-entry['not_found'], entry['path']))
+    for entry in other_missing:
+        entry['percent'] = _format_percentage(entry['not_found'], other_counts[404])
+    probe_pages = [entry for entry in ordered if entry['kind'] != 'other']
+    for group in groups.values():
+        group['count'] = group['success'] + group['not_found']
+    probe_total = sum(group['count'] for group in groups.values())
+    page_count = max(1, math.ceil(len(ordered) / REQUEST_REVIEW_PAGE_SIZE))
+    try:
+        page = min(max(1, int(review_page)), page_count)
+    except (TypeError, ValueError):
+        page = 1
+    offset = (page - 1) * REQUEST_REVIEW_PAGE_SIZE
+    other_total = sum(other_counts.values())
+    return {
+        'success_count': other_counts[200], 'not_found_count': other_counts[404],
+        'total': other_total,
+        'success_percent': _format_percentage(other_counts[200], other_total),
+        'not_found_percent': _format_percentage(other_counts[404], other_total),
+        'not_found_pages': other_missing[:8],
+        'all_total': sum(counts.values()), 'all_success_count': counts[200],
+        'all_not_found_count': counts[404], 'probe_total': probe_total,
+        'probe_success_count': sum(group['success'] for group in groups.values()),
+        'probe_groups': list(groups.values()), 'probe_pages': probe_pages[:8],
+        'review': {'page': page, 'page_count': page_count, 'path_count': len(ordered),
+                   'rows': ordered[offset:offset + REQUEST_REVIEW_PAGE_SIZE]},
+    }
 
 
 def normalize_page_context(value: object) -> str | None:
@@ -750,6 +848,7 @@ class SiteAnalytics:
         journey_start: str = "filter",
         journey_depth: int = JOURNEY_DEPTH_INCREMENT,
         journey_pages: list[str] | None = None,
+        request_page: object = 1,
     ) -> dict[str, object]:
         """Return aggregate analytics for the selected Pacific-time range and filters."""
         if granularity not in GRANULARITIES:
@@ -987,25 +1086,14 @@ class SiteAnalytics:
                 request_conditions.append(request_page_clause)
             request_status_rows = connection.execute(
                 select(
+                    request_status.c.page_path,
                     request_status.c.status_code,
                     func.sum(request_status.c.request_count).label("count"),
                 )
                 .where(*request_conditions)
-                .group_by(request_status.c.status_code)
+                .group_by(request_status.c.page_path, request_status.c.status_code)
             ).all()
-            request_status_counts = {200: 0, 404: 0}
-            for row in request_status_rows:
-                request_status_counts[int(row.status_code)] = int(row.count or 0)
-            not_found_rows = connection.execute(
-                select(
-                    request_status.c.page_path,
-                    func.sum(request_status.c.request_count).label("count"),
-                )
-                .where(*request_conditions, request_status.c.status_code == 404)
-                .group_by(request_status.c.page_path)
-                .order_by(func.sum(request_status.c.request_count).desc(), request_status.c.page_path)
-                .limit(8)
-            ).all()
+            request_summary = _request_status_summary(request_status_rows, review_page=request_page)
 
             checkout_is_in_scope = page_filter in {"all", "cart", "path:/checkout"}
             checkout_conditions = [*time_conditions, events.c.page_path == "/checkout"]
@@ -1229,27 +1317,7 @@ class SiteAnalytics:
             "journey_match_percent": _format_percentage(
                 journey_match_count or 0, journey_population
             ),
-            "request_status": {
-                "success_count": request_status_counts[200],
-                "not_found_count": request_status_counts[404],
-                "total": request_status_counts[200] + request_status_counts[404],
-                "success_percent": _format_percentage(
-                    request_status_counts[200],
-                    request_status_counts[200] + request_status_counts[404],
-                ),
-                "not_found_percent": _format_percentage(
-                    request_status_counts[404],
-                    request_status_counts[200] + request_status_counts[404],
-                ),
-                "not_found_pages": [
-                    {
-                        "path": row.page_path,
-                        "count": int(row.count or 0),
-                        "percent": _format_percentage(int(row.count or 0), request_status_counts[404]),
-                    }
-                    for row in not_found_rows
-                ],
-            },
+            "request_status": request_summary,
             "checkout_insights": {
                 "in_scope": checkout_is_in_scope,
                 "sessions": checkout_sessions,
