@@ -75,10 +75,30 @@ class FullWidthLayoutE2ETests(BaseE2ETest):
         next_button = navigation.get_by_role('button', name='Scroll collections right')
         expect(next_button).to_be_visible()
         for _ in range(8):
-            if not next_button.is_visible():
+            if track.evaluate('track => track.scrollLeft >= track.scrollWidth - track.clientWidth - 2'):
                 break
             next_button.click()
-            self.page.wait_for_timeout(180)
+            # Wait for smooth scrolling to settle before checking/clicking again.
+            # A fixed delay can race the arrow becoming disabled at the end.
+            track.evaluate('''track => new Promise((resolve, reject) => {
+              let last = track.scrollLeft;
+              let settledSince = performance.now();
+              const deadline = setTimeout(() => reject(new Error('Collection scroll did not settle')), 3000);
+              function check() {
+                const now = performance.now();
+                if (Math.abs(track.scrollLeft - last) > 0.1) {
+                  last = track.scrollLeft;
+                  settledSince = now;
+                }
+                if (now - settledSince >= 150) {
+                  clearTimeout(deadline);
+                  resolve();
+                } else {
+                  setTimeout(check, 25);
+                }
+              }
+              setTimeout(check, 25);
+            })''')
         self.assertTrue(track.evaluate('track => track.scrollLeft >= track.scrollWidth - track.clientWidth - 2'))
         expect(track.locator('.home-collection-option').last).to_be_in_viewport()
         self.assertLessEqual(self.page.evaluate('document.documentElement.scrollWidth'), 390)

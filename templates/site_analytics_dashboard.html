@@ -1,4 +1,25 @@
 {% extends "base.html" %}
+{% macro ranked_cells(item, fields, count_field) -%}
+  {% for field in fields %}<td class="analytics-path">{% if field == 'show' %}{{ item.show or item.key }}{% elif field == 'action' %}{{ item.action|replace('_', ' ')|title }}{% else %}{{ item[field] or '—' }}{% endif %}</td>{% endfor %}
+  <td class="analytics-number">{{ '{:,}'.format(item[count_field]) }}</td><td class="analytics-number analytics-percent">{{ item.percent }}%</td>
+{%- endmacro %}
+{% macro ranked_table(key, rows, fields, headings, count_field, count_heading, percent_heading, others) %}
+  <div class="analytics-table-wrap"><table class="analytics-table" id="{{ key }}-table">
+    <thead><tr>{% for heading in headings %}<th>{{ heading }}</th>{% endfor %}<th class="analytics-number">{{ count_heading }}</th><th class="analytics-number">{{ percent_heading }}</th></tr></thead>
+    <tbody>{% for item in rows[:5] %}<tr data-ranked-entry>{{ ranked_cells(item, fields, count_field) }}</tr>{% endfor %}</tbody>
+    {% if rows|length > 5 %}
+    <tfoot><tr><td colspan="{{ fields|length + 2 }}" class="analytics-others-cell">
+      <details id="{{ key }}-others" class="analytics-others" data-other-count="{{ others.count }}">
+        <summary><span class="analytics-others-summary"><span>Others <small>({{ rows|length - 5 }} more · expand for details)</small></span><strong>{{ '{:,}'.format(others.count) }}</strong><strong class="analytics-percent">{{ others.percent }}%</strong></span></summary>
+        <div class="analytics-table-wrap"><table class="analytics-table" aria-label="Other {{ headings[0]|lower }} entries">
+          <thead><tr>{% for heading in headings %}<th>{{ heading }}</th>{% endfor %}<th class="analytics-number">{{ count_heading }}</th><th class="analytics-number">{{ percent_heading }}</th></tr></thead>
+          <tbody>{% for item in rows[5:] %}<tr>{{ ranked_cells(item, fields, count_field) }}</tr>{% endfor %}</tbody>
+        </table></div>
+      </details>
+    </td></tr></tfoot>
+    {% endif %}
+  </table></div>
+{% endmacro %}
 {% block title %}Site Analytics | California Earrings{% endblock %}
 {% block meta_description %}Aggregate site usage analytics for California Earrings.{% endblock %}
 {% block robots_meta %}noindex,nofollow{% endblock %}
@@ -192,30 +213,21 @@
     <section class="analytics-card" aria-labelledby="pages-title">
       <div class="analytics-section-heading"><div><h2 id="pages-title">Top pages</h2><p>Page views in this range</p></div></div>
       {% if analytics.top_pages %}
-      <div class="analytics-table-wrap"><table class="analytics-table">
-        <thead><tr><th>Page</th><th class="analytics-number">Views</th><th class="analytics-number">% of views</th></tr></thead>
-        <tbody>{% for page in analytics.top_pages %}<tr><td class="analytics-path">{{ page.path }}</td><td class="analytics-number">{{ '{:,}'.format(page.count) }}</td><td class="analytics-number analytics-percent">{{ page.percent }}%</td></tr>{% endfor %}</tbody>
-      </table></div>
+      {{ ranked_table('pages', analytics.top_pages, ['path'], ['Page'], 'count', 'Views', '% of views', analytics.others.pages) }}
       {% else %}<p class="analytics-empty">No page views recorded in this range.</p>{% endif %}
     </section>
 
     <section class="analytics-card" aria-labelledby="clicks-title">
       <div class="analytics-section-heading"><div><h2 id="clicks-title">Clicked links and actions</h2></div></div>
       {% if analytics.top_clicks %}
-      <div class="analytics-table-wrap"><table class="analytics-table">
-        <thead><tr><th>Link or action</th><th class="analytics-number">Clicks</th><th class="analytics-number">% of clicks</th></tr></thead>
-        <tbody>{% for item in analytics.top_clicks %}<tr><td>{{ item.target }}</td><td class="analytics-number">{{ '{:,}'.format(item.count) }}</td><td class="analytics-number analytics-percent">{{ item.percent }}%</td></tr>{% endfor %}</tbody>
-      </table></div>
+      {{ ranked_table('clicks', analytics.top_clicks, ['target'], ['Link or action'], 'count', 'Clicks', '% of clicks', analytics.others.clicks) }}
       {% else %}<p class="analytics-empty">No clicks recorded in this range.</p>{% endif %}
     </section>
 
     <section class="analytics-card" aria-labelledby="sources-title">
-      <div class="analytics-section-heading"><div><h2 id="sources-title">Referrer hosts</h2><p>Distinct sessions attributed to a referrer</p></div></div>
+      <div class="analytics-section-heading"><div><h2 id="sources-title">Referrer hosts</h2><p>Others counts unique sessions across remaining hosts; a session can appear under multiple hosts.</p></div></div>
       {% if analytics.referrers %}
-      <div class="analytics-table-wrap"><table class="analytics-table">
-        <thead><tr><th>Host</th><th class="analytics-number">Sessions</th><th class="analytics-number">% of sessions</th></tr></thead>
-        <tbody>{% for source in analytics.referrers %}<tr><td>{{ source.host }}</td><td class="analytics-number">{{ '{:,}'.format(source.sessions) }}</td><td class="analytics-number analytics-percent">{{ source.percent }}%</td></tr>{% endfor %}</tbody>
-      </table></div>
+      {{ ranked_table('sources', analytics.referrers, ['host'], ['Host'], 'sessions', 'Sessions', '% of sessions', analytics.others.sources) }}
       {% else %}<p class="analytics-empty">No external referrers recorded in this range.</p>{% endif %}
     </section>
 
@@ -248,9 +260,9 @@
       <summary class="analytics-section-heading">
         <div>
           <h2 id="request-status-title">Page response status</h2>
-          <p><strong>{{ '{:,}'.format(analytics.request_status.all_total) }}</strong> requests · <strong>{{ '{:,}'.format(analytics.request_status.all_success_count) }}</strong> successful · <strong>{{ '{:,}'.format(analytics.request_status.all_not_found_count) }}</strong> not found (404)</p>
-          <p><strong>{{ '{:,}'.format(analytics.request_status.probe_total) }}</strong> likely probes · <strong>{{ '{:,}'.format(analytics.request_status.probe_groups[0].count) }}</strong> sensitive-file probes</p>
-          <p>View request details</p>
+          <p><strong>{{ '{:,}'.format(analytics.request_status.all_total) }}</strong> requests ({{ analytics.request_status.all_percent }}%) · <strong>{{ '{:,}'.format(analytics.request_status.all_success_count) }}</strong> successful ({{ analytics.request_status.all_success_percent }}%) · <strong>{{ '{:,}'.format(analytics.request_status.all_not_found_count) }}</strong> not found (404) ({{ analytics.request_status.all_not_found_percent }}%)</p>
+          <p><strong>{{ '{:,}'.format(analytics.request_status.probe_total) }}</strong> likely probes ({{ analytics.request_status.probe_percent }}%) · <strong>{{ '{:,}'.format(analytics.request_status.probe_groups[0].count) }}</strong> sensitive-file probes ({{ analytics.request_status.sensitive_probe_percent }}%)</p>
+          <p>Percentages of all requests · View request details</p>
         </div>
       </summary>
       <p class="analytics-empty">HTML GET requests; likely scanner probes excluded from the percentages below.</p>
@@ -330,12 +342,9 @@
     </section>
 
     {% if analytics.connect_actions %}
-    <section class="analytics-card" aria-labelledby="connect-actions-title">
+    <section class="analytics-card" id="connect-title-card" aria-labelledby="connect-actions-title">
       <div class="analytics-section-heading"><div><h2 id="connect-actions-title">Connect-page actions</h2><p>Existing aggregate counts by show and action</p></div></div>
-      <div class="analytics-table-wrap"><table class="analytics-table">
-        <thead><tr><th>Trade show</th><th>Booth</th><th>Action</th><th class="analytics-number">Events</th><th class="analytics-number">% of events</th></tr></thead>
-        <tbody>{% for item in analytics.connect_actions %}<tr><td>{{ item.show or item.key }}</td><td>{{ item.booth or '—' }}</td><td>{{ item.action|replace('_', ' ')|title }}</td><td class="analytics-number">{{ '{:,}'.format(item.count) }}</td><td class="analytics-number analytics-percent">{{ item.percent }}%</td></tr>{% endfor %}</tbody>
-      </table></div>
+      {{ ranked_table('connect', analytics.connect_actions, ['show', 'booth', 'action'], ['Trade show', 'Booth', 'Action'], 'count', 'Events', '% of events', analytics.others.connect) }}
     </section>
     {% endif %}
   </div>

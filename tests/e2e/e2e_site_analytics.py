@@ -153,6 +153,86 @@ class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
             webapp.app.extensions["connect_analytics"] = self.prior_connect_analytics
         self.analytics.engine.dispose()
 
+    def test_top_five_cards_keep_all_other_rows_and_correct_aggregates(self) -> None:
+        """Tails beyond old SQL limits must stay inspectable; referrers need a union.
+
+        Cover top-five ranking, collapsed totals, keyboard expansion, repeated
+        collapse, filtered/empty results, mobile overflow and unchanged storage.
+        """
+        fixture_time = datetime.combine(self.fixture_date, time(hour=18),
+            tzinfo=ZoneInfo('America/Los_Angeles')).astimezone(timezone.utc)
+        events = []
+        for index in range(25):
+            # The final 20 hosts share one session; summing their counts is wrong.
+            session_hash = f'{index + 1:064x}' if index < 5 else 'f' * 64
+            count = 25 - index
+            events.extend(dict(occurred_at=fixture_time, session_id_hash=session_hash,
+                event_type='page_view', page_path=f'/audit-page-{index:02}',
+                referrer_host=f'source-{index:02}.example', click_target=None) for _ in range(count))
+            events.extend(dict(occurred_at=fixture_time, session_id_hash=session_hash,
+                event_type='click', page_path=f'/audit-page-{index:02}',
+                click_target=f'internal:/audit-target-{index:02}', referrer_host=None) for _ in range(count))
+        with self.analytics.engine.begin() as connection:
+            connection.execute(site_analytics_events.delete())
+            connection.execute(connect_event_counts.delete())
+            connection.execute(site_analytics_events.insert(), events)
+            connection.execute(connect_event_counts.insert(), [
+                dict(event_date=self.fixture_date, trade_show_key=f'audit-show-{index:02}',
+                     trade_show_name=f'Audit Show {index:02}', booth='123', action='visit',
+                     count=25-index, updated_at=fixture_time)
+                for index in range(25)
+            ])
+        self.goto('/admin/analytics')
+        request_summary = self.page.locator('#request-status-card > summary').inner_text()
+        for expected in ('5 requests (100%)', '4 successful (80%)', '1 not found (404) (20%)',
+                         '0 likely probes (0%)', '0 sensitive-file probes (0%)'):
+            self.assertIn(expected, request_summary)
+        self.assertIn('Percentages of all requests', request_summary)
+        for key, expected_count, expected_percent in (
+                ('pages', '210', '65%'), ('clicks', '210', '65%'),
+                ('sources', '1', '17%'), ('connect', '210', '65%')):
+            table = self.page.locator(f'#{key}-table')
+            self.assertEqual(table.locator(':scope > tbody > tr[data-ranked-entry]').count(), 5)
+            others = self.page.locator(f'#{key}-others')
+            self.assertIsNone(others.get_attribute('open'))
+            self.assertFalse(others.locator('table').is_visible())
+            self.assertEqual(others.get_attribute('data-other-count'), expected_count)
+            summary = others.locator(':scope > summary')
+            self.assertIn(expected_count, summary.inner_text())
+            self.assertIn(expected_percent, summary.inner_text())
+            summary.focus()
+            summary.press('Enter')
+            self.assertTrue(others.locator('table').is_visible())
+            self.assertEqual(others.locator('tbody tr').count(), 20)
+            self.assertIn('24', others.locator('table').inner_text())
+            summary.click()
+            self.assertFalse(others.locator('table').is_visible())
+        self.assertIn('unique sessions', self.page.locator('#sources-title').locator('xpath=../../..').inner_text())
+        self.page.set_viewport_size({'width':390, 'height':844})
+        self.page.locator('#connect-others > summary').click()
+        self.assertLessEqual(self.page.evaluate('document.documentElement.scrollWidth'), 390)
+        root = self._artifact_dir()
+        root.mkdir(parents=True, exist_ok=True)
+        self.page.locator('#connect-title-card').screenshot(path=str(root / 'connect-others-mobile.png'),
+            style='.navbar {visibility:hidden}')
+        self.goto('/admin/analytics?page_filter=path:/audit-page-00')
+        self.assertEqual(self.page.locator('#pages-table > tbody > tr[data-ranked-entry]').count(), 1)
+        self.assertEqual(self.page.locator('#pages-others').count(), 0)
+        self.assertEqual(self.page.locator('#clicks-others').count(), 0)
+        self.assertEqual(self.page.locator('#sources-others').count(), 0)
+        self.assertEqual(self.page.locator('#connect-others').count(), 0)
+        with self.analytics.engine.connect() as connection:
+            stored_events = list(connection.execute(select(site_analytics_events)).mappings())
+            stored_connect = list(connection.execute(select(connect_event_counts)).mappings())
+        self.assertEqual(len(stored_events), 650)
+        self.assertEqual(sum(row['count'] for row in stored_connect), 325)
+        (root / 'top-five-verification.json').write_text(json.dumps({
+            'view_total':325, 'click_total':325, 'connect_total':325,
+            'remaining_views':210, 'remaining_clicks':210, 'remaining_connect':210,
+            'remaining_unique_referrer_sessions':1, 'remaining_rows_per_card':20,
+            'stored_events':len(stored_events), 'filtered_ranked_rows':1,
+        }, indent=2) + '\n')
+
     def test_request_review_separates_probes_without_hiding_other_missing_pages(self) -> None:
         """Old/new probes, unexpected 200s, pagination and filters must preserve counts.
 
@@ -826,6 +906,8 @@ class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
         html = self.page.content()
         self.assertNotIn('synthetic-private-token', html)
         self.assertNotIn('another-private-token', html)
+        if self.page.locator('#clicks-others').count():
+            self.page.locator('#clicks-others > summary').click()
         self.assertIn('Download order PDF', self.page.locator('main.analytics-dashboard').inner_text())
         with self.analytics.engine.connect() as connection:
             rows = list(connection.execute(select(site_request_status_daily_counts).where(

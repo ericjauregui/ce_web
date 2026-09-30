@@ -392,14 +392,20 @@ def _request_status_summary(rows, *, review_page: object) -> dict[str, object]:
         page = 1
     offset = (page - 1) * REQUEST_REVIEW_PAGE_SIZE
     other_total = sum(other_counts.values())
+    all_total = sum(counts.values())
     return {
         'success_count': other_counts[200], 'not_found_count': other_counts[404],
         'total': other_total,
         'success_percent': _format_percentage(other_counts[200], other_total),
         'not_found_percent': _format_percentage(other_counts[404], other_total),
         'not_found_pages': other_missing[:8],
-        'all_total': sum(counts.values()), 'all_success_count': counts[200],
+        'all_total': all_total, 'all_success_count': counts[200],
         'all_not_found_count': counts[404], 'probe_total': probe_total,
+        'all_percent': _format_percentage(all_total, all_total),
+        'all_success_percent': _format_percentage(counts[200], all_total),
+        'all_not_found_percent': _format_percentage(counts[404], all_total),
+        'probe_percent': _format_percentage(probe_total, all_total),
+        'sensitive_probe_percent': _format_percentage(groups['sensitive_probe']['count'], all_total),
         'probe_success_count': sum(group['success'] for group in groups.values()),
         'probe_groups': list(groups.values()), 'probe_pages': probe_pages[:8],
         'review': {'page': page, 'page_count': page_count, 'path_count': len(ordered),
@@ -1017,14 +1023,12 @@ class SiteAnalytics:
                 .where(*scoped_conditions, is_page_view)
                 .group_by(events.c.page_path)
                 .order_by(func.count().desc(), events.c.page_path)
-                .limit(12)
             ).all()
             click_rows = connection.execute(
                 select(events.c.click_target, func.count().label("count"))
                 .where(*scoped_conditions, is_click)
                 .group_by(events.c.click_target)
                 .order_by(func.count().desc(), events.c.click_target)
-                .limit(12)
             ).all()
             referrer_rows = connection.execute(
                 select(
@@ -1037,8 +1041,15 @@ class SiteAnalytics:
                     func.count(func.distinct(events.c.session_id_hash)).desc(),
                     events.c.referrer_host,
                 )
-                .limit(10)
             ).all()
+            # A session can occur under multiple hosts; Others needs their union.
+            other_referrer_sessions = 0
+            if len(referrer_rows) > 5:
+                other_referrer_sessions = int(connection.execute(
+                    select(func.count(func.distinct(events.c.session_id_hash)))
+                    .where(*scoped_conditions, is_page_view,
+                           events.c.referrer_host.in_([row.referrer_host for row in referrer_rows[5:]]))
+                ).scalar_one() or 0)
             campaign_rows = connection.execute(
                 select(
                     events.c.utm_source,
@@ -1099,8 +1110,10 @@ class SiteAnalytics:
                         connect_event_counts.c.booth,
                         connect_event_counts.c.action,
                     )
-                    .order_by(func.sum(connect_event_counts.c.count).desc())
-                    .limit(20)
+                    .order_by(func.sum(connect_event_counts.c.count).desc(),
+                              connect_event_counts.c.trade_show_key,
+                              connect_event_counts.c.trade_show_name,
+                              connect_event_counts.c.booth, connect_event_counts.c.action)
                 ).all()
 
             request_status = site_request_status_daily_counts
@@ -1345,6 +1358,15 @@ class SiteAnalytics:
                 journey_match_count or 0, journey_population
             ),
             "request_status": request_summary,
+            "others": {
+                key: {"count": count, "percent": _format_percentage(count, total)}
+                for key, count, total in (
+                    ("pages", sum(int(row.count) for row in page_rows[5:]), int(page_views)),
+                    ("clicks", sum(int(row.count) for row in click_rows[5:]), int(clicks)),
+                    ("sources", other_referrer_sessions, int(sessions)),
+                    ("connect", sum(int(row.count or 0) for row in connect_rows[5:]), connect_total),
+                )
+            },
             "checkout_insights": {
                 "in_scope": checkout_is_in_scope,
                 "sessions": checkout_sessions,

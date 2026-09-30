@@ -645,6 +645,50 @@
   white-space: nowrap;
 }
 
+.analytics-table td.analytics-others-cell {
+  padding: 0;
+  text-align: left;
+  white-space: normal;
+}
+
+.analytics-others > summary {
+  padding: 0.7rem 0.5rem;
+  cursor: pointer;
+  color: var(--gold-70);
+}
+
+.analytics-others > summary:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: -2px;
+}
+
+.analytics-others > summary:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.analytics-others-summary {
+  display: inline-grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: start;
+  gap: 0.75rem;
+  width: calc(100% - 1.1rem);
+  vertical-align: top;
+}
+
+.analytics-others-summary small {
+  display: block;
+  color: rgb(255 255 255 / 0.5);
+}
+
+.analytics-others-summary strong {
+  white-space: nowrap;
+  text-align: right;
+}
+
+.analytics-others:not([open]) > :not(summary) {
+  display: none;
+}
+
 .analytics-empty {
   margin: 0;
   border-top: 1px solid rgb(255 255 255 / 0.08);
