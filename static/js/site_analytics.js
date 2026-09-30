@@ -2,7 +2,15 @@
   const endpoint = "/api/analytics/event";
   const contextElement = document.querySelector("[data-analytics-context]");
   const pageContext = contextElement?.dataset.analyticsContext || null;
+  const checkoutForm = document.getElementById("checkoutForm");
+  // The confirmation is rendered by POST /checkout, but is a separate journey step.
+  const pagePath = document.querySelector('[data-analytics-page="/order-submitted"]')
+    ? "/order-submitted" : safePath(window.location.pathname);
   const campaignKeys = ["utm_source", "utm_medium", "utm_campaign"];
+
+  function safePath(path) {
+    return path.replace(/^\/download\/order\/[^/]+\.(csv|pdf)$/, "/download/order/file.$1");
+  }
 
   function campaignValue(key) {
     const value = new URLSearchParams(window.location.search).get(key);
@@ -28,12 +36,12 @@
   function send(eventType, clickTarget = null, extra = null) {
     const payload = {
       event_type: eventType,
-      page_path: window.location.pathname,
+      page_path: pagePath,
     };
     if (pageContext) payload.page_context = pageContext;
     if (clickTarget) payload.click_target = clickTarget;
     if (extra && typeof extra === "object") Object.assign(payload, extra);
-    if (eventType === "page_view" && payload.page_path === window.location.pathname) {
+    if (eventType === "page_view" && payload.page_path === pagePath) {
       const referrerHost = externalReferrerHost();
       if (referrerHost) payload.referrer_host = referrerHost;
       for (const key of campaignKeys) {
@@ -84,7 +92,10 @@
       return explicitTarget;
     }
 
-    if (element.closest("#cartDrawer")) {
+    if (element.matches("summary") && element.closest("#contactQr")) return "action:toggle-contact-qr";
+    if (element.matches(".product-share-btn")) return "action:share-product";
+
+    if (element.closest("#cartContentCard")) {
       if (element.matches(".qty-minus")) return "action:order-summary-quantity-minus";
       if (element.matches(".qty-plus")) return "action:order-summary-quantity-plus";
       if (element.matches(".qty-remove")) return "action:order-summary-remove-item";
@@ -94,8 +105,13 @@
       if (element.matches(".cart-checkout-btn")) return "action:order-summary-checkout";
     }
 
+    if (element.matches(".qty-adjust-btn")) {
+      return element.dataset.delta === "-1" ? "action:order-quantity-minus" : "action:order-quantity-plus";
+    }
+    if (element.matches(".qty-clear-btn")) return "action:order-remove-item";
+
     const productCard = element.closest(".product-card");
-    if (productCard && !element.closest(".add-to-cart-btn, .qty-adjust-btn, .qty-clear-btn")) {
+    if (productCard && !(element instanceof HTMLAnchorElement) && !element.closest(".add-to-cart-btn, .qty-adjust-btn, .qty-clear-btn")) {
       return "component:product-card";
     }
 
@@ -116,7 +132,9 @@
     }
 
     if (destination.origin === window.location.origin) {
-      return `internal:${destination.pathname}`;
+      const download = destination.pathname.match(/^\/download\/order\/[^/]+\.(csv|pdf)$/);
+      if (download) return `action:download-order-${download[1]}`;
+      return `internal:${safePath(destination.pathname)}`;
     }
 
     const hostname = destination.hostname.toLowerCase().replace(/^www\./, "");
@@ -147,8 +165,9 @@
     send("page_view", null, { page_path: "/order-summary" });
   });
 
-  if (window.location.pathname === "/checkout") {
-    let activeSince = performance.now();
+  if (checkoutForm) {
+    let activeSince = document.visibilityState === "hidden" ? null : performance.now();
+    const recordedFields = new Set();
     const checkoutFields = [
       ["name", '[name="name"]'],
       ["company", '[name="company"]'],
@@ -178,19 +197,31 @@
     }
 
     function recordCheckoutFieldProgress() {
-      const form = document.getElementById("checkoutForm");
-      if (!form) return;
+      const form = checkoutForm;
       checkoutFields.forEach(([fieldKey, selector]) => {
         const field = form.querySelector(selector);
-        if (field instanceof HTMLInputElement && field.value.trim()) {
+        if (field instanceof HTMLInputElement && field.value.trim() && !recordedFields.has(fieldKey)) {
+          recordedFields.add(fieldKey);
           send("checkout_field", null, { field_key: fieldKey });
         }
       });
     }
 
+    // Save progress as it happens; mobile tab closure may never deliver pagehide.
+    for (const eventType of ["input", "change", "focusout", "keyup"]) {
+      checkoutForm.addEventListener(eventType, recordCheckoutFieldProgress);
+    }
+    checkoutForm.addEventListener("ce:checkout-option-selected", (event) => {
+      const field = {country: "country", state: "state", phone_country: "phone-country"}[event.target.name];
+      if (field) send("click", `action:checkout-select-${field}`);
+      recordCheckoutFieldProgress();
+    });
+    recordCheckoutFieldProgress();
+
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState === "hidden") {
         recordActiveCheckoutTime();
+        recordCheckoutFieldProgress();
       } else {
         resumeActiveCheckoutTime();
       }
@@ -207,16 +238,44 @@
     });
   }
 
+  document.addEventListener("submit", (event) => {
+    if (event.target === checkoutForm) {
+      send("click", "action:checkout-submit");
+    } else if (event.target instanceof HTMLFormElement && event.target.id === "navSearchForm") {
+      send("click", "action:catalog-search");
+    }
+  }, true);
+
+  document.addEventListener("change", (event) => {
+    if (!(event.target instanceof Element)) return;
+    if (event.target.matches(".qty-input") && event.target.closest("#cartContentCard")) {
+      send("click", "action:order-summary-quantity-edit");
+    } else if (event.target.matches(".product-qty-input")) {
+      send("click", "action:order-quantity-edit");
+    }
+  }, true);
+
+  document.addEventListener("keydown", (event) => {
+    if (event.repeat || !["Enter", " "].includes(event.key) || !(event.target instanceof Element)) return;
+    // Native buttons/links generate click themselves. These custom cards do not.
+    if (event.target.matches(".product-card[role='button'], .inline-reel-card[role='button']")) {
+      send("click", targetFor(event.target));
+    }
+  }, true);
+
   document.addEventListener("click", (event) => {
     if (!(event.target instanceof Element)) return;
+    if (event.target.closest("input:not([type=submit]):not([type=button]):not([type=reset]), textarea, select, .checkout-combobox__option")) return;
     const target = event.target.closest(
-      "a[href], button, input[type='button'], input[type='submit'], input[type='reset'], [role='button']"
+      "a[href], summary, button, input[type='button'], input[type='submit'], input[type='reset'], [role='button']"
     );
-    if (!target) return;
+    if (!target || target.matches(":disabled") || target.getAttribute("aria-disabled") === "true") return;
+    // Track submit attempts from the form event so keyboard and pointer agree.
+    if (target.closest("#checkoutForm") && target.matches("button[type='submit'], input[type='submit']")) return;
     send("click", targetFor(target));
   }, true);
 
-  if (window.location.pathname !== "/checkout") {
+  if (!checkoutForm) {
     window.addEventListener("pageshow", (event) => {
       if (event.persisted) send("page_view");
     });

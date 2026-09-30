@@ -274,6 +274,11 @@ def normalize_page_path(value: object) -> str | None:
         return None
     if any(segment in {".", ".."} for segment in path.split("/")):
         return None
+    # Order download paths contain private bearer tokens. Never store them, even
+    # when a denied download renders the shared 404 HTML page.
+    download = re.fullmatch(r"/download/order/[^/]+\.(csv|pdf)", path)
+    if download:
+        return f"/download/order/file.{download.group(1)}"
     return path
 
 
@@ -325,6 +330,8 @@ def normalize_click_target(value: object) -> str | None:
         return value
     if value.startswith("internal:"):
         path = normalize_page_path(value[len("internal:"):])
+        if path in {"/download/order/file.csv", "/download/order/file.pdf"}:
+            return f"action:download-order-{path.rsplit('.', 1)[1]}"
         return f"internal:{path}" if path else None
     return None
 
@@ -338,8 +345,10 @@ def _page_filter_clause(events, page_filter: str):
         return events.c.page_path == "/"
     if page_filter == "cart":
         return or_(
-            events.c.page_path.in_(("/cart", "/checkout", "/order-summary")),
+            events.c.page_path.in_(("/cart", "/checkout", "/order-summary", "/order-submitted")),
             events.c.click_target.like("action:order-summary-%"),
+            events.c.click_target.like("action:order-quantity-%"),
+            events.c.click_target.like("action:download-order-%"),
             events.c.click_target.in_((
                 "internal:/cart",
                 "internal:/checkout",
@@ -347,6 +356,8 @@ def _page_filter_clause(events, page_filter: str):
                 "action:add-to-cart",
                 "action:open-cart",
                 "action:order-bar-checkout",
+                "action:order-remove-item",
+                "action:checkout-submit",
             )),
         )
     if page_filter == "team":
@@ -432,6 +443,20 @@ def _click_target_label(target: str) -> str:
         "action:order-summary-undo-clear": "Undo Clear Order in Order Summary",
         "action:order-summary-clear": "Clear Order in Order Summary",
         "action:order-summary-checkout": "Checkout from Order Summary",
+        "action:order-quantity-plus": "Increase order quantity",
+        "action:order-quantity-minus": "Decrease order quantity",
+        "action:order-quantity-edit": "Edit order quantity",
+        "action:order-remove-item": "Remove order item",
+        "action:order-summary-quantity-edit": "Edit quantity in Order Summary",
+        "action:checkout-submit": "Attempt to submit order",
+        "action:catalog-search": "Search inventory",
+        "action:checkout-select-country": "Select checkout country",
+        "action:checkout-select-state": "Select checkout state",
+        "action:checkout-select-phone-country": "Select phone country code",
+        "action:download-order-csv": "Download order CSV",
+        "action:download-order-pdf": "Download order PDF",
+        "action:share-product": "Share product",
+        "action:toggle-contact-qr": "Toggle contact QR",
         "component:product-card": "Product card",
     }
     if target in labels:

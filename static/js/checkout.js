@@ -358,6 +358,7 @@
 
     function selectOption(option) {
       config.onSelect(option);
+      input.dispatchEvent(new Event("ce:checkout-option-selected", {bubbles: true}));
       if (config.onValidate) config.onValidate();
       closeMenu();
     }

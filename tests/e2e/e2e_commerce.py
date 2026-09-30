@@ -371,3 +371,79 @@ class CommerceE2ETests(BaseE2ETest):
         self.assertNotIn("set-cookie", current.headers)
         missing = self.context.request.get(f"{self.base_url}/missing-page")
         self.assertEqual(missing.headers["cache-control"], "private, no-store, max-age=0")
+
+
+    def test_confirmation_and_download_tracking_excludes_private_tokens(self) -> None:
+        """A durable local order is a conversion; clicks must never store access tokens."""
+        from domains.site_analytics import SiteAnalytics, site_analytics_events
+        prior = webapp.app.extensions.get("site_analytics")
+        analytics = SiteAnalytics(self.repository.engine)
+        analytics.create_schema_for_tests()
+        webapp.app.extensions["site_analytics"] = analytics
+        events = []
+        statuses = []
+        self.page.expose_function("auditPayload", lambda payload: events.append(payload))
+        self.page.add_init_script("""
+          const beacon = navigator.sendBeacon.bind(navigator);
+          navigator.sendBeacon = (url, body) => {
+            const sent = beacon(url, body);
+            if (sent && url === '/api/analytics/event') body.text().then(text => window.auditPayload(JSON.parse(text)));
+            return sent;
+          };
+        """)
+        self.page.on("response", lambda response: statuses.append(response.status)
+            if response.url.endswith("/api/analytics/event") else None)
+        try:
+            self._add_item(self.valid_code)
+            self._fill_checkout()
+            self._submit_checkout()
+            self.page.wait_for_timeout(300)
+            self.assertTrue(any(event.get('page_path') == '/order-submitted' for event in events), events)
+            # WebKit download navigation stalls the single-threaded local server.
+            # Chromium verifies actual downloads; WebKit verifies the real click
+            # and stored analytics while cancelling only the default navigation.
+            if self.browser_name == 'webkit':
+                self.page.evaluate("""() => document.addEventListener('click', event => {
+                    if (event.target.closest('a[href^="/download/order/"]')) event.preventDefault();
+                })""")
+            for kind in ('csv', 'pdf'):
+                link = self.page.get_by_role('link', name=f'Download {kind.upper()}', exact=True)
+                if self.browser_name == 'webkit':
+                    link.click(no_wait_after=True)
+                else:
+                    with self.page.expect_download():
+                        link.click(no_wait_after=True)
+                self.page.wait_for_timeout(200)
+                self.assertTrue(any(event.get('click_target') == f'action:download-order-{kind}' for event in events), events)
+            self.page.wait_for_timeout(1100)
+            self.page.evaluate("window.dispatchEvent(new Event('pagehide'))")
+            self.page.wait_for_timeout(100)
+            self.assertFalse(any(item['event_type'] == 'page_duration'
+                and item['page_path'] == '/order-submitted' for item in events))
+            self.assertEqual(sum(item.get('click_target') == 'action:checkout-submit' for item in events), 1)
+            self.assertTrue(statuses and all(status == 204 for status in statuses))
+            pdf_path = self.page.get_by_role('link', name='Download PDF').get_attribute('href')
+            token = pdf_path.split('/')[-1].removesuffix('.pdf')
+            # Rejecting another browser's download also must not store its private URL.
+            other = self._browser.new_context()
+            try:
+                self.assertEqual(other.request.get(f'{self.base_url}{pdf_path}').status, 404)
+            finally:
+                other.close()
+            with analytics.engine.connect() as connection:
+                stored = list(connection.execute(select(site_analytics_events)).mappings())
+                from domains.site_analytics import site_request_status_daily_counts
+                stored_statuses = list(connection.execute(select(site_request_status_daily_counts)).mappings())
+            self.assertNotIn(token, str(stored))
+            self.assertNotIn(token, str(stored_statuses))
+            self.assertNotIn(token, json.dumps(events))
+            self.assertTrue(any(row['page_path'] == '/order-submitted' for row in stored))
+            self.assertNotIn('buyer@example.test', str(stored))
+            root = self._artifact_dir()
+            root.mkdir(parents=True, exist_ok=True)
+            (root / 'analytics-network.json').write_text(json.dumps({'events': events, 'responses': statuses}, indent=2) + '\n')
+        finally:
+            if prior is None:
+                webapp.app.extensions.pop('site_analytics', None)
+            else:
+                webapp.app.extensions['site_analytics'] = prior

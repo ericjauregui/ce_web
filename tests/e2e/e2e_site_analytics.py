@@ -1,15 +1,19 @@
 from __future__ import annotations
 
+import json
+import re
+import time as clock
+
 from datetime import datetime, time, timedelta, timezone
 from zoneinfo import ZoneInfo
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, select
 from sqlalchemy.pool import StaticPool
 
 import app as webapp
 from domains.connect_analytics import ConnectAnalytics, connect_event_counts
 from domains.site_analytics import (
-    SiteAnalytics, site_analytics_events, site_request_status_daily_counts,
+    SiteAnalytics, resolve_dashboard_range, site_analytics_events, site_request_status_daily_counts,
 )
 from tests.e2e.common import BaseE2ETest
 
@@ -17,7 +21,12 @@ from tests.e2e.common import BaseE2ETest
 class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
     def setUp(self) -> None:
         super().setUp()
+        # Background media can monopolize the single-threaded local test server.
+        # Playback is covered separately; these tests verify tracking and storage.
+        self.page.route(re.compile(r'/static/reels/[^?]+\.mp4(?:\?.*)?$', re.I),
+            lambda route: route.fulfill(status=204, body=''))
         self.prior_analytics = webapp.app.extensions.get("site_analytics")
+        self.prior_connect_analytics = webapp.app.extensions.get("connect_analytics")
         engine = create_engine(
             "sqlite+pysqlite:///:memory:",
             connect_args={"check_same_thread": False},
@@ -27,6 +36,7 @@ class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
         self.analytics.create_schema_for_tests()
         self.connect_analytics = ConnectAnalytics(engine)
         self.connect_analytics.create_schema_for_tests()
+        webapp.app.extensions["connect_analytics"] = self.connect_analytics
         webapp.app.extensions["site_analytics"] = self.analytics
         self.primary_session = "a" * 64
         self.secondary_session = "b" * 64
@@ -137,6 +147,10 @@ class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
             webapp.app.extensions.pop("site_analytics", None)
         else:
             webapp.app.extensions["site_analytics"] = self.prior_analytics
+        if self.prior_connect_analytics is None:
+            webapp.app.extensions.pop("connect_analytics", None)
+        else:
+            webapp.app.extensions["connect_analytics"] = self.prior_connect_analytics
         self.analytics.engine.dispose()
 
     def test_public_dashboard_shows_aggregates_without_session_identifiers(self) -> None:
@@ -460,3 +474,214 @@ class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
         self.assertTrue(all("value" not in event for event in checkout_events))
         self.assertNotIn("Synthetic Buyer Name", str(checkout_events))
         self.assertNotIn("buyer@example.test", str(checkout_events))
+
+
+    def _watch_analytics(self, *, fallback: bool = False) -> list[dict]:
+        events = []
+        self._analytics_responses = []
+        self.page.expose_function("auditPayload", lambda payload: events.append({"payload": payload}))
+        self.page.add_init_script("""
+          const beacon = navigator.sendBeacon.bind(navigator);
+          navigator.sendBeacon = (url, body) => {
+            const sent = beacon(url, body);
+            if (sent && url === '/api/analytics/event') body.text().then(text => window.auditPayload(JSON.parse(text)));
+            return sent;
+          };
+          const nativeFetch = window.fetch;
+          window.fetch = (url, options) => {
+            if (url === '/api/analytics/event') window.auditPayload(JSON.parse(options.body));
+            return nativeFetch(url, options);
+          };
+        """)
+        if fallback:
+            self.page.add_init_script("navigator.sendBeacon = () => false")
+        def capture(response):
+            if response.url.endswith('/api/analytics/event'):
+                self._analytics_responses.append({"status": response.status, "method": response.request.method})
+                self._save_tracking_evidence(events)
+        self.page.on("response", capture)
+        return events
+
+    def _save_tracking_evidence(self, events: list[dict]) -> None:
+        root = self._artifact_dir()
+        root.mkdir(parents=True, exist_ok=True)
+        (root / "analytics-network.json").write_text(json.dumps({"events": events, "responses": self._analytics_responses}, indent=2) + "\n")
+
+    def _wait_tracking(self, events: list[dict], **expected) -> None:
+        deadline = clock.monotonic() + 5
+        while clock.monotonic() < deadline:
+            if any(all(item["payload"].get(k) == v for k, v in expected.items()) for item in events):
+                self.page.wait_for_timeout(100)
+                self.assertTrue(self._analytics_responses)
+                self.assertTrue(all(item["status"] == 204 for item in self._analytics_responses), self._analytics_responses)
+                return
+            self.page.wait_for_timeout(50)
+        self.fail(f"Missing analytics event {expected}: {events}")
+
+    def test_keyboard_and_quantity_edits_are_stored_and_grouped(self) -> None:
+        """Catch missing keyboard/input events and per-product quantity labels."""
+        from playwright.sync_api import expect
+        events = self._watch_analytics()
+        self.goto("/")
+        card = self.page.locator(".product-card").first
+        card.focus()
+        card.press("Enter")
+        self._wait_tracking(events, click_target="component:product-card")
+        expect(card).to_have_attribute("aria-expanded", "true")
+        card.locator(".add-to-cart-btn").click()
+        expect(card.locator(".product-qty-input")).to_have_value("1")
+        card.locator('[data-delta="1"]').click()
+        expect(card.locator(".product-qty-input")).to_have_value("2")
+        self._wait_tracking(events, click_target="action:order-quantity-plus")
+        card.locator('[data-delta="-1"]').click()
+        self._wait_tracking(events, click_target="action:order-quantity-minus")
+        card.locator(".product-qty-input").fill("4")
+        card.locator(".product-qty-input").press("Tab")
+        expect(card).to_have_attribute("data-qty", "4")
+        self._wait_tracking(events, click_target="action:order-quantity-edit")
+        card.locator(".product-detail-link").click()
+        self._wait_tracking(events, click_target=f"internal:/product/{self.valid_code}")
+        self.page.locator('[data-delta="1"]').click()
+        self._wait_tracking(events, page_path=f"/product/{self.valid_code}", click_target="action:order-quantity-plus")
+        self.goto("/cart")
+        self.page.locator(".qty-plus").first.click()
+        self._wait_tracking(events, page_path="/cart", click_target="action:order-summary-quantity-plus")
+        expect(self.page.locator(".qty-input").first).to_have_value("6")
+        self.page.locator(".qty-input").first.fill("7")
+        self.page.locator(".qty-input").first.press("Tab")
+        self._wait_tracking(events, click_target="action:order-summary-quantity-edit")
+        self.page.locator(".qty-remove").first.click()
+        self._wait_tracking(events, click_target="action:order-summary-remove-item")
+        with self.analytics.engine.connect() as connection:
+            targets = set(connection.execute(select(site_analytics_events.c.click_target).where(
+                site_analytics_events.c.occurred_at >= datetime.now(timezone.utc) - timedelta(minutes=2)
+            )).scalars())
+        self.assertIn("action:order-quantity-edit", targets)
+        self.assertIn("action:order-summary-quantity-edit", targets)
+        summary = self.analytics.dashboard_summary(
+            page_filter="cart",
+            range_values=resolve_dashboard_range({}, today=datetime.now(ZoneInfo("America/Los_Angeles")).date() + timedelta(days=1)),
+        )
+        self.assertIn("Increase order quantity", str(summary))
+        self.assertIn("Edit quantity in Order Summary", str(summary))
+        self.assertEqual(sum(item["payload"].get("click_target") == "component:product-card" for item in events), 1)
+
+    def test_checkout_progress_survives_backgrounding_without_field_values(self) -> None:
+        """Record progress while editing, deduplicate lifecycle flushes, omit option values."""
+        events = self._watch_analytics()
+        self.open_checkout_with_item()
+        self.page.locator('#checkoutForm [name="name"]').fill("Synthetic Secret Buyer")
+        self._wait_tracking(events, event_type="checkout_field", field_key="name")
+        self.page.locator('#checkoutForm [name="name"]').fill("Different Secret Buyer")
+        self.page.locator('#checkoutForm [name="notes"]').fill("Secret order notes")
+        self.page.locator("#checkoutCountry").fill("United States")
+        self.page.locator("#checkoutCountryCombobox .checkout-combobox__option").first.click()
+        self._wait_tracking(events, click_target="action:checkout-select-country")
+        self._wait_tracking(events, event_type="checkout_field", field_key="country")
+        self.page.locator('#checkoutForm [name="name"]').press("Enter")
+        self._wait_tracking(events, click_target="action:checkout-submit")
+        self.page.wait_for_timeout(1100)
+        self.page.evaluate("""() => {
+          Object.defineProperty(document, 'visibilityState', {configurable: true, value: 'hidden'});
+          document.dispatchEvent(new Event('visibilitychange'));
+          window.dispatchEvent(new Event('pagehide'));
+        }""")
+        self._wait_tracking(events, event_type="page_duration")
+        self.page.wait_for_timeout(100)
+        fields = [item["payload"]["field_key"] for item in events if item["payload"]["event_type"] == "checkout_field"]
+        self.assertEqual(fields.count("name"), 1)
+        self.assertEqual(fields.count("country"), 1)
+        self.assertEqual(sum(item["payload"]["event_type"] == "page_duration" for item in events), 1)
+        for value in ("Secret Buyer", "Secret order notes", "United States", "united-states"):
+            self.assertNotIn(value, json.dumps(events))
+        with self.analytics.engine.connect() as connection:
+            stored = list(connection.execute(select(site_analytics_events.c.field_key).where(
+                site_analytics_events.c.event_type == "checkout_field",
+                site_analytics_events.c.occurred_at >= datetime.now(timezone.utc) - timedelta(minutes=2),
+            )).scalars())
+        self.assertCountEqual(stored, fields)
+
+    def test_page_coverage_attribution_and_search_with_fetch_fallback(self) -> None:
+        """Verify real accepted/stored events, shared session, query omission, and fallback."""
+        events = self._watch_analytics(fallback=True)
+        self.goto("/?utm_source=audit&utm_medium=local&utm_campaign=tracking&q=secret-search&gclid=secret-id")
+        self._wait_tracking(events, event_type="page_view", page_path="/", utm_source="audit")
+        cookie = next(cookie for cookie in self.context.cookies() if cookie["name"] == "ce_analytics_session")
+        for path in ("/about", "/contact", "/team", "/trade-shows", "/connect", "/reels", "/faqs", "/privacy"):
+            self.goto(path)
+            self._wait_tracking(events, event_type="page_view", page_path=path)
+        self.goto("/team")
+        member_path = self.page.locator('a[href^="/team/"]').first.get_attribute("href")
+        self.goto(member_path)
+        self._wait_tracking(events, event_type="page_view", page_path=member_path)
+        self.page.set_viewport_size({"width": 390, "height": 844})
+        self.page.locator("#contactQr summary").click()
+        self._wait_tracking(events, click_target="action:toggle-contact-qr")
+        self.page.set_viewport_size(self.viewport)
+        self.goto("/")
+        self.page.locator(".nav-search-trigger").click()
+        search = self.page.locator('#navSearchForm [name="q"]')
+        search.fill("private-search-phrase")
+        search.press("Enter")
+        self._wait_tracking(events, click_target="action:catalog-search")
+        current_cookie = next(cookie for cookie in self.context.cookies() if cookie["name"] == "ce_analytics_session")
+        self.assertEqual(cookie["value"], current_cookie["value"])
+        self.assertTrue(cookie["httpOnly"])
+        self.assertEqual(cookie["expires"], -1)
+        with self.analytics.engine.connect() as connection:
+            rows = list(connection.execute(select(site_analytics_events).where(
+                site_analytics_events.c.occurred_at >= datetime.now(timezone.utc) - timedelta(minutes=2)
+            )).mappings())
+        self.assertEqual(len({row["session_id_hash"] for row in rows}), 1)
+        self.assertTrue(any(row["utm_campaign"] == "tracking" for row in rows))
+        for value in ("secret-search", "secret-id", "private-search-phrase", cookie["value"]):
+            self.assertNotIn(value, str(rows))
+            self.assertNotIn(value, json.dumps(events))
+
+    def test_historical_download_tokens_are_redacted_before_public_reporting(self) -> None:
+        """Migration must preserve counts, merge colliding daily keys, and hide old tokens."""
+        import hashlib
+        import importlib.util
+        from pathlib import Path
+        from alembic.migration import MigrationContext
+        from alembic.operations import Operations
+        migration_path = Path(webapp.BASE_DIR) / 'migrations/versions/20260930_0006_redact_analytics_downloads.py'
+        spec = importlib.util.spec_from_file_location('analytics_redaction', migration_path)
+        migration = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(migration)
+        with self.analytics.engine.begin() as connection:
+            connection.execute(site_analytics_events.insert().values(
+                occurred_at=datetime.combine(self.fixture_date, time(hour=18)),
+                session_id_hash=self.primary_session,
+                event_type='click', page_path='/checkout',
+                click_target='internal:/download/order/synthetic-private-token.pdf',
+            ))
+            for path, count in (('/download/order/file.pdf', 3),
+                ('/download/order/synthetic-private-token.pdf', 4),
+                ('/download/order/another-private-token.pdf', 5)):
+                connection.execute(site_request_status_daily_counts.insert().values(
+                    event_date=self.fixture_date, page_path=path, status_code=404, request_count=count,
+                ))
+            with Operations.context(MigrationContext.configure(connection)):
+                migration.upgrade()
+                migration.upgrade()
+        self.goto('/admin/analytics')
+        html = self.page.content()
+        self.assertNotIn('synthetic-private-token', html)
+        self.assertNotIn('another-private-token', html)
+        self.assertIn('Download order PDF', self.page.locator('main.analytics-dashboard').inner_text())
+        with self.analytics.engine.connect() as connection:
+            rows = list(connection.execute(select(site_request_status_daily_counts).where(
+                site_request_status_daily_counts.c.page_path.like('/download/order/%')
+            )).mappings())
+            target = connection.execute(select(site_analytics_events.c.click_target).where(
+                site_analytics_events.c.click_target == 'action:download-order-pdf'
+            )).scalar_one()
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]['request_count'], 12)
+        root = self._artifact_dir()
+        root.mkdir(parents=True, exist_ok=True)
+        (root / 'migration-verification.json').write_text(json.dumps({
+            'migration_sha256': hashlib.sha256(migration_path.read_bytes()).hexdigest(),
+            'preserved_daily_count': rows[0]['request_count'], 'click_target': target,
+        }, indent=2) + '\n')
