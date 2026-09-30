@@ -3,7 +3,7 @@
 Failure inventory: stale catalog quantities, duplicate event handlers, lost notes
 on close/checkout, failed reads or writes, missing undo after reopening, clipped
 mobile rows, a scrolling footer, background scrolling, escaped keyboard focus,
-full-screen mobile coverage, and untracked overlay interactions.
+full-screen mobile coverage, an incomplete panel outline, and untracked overlay interactions.
 """
 import re
 import app as webapp
@@ -44,6 +44,35 @@ class CartDrawerE2ETests(BaseE2ETest):
         self.page.get_by_role('button', name='Close order').click()
         self.page.wait_for_function('window.__cartDrawerHidden === true')
         expect(self.page.locator('#cartDrawer')).not_to_have_attribute('aria-modal', 'true')
+
+    def test_order_summary_outline_continues_across_top_and_bottom(self):
+        self.seed()
+        self.goto('/')
+        for width in (390, 1280):
+            self.page.set_viewport_size({'width': width, 'height': 844})
+            self.open_drawer()
+            self.page.wait_for_function('''() => {
+              const bounds = document.getElementById('cartDrawer').getBoundingClientRect();
+              return bounds.left >= 0 && bounds.right <= innerWidth + 1;
+            }''')
+            outline = self.page.locator('#cartDrawer').evaluate('''panel => {
+              const style = getComputedStyle(panel);
+              return {
+                top: [style.borderTopWidth, style.borderTopColor],
+                right: [style.borderRightWidth, style.borderRightColor],
+                bottom: [style.borderBottomWidth, style.borderBottomColor],
+                left: [style.borderLeftWidth, style.borderLeftColor],
+                topLeftRadius: style.borderTopLeftRadius,
+                bottomLeftRadius: style.borderBottomLeftRadius,
+              };
+            }''')
+            self.assertEqual(outline['top'], outline['left'], outline)
+            self.assertEqual(outline['right'], outline['left'], outline)
+            self.assertEqual(outline['bottom'], outline['left'], outline)
+            self.assertNotEqual(outline['topLeftRadius'], '0px', outline)
+            self.assertNotEqual(outline['bottomLeftRadius'], '0px', outline)
+            self.page.screenshot(path=str(self._artifact_dir() / f'outlined-order-summary-{width}.png'))
+            self.close_drawer()
 
     def test_order_summary_view_and_button_events_are_distinct(self):
         self.page.add_init_script("""
