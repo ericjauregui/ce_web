@@ -153,8 +153,107 @@ class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
             webapp.app.extensions["connect_analytics"] = self.prior_connect_analytics
         self.analytics.engine.dispose()
 
+    def test_session_start_attribution_and_generic_connect_events(self) -> None:
+        """Repeat views, changed tags, ties, older starts and click-only sessions
+        must not inflate attribution. Direct and all tails must partition starts;
+        displayed shares must total 100%, including collapsed Others.
+        Removing booth must combine same-event/action counts without losing data.
+        """
+        from decimal import Decimal
+        at = datetime.combine(self.fixture_date, time(hour=10),
+            tzinfo=ZoneInfo('America/Los_Angeles')).astimezone(timezone.utc)
+        with self.analytics.engine.begin() as connection:
+            connection.execute(site_analytics_events.delete())
+            connection.execute(connect_event_counts.delete())
+            for index in range(13):
+                session_hash = f'{index + 1:064x}'
+                connection.execute(site_analytics_events.insert().values(
+                    occurred_at=at, session_id_hash=session_hash, event_type='page_view',
+                    page_path=f'/landing-{index:02}',
+                    referrer_host=None if index == 0 else f'start-{index:02}.example',
+                    utm_source=None if index == 0 else f'source-{index:02}',
+                    utm_medium=None if index == 0 else 'email',
+                    utm_campaign=None if index == 0 else f'campaign-{index:02}',
+                ))
+                connection.execute(site_analytics_events.insert().values(
+                    occurred_at=at, session_id_hash=session_hash, event_type='page_view',
+                    page_path='/return-path', referrer_host='later.example',
+                    utm_source='later-source', utm_medium='social', utm_campaign='later-campaign',
+                ))
+            # Insert a returning view before its older start to test chronological ranking.
+            for occurred_at, page_path in ((at, '/return-path'), (at-timedelta(days=1), '/prior-start')):
+                connection.execute(site_analytics_events.insert().values(
+                    occurred_at=occurred_at, session_id_hash='e'*64, event_type='page_view',
+                    page_path=page_path, referrer_host='older.example', utm_source='older-source',
+                ))
+            connection.execute(site_analytics_events.insert().values(
+                occurred_at=at, session_id_hash='f'*64, event_type='click',
+                page_path='/return-path', click_target='action:add-to-order',
+            ))
+            for key, name, booth, count in (('', '', '', 2), ('', '', '117', 3),
+                                           ('same-event', 'Same Event', '100', 4),
+                                           ('same-event', 'Same Event', '200', 6)):
+                connection.execute(connect_event_counts.insert().values(
+                    event_date=self.fixture_date, trade_show_key=key, trade_show_name=name,
+                    booth=booth, action='visit', count=count, updated_at=at,
+                ))
+        query = f'?range=custom&date_from={self.fixture_date}&date_to={self.fixture_date}'
+        self.goto('/admin/analytics'+query)
+        self.assertEqual(self.page.locator('.analytics-grid > .analytics-card').first.get_attribute('id'),
+                         'connect-title-card')
+        connect = self.page.locator('#connect-title-card')
+        self.assertEqual(connect.locator('thead th').all_inner_texts(), ['Event', 'Action', 'Events', '% of events'])
+        self.assertEqual(connect.locator('tbody tr').count(), 2)
+        self.assertIn('Generic', connect.inner_text())
+        self.assertIn('10', connect.inner_text())
+        self.assertIn('5', connect.inner_text())
+        for key in ('sources', 'campaigns'):
+            card = self.page.locator(f'#{key}-table').locator('xpath=../..')
+            self.assertEqual(card.get_attribute('data-session-starts'), '13')
+            self.assertIn('Direct', card.inner_text())
+            self.assertNotIn('later', card.inner_text())
+            self.assertNotIn('older', card.inner_text())
+            top = self.page.locator(f'#{key}-table > tbody > tr')
+            others = self.page.locator(f'#{key}-others')
+            self.assertEqual(top.count(), 5)
+            self.assertEqual(others.get_attribute('data-other-count'), '8')
+            shares = [Decimal(row.locator('td').last.inner_text().strip('%')) for row in top.all()]
+            shares.append(Decimal(others.locator('summary strong').last.inner_text().strip('%')))
+            self.assertEqual(sum(shares), 100)
+            others.locator('summary').click()
+            self.assertEqual(others.locator('tbody tr').count(), 8)
+            all_rows = top.all() + others.locator('tbody tr').all()
+            self.assertEqual(sum(int(row.locator('td').nth(-2).inner_text()) for row in all_rows), 13)
+            self.assertEqual(sum(Decimal(row.locator('td').last.inner_text().strip('%')) for row in all_rows), 100)
+            self.assertNotIn('later', card.inner_text())
+            self.assertNotIn('older', card.inner_text())
+            others.locator('summary').click()
+        root = self._artifact_dir()
+        root.mkdir(parents=True, exist_ok=True)
+        self.page.set_viewport_size({'width':390, 'height':844})
+        self.assertLessEqual(self.page.evaluate('document.documentElement.scrollWidth'), 390)
+        connect.screenshot(path=str(root/'connect-events-mobile.png'), style='.navbar {visibility:hidden}')
+        self.goto('/admin/analytics'+query+'&page_filter=path:/return-path')
+        for title in ('sources', 'campaigns'):
+            card = self.page.locator(f'#{title}-title').locator('xpath=../../..')
+            self.assertEqual(card.get_attribute('data-session-starts'), '0')
+            self.assertIn('No session starts', card.inner_text())
+        self.goto('/admin/analytics'+query+'&page_filter=path:/landing-00')
+        for key in ('sources', 'campaigns'):
+            row = self.page.locator(f'#{key}-table > tbody > tr')
+            self.assertEqual(row.count(), 1)
+            self.assertIn('Direct', row.inner_text())
+            self.assertEqual(row.locator('td').last.inner_text(), '100%')
+        (root/'attribution-verification.json').write_text(json.dumps({
+            'session_starts':13, 'source_total':13, 'campaign_total':13,
+            'displayed_share_sum':100, 'later_tags_ignored':True,
+            'older_start_excluded':True, 'tie_order_uses_first_insert':True,
+            'filtered_returning_page_starts':0, 'filtered_direct_start_share':'100%',
+            'connect_generic_events':5, 'same_event_across_booths':10,
+        }, indent=2)+'\n')
+
     def test_top_five_cards_keep_all_other_rows_and_correct_aggregates(self) -> None:
-        """Tails beyond old SQL limits must stay inspectable; referrers need a union.
+        """Tails beyond old SQL limits must stay inspectable with session-start shares.
 
         Cover top-five ranking, collapsed totals, keyboard expansion, repeated
         collapse, filtered/empty results, mobile overflow and unchanged storage.
@@ -163,8 +262,7 @@ class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
             tzinfo=ZoneInfo('America/Los_Angeles')).astimezone(timezone.utc)
         events = []
         for index in range(25):
-            # The final 20 hosts share one session; summing their counts is wrong.
-            session_hash = f'{index + 1:064x}' if index < 5 else 'f' * 64
+            session_hash = f'{index + 1:064x}'
             count = 25 - index
             events.extend(dict(occurred_at=fixture_time, session_id_hash=session_hash,
                 event_type='page_view', page_path=f'/audit-page-{index:02}',
@@ -190,7 +288,7 @@ class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
         self.assertIn('Percentages of all requests', request_summary)
         for key, expected_count, expected_percent in (
                 ('pages', '210', '65%'), ('clicks', '210', '65%'),
-                ('sources', '1', '17%'), ('connect', '210', '65%')):
+                ('sources', '20', '80%'), ('connect', '210', '65%')):
             table = self.page.locator(f'#{key}-table')
             self.assertEqual(table.locator(':scope > tbody > tr[data-ranked-entry]').count(), 5)
             others = self.page.locator(f'#{key}-others')
@@ -207,7 +305,7 @@ class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
             self.assertIn('24', others.locator('table').inner_text())
             summary.click()
             self.assertFalse(others.locator('table').is_visible())
-        self.assertIn('unique sessions', self.page.locator('#sources-title').locator('xpath=../../..').inner_text())
+        self.assertIn('session starts', self.page.locator('#sources-title').locator('xpath=../../..').inner_text())
         self.page.set_viewport_size({'width':390, 'height':844})
         self.page.locator('#connect-others > summary').click()
         self.assertLessEqual(self.page.evaluate('document.documentElement.scrollWidth'), 390)
@@ -229,7 +327,7 @@ class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
         (root / 'top-five-verification.json').write_text(json.dumps({
             'view_total':325, 'click_total':325, 'connect_total':325,
             'remaining_views':210, 'remaining_clicks':210, 'remaining_connect':210,
-            'remaining_unique_referrer_sessions':1, 'remaining_rows_per_card':20,
+            'remaining_referrer_session_starts':20, 'remaining_rows_per_card':20,
             'stored_events':len(stored_events), 'filtered_ranked_rows':1,
         }, indent=2) + '\n')
 
@@ -487,9 +585,9 @@ class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
         self.assertNotIn("Click reel card 1 records a click on that card", clicks_card.inner_text())
         self.assertNotIn("Play video 1", clicks_card.inner_text())
         self.assertIn("newsletter.example", sources_card.inner_text())
-        self.assertIn("33%", sources_card.inner_text())
+        self.assertIn("33.3%", sources_card.inner_text())
         self.assertIn("fall-launch", campaigns_card.inner_text())
-        self.assertIn("33%", campaigns_card.inner_text())
+        self.assertIn("33.3%", campaigns_card.inner_text())
         self.assertIn("9%", contexts_card.inner_text())
         self.assertIn("20%", contexts_card.inner_text())
         connect_actions_card = self.page.locator("#connect-actions-title").locator("xpath=../../..")

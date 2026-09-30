@@ -198,6 +198,20 @@ def _format_percentage(part: int, total: int) -> str:
     return str(math.floor(percentage + 0.5))
 
 
+def _partition_shares(rows: list[dict]) -> list[dict]:
+    """Allocate tenths of a percent so an exhaustive partition displays 100%."""
+    total = sum(row['sessions'] for row in rows)
+    if not total:
+        return rows
+    portions = [divmod(row['sessions'] * 1000, total) for row in rows]
+    units = [portion[0] for portion in portions]
+    # Stable ranking resolves equal remainders consistently on every database.
+    for index in sorted(range(len(rows)), key=lambda index: (-portions[index][1], index))[:1000-sum(units)]:
+        units[index] += 1
+    return [{**row, 'percent_units': share, 'percent': f'{share / 10:g}'}
+            for row, share in zip(rows, units)]
+
+
 metadata = MetaData()
 site_analytics_events = Table(
     "site_analytics_events",
@@ -1030,44 +1044,43 @@ class SiteAnalytics:
                 .group_by(events.c.click_target)
                 .order_by(func.count().desc(), events.c.click_target)
             ).all()
-            referrer_rows = connection.execute(
-                select(
-                    events.c.referrer_host,
-                    func.count(func.distinct(events.c.session_id_hash)).label("sessions"),
-                )
-                .where(*scoped_conditions, is_page_view, events.c.referrer_host.is_not(None))
-                .group_by(events.c.referrer_host)
-                .order_by(
-                    func.count(func.distinct(events.c.session_id_hash)).desc(),
-                    events.c.referrer_host,
-                )
+            # Rank before date/page filters: returning views cannot become starts.
+            entry_pages = select(
+                events.c.occurred_at, events.c.page_path, events.c.page_context, events.c.click_target,
+                events.c.referrer_host, events.c.utm_source, events.c.utm_medium,
+                events.c.utm_campaign,
+                func.row_number().over(partition_by=events.c.session_id_hash,
+                    order_by=[events.c.occurred_at, events.c.id]).label('entry_rank'),
+            ).where(is_page_view).cte('session_entry_pages')
+            entry_conditions = [entry_pages.c.entry_rank == 1,
+                entry_pages.c.occurred_at >= start_at, entry_pages.c.occurred_at < end_at]
+            entry_page_clause = _page_filter_clause(entry_pages, page_filter)
+            if entry_page_clause is not None:
+                entry_conditions.append(entry_page_clause)
+            attribution_columns = [entry_pages.c.referrer_host, entry_pages.c.utm_source,
+                                   entry_pages.c.utm_medium, entry_pages.c.utm_campaign]
+            entry_rows = connection.execute(
+                select(*attribution_columns, func.count().label('sessions'))
+                .where(*entry_conditions).group_by(*attribution_columns)
             ).all()
-            # A session can occur under multiple hosts; Others needs their union.
-            other_referrer_sessions = 0
-            if len(referrer_rows) > 5:
-                other_referrer_sessions = int(connection.execute(
-                    select(func.count(func.distinct(events.c.session_id_hash)))
-                    .where(*scoped_conditions, is_page_view,
-                           events.c.referrer_host.in_([row.referrer_host for row in referrer_rows[5:]]))
-                ).scalar_one() or 0)
-            campaign_rows = connection.execute(
-                select(
-                    events.c.utm_source,
-                    events.c.utm_medium,
-                    events.c.utm_campaign,
-                    func.count(func.distinct(events.c.session_id_hash)).label("sessions"),
-                )
-                .where(
-                    *scoped_conditions,
-                    is_page_view,
-                    (events.c.utm_source.is_not(None))
-                    | (events.c.utm_medium.is_not(None))
-                    | (events.c.utm_campaign.is_not(None)),
-                )
-                .group_by(events.c.utm_source, events.c.utm_medium, events.c.utm_campaign)
-                .order_by(func.count(func.distinct(events.c.session_id_hash)).desc())
-                .limit(10)
-            ).all()
+            source_counts: dict[str, int] = {}
+            campaign_counts: dict[tuple, int] = {}
+            for row in entry_rows:
+                host = row.referrer_host or 'Direct'
+                source_counts[host] = source_counts.get(host, 0) + int(row.sessions)
+                tags = (row.utm_source or None, row.utm_medium or None, row.utm_campaign or None)
+                campaign_counts[tags] = campaign_counts.get(tags, 0) + int(row.sessions)
+            session_starts = sum(source_counts.values())
+            referrer_summary = _partition_shares([
+                {'host': host, 'sessions': count}
+                for host, count in sorted(source_counts.items(), key=lambda item: (-item[1], item[0]))
+            ])
+            campaign_summary = _partition_shares([
+                {'source': tags[0] or 'Direct', 'medium': tags[1] or 'Direct',
+                 'campaign': tags[2] or 'Direct', 'sessions': count}
+                for tags, count in sorted(campaign_counts.items(),
+                    key=lambda item: (-item[1], tuple(value or '' for value in item[0])))
+            ])
             context_rows = connection.execute(
                 select(
                     events.c.page_context,
@@ -1092,11 +1105,12 @@ class SiteAnalytics:
                         connect_event_counts.c.event_date <= end_date,
                     )
                 ).scalar_one() or 0)
+                connect_event_name = func.coalesce(
+                    func.nullif(func.trim(connect_event_counts.c.trade_show_name), ''), 'Generic')
                 connect_rows = connection.execute(
                     select(
                         connect_event_counts.c.trade_show_key,
-                        connect_event_counts.c.trade_show_name,
-                        connect_event_counts.c.booth,
+                        connect_event_name.label('trade_show_name'),
                         connect_event_counts.c.action,
                         func.sum(connect_event_counts.c.count).label("count"),
                     )
@@ -1106,14 +1120,13 @@ class SiteAnalytics:
                     )
                     .group_by(
                         connect_event_counts.c.trade_show_key,
-                        connect_event_counts.c.trade_show_name,
-                        connect_event_counts.c.booth,
+                        connect_event_name,
                         connect_event_counts.c.action,
                     )
                     .order_by(func.sum(connect_event_counts.c.count).desc(),
                               connect_event_counts.c.trade_show_key,
-                              connect_event_counts.c.trade_show_name,
-                              connect_event_counts.c.booth, connect_event_counts.c.action)
+                              connect_event_name,
+                              connect_event_counts.c.action)
                 ).all()
 
             request_status = site_request_status_daily_counts
@@ -1358,14 +1371,19 @@ class SiteAnalytics:
                 journey_match_count or 0, journey_population
             ),
             "request_status": request_summary,
+            "session_starts": session_starts,
             "others": {
-                key: {"count": count, "percent": _format_percentage(count, total)}
-                for key, count, total in (
-                    ("pages", sum(int(row.count) for row in page_rows[5:]), int(page_views)),
-                    ("clicks", sum(int(row.count) for row in click_rows[5:]), int(clicks)),
-                    ("sources", other_referrer_sessions, int(sessions)),
-                    ("connect", sum(int(row.count or 0) for row in connect_rows[5:]), connect_total),
-                )
+                **{key: {'count': sum(row['sessions'] for row in rows[5:]),
+                         'percent': f"{sum(row['percent_units'] for row in rows[5:]) / 10:g}"}
+                   for key, rows in (('sources', referrer_summary), ('campaigns', campaign_summary))},
+                **{
+                    key: {"count": count, "percent": _format_percentage(count, total)}
+                    for key, count, total in (
+                        ("pages", sum(int(row.count) for row in page_rows[5:]), int(page_views)),
+                        ("clicks", sum(int(row.count) for row in click_rows[5:]), int(clicks)),
+                        ("connect", sum(int(row.count or 0) for row in connect_rows[5:]), connect_total),
+                    )
+                },
             },
             "checkout_insights": {
                 "in_scope": checkout_is_in_scope,
@@ -1407,24 +1425,8 @@ class SiteAnalytics:
                 }
                 for row in click_rows
             ],
-            "referrers": [
-                {
-                    "host": row.referrer_host,
-                    "sessions": int(row.sessions),
-                    "percent": _format_percentage(int(row.sessions), int(sessions)),
-                }
-                for row in referrer_rows
-            ],
-            "campaigns": [
-                {
-                    "source": row.utm_source,
-                    "medium": row.utm_medium,
-                    "campaign": row.utm_campaign,
-                    "sessions": int(row.sessions),
-                    "percent": _format_percentage(int(row.sessions), int(sessions)),
-                }
-                for row in campaign_rows
-            ],
+            "referrers": referrer_summary,
+            "campaigns": campaign_summary,
             "contexts": [
                 {
                     "name": row.page_context,
@@ -1439,7 +1441,6 @@ class SiteAnalytics:
                 {
                     "key": row.trade_show_key,
                     "show": row.trade_show_name,
-                    "booth": row.booth,
                     "action": row.action,
                     "count": int(row.count or 0),
                     "percent": _format_percentage(int(row.count or 0), connect_total),

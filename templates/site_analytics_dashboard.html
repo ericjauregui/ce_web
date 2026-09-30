@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% macro ranked_cells(item, fields, count_field) -%}
-  {% for field in fields %}<td class="analytics-path">{% if field == 'show' %}{{ item.show or item.key }}{% elif field == 'action' %}{{ item.action|replace('_', ' ')|title }}{% else %}{{ item[field] or '—' }}{% endif %}</td>{% endfor %}
+{% for field in fields %}<td class="analytics-path">{% if field == 'show' %}{{ item.show or 'Generic' }}{% elif field == 'action' %}{{ item.action|replace('_', ' ')|title }}{% else %}{{ item[field] or '—' }}{% endif %}</td>{% endfor %}
   <td class="analytics-number">{{ '{:,}'.format(item[count_field]) }}</td><td class="analytics-number analytics-percent">{{ item.percent }}%</td>
 {%- endmacro %}
 {% macro ranked_table(key, rows, fields, headings, count_field, count_heading, percent_heading, others) %}
@@ -210,6 +210,13 @@
   </section>
 
   <div class="analytics-grid">
+    {% if analytics.connect_actions %}
+    <section class="analytics-card" id="connect-title-card" aria-labelledby="connect-actions-title">
+      <div class="analytics-section-heading"><div><h2 id="connect-actions-title">Connect-page actions</h2><p>Aggregate counts by event and action</p></div></div>
+      {{ ranked_table('connect', analytics.connect_actions, ['show', 'action'], ['Event', 'Action'], 'count', 'Events', '% of events', analytics.others.connect) }}
+    </section>
+    {% endif %}
+
     <section class="analytics-card" aria-labelledby="pages-title">
       <div class="analytics-section-heading"><div><h2 id="pages-title">Top pages</h2><p>Page views in this range</p></div></div>
       {% if analytics.top_pages %}
@@ -224,21 +231,20 @@
       {% else %}<p class="analytics-empty">No clicks recorded in this range.</p>{% endif %}
     </section>
 
-    <section class="analytics-card" aria-labelledby="sources-title">
-      <div class="analytics-section-heading"><div><h2 id="sources-title">Referrer hosts</h2><p>Others counts unique sessions across remaining hosts; a session can appear under multiple hosts.</p></div></div>
+    <section class="analytics-card" aria-labelledby="sources-title" data-session-starts="{{ analytics.session_starts }}">
+      <div class="analytics-section-heading"><div><h2 id="sources-title">Referrer hosts</h2><p>{{ '{:,}'.format(analytics.session_starts) }} session starts · First recorded page view, filtered by start date and landing page</p></div></div>
       {% if analytics.referrers %}
-      {{ ranked_table('sources', analytics.referrers, ['host'], ['Host'], 'sessions', 'Sessions', '% of sessions', analytics.others.sources) }}
-      {% else %}<p class="analytics-empty">No external referrers recorded in this range.</p>{% endif %}
+      {{ ranked_table('sources', analytics.referrers, ['host'], ['Host'], 'sessions', 'Starts', '% of starts', analytics.others.sources) }}
+      <p class="analytics-small-note">Direct means no referrer was captured on the first page view.</p>
+      {% else %}<p class="analytics-empty">No session starts recorded in this range.</p>{% endif %}
     </section>
 
-    <section class="analytics-card" aria-labelledby="campaigns-title">
-      <div class="analytics-section-heading"><div><h2 id="campaigns-title">Campaigns</h2><p>Sessions grouped by saved UTM tags</p></div></div>
+    <section class="analytics-card" aria-labelledby="campaigns-title" data-session-starts="{{ analytics.session_starts }}">
+      <div class="analytics-section-heading"><div><h2 id="campaigns-title">Campaigns</h2><p>{{ '{:,}'.format(analytics.session_starts) }} session starts · Campaign tags from the first recorded page view</p></div></div>
       {% if analytics.campaigns %}
-      <div class="analytics-table-wrap"><table class="analytics-table">
-        <thead><tr><th>Source</th><th>Medium</th><th>Campaign</th><th class="analytics-number">Sessions</th><th class="analytics-number">% of sessions</th></tr></thead>
-        <tbody>{% for campaign in analytics.campaigns %}<tr><td>{{ campaign.source or '—' }}</td><td>{{ campaign.medium or '—' }}</td><td>{{ campaign.campaign or '—' }}</td><td class="analytics-number">{{ '{:,}'.format(campaign.sessions) }}</td><td class="analytics-number analytics-percent">{{ campaign.percent }}%</td></tr>{% endfor %}</tbody>
-      </table></div>
-      {% else %}<p class="analytics-empty">No tagged campaign visits recorded in this range.</p>{% endif %}
+      {{ ranked_table('campaigns', analytics.campaigns, ['source', 'medium', 'campaign'], ['Source', 'Medium', 'Campaign'], 'sessions', 'Starts', '% of starts', analytics.others.campaigns) }}
+      <p class="analytics-small-note">Direct means no value was captured for that campaign tag on the first page view. Date and page filters apply to session starts.</p>
+      {% else %}<p class="analytics-empty">No session starts recorded in this range.</p>{% endif %}
     </section>
 
     {% if analytics.contexts %}
@@ -341,12 +347,6 @@
       {% else %}<p class="analytics-empty">Select all pages or a cart and checkout filter to view checkout progress.</p>{% endif %}
     </section>
 
-    {% if analytics.connect_actions %}
-    <section class="analytics-card" id="connect-title-card" aria-labelledby="connect-actions-title">
-      <div class="analytics-section-heading"><div><h2 id="connect-actions-title">Connect-page actions</h2><p>Existing aggregate counts by show and action</p></div></div>
-      {{ ranked_table('connect', analytics.connect_actions, ['show', 'booth', 'action'], ['Trade show', 'Booth', 'Action'], 'count', 'Events', '% of events', analytics.others.connect) }}
-    </section>
-    {% endif %}
   </div>
 
   <section class="analytics-card analytics-paths" aria-labelledby="paths-title">
