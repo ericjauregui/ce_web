@@ -364,14 +364,19 @@ function initializeCatalogScrollTracking() {
     }
     const pinnedToNav = header.getBoundingClientRect().top <= navHeight + 2;
     const expanded = toggle.getAttribute("aria-expanded") === "true";
-    if (autoCollapsed && (!mobile.matches || !pinnedToNav)) {
+    const nextCollection = sections[1];
+    const pastFirstCollection = Boolean(
+      nextCollection && nextCollection.getBoundingClientRect().top <=
+        navHeight + header.getBoundingClientRect().height + 12,
+    );
+    if (autoCollapsed && (!mobile.matches || !pinnedToNav || !pastFirstCollection)) {
       setExpanded(true);
       autoCollapsed = false;
       downwardTravel = 0;
     } else if (mobile.matches && upwardTravel > 16 && !expanded) {
       setExpanded(true);
       autoCollapsed = false;
-    } else if (mobile.matches && pinnedToNav && downwardTravel > 16 && expanded) {
+    } else if (mobile.matches && pinnedToNav && pastFirstCollection && downwardTravel > 16 && expanded) {
       setExpanded(false);
       autoCollapsed = true;
       downwardTravel = 0;

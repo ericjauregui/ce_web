@@ -272,7 +272,8 @@ class UXE2ETests(BaseE2ETest):
         navigation = self.page.locator('#homeCollectionNavigation')
         expect(toggle).to_have_attribute('aria-expanded', 'true')
         expanded_height = self.page.locator('.home-collections').bounding_box()['height']
-        self.page.mouse.wheel(0, 1100)
+        self.page.locator('.catalog-collection-section').nth(1).evaluate(
+            "section => window.scrollTo({top: section.getBoundingClientRect().top + scrollY, behavior: 'instant'})")
         expect(toggle).to_have_attribute('aria-expanded', 'false')
         expect(navigation).to_be_hidden()
         self.assertLess(self.page.locator('.home-collections').bounding_box()['height'], expanded_height - 50)
@@ -304,6 +305,44 @@ class UXE2ETests(BaseE2ETest):
         expect(navigation).to_be_hidden()
         toggle.click()
         expect(navigation).to_be_visible()
+
+    def test_view_catalog_keeps_collections_open_until_past_classic_studs(self):
+        self.page.route(re.compile(r'/static/reels/[^?]+\.mp4(?:\?.*)?$', re.I), lambda r: r.fulfill(status=204, body=''))
+        self.goto('/', wait_until='load')
+        self.page.evaluate('document.fonts.ready')
+        toggle = self.page.locator('.home-collections-toggle')
+        next_collection = self.page.locator('.catalog-collection-section').nth(1)
+        self.page.get_by_role('link', name='View Catalog', exact=True).click()
+        self.page.wait_for_function("location.hash === '#section-studs' && scrollY > 0")
+        self.page.wait_for_timeout(650)
+        expect(toggle).to_have_attribute('aria-expanded', 'true')
+        self.page.screenshot(path=str(self._artifact_dir_for_capture() / 'view-catalog-collections-expanded.png'))
+
+        next_collection.evaluate('''section => {
+          const header = document.querySelector('.home-collections');
+          const nav = document.querySelector('.navbar');
+          const readingLine = nav.getBoundingClientRect().height + header.getBoundingClientRect().height + 12;
+          window.scrollTo({top: section.getBoundingClientRect().top + scrollY - readingLine - 80, behavior: 'instant'});
+        }''')
+        self.page.wait_for_function('''() => {
+          const next = document.querySelectorAll('.catalog-collection-section')[1];
+          const nav = document.querySelector('.navbar');
+          const header = document.querySelector('.home-collections');
+          const readingLine = nav.getBoundingClientRect().height + header.getBoundingClientRect().height + 12;
+          return next.getBoundingClientRect().top >= readingLine + 75;
+        }''')
+        self.page.wait_for_timeout(100)
+        expect(toggle).to_have_attribute('aria-expanded', 'true')
+        self.page.screenshot(path=str(self._artifact_dir_for_capture() / 'classic-studs-near-end-expanded.png'))
+        self.page.mouse.wheel(0, 140)
+        self.page.wait_for_function('''() => {
+          const next = document.querySelectorAll('.catalog-collection-section')[1];
+          const nav = document.querySelector('.navbar');
+          const header = document.querySelector('.home-collections');
+          return next.getBoundingClientRect().top <= nav.getBoundingClientRect().height + header.getBoundingClientRect().height + 12;
+        }''')
+        expect(toggle).to_have_attribute('aria-expanded', 'false')
+        self.page.screenshot(path=str(self._artifact_dir_for_capture() / 'past-classic-studs-collapsed.png'))
 
     def test_collections_transition_smoothly_and_respect_reduced_motion(self):
         self.page.route(re.compile(r'/static/reels/[^?]+\.mp4(?:\?.*)?$', re.I), lambda r: r.fulfill(status=204, body=''))
