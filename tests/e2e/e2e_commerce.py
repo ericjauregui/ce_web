@@ -25,6 +25,7 @@ import app as webapp
 from domains import emailing
 from domains.orders import OrderItemRecord, OrderRecord, OrderRepository
 from tests.e2e.common import BaseE2ETest
+from tests.e2e.page_title import TITLE_WIDTHS, assert_page_title_row
 
 
 class CommerceE2ETests(BaseE2ETest):
@@ -194,6 +195,12 @@ class CommerceE2ETests(BaseE2ETest):
             order_notes='Please confirm availability <script>alert("x")</script>',
         )
         self._submit_checkout()
+
+        for width in TITLE_WIDTHS:
+            with self.subTest(confirmation_title_width=width):
+                self.page.set_viewport_size({"width": width, "height": 900})
+                assert_page_title_row(self, f"order-submitted-{width}")
+        self.page.set_viewport_size(self.viewport)
 
         order_number = self.page.locator(".order-submitted-card strong").first.inner_text().removeprefix("Order ID: ")
         self.assertRegex(order_number, r"^#CE\d{8}$")
