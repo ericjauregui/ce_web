@@ -16,6 +16,7 @@ from domains.site_analytics import (
     SiteAnalytics, resolve_dashboard_range, site_analytics_events, site_request_status_daily_counts,
 )
 from tests.e2e.common import BaseE2ETest
+from tests.e2e.page_title import assert_page_top_gap
 
 
 class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
@@ -199,6 +200,7 @@ class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
                 ))
         query = f'?range=custom&date_from={self.fixture_date}&date_to={self.fixture_date}'
         self.goto('/admin/analytics'+query)
+        assert_page_top_gap(self, '.analytics-heading', 'analytics-top-gap')
         self.assertEqual(self.page.locator('.analytics-grid > .analytics-card').first.get_attribute('id'),
                          'connect-title-card')
         connect = self.page.locator('#connect-title-card')

@@ -127,6 +127,7 @@ html::before {
 
 :root {
   --nav-height: 66px;
+  --page-heading-gap: 1.5rem;
   --gold-rgb: 215 192 122;
   --gold: #d7c07a;
   --gold-subtle: rgb(var(--gold-rgb) / 0.62);
@@ -151,6 +152,11 @@ body {
 main {
   margin-top: 0 !important;
   padding-top: var(--nav-actual-height, var(--nav-height)) !important;
+}
+
+/* Secondary pages share a compact gap below the navbar; hero pages keep their spacing. */
+.page-shell > main > :is(section, .analytics-dashboard):first-child {
+  padding-top: var(--page-heading-gap) !important;
 }
 
 .brand {

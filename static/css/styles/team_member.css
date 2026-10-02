@@ -1,6 +1,6 @@
 /* Digital business cards: scoped to individual member pages. */
 .digital-card-view { --dbc-gold: #d6b766; --dbc-line: rgba(214,183,102,.42); }
-.dbc-page-links { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; }
+.dbc-page-links { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: var(--page-heading-gap); }
 .dbc-page-links .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; font-size: .9rem; }
 .digital-card-view a { color: var(--dbc-gold); }
 .digital-card-view a:hover { color: #f7e6b4; }

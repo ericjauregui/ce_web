@@ -885,6 +885,7 @@
   align-items: center;
   gap: clamp(.55rem, 1.4vw, .95rem);
   min-height: 42px;
+  margin-bottom: var(--page-heading-gap) !important;
 }
 
 .page-title-row .page-title-back,
@@ -953,8 +954,8 @@
   }
 
   .page-title-row {
-    /* Equal side columns keep the title at the page's horizontal center. */
-    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) minmax(0, 1fr);
+    /* Let short titles release space to equally sized action columns. */
+    grid-template-columns: minmax(0, 1fr) fit-content(50%) minmax(0, 1fr);
   }
 
   .page-title-row > h1 {

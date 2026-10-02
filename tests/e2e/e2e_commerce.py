@@ -25,7 +25,7 @@ import app as webapp
 from domains import emailing
 from domains.orders import OrderItemRecord, OrderRecord, OrderRepository
 from tests.e2e.common import BaseE2ETest
-from tests.e2e.page_title import TITLE_WIDTHS, assert_page_title_row
+from tests.e2e.page_title import TITLE_WIDTHS, assert_page_title_row, assert_page_top_gap
 
 
 class CommerceE2ETests(BaseE2ETest):
@@ -366,6 +366,15 @@ class CommerceE2ETests(BaseE2ETest):
                 self.assertEqual(response.status, expected)
             self.assertIn("Your cart is still saved", response.text())
             self.assertEqual(self.context.request.get(f"{self.base_url}/api/cart/count").json()["total_items"], 1)
+            self._fill_checkout()
+            with self.page.expect_response(
+                lambda response: urlsplit(response.url).path == "/checkout"
+                and response.request.method == "POST"
+            ) as limited_submission:
+                self.page.locator("#checkoutForm button[type='submit']").click()
+            self.assertEqual(limited_submission.value.status, 429)
+            self.page.get_by_role("heading", name="Please try again shortly").wait_for()
+            assert_page_top_gap(self, 'main > section > .card', 'rate-limit-top-gap')
 
         home = self.goto("/")
         self.assertEqual(home.headers["cache-control"], "private, no-store, max-age=0")

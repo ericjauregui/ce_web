@@ -7,10 +7,10 @@
   <div class="page-title-row mb-4">
     <a class="btn btn-outline-gold page-back-btn page-title-back" href="{{ url_for('index') }}#section-studs">{% include 'partials/catalog_button_label.html' %}</a>
     <h1 class="text-gold mb-0">{{ team.headline }}</h1>
-    <span class="page-title-spacer btn btn-outline-gold page-back-btn" aria-hidden="true">{% include 'partials/catalog_button_label.html' %}</span>
+    <a class="btn btn-outline-gold page-title-action" href="{{ url_for('about') }}">About Us</a>
   </div>
 
-  <div class="row row-cols-1 row-cols-xl-3 g-3 mt-1">
+  <div class="row row-cols-1 row-cols-xl-3 g-3">
     {% for m in members %}
       <div class="col">
         <div class="card bg-dark border-gold h-100 p-2 p-md-3 team-member-card team-member-card-linkable"
