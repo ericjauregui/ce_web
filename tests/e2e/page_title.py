@@ -39,6 +39,7 @@ def assert_page_title_row(test, label):
           const box = node.getBoundingClientRect();
           const range = document.createRange();
           range.selectNodeContents(node);
+          const style = getComputedStyle(node);
           return {
             text: node.textContent.trim(),
             isTitle: node.tagName === 'H1',
@@ -46,6 +47,9 @@ def assert_page_title_row(test, label):
             centerY: box.top + box.height / 2,
             scrollWidth: node.scrollWidth,
             clientWidth: node.clientWidth,
+            textWidth: range.getBoundingClientRect().width,
+            horizontalInsets: ['paddingLeft', 'paddingRight', 'borderLeftWidth', 'borderRightWidth']
+              .reduce((total, property) => total + parseFloat(style[property]), 0),
             textRects: [...range.getClientRects()].map(r => r.toJSON()),
           };
         }),
@@ -79,3 +83,4 @@ def assert_page_title_row(test, label):
     test.page.screenshot(path=str(artifact_dir / f"{label}.png"), animations="disabled")
     (artifact_dir / f"{label}.html").write_text(test.page.content(), encoding="utf-8")
     (artifact_dir / f"{label}.json").write_text(json.dumps(geometry, indent=2) + "\n", encoding="utf-8")
+    return geometry

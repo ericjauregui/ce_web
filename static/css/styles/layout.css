@@ -994,10 +994,6 @@
   white-space: nowrap;
 }
 
-.page-title-row--nowrap > :is(.page-title-back, .page-title-action) {
-  width: 9rem;
-}
-
 /* Full labels need compact type only in the narrowest About and Reels rows. */
 @container (max-width: 340px) {
   :is(.about-page, .reels-page) .page-title-row--nowrap > :is(.page-title-back, .page-title-action) {

@@ -13,7 +13,8 @@ labels despite available space beside a short title.
 The Team header must expose About Us without wrapping either action or title.
 The Reels header must link to Meet the Team. FAQs, About, and Reels must keep
 their complete labels on one line, including around narrow layout transitions.
-Different button widths must not leave unequal visible gaps around the title.
+Actions must retain the Team page's standard content-sized styling. Forced
+equal widths stretch buttons even when titles remain centered and labels fit.
 """
 
 import re
@@ -81,15 +82,15 @@ class PageTitleE2ETests(BaseE2ETest):
                     })""")
                     if path != "/contact" or width >= 360:
                         self.assertTrue(single_line, (path, width, action.inner_text()))
-                    assert_page_title_row(self, f"single-line-{path.strip('/')}-{width}")
-                    if path in ("/faqs", "/about", "/reels"):
-                        gaps = self.page.locator(".page-title-row").evaluate("""row => {
-                          const left = row.querySelector('.page-title-back').getBoundingClientRect();
-                          const title = row.querySelector('h1').getBoundingClientRect();
-                          const right = row.querySelector('.page-title-action').getBoundingClientRect();
-                          return [title.left - left.right, right.left - title.right];
-                        }""")
-                        self.assertAlmostEqual(*gaps, delta=1, msg=(path, width, gaps))
+                    geometry = assert_page_title_row(self, f"single-line-{path.strip('/')}-{width}")
+                    if path in ("/team", "/faqs", "/about", "/reels"):
+                        for button in (item for item in geometry["items"] if not item["isTitle"]):
+                            # Shared max-width may constrain a button, but must never stretch it.
+                            self.assertLessEqual(
+                                button["box"]["width"],
+                                button["textWidth"] + button["horizontalInsets"] + 1,
+                                msg=(path, width, button),
+                            )
                     if path == "/team" and width == 390:
                         action.click()
                         expect(self.page.locator(".page-title-row h1")).to_have_text("About Us")
