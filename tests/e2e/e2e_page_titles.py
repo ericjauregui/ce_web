@@ -4,13 +4,16 @@ Failure inventory: page-specific mobile rules move titles/actions to separate
 rows; hidden centering spacers crowd two-control headings; long title/button
 labels overlap, clip, or force horizontal scrolling; cart state changes layout.
 Unequal action columns shift the title away from the page's horizontal center.
-Catalog labels may wrap unnecessarily or lose their desktop wording. Team,
-FAQs, and About use the compact mobile label; Contact, member navigation,
-and the trade-show collection action retain their full labels.
+Catalog labels may wrap unnecessarily or lose their wording. Team uses the
+compact mobile label; FAQs, About, Contact, member navigation, and the
+trade-show collection action retain their full labels.
 Excess page padding and Bootstrap row gutters can leave unequal gaps above
 the header and below it. A fixed-width title track can wrap short button
 labels despite available space beside a short title.
 The Team header must expose About Us without wrapping either action or title.
+The Reels header must link to Meet the Team. FAQs, About, and Reels must keep
+their complete labels on one line, including around narrow layout transitions.
+Different button widths must not leave unequal visible gaps around the title.
 """
 
 import re
@@ -47,9 +50,9 @@ class PageTitleE2ETests(BaseE2ETest):
                     assert_page_title_row(self, f"populated-{path.strip('/')}-{width}")
 
     def test_page_titles_leave_room_for_single_line_actions(self):
-        for width in TITLE_WIDTHS:
+        for width in sorted(set(TITLE_WIDTHS + (364, 365, 375))):
             self.page.set_viewport_size({"width": width, "height": 900})
-            for path in ("/team", "/faqs", "/about", "/contact"):
+            for path in ("/team", "/faqs", "/about", "/contact", "/reels"):
                 with self.subTest(width=width, path=path):
                     self.goto(path)
                     self.page.evaluate("document.fonts.ready")
@@ -57,23 +60,42 @@ class PageTitleE2ETests(BaseE2ETest):
                     if path == "/team":
                         expect(action).to_have_text("About Us")
                         expect(action).to_have_attribute("href", "/about")
+                    if path == "/reels":
+                        expect(action).to_have_text("Meet the Team")
+                        expect(action).to_have_attribute("href", "/team")
+                    if path in ("/faqs", "/about"):
+                        expect(self.page.locator(".page-title-back")).to_have_text("Browse Catalog")
+                    if path != "/contact":
                         title = self.page.locator(".page-title-row h1")
                         self.assertTrue(title.evaluate("""e => {
                           return e.getBoundingClientRect().height <=
                             parseFloat(getComputedStyle(e).lineHeight) + 1;
                         }"""), (path, width, title.inner_text()))
-                    single_line = action.evaluate("""e => {
+                    single_line = self.page.locator(
+                        ".page-title-back, .page-title-action"
+                    ).evaluate_all("""buttons => buttons.every(e => {
                       const range = document.createRange();
-                      range.selectNodeContents(e);
+                      range.selectNodeContents(e.querySelector('.catalog-button-label') || e);
                       return range.getBoundingClientRect().height <=
                         parseFloat(getComputedStyle(e).lineHeight) + 1;
-                    }""")
+                    })""")
                     if path != "/contact" or width >= 360:
                         self.assertTrue(single_line, (path, width, action.inner_text()))
                     assert_page_title_row(self, f"single-line-{path.strip('/')}-{width}")
+                    if path in ("/faqs", "/about", "/reels"):
+                        gaps = self.page.locator(".page-title-row").evaluate("""row => {
+                          const left = row.querySelector('.page-title-back').getBoundingClientRect();
+                          const title = row.querySelector('h1').getBoundingClientRect();
+                          const right = row.querySelector('.page-title-action').getBoundingClientRect();
+                          return [title.left - left.right, right.left - title.right];
+                        }""")
+                        self.assertAlmostEqual(*gaps, delta=1, msg=(path, width, gaps))
                     if path == "/team" and width == 390:
                         action.click()
                         expect(self.page.locator(".page-title-row h1")).to_have_text("About Us")
+                    if path == "/reels" and width == 390:
+                        action.click()
+                        expect(self.page.locator(".page-title-row h1")).to_have_text("Meet the Team")
 
     def test_other_pages_have_compact_top_spacing_and_heroes_stay_flush(self):
         self.goto("/team")
@@ -112,7 +134,7 @@ class PageTitleE2ETests(BaseE2ETest):
             self.page.set_viewport_size({"width": width, "height": 900})
             for path in paths:
                 with self.subTest(width=width, path=path):
-                    compact_header = path in ("/team", "/faqs", "/about")
+                    compact_header = path == "/team"
                     expected = "Catalog" if compact_header and width < 768 else "Browse Catalog"
                     self.goto(path)
                     self.page.evaluate("document.fonts.ready")

@@ -990,6 +990,26 @@
 
 }
 
+.page-title-row--nowrap > :is(h1, .page-title-back, .page-title-action) {
+  white-space: nowrap;
+}
+
+.page-title-row--nowrap > :is(.page-title-back, .page-title-action) {
+  width: 9rem;
+}
+
+/* Full labels need compact type only in the narrowest About and Reels rows. */
+@container (max-width: 340px) {
+  :is(.about-page, .reels-page) .page-title-row--nowrap > :is(.page-title-back, .page-title-action) {
+    font-size: clamp(.75rem, 3.8cqw, .85rem);
+    padding-inline: .25rem;
+  }
+
+  .reels-page .page-title-row--nowrap > h1 {
+    font-size: clamp(1.15rem, 5.8cqw, 1.35rem);
+  }
+}
+
 .cart-page .cart-summary-metrics .text-gold-70,
 .checkout-page .checkout-summary-metrics .text-gold-70 {
   display: inline-flex;
