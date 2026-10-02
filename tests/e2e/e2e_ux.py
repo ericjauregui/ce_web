@@ -275,7 +275,8 @@ class UXE2ETests(BaseE2ETest):
         self.page.locator('#section-studs .catalog-collection-heading').evaluate('''heading => {
           const nav = document.querySelector('.navbar');
           const collections = document.querySelector('.home-collections');
-          const stickyBottom = nav.getBoundingClientRect().height + collections.getBoundingClientRect().height;
+          const compactHeight = collections.getBoundingClientRect().height - collections.querySelector('.home-collection-panel').getBoundingClientRect().height;
+          const stickyBottom = nav.getBoundingClientRect().height + compactHeight;
           window.scrollTo({top: heading.getBoundingClientRect().bottom + scrollY - stickyBottom + 80, behavior: 'instant'});
         }''')
         expect(toggle).to_have_attribute('aria-expanded', 'false')
@@ -325,14 +326,16 @@ class UXE2ETests(BaseE2ETest):
         first_heading.evaluate('''heading => {
           const collections = document.querySelector('.home-collections');
           const nav = document.querySelector('.navbar');
-          const stickyBottom = nav.getBoundingClientRect().height + collections.getBoundingClientRect().height;
+          const compactHeight = collections.getBoundingClientRect().height - collections.querySelector('.home-collection-panel').getBoundingClientRect().height;
+          const stickyBottom = nav.getBoundingClientRect().height + compactHeight;
           window.scrollTo({top: heading.getBoundingClientRect().bottom + scrollY - stickyBottom - 32, behavior: 'instant'});
         }''')
         self.page.wait_for_function('''() => {
           const heading = document.querySelector('#section-studs .catalog-collection-heading');
           const nav = document.querySelector('.navbar');
           const collections = document.querySelector('.home-collections');
-          const stickyBottom = nav.getBoundingClientRect().height + collections.getBoundingClientRect().height;
+          const compactHeight = collections.getBoundingClientRect().height - collections.querySelector('.home-collection-panel').getBoundingClientRect().height;
+          const stickyBottom = nav.getBoundingClientRect().height + compactHeight;
           return heading.getBoundingClientRect().bottom >= stickyBottom + 30;
         }''')
         self.page.wait_for_timeout(100)
@@ -343,9 +346,14 @@ class UXE2ETests(BaseE2ETest):
           const heading = document.querySelector('#section-studs .catalog-collection-heading');
           const nav = document.querySelector('.navbar');
           const collections = document.querySelector('.home-collections');
-          return heading.getBoundingClientRect().bottom <= nav.getBoundingClientRect().height + collections.getBoundingClientRect().height;
+          return heading.getBoundingClientRect().bottom <= nav.getBoundingClientRect().height + collections.getBoundingClientRect().height - collections.querySelector('.home-collection-panel').getBoundingClientRect().height;
         }''')
         expect(toggle).to_have_attribute('aria-expanded', 'false')
+        self.page.wait_for_timeout(450)
+        self.assertLessEqual(
+            first_heading.bounding_box()['y'] + first_heading.bounding_box()['height'],
+            self.page.locator('.navbar').bounding_box()['height'] + self.page.locator('.home-collections').bounding_box()['height'] + 1,
+        )
         self.assertGreater(self.page.locator('.catalog-collection-section').nth(1).bounding_box()['y'], 844)
         self.page.screenshot(path=str(self._artifact_dir_for_capture() / 'past-classic-studs-heading-collapsed.png'))
 

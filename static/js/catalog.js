@@ -365,9 +365,12 @@ function initializeCatalogScrollTracking() {
     }
     const pinnedToNav = header.getBoundingClientRect().top <= navHeight + 2;
     const expanded = toggle.getAttribute("aria-expanded") === "true";
+    // The collection row shrinks on collapse. Use its compact height so the
+    // heading does not reappear below it after the transition finishes.
+    const compactHeaderHeight = header.getBoundingClientRect().height - panel.getBoundingClientRect().height;
     const pastFirstHeading = Boolean(
       firstHeading && firstHeading.getBoundingClientRect().bottom <=
-        navHeight + header.getBoundingClientRect().height,
+        navHeight + compactHeaderHeight,
     );
     if (autoCollapsed && (!mobile.matches || !pinnedToNav)) {
       setExpanded(true);
