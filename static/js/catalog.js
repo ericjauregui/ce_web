@@ -569,7 +569,9 @@ document.addEventListener("click", (event) => {
   if (!link) return;
 
   event.preventDefault();
-  window.scrollTo({ top: 0, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" });
+  const collectionsCollapsed = document.querySelector(".home-collections-toggle")?.getAttribute("aria-expanded") === "false";
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  window.scrollTo({ top: 0, behavior: collectionsCollapsed || reducedMotion ? "instant" : "smooth" });
   window.history.replaceState(
     null,
     "",

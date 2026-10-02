@@ -357,6 +357,34 @@ class UXE2ETests(BaseE2ETest):
         self.assertGreater(self.page.locator('.catalog-collection-section').nth(1).bounding_box()['y'], 844)
         self.page.screenshot(path=str(self._artifact_dir_for_capture() / 'past-classic-studs-heading-collapsed.png'))
 
+    def test_jump_to_top_reaches_landing_from_collapsed_collections(self):
+        self.page.route(re.compile(r'/static/reels/[^?]+\.mp4(?:\?.*)?$', re.I), lambda r: r.fulfill(status=204, body=''))
+        self.goto('/', wait_until='load')
+        self.page.get_by_role('link', name='View Catalog', exact=True).click()
+        self.page.wait_for_function("location.hash === '#section-studs' && scrollY > 0")
+        self.page.wait_for_timeout(650)
+        jump = self.page.get_by_role('link', name='Jump to top', exact=True)
+        toggle = self.page.locator('.home-collections-toggle')
+
+        for collapsed in (True, False):
+            with self.subTest(collapsed=collapsed):
+                self.page.evaluate("window.scrollTo({top: 10000, behavior: 'instant'})")
+                expect(toggle).to_have_attribute('aria-expanded', 'false')
+                if not collapsed:
+                    toggle.click()
+                    expect(toggle).to_have_attribute('aria-expanded', 'true')
+                self.page.wait_for_timeout(550)
+                jump.click()
+                if collapsed:
+                    self.page.wait_for_timeout(650)
+                else:
+                    self.page.wait_for_function('window.scrollY <= 2', timeout=5000)
+                actual_y = self.page.evaluate('window.scrollY')
+                self.assertLessEqual(actual_y, 2, (collapsed, actual_y))
+                expect(toggle).to_have_attribute('aria-expanded', 'true')
+                self.assertNotIn('#section-', self.page.url)
+                self.page.screenshot(path=str(self._artifact_dir_for_capture() / f'jump-to-top-{collapsed}.png'))
+
     def test_collections_transition_smoothly_and_respect_reduced_motion(self):
         self.page.route(re.compile(r'/static/reels/[^?]+\.mp4(?:\?.*)?$', re.I), lambda r: r.fulfill(status=204, body=''))
         self.goto('/', wait_until='load')
