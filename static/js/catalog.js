@@ -339,6 +339,7 @@ function initializeCatalogScrollTracking() {
   const track = header.querySelector(".home-collection-track");
   const options = Array.from(track.querySelectorAll("[data-target]"));
   const sections = options.map((option) => document.getElementById(option.dataset.target));
+  const firstHeading = sections[0]?.querySelector(".catalog-collection-heading, .sticky-section-header") || sections[0];
   let activeIndex = -1;
   let frame = 0;
 
@@ -364,19 +365,18 @@ function initializeCatalogScrollTracking() {
     }
     const pinnedToNav = header.getBoundingClientRect().top <= navHeight + 2;
     const expanded = toggle.getAttribute("aria-expanded") === "true";
-    const nextCollection = sections[1];
-    const pastFirstCollection = Boolean(
-      nextCollection && nextCollection.getBoundingClientRect().top <=
-        navHeight + header.getBoundingClientRect().height + 12,
+    const pastFirstHeading = Boolean(
+      firstHeading && firstHeading.getBoundingClientRect().bottom <=
+        navHeight + header.getBoundingClientRect().height,
     );
-    if (autoCollapsed && (!mobile.matches || !pinnedToNav || !pastFirstCollection)) {
+    if (autoCollapsed && (!mobile.matches || !pinnedToNav)) {
       setExpanded(true);
       autoCollapsed = false;
       downwardTravel = 0;
     } else if (mobile.matches && upwardTravel > 16 && !expanded) {
       setExpanded(true);
       autoCollapsed = false;
-    } else if (mobile.matches && pinnedToNav && pastFirstCollection && downwardTravel > 16 && expanded) {
+    } else if (mobile.matches && pinnedToNav && pastFirstHeading && downwardTravel > 16 && expanded) {
       setExpanded(false);
       autoCollapsed = true;
       downwardTravel = 0;
