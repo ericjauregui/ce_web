@@ -23,7 +23,7 @@ class FullWidthLayoutE2ETests(BaseE2ETest):
         )
 
     def test_catalog_and_browse_pages_use_available_width(self):
-        for width in (768, 900, 1024, 1440):
+        for width in (768, 900, 1024, 1440, 1695):
             self.page.set_viewport_size({"width": width, "height": 900})
             self.goto('/')
             self.page.wait_for_function(
@@ -39,16 +39,36 @@ class FullWidthLayoutE2ETests(BaseE2ETest):
               const outer = nav.closest('.container').getBoundingClientRect();
               const inner = nav.getBoundingClientRect();
               const styles = getComputedStyle(nav.closest('.container'));
-              return Math.abs(inner.left - outer.left - parseFloat(styles.paddingLeft)) <= 2 &&
-                Math.abs(outer.right - parseFloat(styles.paddingRight) - inner.right) <= 2;
+              const contentLeft = outer.left + parseFloat(styles.paddingLeft);
+              const contentRight = outer.right - parseFloat(styles.paddingRight);
+              return inner.left >= contentLeft - 2 && inner.right <= contentRight + 2 &&
+                Math.abs((inner.left + inner.right) - (contentLeft + contentRight)) <= 4;
             }'''), width)
             self.assertTrue(track.evaluate('track => track.scrollWidth <= track.clientWidth + 1'), width)
+            if width >= 1024:
+                gaps = track.evaluate('''track => {
+                  const items = [...track.querySelectorAll('.home-collection-option')];
+                  return items.slice(1).map((item, index) =>
+                    item.getBoundingClientRect().left - items[index].getBoundingClientRect().right);
+                }''')
+                self.assertTrue(gaps, width)
+                self.assertLessEqual(max(gaps), 24, (width, gaps))
             self.assertLessEqual(self.page.evaluate('document.documentElement.scrollWidth'), width)
             self.page.screenshot(path=str(self._artifact_dir() / f'catalog-width-{width}.png'))
+            if width == 1695:
+                navigation.evaluate('''nav => {
+                  const navbar = document.querySelector('.navbar');
+                  window.scrollTo({
+                    top: nav.getBoundingClientRect().top + scrollY - navbar.getBoundingClientRect().height,
+                    behavior: 'instant',
+                  });
+                }''')
+                self.page.screenshot(path=str(self._artifact_dir() / 'catalog-collections-centered-1695.png'))
             if width == 768:
                 self.page.locator('.catalog-collection-section .product-card').first.scroll_into_view_if_needed()
                 self.page.screenshot(path=str(self._artifact_dir() / 'catalog-cards-width-768.png'))
 
+        self.page.set_viewport_size({"width": 1440, "height": 900})
         for path, selector in (
             ('/reels', '.reels-page'),
             ('/team', '.team-page'),
