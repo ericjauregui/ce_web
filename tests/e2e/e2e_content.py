@@ -109,6 +109,68 @@ class ContentJourneysE2ETests(BaseE2ETest):
             self.assertEqual(image.status, 200)
             self.assertTrue(image.body().startswith(b"\xff\xd8\xff"))
 
+    def test_owner_card_on_about_and_trade_shows(self) -> None:
+        expected = None
+        for path in ("/trade-shows", "/about"):
+            for width in (320, 390, 768, 1280):
+                self.page.set_viewport_size({"width": width, "height": 844})
+                self.goto(path)
+                panel = self.page.locator(".trade-show-video-panel")
+                video = panel.locator("video")
+                self.assertEqual(panel.count(), 1)
+                content = {
+                    "title": panel.locator("h2").inner_text(),
+                    "description": panel.locator("p").inner_text(),
+                    "source": video.locator("source").get_attribute("src"),
+                    "poster": video.get_attribute("poster"),
+                }
+                if expected is None:
+                    expected = content
+                self.assertEqual(content, expected)
+                self.assertEqual(content["title"], "Meet the Owner")
+                self.assertTrue(video.evaluate("v => v.controls && v.muted && v.loop && v.playsInline"))
+                if path == "/about":
+                    self.assertTrue(panel.evaluate("""panel => {
+                        const about = document.querySelector('.about-page');
+                        return about.lastElementChild.contains(panel)
+                          && panel.getBoundingClientRect().top >= about.querySelector('.card').getBoundingClientRect().bottom;
+                    }"""))
+                video.scroll_into_view_if_needed()
+                self.page.wait_for_function("""() => {
+                    const video = document.getElementById('ownerVideo');
+                    return video.readyState >= 2 && video.currentTime > .1 && !video.paused;
+                }""", timeout=15000)
+                self.assertTrue(self.page.evaluate("document.documentElement.scrollWidth <= innerWidth"))
+                bounds = panel.bounding_box()
+                self.assertGreaterEqual(bounds["x"], 0)
+                self.assertLessEqual(bounds["x"] + bounds["width"], width + 1)
+                video.evaluate("v => v.pause()")
+                self._artifact_dir().mkdir(parents=True, exist_ok=True)
+                self.page.screenshot(
+                    path=str(self._artifact_dir() / f"owner-{path.strip('/')}-{width}.png"),
+                    animations="disabled",
+                )
+                self.page.evaluate("window.scrollTo(0, 0)")
+                video.scroll_into_view_if_needed()
+                self.page.wait_for_timeout(300)
+                self.assertTrue(video.evaluate("v => v.paused"), "Preserve the viewer's pause")
+                video.evaluate("v => { v.volume = .5; }")
+                self.page.wait_for_function("!document.getElementById('ownerVideo').muted")
+                video.evaluate("v => { v.muted = true; }")
+                self.page.wait_for_timeout(100)
+                self.assertTrue(video.evaluate("v => v.muted"))
+                video.evaluate("v => v.play()")
+                self.page.set_viewport_size({"width": width, "height": 300})
+                self.page.evaluate("window.scrollTo(0, 0)")
+                self.page.wait_for_function("document.getElementById('ownerVideo').paused", timeout=5000)
+                self.assertEqual(self.page_errors, [])
+
+        self.page.emulate_media(reduced_motion="reduce")
+        self.goto("/about")
+        self.page.locator("#ownerVideo").scroll_into_view_if_needed()
+        self.page.wait_for_timeout(300)
+        self.assertTrue(self.page.locator("#ownerVideo").evaluate("v => v.paused"))
+
     def test_trade_show_details_assets_and_calendar_export(self) -> None:
         config = json.loads(webapp.TRADE_SHOWS_PATH.read_text(encoding="utf-8"))
         show = config["events"][config["active_event"]]

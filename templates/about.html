@@ -1,6 +1,10 @@
 {% extends "base.html" %}
 {% block title %}About California Earrings | Wholesale Jewelry{% endblock %}
 {% block meta_description %}Learn how California Earrings has supplied wholesale real, authentic 14K gold earrings and body jewelry to retailers worldwide for more than 30 years.{% endblock %}
+{% block page_css %}
+<link href="{{ asset_url('css/styles/inline_reels.css') }}" rel="stylesheet">
+<link href="{{ asset_url('css/styles/owner_video.css') }}" rel="stylesheet">
+{% endblock %}
 {% block content %}
 <section class="container py-5 about-page" style="max-width: 900px;">
   <div class="page-title-row page-title-row--nowrap mb-4">
@@ -24,6 +28,9 @@
       Thank you for considering California Earrings as your wholesale jewelry partner.
     </p>
   </div>
+  <div class="mt-4">
+    {% include "partials/owner_video.html" %}
+  </div>
 </section>
 {% endblock %}
 
@@ -38,4 +45,10 @@
       "description": "Background on California Earrings, a Los Angeles wholesale supplier of luxury real, authentic 14K gold earrings and body jewelry."
     }|tojson }}
 </script>
+{% endblock %}
+
+{% block body_end %}
+{{ super() }}
+<script src="{{ asset_url('js/inline_reels.js') }}"></script>
+<script src="{{ asset_url('js/owner_video.js') }}"></script>
 {% endblock %}
