@@ -78,6 +78,7 @@
 @media (min-width: 992px) {
   .home-collections > .container.py-3 { padding-block: .55rem !important; }
   .home-collections .home-row-heading { margin-bottom: .35rem; }
+  .home-collections:has(.home-collections-toggle[aria-expanded="false"]) > .container.py-3 { padding-top: .9rem !important; }
 }
 @media (max-width: 991.98px) {
   .home-collection-navigation, .home-collection-track { gap: .4rem; }
