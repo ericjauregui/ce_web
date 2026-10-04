@@ -6,8 +6,19 @@ import json
 TITLE_WIDTHS = (320, 360, 390, 430, 575, 576, 767, 768, 1024, 1280, 1440)
 
 
+def _wait_for_nav_metrics(test):
+    # The navbar updates this value on the next animation frame after a resize.
+    test.page.wait_for_function("""() => {
+      const nav = document.querySelector('.navbar');
+      const height = parseFloat(getComputedStyle(document.documentElement)
+        .getPropertyValue('--nav-actual-height'));
+      return nav && Number.isFinite(height) && Math.abs(height - nav.offsetHeight) <= 1;
+    }""")
+
+
 def assert_page_top_gap(test, selector, label, expected=24):
     test.page.evaluate("document.fonts.ready")
+    _wait_for_nav_metrics(test)
     geometry = test.page.locator(selector).evaluate("""e => ({
       topGap: e.getBoundingClientRect().top - document.querySelector('.navbar').getBoundingClientRect().bottom,
       viewport: innerWidth,
@@ -22,6 +33,7 @@ def assert_page_top_gap(test, selector, label, expected=24):
 
 def assert_page_title_row(test, label):
     test.page.evaluate("document.fonts.ready")
+    _wait_for_nav_metrics(test)
     geometry = test.page.locator(".page-title-row").evaluate("""row => {
       const rect = row.getBoundingClientRect();
       const content = [...row.parentElement.querySelectorAll('.card')]
