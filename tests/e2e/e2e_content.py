@@ -124,6 +124,12 @@ class ContentJourneysE2ETests(BaseE2ETest):
                     "source": video.locator("source").get_attribute("src"),
                     "poster": video.get_attribute("poster"),
                 }
+                description = content.pop("description")
+                self.assertTrue(description.strip())
+                if path == "/about":
+                    self.assertNotIn("at the show", description)
+                else:
+                    self.assertIn("at the show", description)
                 if expected is None:
                     expected = content
                 self.assertEqual(content, expected)
