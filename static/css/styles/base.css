@@ -126,7 +126,8 @@ html::before {
 
 
 :root {
-  --nav-height: 66px;
+  --nav-logo-height: clamp(40px, 4vw, 48px);
+  --nav-height: calc(max(44px, var(--nav-logo-height)) + .5rem + 1px);
   --page-heading-gap: 1.5rem;
   --gold-rgb: 215 192 122;
   --gold: #d7c07a;
@@ -166,17 +167,25 @@ main {
 }
 
 .brand-logo {
-  height: clamp(40px, 4vw, 70px);
+  height: var(--nav-logo-height);
   width: auto;
   object-fit: contain;
   display: block;
   filter: drop-shadow(0 1px 6px rgba(0, 0, 0, .35));
 }
 
-/* Slightly more compact navbar spacing */
+/* Keep the shared top row compact while preserving 44px mobile controls. */
 .navbar {
-  padding-top: .45rem;
-  padding-bottom: .45rem;
+  padding-top: .25rem;
+  padding-bottom: .25rem;
+}
+
+.navbar .brand-lockup {
+  display: inline-flex;
+  align-items: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding-block: 0;
 }
 
 .navbar.fixed-top.border-gold {

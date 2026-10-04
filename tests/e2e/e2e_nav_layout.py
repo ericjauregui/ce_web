@@ -1,11 +1,122 @@
 from __future__ import annotations
 
+import json
+import re
+
 from playwright.sync_api import expect
 from tests.e2e.common import BaseE2ETest
 
 
 class NavLayoutE2ETests(BaseE2ETest):
     browser_name = "chromium"
+
+    def test_compact_navbar_and_offsets_across_site_pages(self) -> None:
+        # Catch page overrides, clipped controls, stale sticky offsets, and
+        # menu expansion moving the page beneath the fixed navigation row.
+        self.page.route(
+            re.compile(r"/static/reels/[^?]+\.mp4(?:\?.*)?$", re.I),
+            lambda route: route.fulfill(status=204, body=""),
+        )
+        self.goto("/team")
+        member_path = self.page.locator(".team-card-link").first.get_attribute("href")
+        paths = ("/", "/?q=stud", "/team", member_path, "/about", "/contact",
+                 "/faqs", "/reels", "/trade-shows", "/connect", "/privacy",
+                 f"/product/{self.valid_code}", "/cart", "/checkout", "/missing-page")
+        records = []
+        root = self._artifact_dir()
+        root.mkdir(parents=True, exist_ok=True)
+        for width in (320, 390, 767, 768, 1280, 1692):
+            self.page.set_viewport_size({"width": width, "height": 900})
+            for index, path in enumerate(paths):
+                with self.subTest(width=width, path=path):
+                    self.page.goto(f"{self.base_url}{path}", wait_until="load")
+                    self.page.evaluate("document.fonts.ready")
+                    self.page.wait_for_function("""() => Math.abs(
+                        parseFloat(getComputedStyle(document.documentElement)
+                            .getPropertyValue('--nav-actual-height')) -
+                        document.querySelector('.navbar').getBoundingClientRect().height
+                    ) <= 1""")
+                    geometry = self.page.evaluate("""() => {
+                      const nav = document.querySelector('.navbar').getBoundingClientRect();
+                      const rect = e => {
+                        const r = e.getBoundingClientRect();
+                        return {top: r.top, bottom: r.bottom, left: r.left,
+                                right: r.right, height: r.height};
+                      };
+                      return {
+                        height: nav.height,
+                        fallback: parseFloat(getComputedStyle(document.querySelector('main'))
+                          .paddingTop),
+                        overflow: document.documentElement.scrollWidth > innerWidth,
+                        controls: Array.from(document.querySelectorAll(
+                          '.brand-lockup, .nav-search-trigger, .nav-actions')).map(rect),
+                      };
+                    }""")
+                    records.append({"width": width, "path": path, **geometry})
+                    (root / "navbar-geometry.json").write_text(json.dumps(records, indent=2))
+                    self.assertGreaterEqual(geometry["height"], 52)
+                    self.assertLessEqual(geometry["height"], 58)
+                    self.assertAlmostEqual(geometry["fallback"], geometry["height"], delta=1)
+                    self.assertFalse(geometry["overflow"])
+                    controls = geometry["controls"]
+                    self.assertGreaterEqual(controls[0]["height"], 44)
+                    for control in controls:
+                        self.assertGreaterEqual(control["top"], 0)
+                        self.assertLessEqual(control["bottom"], geometry["height"])
+                        self.assertGreaterEqual(control["left"], 0)
+                        self.assertLessEqual(control["right"], width)
+                        self.assertLessEqual(abs((control["top"] + control["bottom"]) / 2
+                                                 - geometry["height"] / 2), 1)
+                    self.assertLessEqual(controls[0]["right"], controls[1]["left"])
+                    self.assertLessEqual(controls[1]["right"], controls[2]["left"])
+                    if path in ("/", "/connect"):
+                        toggle = self.page.get_by_role("button", name="Toggle navigation")
+                        before_y = self.page.evaluate("scrollY")
+                        toggle.click()
+                        expect(self.page.locator("#nav")).to_be_visible()
+                        self.page.wait_for_function("!document.querySelector('#nav').classList.contains('collapsing')")
+                        self.assertAlmostEqual(self.page.locator(".navbar").bounding_box()["height"],
+                                               geometry["height"], delta=1)
+                        self.assertAlmostEqual(self.page.evaluate("scrollY"), before_y, delta=1)
+                        self.assertGreaterEqual(self.page.locator("#nav").bounding_box()["y"],
+                                                max(control["bottom"] for control in controls) - 1)
+                        self.page.screenshot(path=str(root / f"menu-{index}-{width}.png"))
+                        toggle.click()
+                        expect(self.page.locator("#nav")).to_be_hidden()
+                        self.page.locator(".nav-search-trigger").click()
+                        expect(self.page.locator(".nav-search-input")).to_be_focused()
+                        # Search restores input focus on its opening frame.
+                        # Finish that frame before testing Escape focus return.
+                        self.page.evaluate("() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))")
+                        self.page.keyboard.press("Escape")
+                        expect(self.page.locator(".nav-search-trigger")).to_be_focused()
+                    if width in (390, 1692):
+                        self.page.screenshot(path=str(root / f"page-{index}-{width}.png"))
+
+    def test_navbar_resize_keeps_home_sticky_collections_flush(self) -> None:
+        self.page.route(
+            re.compile(r"/static/reels/[^?]+\.mp4(?:\?.*)?$", re.I),
+            lambda route: route.fulfill(status=204, body=""),
+        )
+        self.goto("/", wait_until="load")
+        self.page.evaluate("document.fonts.ready")
+        root = self._artifact_dir()
+        root.mkdir(parents=True, exist_ok=True)
+        for width in (1692, 1280, 768, 767, 390, 320, 1692):
+            self.page.set_viewport_size({"width": width, "height": 900})
+            self.page.evaluate("() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))")
+            self.page.evaluate("scrollTo({top: 8000, behavior: 'instant'})")
+            self.page.wait_for_function("""() => Math.abs(
+                document.querySelector('.home-collections').getBoundingClientRect().top -
+                document.querySelector('.navbar').getBoundingClientRect().bottom
+            ) <= 1""")
+            self.page.wait_for_timeout(150)
+            self.assertEqual(self.page.evaluate("innerWidth"), width)
+            self.assertAlmostEqual(self.page.locator(".navbar").bounding_box()["y"], 0, delta=1)
+            self.page.screenshot(path=str(root / f"sticky-{width}.png"))
+            self.page.get_by_role("link", name="Jump to top", exact=True).click()
+            self.page.wait_for_function("scrollY <= 2")
+            expect(self.page.locator(".home-collections-toggle")).to_have_attribute("aria-expanded", "true")
 
     def test_nav_search_stays_centered_and_expands(self) -> None:
         self.page.goto(f"{self.base_url}/", wait_until="domcontentloaded")

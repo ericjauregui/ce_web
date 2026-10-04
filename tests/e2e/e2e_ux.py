@@ -280,7 +280,10 @@ class UXE2ETests(BaseE2ETest):
           window.scrollTo({top: heading.getBoundingClientRect().bottom + scrollY - stickyBottom + 80, behavior: 'instant'});
         }''')
         expect(toggle).to_have_attribute('aria-expanded', 'false')
-        expect(navigation).to_be_hidden()
+        # Chromium can report the child nav as visible even when its grid
+        # panel clips it completely. Verify the rendered and interactive state.
+        self.page.wait_for_function("document.querySelector('.home-collection-panel').getBoundingClientRect().height <= 1")
+        self.assertTrue(navigation.evaluate('e => e.inert'))
         self.assertLess(self.page.locator('.home-collections').bounding_box()['height'], expanded_height - 50)
         self.page.wait_for_function("getComputedStyle(document.querySelector('.home-collections-toggle svg')).transform.startsWith('matrix(-1,')")
         self.page.screenshot(path=str(self._artifact_dir_for_capture() / 'collections-auto-collapsed.png'))

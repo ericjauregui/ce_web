@@ -7,7 +7,7 @@ tablet widths, and phone users cannot discover or reach off-screen collections.
 
 import re
 
-from playwright.sync_api import expect
+from playwright.sync_api import TimeoutError as PlaywrightTimeoutError, expect
 
 from tests.e2e.common import BaseE2ETest
 
@@ -97,7 +97,17 @@ class FullWidthLayoutE2ETests(BaseE2ETest):
         for _ in range(8):
             if track.evaluate('track => track.scrollLeft >= track.scrollWidth - track.clientWidth - 2'):
                 break
-            next_button.click()
+            try:
+                next_button.click(timeout=2000)
+            except PlaywrightTimeoutError:
+                # A final smooth-scroll frame can reach the end after the
+                # check above, disabling the arrow while click retries.
+                # Accept only that completed destination, never a stuck control.
+                if next_button.is_enabled() or not track.evaluate(
+                    'track => track.scrollLeft >= track.scrollWidth - track.clientWidth - 2'
+                ):
+                    raise
+                break
             # Wait for smooth scrolling to settle before checking/clicking again.
             # A fixed delay can race the arrow becoming disabled at the end.
             track.evaluate('''track => new Promise((resolve, reject) => {
