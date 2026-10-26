@@ -68,26 +68,6 @@
 </section>
 {% endblock %}
 
-{% block schema_json_ld %}
-{{ super() }}
-<script type="application/ld+json">
-  {{ {
-    "@context": "https://schema.org",
-    "@type": "Product",
-    "name": product.name,
-    "sku": product.code,
-    "category": collection_label,
-    "description": product.description,
-    "image": [product_image_url],
-    "brand": {
-      "@type": "Brand",
-      "name": site_name
-    },
-    "url": canonical_url
-  }|tojson }}
-</script>
-{% endblock %}
-
 {% block body_end %}
 <script src="{{ asset_url('js/product_detail.js') }}"></script>
 {% endblock %}

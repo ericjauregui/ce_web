@@ -87,6 +87,14 @@ class CatalogJourneyE2ETests(BaseE2ETest):
         detail_image = self.page.locator(".product-detail-image")
         self.assertIn("/static/product_images/101SB.jpg", detail_image.get_attribute("src"))
         self.assertIsNone(detail_image.get_attribute("srcset"))
+        schema_types = self.page.locator('script[type="application/ld+json"]').evaluate_all(
+            "scripts => scripts.map(script => JSON.parse(script.textContent)['@type'])"
+        )
+        self.assertNotIn("Product", schema_types)
+        self.assertIn("LocalBusiness", schema_types)
+        self.assertIn("WebSite", schema_types)
+        self.assertEqual(self.page.locator('meta[property="og:type"]').get_attribute("content"), "product")
+        self.assertTrue(self.page.locator('link[rel="canonical"]').get_attribute("href").endswith("/product/101SB"))
 
         self.page.locator(".product-detail-top-add-btn").click()
         self.page.wait_for_function(

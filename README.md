@@ -5,7 +5,7 @@ Flask-based wholesale jewelry site for California Earrings. The app serves a ser
 ## What the app does
 
 - Renders the wholesale catalog at `/` with in-page collection sections and query-driven inventory search.
-- Serves product detail pages at `/product/<product_code>` with canonical redirects, product schema, and share-friendly metadata.
+- Serves product detail pages at `/product/<product_code>` with canonical redirects and share-friendly metadata.
 - Surfaces the latest short-form inventory videos on the homepage and the full reels experience at `/reels`.
 - Supports a session-backed cart and order checkout flow with CSV/PDF order exports.
 - Publishes crawlable marketing/support pages at `/about`, `/contact`, `/faqs`, `/team`, and `/team/<member_slug>`.
@@ -47,7 +47,7 @@ Static media lives in:
 
 - `templates/index.html`: homepage hero, catalog sections, and latest inventory reels strip.
 - `templates/reels.html`: all-reels landing page with the newer swipe-and-play UX.
-- `templates/product_detail.html`: product detail page with product schema.
+- `templates/product_detail.html`: product detail page with share-friendly metadata.
 - `templates/faqs.html`: FAQ accordion plus FAQPage schema.
 - `templates/contact.html`: contact page plus local business/contact schema.
 - `templates/team.html` and `templates/team_member.html`: team directory and individual contact-card pages.
