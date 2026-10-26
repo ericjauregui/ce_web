@@ -22,6 +22,7 @@ from urllib.parse import quote, urlencode
 from urllib.request import Request, urlopen
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
+from PIL import Image, ImageOps, UnidentifiedImageError
 
 from domains.cart import cart_to_pdf_bytes, country_export_code
 
@@ -32,6 +33,9 @@ ORDER_EMAIL_MAX_RETRIES = max(0, int(os.getenv("ORDER_EMAIL_MAX_RETRIES", "0") o
 ORDER_EMAIL_RETRY_DELAY_SECONDS = max(0.0, float(os.getenv("ORDER_EMAIL_RETRY_DELAY_SECONDS", "1") or "1"))
 ORDER_EMAIL_REQUEST_TIMEOUT_SECONDS = max(1.0, float(os.getenv("ORDER_EMAIL_REQUEST_TIMEOUT_SECONDS", "8") or "8"))
 MAX_ORDER_ITEM_QUANTITY = 999
+# Rendered at 56px; keep 2x detail without embedding catalog originals.
+EMAIL_THUMBNAIL_SIZE = (112, 112)
+EMAIL_THUMBNAIL_JPEG_QUALITY = 65
 
 ORDER_LOG_DIR = BASE_DIR / "logs"
 ORDER_DB_PATH = ORDER_LOG_DIR / "orders.db"
@@ -512,7 +516,7 @@ def _inline_image_attachments() -> dict[str, tuple[bytes, str, str, str]]:
 def _product_thumbnail_attachments(
     items: list[dict[str, Any]], base_dir: Path,
 ) -> dict[str, tuple[bytes, str, str, str]]:
-    """Embed only existing local product photos, once per filename."""
+    """Embed small JPEG previews of local photos, once per filename."""
     root = (base_dir / "static" / "product_images").resolve()
     attachments = {}
     for item in items:
@@ -525,11 +529,19 @@ def _product_thumbnail_attachments(
         if path.resolve().parent != root:
             continue
         try:
-            data = path.read_bytes()
-        except OSError:
-            continue  # Missing photos must not prevent an order receipt.
-        maintype, subtype = _guess_image_type(path)
-        attachments[filename] = (data, maintype, subtype, make_msgid(domain="californiaearrings.com")[1:-1])
+            with Image.open(path) as source:
+                thumbnail = ImageOps.exif_transpose(source)
+                thumbnail.thumbnail(EMAIL_THUMBNAIL_SIZE, Image.Resampling.LANCZOS)
+                # Palette and transparent photos need a white background in JPEG.
+                rgba = thumbnail.convert("RGBA")
+                flattened = Image.new("RGB", rgba.size, "white")
+                flattened.paste(rgba, mask=rgba.getchannel("A"))
+                buffer = io.BytesIO()
+                flattened.save(buffer, format="JPEG", quality=EMAIL_THUMBNAIL_JPEG_QUALITY, optimize=True)
+                data = buffer.getvalue()
+        except (OSError, ValueError, UnidentifiedImageError, Image.DecompressionBombError):
+            continue  # Missing or unreadable photos must not prevent a receipt.
+        attachments[filename] = (data, "image", "jpeg", make_msgid(domain="californiaearrings.com")[1:-1])
     return attachments
 
 
@@ -590,7 +602,7 @@ def make_message(
         for filename, (data, maintype, subtype, cid) in thumbnails.items():
             html_part.add_related(
                 data, maintype=maintype, subtype=subtype,
-                cid=f"<{cid}>", filename=filename, disposition="inline",
+                cid=f"<{cid}>", filename=Path(filename).with_suffix(".jpg").name, disposition="inline",
             )
         if "logo" in inline_images:
             logo_bytes, logo_maintype, logo_subtype, logo_cid = inline_images["logo"]

@@ -1,12 +1,15 @@
 from __future__ import annotations
 
 import base64
+import io
 import logging
 import os
 import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
+
+from PIL import Image
 
 from domains import emailing
 
@@ -83,14 +86,19 @@ class EmailingTests(unittest.TestCase):
             }
         ]
 
-    def test_receipt_embeds_original_product_photo_once(self) -> None:
+    def test_receipt_embeds_compressed_product_photo_once(self) -> None:
         items = [dict(code="101SB", name="Gold Earrings", quantity=2, image="101SB.jpg", notes="First"),
                  dict(code="101SB", name="Gold Earrings", quantity=1, image="101SB.jpg", notes="Second"),
                  dict(code="missing", name="No photo", quantity=1, image="absent-photo.jpg")]
         message = emailing.make_message("#CE1", self._customer(), items, "", Path("order.csv"), emailing._load_email_settings())
         photos = [part for part in message.walk() if part.get_filename() == "101SB.jpg"]
         self.assertEqual(len(photos), 1)
-        self.assertEqual(photos[0].get_payload(decode=True), (emailing.BASE_DIR / "static/product_images/101SB.jpg").read_bytes())
+        data = photos[0].get_payload(decode=True)
+        self.assertLess(len(data), 12 * 1024)
+        self.assertLess(len(data), (emailing.BASE_DIR / "static/product_images/101SB.jpg").stat().st_size)
+        with Image.open(io.BytesIO(data)) as image:
+            self.assertEqual(image.format, "JPEG")
+            self.assertLessEqual(max(image.size), 112)
         html = message.get_body(preferencelist=("html",)).get_content()
         self.assertEqual(html.count("cid:" + str(photos[0]["Content-ID"])[1:-1]), 2)
         self.assertNotIn(">Photo</th>", html)
@@ -98,6 +106,37 @@ class EmailingTests(unittest.TestCase):
         self.assertIn("missing", html)
         self.assertNotIn("absent-photo.jpg", html)
         self.assertIn('width="56"', html)
+
+    def test_thumbnail_conversion_handles_codecs_and_bad_photos_without_changing_sources(self) -> None:
+        root = Path(self._tempdir.name)
+        image_dir = root / "static" / "product_images"
+        image_dir.mkdir(parents=True)
+        Image.new("RGBA", (400, 200), (255, 0, 0, 0)).save(image_dir / "clear.png")
+        Image.new("P", (200, 400)).save(image_dir / "palette.gif", transparency=0)
+        Image.new("RGB", (12, 6), "blue").save(image_dir / "tiny.jpg")
+        rotated = Image.new("RGB", (400, 200), "red")
+        exif = Image.Exif()
+        exif[274] = 6
+        rotated.save(image_dir / "rotated.jpg", exif=exif)
+        (image_dir / "corrupt.jpg").write_bytes(b"not an image")
+        originals = {path.name: path.read_bytes() for path in image_dir.iterdir()}
+        attachments = emailing._product_thumbnail_attachments(
+            [dict(image=name) for name in [*originals, "missing.jpg", "clear.png"]], root,
+        )
+        self.assertEqual(set(attachments), {"clear.png", "palette.gif", "tiny.jpg", "rotated.jpg"})
+        for name, (data, maintype, subtype, cid) in attachments.items():
+            self.assertEqual((maintype, subtype), ("image", "jpeg"))
+            self.assertTrue(cid)
+            self.assertLess(len(data), 12 * 1024)
+            self.assertEqual((image_dir / name).read_bytes(), originals[name])
+            with Image.open(io.BytesIO(data)) as image:
+                self.assertLessEqual(max(image.size), 112)
+                if name in {"clear.png", "palette.gif"}:
+                    self.assertEqual(image.getpixel((0, 0)), (255, 255, 255))
+                elif name == "tiny.jpg":
+                    self.assertEqual(image.size, (12, 6))
+                elif name == "rotated.jpg":
+                    self.assertEqual(image.size, (56, 112))
 
     def test_thumbnail_loader_rejects_external_and_parent_paths(self) -> None:
         images = ["../assets/ce_logo_full.png", "https://example.com/image.jpg", "/tmp/photo.jpg", "absent.jpg"]

@@ -7,16 +7,20 @@ The shared E2E runner writes screenshots, browser events, and a hash manifest.
 
 from __future__ import annotations
 
+import base64
+import io
 import json
 import logging
 import re
 import tempfile
 from contextlib import ExitStack
 from datetime import datetime, timezone
+from email.policy import SMTP
 from pathlib import Path
 from unittest.mock import patch
 from urllib.parse import urlsplit
 
+from PIL import Image
 from sqlalchemy import event, func, select
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import Session
@@ -280,6 +284,92 @@ class CommerceE2ETests(BaseE2ETest):
             f"{self.base_url}/checkout", form={**form_data, "company": "Different Company"}
         )
         self.assertEqual(changed.status, 409)
+
+    def test_large_order_email_is_compact_and_keeps_codes_on_one_line(self) -> None:
+        image_root = webapp.BASE_DIR / "static" / "product_images"
+        products = [product for product in webapp.load_products()
+                    if (image_root / product["image"]).is_file()]
+        longest = max(products, key=lambda product: len(product["code"]))
+        # Stress the old full-resolution embedding with the largest catalog photos.
+        products = [longest, *sorted(
+            (product for product in products if product["code"] != longest["code"]),
+            key=lambda product: (image_root / product["image"]).stat().st_size,
+            reverse=True,
+        )[:66]]
+        self.assertEqual(len(products), 67)
+        for index, product in enumerate(products):
+            self._add_item(product["code"], 999 if index == 0 else 1)
+        long_note = "Please keep these paired. " + "Long unbroken note " + "X" * 350
+        for product, note in ((products[0], long_note), (products[1], "Pair these")):
+            response = self._post_json("/api/cart/note", {"code": product["code"], "note": note})
+            self.assertEqual(response.status, 200)
+        self._fill_checkout()
+        self._submit_checkout()
+        self.assertEqual(len(self.sent_messages), 1)
+        message = self.sent_messages[0]
+        mime = message.as_bytes(policy=SMTP)
+        html = message.get_body(preferencelist=("html",)).get_content()
+        plain = message.get_body(preferencelist=("plain",)).get_content()
+        self.assertIn(long_note, plain)
+        csv_url = self.page.get_by_role("link", name="Download CSV").get_attribute("href")
+        self.assertIn(long_note, self.context.request.get(f"{self.base_url}{csv_url}").text())
+        preview = html
+        image_parts = [part for part in message.walk() if part.get_content_maintype() == "image"]
+        thumbnail_names = {Path(product["image"]).with_suffix(".jpg").name for product in products}
+        product_parts = [part for part in image_parts if part.get_filename() in thumbnail_names]
+        for part in image_parts:
+            cid = str(part["Content-ID"])[1:-1]
+            encoded = base64.b64encode(part.get_payload(decode=True)).decode("ascii")
+            preview = preview.replace(f"cid:{cid}", f"data:{part.get_content_type()};base64,{encoded}")
+        artifacts = self._artifact_dir()
+        artifacts.mkdir(parents=True, exist_ok=True)
+        (artifacts / "intercepted-email.eml").write_bytes(mime)
+        (artifacts / "email-size.json").write_text(json.dumps({
+            "item_count": len(products), "mime_bytes": len(mime),
+            "original_product_image_bytes": sum((image_root / p["image"]).stat().st_size for p in products),
+            "inline_product_image_bytes": sum(len(part.get_payload(decode=True)) for part in product_parts),
+            "pdf_bytes": sum(len(part.get_payload(decode=True)) for part in message.iter_attachments()
+                             if part.get_content_type() == "application/pdf"),
+        }, indent=2) + "\n")
+        self.page.set_content(preview, wait_until="load")
+        (artifacts / "receipt-preview.html").write_text(preview, encoding="utf-8")
+        for width in (320, 375, 600, 800):
+            with self.subTest(email_width=width):
+                self.page.set_viewport_size({"width": width, "height": 900})
+                self.page.screenshot(path=str(artifacts / f"receipt-{width}.png"))
+                self.assertTrue(self.page.evaluate(
+                    "document.documentElement.scrollWidth <= window.innerWidth"
+                ))
+                rows = self.page.locator("table:has(> thead) > tbody > tr")
+                self.assertEqual(rows.count(), 67)
+                for index, product in enumerate(products):
+                    row = rows.nth(index)
+                    self.assertEqual(row.locator("td strong").inner_text(), product["code"])
+                    self.assertTrue(row.locator("td strong").evaluate("""code => {
+                        const range = document.createRange(); range.selectNodeContents(code);
+                        const bounds = range.getBoundingClientRect();
+                        const cell = code.closest('td').getBoundingClientRect();
+                        return range.getClientRects().length === 1 && bounds.right <= cell.right;
+                    }"""))
+                note_cell = rows.first.locator("td").nth(2)
+                self.assertTrue(note_cell.inner_text().endswith("…"))
+                self.assertTrue(note_cell.evaluate("""cell => {
+                    const text = cell.firstElementChild;
+                    const style = getComputedStyle(text);
+                    return style.textOverflow === 'ellipsis' && style.overflow === 'hidden'
+                        && style.whiteSpace === 'nowrap' && text.scrollWidth > text.clientWidth;
+                }"""))
+                self.assertEqual(rows.nth(1).locator("td").nth(2).inner_text(), "Pair these")
+                self.assertEqual(rows.nth(2).locator("td").nth(2).inner_text(), "")
+                self.assertEqual(rows.first.locator("td").last.inner_text(), "999")
+        self.assertEqual(len(product_parts), 67)
+        for part in product_parts:
+            data = part.get_payload(decode=True)
+            self.assertEqual(part.get_content_type(), "image/jpeg")
+            self.assertLess(len(data), 12 * 1024)
+            with Image.open(io.BytesIO(data)) as thumbnail:
+                self.assertLessEqual(max(thumbnail.size), 112)
+        self.assertLess(len(mime), 1024 * 1024, "A 67-item receipt must stay below 1 MiB including its PDF")
 
     def test_email_outage_keeps_durable_order_and_download(self) -> None:
         self.fail_delivery = True

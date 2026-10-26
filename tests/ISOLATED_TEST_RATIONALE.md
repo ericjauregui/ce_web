@@ -14,6 +14,7 @@ Browser E2E tests are the primary suite. These isolated checks remain because th
 - Graph transport can send malformed MIME or break base64 and inline image references; a large order can silently omit product rows. A browser test with a stubbed Graph boundary proves the customer flow but not Graph wire serialization or 100-line completeness.
 - Attachment paths can escape the asset directory, and Pacific timestamps can be wrong across daylight saving time. The browser checkout now covers customer text escaping in the intercepted email; ordinary runs do not cover crafted attachment paths or seasonal dates reliably.
 - A large image-heavy order can repeatedly embed full-resolution JPEGs, make the private PDF too large to download, fail while resizing source images, or stop producing valid PDF bytes. The ordinary two-item browser checkout does not cover that stress case.
+- Email thumbnail conversion can mishandle transparent/palette images or EXIF rotation, upscale tiny photos, mutate original assets, or abort delivery on a corrupt photo. Crafted local image fixtures cover these codec failures; the browser suite covers the complete 67-item email size and responsive layout.
 
 ## Image generation and cache
 
