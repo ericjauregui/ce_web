@@ -398,18 +398,23 @@ class UXE2ETests(BaseE2ETest):
         expanded_height = panel.bounding_box()['height']
         self.page.screenshot(path=str(self._artifact_dir_for_capture() / 'collections-before-collapse.png'))
         toggle.click()
-        self.page.screenshot(path=str(self._artifact_dir_for_capture() / 'collections-collapse-start.png'))
-        self.page.wait_for_function('(height) => { const r = document.querySelector(".home-collection-panel").getBoundingClientRect(); return r.height > 1 && r.height < height - 1; }', arg=expanded_height)
-        mid_height = panel.bounding_box()['height']
+        mid_height = self.page.wait_for_function('''height => {
+            const current = document.querySelector('.home-collection-panel').getBoundingClientRect().height;
+            return current > 1 && current < height - 1 ? current : false;
+        }''', arg=expanded_height).json_value()
         self.assertGreater(mid_height, 1)
         self.assertLess(mid_height, expanded_height - 1)
+        self.page.screenshot(path=str(self._artifact_dir_for_capture() / 'collections-collapse-start.png'))
         self.page.screenshot(path=str(self._artifact_dir_for_capture() / 'collections-mid-collapse.png'))
         expect(navigation).to_be_hidden()
         toggle.click()
+        mid_height = self.page.wait_for_function('''height => {
+            const current = document.querySelector('.home-collection-panel').getBoundingClientRect().height;
+            return current > 1 && current < height - 1 ? current : false;
+        }''', arg=expanded_height).json_value()
+        self.assertGreater(mid_height, 1)
+        self.assertLess(mid_height, expanded_height - 1)
         self.page.screenshot(path=str(self._artifact_dir_for_capture() / 'collections-expand-start.png'))
-        self.page.wait_for_function('(height) => { const r = document.querySelector(".home-collection-panel").getBoundingClientRect(); return r.height > 1 && r.height < height - 1; }', arg=expanded_height)
-        self.assertGreater(panel.bounding_box()['height'], 1)
-        self.assertLess(panel.bounding_box()['height'], expanded_height - 1)
         # Reverse a transition with the same control; it should finish in the requested state.
         toggle.click()
         expect(navigation).to_be_hidden()

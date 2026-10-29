@@ -16,7 +16,7 @@
 .trade-show-mobile-bar { display: none; }
 @media (max-width: 767.98px) {
   .trade-show-mobile-bar:not([hidden]) { display: flex; position: fixed; bottom: 0; left: 0; right: 0; z-index: 1020; gap: 1rem; align-items: center; justify-content: space-between; padding: .6rem 1rem calc(.6rem + env(safe-area-inset-bottom)); background: #10100e; border-top: 1px solid #615334; }
-  .trade-show-mobile-booth { color: #fff1cf; display: flex; flex-direction: column; justify-content: center; min-height: 48px; font-weight: 700; text-decoration: none; white-space: nowrap; }
+  .trade-show-mobile-booth { color: #fff1cf; display: flex; flex-direction: column; justify-content: center; min-width: 0; min-height: 48px; font-weight: 700; line-height: 1.2; text-decoration: none; }
   .trade-show-mobile-booth small { color: #b8b4aa; font-size: .7rem; font-weight: 400; }
   .trade-show-mobile-bar .btn { width: auto; min-width: 145px; }
   body:has(.trade-show-page) { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }

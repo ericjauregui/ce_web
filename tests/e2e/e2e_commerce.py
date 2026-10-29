@@ -342,16 +342,21 @@ class CommerceE2ETests(BaseE2ETest):
                 ))
                 rows = self.page.locator("table:has(> thead) > tbody > tr")
                 self.assertEqual(rows.count(), 67)
-                for index, product in enumerate(products):
+                rendered_codes = rows.locator("td strong").all_inner_texts()
+                self.assertCountEqual(rendered_codes, [product["code"] for product in products])
+                for index in range(rows.count()):
                     row = rows.nth(index)
-                    self.assertEqual(row.locator("td strong").inner_text(), product["code"])
                     self.assertTrue(row.locator("td strong").evaluate("""code => {
                         const range = document.createRange(); range.selectNodeContents(code);
                         const bounds = range.getBoundingClientRect();
                         const cell = code.closest('td').getBoundingClientRect();
                         return range.getClientRects().length === 1 && bounds.right <= cell.right;
                     }"""))
-                note_cell = rows.first.locator("td").nth(2)
+                rows_by_code = {code: rows.nth(index) for index, code in enumerate(rendered_codes)}
+                first_row = rows_by_code[products[0]["code"]]
+                second_row = rows_by_code[products[1]["code"]]
+                third_row = rows_by_code[products[2]["code"]]
+                note_cell = first_row.locator("td").nth(2)
                 self.assertTrue(note_cell.inner_text().endswith("…"))
                 self.assertTrue(note_cell.evaluate("""cell => {
                     const text = cell.firstElementChild;
@@ -359,9 +364,9 @@ class CommerceE2ETests(BaseE2ETest):
                     return style.textOverflow === 'ellipsis' && style.overflow === 'hidden'
                         && style.whiteSpace === 'nowrap' && text.scrollWidth > text.clientWidth;
                 }"""))
-                self.assertEqual(rows.nth(1).locator("td").nth(2).inner_text(), "Pair these")
-                self.assertEqual(rows.nth(2).locator("td").nth(2).inner_text(), "")
-                self.assertEqual(rows.first.locator("td").last.inner_text(), "999")
+                self.assertEqual(second_row.locator("td").nth(2).inner_text(), "Pair these")
+                self.assertEqual(third_row.locator("td").nth(2).inner_text(), "")
+                self.assertEqual(first_row.locator("td").last.inner_text(), "999")
         self.assertEqual(len(product_parts), 67)
         for part in product_parts:
             data = part.get_payload(decode=True)

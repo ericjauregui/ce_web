@@ -89,12 +89,21 @@
             </dt>
             <dd><time datetime="{{ show.start_date }}">{{ show.dates_display }}</time></dd>
           </div>
+          {% if show.hours_display %}
+          <div>
+            <dt>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+              Hours
+            </dt>
+            <dd>{% for hours in show.hours_display %}{{ hours }}{% if not loop.last %}<br>{% endif %}{% endfor %}</dd>
+          </div>
+          {% endif %}
           <div>
             <dt>
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6.1 7-12a7 7 0 10-14 0c0 5.9 7 12 7 12z"/><circle cx="12" cy="9" r="2"/></svg>
               Venue
             </dt>
-            <dd><a class="trade-show-venue-link" href="{{ show.maps_url }}" target="_blank" rel="noopener noreferrer">{{ show.venue }}<br><span>{{ show.city }}</span></a></dd>
+            <dd><a class="trade-show-venue-link" href="{{ show.maps_url }}" target="_blank" rel="noopener noreferrer">{{ show.venue }}<br><span>{% if show.address %}{{ show.address }}<br>{% endif %}{{ show.city }}{% if show.postal_code %} {{ show.postal_code }}{% endif %}</span></a></dd>
           </div>
           <div>
             <dt>

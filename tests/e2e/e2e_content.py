@@ -156,8 +156,15 @@ class ContentJourneysE2ETests(BaseE2ETest):
                     path=str(self._artifact_dir() / f"owner-{path.strip('/')}-{width}.png"),
                     animations="disabled",
                 )
-                self.page.evaluate("window.scrollTo(0, 0)")
+                self.page.evaluate("window.scrollTo({top: 0, behavior: 'instant'})")
                 video.scroll_into_view_if_needed()
+                self.page.wait_for_function("""() => {
+                    const rect = document.getElementById('ownerVideo').getBoundingClientRect();
+                    const visibleWidth = Math.max(0, Math.min(rect.right, innerWidth) - Math.max(rect.left, 0));
+                    const visibleHeight = Math.max(0, Math.min(rect.bottom, innerHeight) - Math.max(rect.top, 0));
+                    return rect.width > 0 && rect.height > 0
+                        && visibleWidth * visibleHeight / (rect.width * rect.height) >= .35;
+                }""")
                 self.page.wait_for_timeout(300)
                 self.assertTrue(video.evaluate("v => v.paused"), "Preserve the viewer's pause")
                 video.evaluate("v => { v.volume = .5; }")
@@ -167,8 +174,12 @@ class ContentJourneysE2ETests(BaseE2ETest):
                 self.assertTrue(video.evaluate("v => v.muted"))
                 video.evaluate("v => v.play()")
                 self.page.set_viewport_size({"width": width, "height": 300})
-                self.page.evaluate("window.scrollTo(0, 0)")
-                self.page.wait_for_function("document.getElementById('ownerVideo').paused", timeout=5000)
+                self.page.evaluate("window.scrollTo({top: 0, behavior: 'instant'})")
+                self.page.wait_for_function("""() => {
+                    const video = document.getElementById('ownerVideo');
+                    const rect = video.getBoundingClientRect();
+                    return video.paused && (rect.top >= innerHeight || rect.bottom <= 0);
+                }""", timeout=5000)
                 self.assertEqual(self.page_errors, [])
 
         self.page.emulate_media(reduced_motion="reduce")
@@ -184,6 +195,8 @@ class ContentJourneysE2ETests(BaseE2ETest):
         self.goto("/trade-shows")
         self.assertIn(show["name"], self.page.locator("h1").inner_text())
         self.assertIn(show["booth"], self.page.locator("#booth-details").inner_text())
+        for hours in show.get("hours_display", []):
+            self.assertIn(hours, self.page.locator("#booth-details").inner_text())
 
         logo = self.page.locator("#booth-details img")
         logo.scroll_into_view_if_needed()
@@ -221,6 +234,58 @@ class ContentJourneysE2ETests(BaseE2ETest):
         social = self.page.locator('meta[property="og:image"]').get_attribute("content")
         self.assertEqual(social, self.page.locator('meta[name="twitter:image"]').get_attribute("content"))
         self.assertEqual(self.page.request.get(f"{self.base_url}{urlsplit(social).path}").status, 200)
+
+    def test_trade_show_hours_and_pending_booth_across_viewports(self) -> None:
+        config = json.loads(webapp.TRADE_SHOWS_PATH.read_text(encoding="utf-8"))
+        config["active_event"] = "jis-spring-2027"
+        spring = config["events"]["jis-spring-2027"]
+        spring["booth"] = "Booth details coming soon"
+        spring["postal_code"] = "33139"
+        spring["hours_display"] = [
+            "Sunday–Monday: 10 AM–6 PM",
+            "Tuesday: 10 AM–4 PM",
+        ]
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "trade_shows.json"
+            source.write_text(json.dumps(config), encoding="utf-8")
+            with patch.object(webapp, "TRADE_SHOWS_PATH", source):
+                for width in (320, 390, 768, 1280):
+                    self.page.set_viewport_size({"width": width, "height": 844})
+                    self.goto("/trade-shows")
+                    card = self.page.locator("#booth-details")
+                    self.assertIn("JIS Spring 2027", self.page.locator("h1").inner_text())
+                    for text in (
+                        "March 7–9, 2027",
+                        "Miami Beach Convention Center",
+                        "1901 Convention Center Drive",
+                        "Miami Beach, Florida 33139",
+                        "Booth details coming soon",
+                        "Sunday–Monday: 10 AM–6 PM",
+                        "Tuesday: 10 AM–4 PM",
+                    ):
+                        self.assertIn(text, card.inner_text())
+                    self.assertEqual(card.get_by_role("link", name="Show Details").get_attribute("href"),
+                                     "https://www.jisshow.com/spring/en-us.html")
+                    self.assertTrue(self.page.evaluate("document.documentElement.scrollWidth <= innerWidth"))
+                    self.assertTrue(card.evaluate("element => element.scrollWidth <= element.clientWidth"))
+                    card.screenshot(path=str(self._artifact_dir() / f"spring-show-card-{width}.png"),
+                                    animations="disabled")
+                    if width < 768:
+                        self.page.evaluate("window.scrollTo(0, document.querySelector('.trade-show-hero').offsetHeight + 150)")
+                        self.page.wait_for_function("!document.getElementById('showMobileBar').hidden")
+                        booth = self.page.locator("#showMobileBar .trade-show-mobile-booth").bounding_box()
+                        message = self.page.locator("#showMobileBar .btn").bounding_box()
+                        self.assertGreaterEqual(booth["x"], 0)
+                        self.assertLessEqual(booth["x"] + booth["width"], message["x"])
+                        self.assertLessEqual(message["x"] + message["width"], width)
+
+                config["active_event"] = "jck-2027"
+                config["events"]["jck-2027"].pop("hours_display", None)
+                source.write_text(json.dumps(config), encoding="utf-8")
+                self.page.reload(wait_until="domcontentloaded")
+                self.assertIn("JCK 2027", self.page.locator("h1").inner_text())
+                self.assertNotIn("Sunday–Monday: 10 AM–6 PM", self.page.locator("#booth-details").inner_text())
+                self.assertEqual(self.page.locator("#booth-details dt").filter(has_text="Hours").count(), 0)
 
     def test_trade_show_event_switch_and_stale_preview_fallback(self) -> None:
         config = json.loads(webapp.TRADE_SHOWS_PATH.read_text(encoding="utf-8"))

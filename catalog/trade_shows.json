@@ -1,5 +1,5 @@
 {
-  "active_event": "jis-fall-2026",
+  "active_event": "jis-spring-2027",
   "connect_event_override": null,
   "events": {
     "jis-fall-2026": {
@@ -41,15 +41,25 @@
       "start_date": "2027-03-07",
       "end_date": "2027-03-09",
       "time_zone": "America/New_York",
+      "hours_display": [
+        "Sunday–Monday: 10 AM–6 PM",
+        "Tuesday: 10 AM–4 PM"
+      ],
       "venue": "Miami Beach Convention Center",
       "address": "1901 Convention Center Drive",
       "city": "Miami Beach, Florida",
+      "postal_code": "33139",
       "booth": "Booth details coming soon",
       "official_url": "https://www.jisshow.com/spring/en-us.html",
       "logo_asset": "assets/trade-shows/jis-spring-logo.png",
       "hero_image": "assets/trade-shows/miami-night.webp",
       "mobile_hero_image": "assets/trade-shows/miami-mobile-v2.webp",
-      "video": {"asset": "assets/trade-shows/owner-welcome.mp4"},
+      "video": {
+        "asset": "assets/trade-shows/owner-welcome.mp4",
+        "eyebrow": "A message from our owner",
+        "title": "Meet the Owner",
+        "description": "A quick welcome from the owner and a look at what retailers can expect when they visit California Earrings at the show."
+      },
       "curated_products": [
         {"code": "254SB", "label": "Classic Studs", "image": "assets/trade-shows/product-254SB.webp"},
         {"code": "106BSB", "label": "Bezel Studs", "image": "assets/trade-shows/product-106BSB.webp"},
