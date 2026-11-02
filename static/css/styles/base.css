@@ -977,6 +977,18 @@ body:has(.product-detail-page) {
   white-space: nowrap;
 }
 
+/* Keep product names readable when the desktop details column is narrow. */
+@media (min-width: 992px) and (max-width: 1199.98px) {
+  .product-detail-title-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: .7rem;
+  }
+
+  .product-detail-code-badge {
+    justify-self: start;
+  }
+}
+
 @media (max-width: 767.98px) {
   .product-detail-title-row {
     grid-template-columns: minmax(0, 1fr) minmax(112px, 30%);

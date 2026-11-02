@@ -7,6 +7,49 @@ from tests.e2e.common import BaseE2ETest
 class UXE2ETests(BaseE2ETest):
     viewport = {"width": 390, "height": 844}
 
+    def test_product_identity_has_room_at_intermediate_desktop_widths(self):
+        # Local synthetic cart only; no checkout or email submission.
+        self.goto('/product/101SB')
+        title = self.page.locator('.product-detail-title')
+        badge = self.page.locator('.product-detail-code-badge')
+        expect(badge).to_have_text('101SB')
+        for width in (390, 768, 991, 992, 1024, 1180, 1199, 1200, 1440):
+            with self.subTest(width=width):
+                self.page.set_viewport_size({'width': width, 'height': 900})
+                self.page.evaluate('document.fonts.ready')
+                geometry = self.page.locator('.product-detail-title-row').evaluate('''row => {
+                  const title = row.querySelector('h1');
+                  const badge = row.querySelector('.product-detail-code-badge');
+                  return {row: row.getBoundingClientRect().toJSON(),
+                    title: title.getBoundingClientRect().toJSON(),
+                    badge: badge.getBoundingClientRect().toJSON(),
+                    fits: [title, badge].every(e => e.scrollWidth <= e.clientWidth + 1)};
+                }''')
+                row, heading, code = (geometry[key] for key in ('row', 'title', 'badge'))
+                self.assertTrue(geometry['fits'])
+                if 992 <= width < 1200:
+                    self.assertAlmostEqual(heading['width'], row['width'], delta=1)
+                    self.assertGreaterEqual(code['top'], heading['bottom'])
+                    self.assertAlmostEqual(code['left'], heading['left'], delta=1)
+                    self.assertLess(code['width'], row['width'] / 2)
+                else:
+                    # Preserve the existing phone/tablet and wide-desktop row.
+                    self.assertLessEqual(heading['right'], code['left'])
+                self.assertLessEqual(self.page.evaluate('document.documentElement.scrollWidth'), width)
+                expect(title).to_be_visible()
+                expect(self.page.locator('.product-detail-top-actions')).to_be_visible()
+                self.page.screenshot(path=str(self._artifact_dir_for_capture() / f'product-identity-{width}.png'), animations='disabled')
+        self.page.set_viewport_size({'width': 1180, 'height': 900})
+        add = self.page.get_by_role('button', name='Add to Order', exact=True)
+        add.focus()
+        self.page.keyboard.press('Enter')
+        qty = self.page.get_by_role('spinbutton', name='Quantity for 101SB', exact=True)
+        expect(qty).to_have_value('1')
+        self.page.get_by_role('button', name='Increase quantity for 101SB', exact=True).click()
+        expect(qty).to_have_value('2')
+        self.page.get_by_role('button', name='Remove 101SB from order', exact=True).click()
+        expect(add).to_have_text('Add to Order')
+
     def test_checkout_names_validation_and_action_wording(self):
         self.page.route(re.compile(r'/static/reels/[^?]+\.mp4(?:\?.*)?$', re.I), lambda r: r.fulfill(status=204, body=''))
         self.add_first_catalog_item_to_cart()
