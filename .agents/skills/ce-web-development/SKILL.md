@@ -18,6 +18,7 @@ Use this skill to avoid rediscovering product decisions and regression-prone beh
 
 ## Read the relevant reference
 
+- [Holistic UI foundation](references/holistic-ui.md): shared design principles, storefront-specific constraints, selective reference use and performance/functionality gates. Use for app-wide or targeted visual polish; native component stacks are not storefront dependencies.
 - [Responsive UI and browser behavior](references/ui-and-media.md): catalog buttons/chips, sticky actions, mini-cart, WhatsApp drag, video sound.
 - [Catalog and trade shows](references/content.md): content sources, copy constraints, reusable events, SEO.
 - [Team contact assets](references/team-assets.md): branded static vCard QR generation, portraits, social previews, contact cards.
@@ -32,3 +33,4 @@ Use this skill to avoid rediscovering product decisions and regression-prone beh
 4. Report the change, verification, and whether it is local, committed, or deployed. A skipped test, simulated mobile viewport, or screenshot is not real-device evidence.
 
 Use existing runbooks for deployment/database work within the user's authorized scope. This skill does not initiate deployments, real orders, or email delivery by itself.
+
