@@ -8,6 +8,33 @@ from tests.e2e.common import BaseE2ETest
 class UXE2ETests(BaseE2ETest):
     viewport = {"width": 390, "height": 844}
 
+    def test_checkout_state_suggestions_follow_country_and_allow_free_text(self):
+        self.context.request.post(f'{self.base_url}/api/cart/set', data={'code': '101SB', 'qty': 1})
+        self.goto('/checkout')
+        country = self.page.locator('#checkoutCountry')
+        state = self.page.locator('#checkoutState')
+        state.fill('Calif')
+        self.page.locator('#checkoutStateListbox').get_by_role('option', name='California', exact=True).click()
+        expect(state).to_have_value('California')
+        country.fill('Canada')
+        country.press('Enter')
+        state.fill('Ont')
+        self.page.locator('#checkoutStateListbox').get_by_role('option', name='Ontario', exact=True).click()
+        expect(state).to_have_value('Ontario')
+        country.fill('')
+        state.fill('Ontario')
+        self.page.locator('#checkoutStateListbox').get_by_role('option', name='Ontario Canada', exact=True).click()
+        expect(country).to_have_value('Canada')
+        state.fill('My custom region')
+        state.press('Tab')
+        expect(state).to_have_value('My custom region')
+        country.fill('United States')
+        country.press('Enter')
+        state.fill('Calif')
+        self.page.locator('#checkoutStateListbox').get_by_role('option', name='California', exact=True).click()
+        expect(state).to_have_value('California')
+        self.page.screenshot(path=str(self._artifact_dir_for_capture() / 'checkout-state-country-switch.png'))
+
     def test_checkout_combobox_does_not_commit_composing_keystrokes(self):
         self.context.request.post(f'{self.base_url}/api/cart/set', data={'code': '101SB', 'qty': 1})
         self.goto('/checkout')

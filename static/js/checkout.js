@@ -143,21 +143,29 @@
     },
   );
 
-  const stateOptionsByCountry = {};
-  const allStateOptions = [];
+  const stateOptionsByCountry = new Map();
+  const stateOffsetsByCountry = new Map();
+  let allStateOptions = null;
   let stateSourceIndex = 0;
-
   countryOptions.forEach(function (countryOption) {
-    const stateNames = subdivisionsByCountryKey[countryOption.key] || [];
-    const options = stateNames.map(function (stateName) {
+    stateOffsetsByCountry.set(countryOption.key, stateSourceIndex);
+    stateSourceIndex += (subdivisionsByCountryKey[countryOption.key] || []).length;
+  });
+
+  function getStateOptions(countryKey) {
+    if (stateOptionsByCountry.has(countryKey)) return stateOptionsByCountry.get(countryKey);
+    const countryOption = countryOptions.find(option => option.key === countryKey);
+    if (!countryOption) return [];
+    const stateNames = subdivisionsByCountryKey[countryKey] || [];
+    const options = stateNames.map(function (stateName, index) {
       return {
-        id: `${countryOption.key}:${stateName}`,
+        id: `${countryKey}:${stateName}`,
         key: stateName,
         label: stateName,
         value: stateName,
         sortLabel: stateName,
-        sourceIndex: stateSourceIndex++,
-        countryKey: countryOption.key,
+        sourceIndex: stateOffsetsByCountry.get(countryKey) + index,
+        countryKey,
         countryLabel: countryOption.label,
         matchTexts: [
           normalizeLookupValue(stateName),
@@ -165,9 +173,16 @@
         ],
       };
     });
-    stateOptionsByCountry[countryOption.key] = options;
-    allStateOptions.push.apply(allStateOptions, options);
-  });
+    stateOptionsByCountry.set(countryKey, options);
+    return options;
+  }
+
+  function getAllStateOptions() {
+    if (!allStateOptions) {
+      allStateOptions = countryOptions.flatMap(option => getStateOptions(option.key));
+    }
+    return allStateOptions;
+  }
 
   function compareOptions(left, right) {
     const labelCompare = left.sortLabel.localeCompare(right.sortLabel);
@@ -816,8 +831,8 @@
     getOptions: function (query) {
       const selectedCountryKey = countryKeyInput.value.trim();
       const sourceOptions = selectedCountryKey
-        ? stateOptionsByCountry[selectedCountryKey] || []
-        : allStateOptions;
+        ? getStateOptions(selectedCountryKey)
+        : getAllStateOptions();
 
       return filterOptions(sourceOptions, query, {
         limit: 14,
