@@ -456,13 +456,19 @@
       openMenu();
     });
 
-    menu.addEventListener("pointerdown", function (event) {
+    menu.addEventListener("mousedown", function (event) {
+      if (event.target.closest(".checkout-combobox__option")) event.preventDefault();
+    });
+
+    menu.addEventListener("click", function (event) {
       const optionNode = event.target.closest(".checkout-combobox__option");
       if (!optionNode) return;
-      event.preventDefault();
       const nextIndex = Number(optionNode.dataset.index);
       if (!Number.isInteger(nextIndex) || !currentOptions[nextIndex]) return;
-      selectOption(currentOptions[nextIndex]);
+      const option = currentOptions[nextIndex];
+      // Refocusing can rebuild the menu; keep the option the user activated.
+      input.focus({preventScroll: true});
+      selectOption(option);
     });
 
     menu.addEventListener("mousemove", function (event) {

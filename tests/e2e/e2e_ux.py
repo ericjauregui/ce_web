@@ -8,6 +8,42 @@ from tests.e2e.common import BaseE2ETest
 class UXE2ETests(BaseE2ETest):
     viewport = {"width": 390, "height": 844}
 
+    def test_checkout_options_commit_on_activation_not_touch_start(self):
+        self.context.request.post(f'{self.base_url}/api/cart/set', data={'code': '101SB', 'qty': 1})
+        self.goto('/checkout')
+        self.page.evaluate("""() => {
+          window.optionSelections = 0;
+          document.addEventListener('ce:checkout-option-selected', () => window.optionSelections++);
+        }""")
+        country = self.page.locator('#checkoutCountry')
+        country.fill('Can')
+        option = self.page.locator('#checkoutCountryListbox').get_by_role('option', name='Canada', exact=True)
+        option.dispatch_event('pointerdown', {'pointerType': 'touch', 'pointerId': 1, 'bubbles': True})
+        option.dispatch_event('pointermove', {'pointerType': 'touch', 'pointerId': 1, 'clientY': 100, 'bubbles': True})
+        option.dispatch_event('pointercancel', {'pointerType': 'touch', 'pointerId': 1, 'bubbles': True})
+        expect(country).to_have_value('Can')
+        expect(country).to_have_attribute('aria-expanded', 'true')
+        self.assertEqual(self.page.evaluate('window.optionSelections'), 0)
+        option.click()
+        expect(country).to_have_value('Canada')
+        expect(country).to_be_focused()
+        expect(country).to_have_attribute('aria-expanded', 'false')
+        self.assertEqual(self.page.evaluate('window.optionSelections'), 1)
+        country.fill('United')
+        option = self.page.locator('#checkoutCountryListbox').get_by_role('option', name='United Kingdom', exact=True)
+        option.focus()
+        option.press('Enter')
+        expect(country).to_have_value('United Kingdom')
+        expect(country).to_be_focused()
+        expect(country).to_have_attribute('aria-expanded', 'false')
+        self.assertEqual(self.page.evaluate('window.optionSelections'), 2)
+        country.fill('Can')
+        country.press('ArrowDown')
+        country.press('Enter')
+        expect(country).to_have_value('Canada')
+        self.assertEqual(self.page.evaluate('window.optionSelections'), 3)
+        self.page.screenshot(path=str(self._artifact_dir_for_capture() / 'checkout-option-activation.png'))
+
     def test_checkout_query_edit_clears_previous_option_highlight(self):
         self.context.request.post(f'{self.base_url}/api/cart/set', data={'code': '101SB', 'qty': 1})
         self.goto('/checkout')
