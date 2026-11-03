@@ -8,6 +8,28 @@ from tests.e2e.common import BaseE2ETest
 class UXE2ETests(BaseE2ETest):
     viewport = {"width": 390, "height": 844}
 
+    def test_checkout_query_edit_clears_previous_option_highlight(self):
+        self.context.request.post(f'{self.base_url}/api/cart/set', data={'code': '101SB', 'qty': 1})
+        self.goto('/checkout')
+        country = self.page.locator('#checkoutCountry')
+        country.fill('United')
+        country.press('ArrowDown')
+        country.press('ArrowDown')
+        self.assertTrue(country.get_attribute('aria-activedescendant'))
+        country.fill('Can')
+        self.assertIsNone(country.get_attribute('aria-activedescendant'))
+        expect(self.page.locator('#checkoutCountryListbox .is-active')).to_have_count(0)
+        country.press('ArrowDown')
+        country.press('Enter')
+        expect(country).to_have_value('Canada')
+        expect(self.page.locator('#checkoutCountryKey')).to_have_value('ca')
+        country.fill('United Kingdom')
+        self.assertIsNone(country.get_attribute('aria-activedescendant'))
+        country.press('Enter')
+        expect(country).to_have_value('United Kingdom')
+        expect(self.page.locator('#checkoutCountryKey')).to_have_value('gb')
+        self.page.screenshot(path=str(self._artifact_dir_for_capture() / 'checkout-fresh-option-selection.png'))
+
     def test_checkout_country_prefix_typing_commits_only_on_selection_or_blur(self):
         self.context.request.post(f'{self.base_url}/api/cart/set', data={'code': '101SB', 'qty': 1})
         self.goto('/checkout')

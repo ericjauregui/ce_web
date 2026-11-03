@@ -390,6 +390,7 @@
 
     input.addEventListener("focus", openMenu);
     input.addEventListener("input", function () {
+      activeIndex = -1;
       config.onInputSync(input.value);
       openMenu();
     });
