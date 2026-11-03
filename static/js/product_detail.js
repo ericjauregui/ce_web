@@ -55,7 +55,7 @@ async function setQtyOnServer(card, nextQty) {
 
 }
 
-document.addEventListener("DOMContentLoaded", async () => {
+document.addEventListener("DOMContentLoaded", () => {
   const card = document.querySelector(".product-detail-meta-card[data-code]");
   if (!card) return;
 
@@ -104,11 +104,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       window.prompt("Copy this product link", shareUrl);
     });
   }
-
-  try {
-    const countData = await fetch("/api/cart/count").then((r) => r.json());
-    updateCartBadge(countData.total_items || 0);
-  } catch (_err) {}
 
   document.addEventListener("click", async (event) => {
     const addButton = event.target.closest(".add-to-cart-btn");

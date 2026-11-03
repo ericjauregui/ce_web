@@ -78,6 +78,28 @@ class UXE2ETests(BaseE2ETest):
         self.page.wait_for_url('**/product/*')
         expect(self.page.locator('.product-detail-title')).to_be_visible()
 
+    def test_product_order_controls_do_not_wait_for_background_count(self):
+        self.context.request.post(f'{self.base_url}/api/cart/set', data={'code': '101SB', 'qty': 2})
+        self.context.request.post(f'{self.base_url}/api/cart/set', data={'code': '102SB', 'qty': 3})
+        stalled_counts = []
+        self.page.route('**/api/cart/count', lambda route: stalled_counts.append(route))
+        self.goto('/product/101SB')
+        card = self.page.locator('.product-detail-meta-card')
+        button = self.page.locator('.product-detail-top-add-btn')
+        expect(card.locator('.product-qty-input')).to_have_value('2')
+        expect(button).to_have_text('2 items in order')
+        expect(self.page.locator('#cartCountBadge')).to_have_text('5')
+        button.click()
+        expect(card.locator('.product-qty-input')).to_have_value('3')
+        expect(button).to_have_text('3 items in order')
+        expect(self.page.locator('#cartCountBadge')).to_have_text('6')
+        card.locator('.qty-adjust-btn').last.click()
+        expect(card.locator('.product-qty-input')).to_have_value('4')
+        expect(self.page.locator('#cartCountBadge')).to_have_text('7')
+        self.assertEqual(stalled_counts, [])
+        self.assertEqual(self.context.request.get(f'{self.base_url}/api/cart/count').json()['total_items'], 7)
+        self.page.screenshot(path=str(self._artifact_dir_for_capture() / 'product-controls-without-count-dependency.png'))
+
     def test_product_identity_has_room_at_intermediate_desktop_widths(self):
         # Local synthetic cart only; no checkout or email submission.
         self.goto('/product/101SB')
