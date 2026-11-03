@@ -442,7 +442,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const shouldResetToLanding =
     currentPath === "/" &&
     isReloadNavigation() &&
-    (query !== "" || hash.startsWith("#section-"));
+    query === "" && hash.startsWith("#section-");
 
   if (shouldResetToLanding) {
     window.history.replaceState(null, "", currentPath);

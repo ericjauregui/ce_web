@@ -375,6 +375,30 @@ class UXE2ETests(BaseE2ETest):
     def test_owner_video_reduced_motion_waits_for_explicit_play(self):
         self._assert_owner_waits_for_explicit_play(save_data=False)
 
+    def test_search_refresh_keeps_query_results_and_clear_recovery(self):
+        self.page.route(re.compile(r'/static/reels/[^?]+\.mp4(?:\?.*)?$', re.I), lambda r: r.fulfill(status=204, body=''))
+        for suffix in ('', '#section-search-results'):
+            with self.subTest(suffix=suffix):
+                self.goto('/?q=101SB' + suffix)
+                codes = self.page.locator('.product-detail-link').all_text_contents()
+                self.page.reload(wait_until='domcontentloaded')
+                expect(self.page.locator('#section-search-results')).to_be_visible()
+                self.assertEqual(parse_qs(urlsplit(self.page.url).query), {'q': ['101SB']})
+                expect(self.page.locator('.nav-search-input')).to_have_value('101SB')
+                self.assertEqual(self.page.locator('.product-detail-link').all_text_contents(), codes)
+                self.page.locator('.nav-search-trigger').click()
+                with self.page.expect_navigation(url=f'{self.base_url}/', wait_until='domcontentloaded'):
+                    self.page.locator('.nav-search-input').fill('')
+                expect(self.page.locator('#catalogCollectionPicker')).to_be_visible()
+                expect(self.page.locator('.nav-search-input')).to_have_value('')
+                self.assertGreater(self.page.locator('.product-detail-link').count(), len(codes))
+        self.page.screenshot(path=str(self._artifact_dir_for_capture() / 'search-refresh-clear-full-catalog.png'))
+        # Keep the established collection-only refresh reset.
+        self.goto('/#section-studs')
+        self.page.reload(wait_until='domcontentloaded')
+        self.page.wait_for_url(f'{self.base_url}/')
+        expect(self.page.locator('#catalogCollectionPicker')).to_be_visible()
+
     def test_clearing_search_restores_images_drawer_and_history(self):
         self.page.route(re.compile(r'/static/reels/[^?]+\.mp4(?:\?.*)?$', re.I), lambda r: r.fulfill(status=204, body=''))
         self.goto('/about')
