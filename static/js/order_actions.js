@@ -22,37 +22,39 @@
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 15000);
     try {
-      response = await fetch(url, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload || {}), signal: controller.signal});
-    } catch (_) {
-      throw new Error('We couldn’t confirm your update. Check your connection and review your order before trying again.');
+      try {
+        response = await fetch(url, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload || {}), signal: controller.signal});
+      } catch (_) {
+        throw new Error('We couldn’t confirm your update. Check your connection and review your order before trying again.');
+      }
+      if (!response.ok) {
+        const error = new Error(response.status === 410
+          ? 'The 30-second Undo window has ended.'
+          : response.status === 429
+          ? 'Please wait a moment, then try again. Your update was not saved.'
+          : response.status >= 500
+          ? 'We couldn’t confirm your update. Review your order before trying again.'
+          : 'We couldn’t save your update. Please try again.');
+        error.status = response.status;
+        throw error;
+      }
+      let data;
+      try { data = await response.json(); } catch (_) {
+        throw new Error('We couldn’t confirm your update. Review your order before trying again.');
+      }
+      if (!data || data.ok !== true) throw new Error('We couldn’t save your update. Please try again.');
+      const valid = url.endsWith('/note')
+        ? typeof data.note === 'string'
+        : Number.isInteger(data.total_items) && Number.isInteger(data.distinct_items) &&
+          (!/\/(add|set)$/.test(url) || Number.isInteger(data.qty));
+      if (!valid) throw new Error('We couldn’t confirm your update. Review your order before trying again.');
+      if (url.endsWith('/undo') && (typeof data.rows_html !== 'string' || !Number.isFinite(data.undo_seconds))) {
+        throw new Error('We couldn’t confirm your update. Review your order before trying again.');
+      }
+      return data;
     } finally {
       clearTimeout(timeout);
     }
-    if (!response.ok) {
-      const error = new Error(response.status === 410
-        ? 'The 30-second Undo window has ended.'
-        : response.status === 429
-        ? 'Please wait a moment, then try again. Your update was not saved.'
-        : response.status >= 500
-        ? 'We couldn’t confirm your update. Review your order before trying again.'
-        : 'We couldn’t save your update. Please try again.');
-      error.status = response.status;
-      throw error;
-    }
-    let data;
-    try { data = await response.json(); } catch (_) {
-      throw new Error('We couldn’t confirm your update. Review your order before trying again.');
-    }
-    if (!data || data.ok !== true) throw new Error('We couldn’t save your update. Please try again.');
-    const valid = url.endsWith('/note')
-      ? typeof data.note === 'string'
-      : Number.isInteger(data.total_items) && Number.isInteger(data.distinct_items) &&
-        (!/\/(add|set)$/.test(url) || Number.isInteger(data.qty));
-    if (!valid) throw new Error('We couldn’t confirm your update. Review your order before trying again.');
-    if (url.endsWith('/undo') && (typeof data.rows_html !== 'string' || !Number.isFinite(data.undo_seconds))) {
-      throw new Error('We couldn’t confirm your update. Review your order before trying again.');
-    }
-    return data;
   }
   function run(action, rollback = () => {}, message = 'Order updated.') {
     if (pending++ === 0) {

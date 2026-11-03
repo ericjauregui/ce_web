@@ -235,6 +235,44 @@ class UXE2ETests(BaseE2ETest):
         expect(self.page.locator('#orderFeedback')).to_be_hidden()
         self.assertEqual(self.page_errors, [])
 
+    def test_stalled_cart_response_body_releases_controls_for_review(self):
+        self.goto('/product/101SB')
+        # A real local mutation saves the cookie; only its response body is
+        # replaced by an unfinished stream. No production request or retry.
+        self.page.evaluate("""() => {
+          const originalFetch = window.fetch.bind(window);
+          window.stalledAddRequests = 0;
+          window.fetch = async (url, options) => {
+            const response = await originalFetch(url, options);
+            if (url !== '/api/cart/add') return response;
+            window.stalledAddRequests++;
+            await response.text();
+            const body = new ReadableStream({start(controller) {
+              const abort = () => controller.error(new DOMException('Aborted', 'AbortError'));
+              if (options.signal.aborted) abort();
+              else options.signal.addEventListener('abort', abort, {once: true});
+            }});
+            return new Response(body, {status: response.status, headers: response.headers});
+          };
+        }""")
+        button = self.page.locator('.product-detail-top-add-btn')
+        button.click()
+        expect(button).to_be_disabled()
+        expect(self.page.locator('#orderStatus')).to_have_text('Saving changes…')
+        expect(self.page.locator('#orderFeedback')).to_contain_text('couldn’t confirm', timeout=20000)
+        expect(self.page.locator('#orderFeedback')).to_contain_text('Review your order before trying again')
+        expect(self.page.locator('#orderStatus')).to_be_empty()
+        expect(button).to_be_enabled()
+        self.assertEqual(self.page.evaluate('window.stalledAddRequests'), 1)
+        self.page.locator('#cartLink').click()
+        self.page.wait_for_url('**/cart')
+        row = self.page.locator('#cartTableBody .qty-control[data-code="101SB"]')
+        expect(row.locator('.product-qty-input')).to_have_value('1')
+        row.locator('.qty-adjust-btn').last.click()
+        expect(row.locator('.product-qty-input')).to_have_value('2')
+        expect(self.page.locator('#orderStatus')).to_have_text('Order updated.')
+        self.page.screenshot(path=str(self._artifact_dir_for_capture() / 'stalled-body-order-recovery.png'))
+
     def test_server_error_after_saved_add_requires_review_not_automatic_retry(self):
         self.page.route(re.compile(r'/static/reels/[^?]+\.mp4(?:\?.*)?$', re.I), lambda r: r.fulfill(status=204, body=''))
         self.goto('/')
