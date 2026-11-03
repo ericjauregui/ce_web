@@ -316,39 +316,6 @@
 
                 let clearInFlight = false;
 
-                async function restoreHomeContentWithoutReload() {
-                  const response = await fetch("/", {
-                    method: "GET",
-                    headers: { Accept: "text/html" },
-                    credentials: "same-origin",
-                  });
-
-                  if (!response.ok) {
-                    throw new Error(`Failed to fetch home content: ${response.status}`);
-                  }
-
-                  const html = await response.text();
-                  const parser = new DOMParser();
-                  const nextDoc = parser.parseFromString(html, "text/html");
-                  const nextMain = nextDoc.querySelector("main");
-                  const currentMain = document.querySelector("main");
-
-                  if (!nextMain || !currentMain) {
-                    throw new Error("Unable to locate page main content");
-                  }
-
-                  currentMain.replaceWith(nextMain);
-                  if (nextDoc.title) document.title = nextDoc.title;
-                  window.history.replaceState(null, "", "/");
-                  window.scrollTo({ top: 0, behavior: "smooth" });
-
-                  document.dispatchEvent(
-                    new CustomEvent("ce:content-replaced", {
-                      detail: { source: "search-clear" },
-                    })
-                  );
-                }
-
               if (input) {
                 input.addEventListener("keydown", (e) => {
                   if (e.key === "Enter" && !e.isComposing) {
@@ -378,11 +345,10 @@
                     if (onSamePath) {
                       const hasSearchState = window.location.search.includes("q=") || window.location.hash.startsWith("#section-");
                       if (hasSearchState) {
-                        try {
-                          await restoreHomeContentWithoutReload();
-                        } catch (_err) {
-                          window.location.assign(target.pathname);
-                        }
+                        // Reload the document so media observers and order controls
+                        // bind to the restored catalog. Preserve the replaced search history.
+                        await window.CEOrder?.whenIdle();
+                        window.location.replace(target.pathname);
                         return;
                       }
 

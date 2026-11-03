@@ -375,6 +375,50 @@ class UXE2ETests(BaseE2ETest):
     def test_owner_video_reduced_motion_waits_for_explicit_play(self):
         self._assert_owner_waits_for_explicit_play(save_data=False)
 
+    def test_clearing_search_restores_images_drawer_and_history(self):
+        self.page.route(re.compile(r'/static/reels/[^?]+\.mp4(?:\?.*)?$', re.I), lambda r: r.fulfill(status=204, body=''))
+        self.goto('/about')
+        self.goto('/?q=101SB')
+        self.page.locator('.nav-search-trigger').click()
+        with self.page.expect_navigation(url=f'{self.base_url}/', wait_until='domcontentloaded'):
+            self.page.locator('.nav-search-input').fill('')
+        expect(self.page.locator('.nav-search-input')).to_have_value('')
+        card = self.page.locator('.product-card').first
+        card.scroll_into_view_if_needed()
+        self.page.wait_for_function('image => image.complete && image.naturalWidth > 0',
+                                    arg=card.locator('img.product-img').element_handle())
+        code = card.locator('.add-to-cart-btn').get_attribute('data-code')
+        card.locator('.add-to-cart-btn').click()
+        expect(card.locator('.product-qty-input')).to_have_value('1')
+        self.page.get_by_role('button', name='Review Order', exact=True).click()
+        drawer = self.page.locator('#cartDrawer')
+        expect(drawer).to_have_class(re.compile(r'\bshow\b'))
+        expect(drawer.locator(f'.qty-control[data-code="{code}"] .product-qty-input')).to_have_value('1')
+        self.page.screenshot(path=str(self._artifact_dir_for_capture() / 'search-clear-working-order-drawer.png'))
+        drawer.get_by_role('button', name='Close order summary', exact=True).click()
+        expect(drawer).not_to_have_class(re.compile(r'\bshow\b'))
+        self.page.go_back()
+        self.page.wait_for_url('**/about')
+        expect(self.page.get_by_role('heading', name='About Us', exact=True)).to_be_visible()
+
+    def test_clearing_search_waits_for_pending_cart_write(self):
+        self.page.route(re.compile(r'/static/reels/[^?]+\.mp4(?:\?.*)?$', re.I), lambda r: r.fulfill(status=204, body=''))
+        self.goto('/?q=101SB')
+        pending = []
+        self.page.route('**/api/cart/add', lambda route: pending.append(route))
+        button = self.page.locator('.add-to-cart-btn').first
+        code = button.get_attribute('data-code')
+        button.click()
+        expect(button).to_be_disabled()
+        self.page.locator('.nav-search-trigger').click()
+        self.page.locator('.nav-search-input').fill('')
+        self.assertEqual(parse_qs(urlsplit(self.page.url).query), {'q': ['101SB']})
+        self.assertEqual(len(pending), 1)
+        with self.page.expect_navigation(url=f'{self.base_url}/', wait_until='domcontentloaded'):
+            pending[0].continue_()
+        expect(self.page.locator(f'.product-qty-control[data-code="{code}"] .product-qty-input')).to_have_value('1')
+        self.assertEqual(self.context.request.get(f'{self.base_url}/api/cart/count').json()['total_items'], 1)
+
     def test_product_catalog_return_preserves_search(self):
         for width in (390, 1280):
             with self.subTest(width=width):
