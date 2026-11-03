@@ -46,6 +46,7 @@ const undoStorageKey = 'ceCartUndoV1';
 const undoDurationMs = 30000;
 const undoEntries = new Map();
 const noteTimers = new Map();
+const pendingNotes = new Map();
 const cartBody = document.getElementById('cartTableBody');
 let totalQuantity = Number(document.getElementById('cartTotalQty').textContent);
 function clampQty(value) { return Math.max(0, Math.min(999, parseInt(value, 10) || 0)); }
@@ -209,11 +210,18 @@ function saveNote(input) {
   clearTimeout(noteTimers.get(input));
   noteTimers.delete(input);
   const note = input.value.trim().slice(0, 500);
-  return CEOrder.run(async () => {
+  const pending = pendingNotes.get(input);
+  if (pending && pending.note === note) return pending.promise;
+  const entry = {note};
+  entry.promise = CEOrder.run(async () => {
     if (!input.isConnected || input.closest('.is-removed') || note === input.dataset.savedNote) return;
     const data = await CEOrder.post('/api/cart/note', {code: input.dataset.code, note});
     input.dataset.savedNote = data.note;
-  }, () => {}, 'Item note saved.');
+  }, () => {}, 'Item note saved.').finally(() => {
+    if (pendingNotes.get(input) === entry) pendingNotes.delete(input);
+  });
+  pendingNotes.set(input, entry);
+  return entry.promise;
 }
 CEOrder.flush = async () => {
   const results = await Promise.all([...cartRoot.querySelectorAll('tr:not(.is-removed) .item-note-input')]

@@ -303,6 +303,34 @@ class UXE2ETests(BaseE2ETest):
         self.assertEqual(len(mutations), 1)
         self.page.screenshot(path=str(self._artifact_dir_for_capture() / 'server-error-review-saved-order.png'))
 
+    def test_pending_note_blur_and_checkout_share_failure_without_resend(self):
+        self.context.request.post(f'{self.base_url}/api/cart/set', data={'code': '101SB', 'qty': 1})
+        self.goto('/cart')
+        held = []
+        self.page.route('**/api/cart/note', lambda route: held.append(route))
+        note = self.page.locator('.item-note-input[data-code="101SB"]')
+        note.fill('Synthetic pending note')
+        # Blur starts the save; the link guard flushes that same dirty note.
+        self.page.get_by_role('link', name='Checkout', exact=True).click()
+        expect(self.page.locator('#orderStatus')).to_have_text('Saving changes…')
+        self.assertEqual(len(held), 1)
+        held[0].fulfill(status=503, json={'ok': False})
+        expect(self.page.locator('#orderFeedback')).to_contain_text('couldn’t confirm')
+        expect(self.page.locator('#orderStatus')).to_be_empty()
+        self.assertFalse(self.page.evaluate('window.CEOrder.whenIdle()'))
+        self.assertEqual(len(held), 1)
+        self.assertEqual(urlsplit(self.page.url).path, '/cart')
+        expect(note).to_have_value('Synthetic pending note')
+        # Deliberate retry after settlement is still allowed and sends once.
+        self.page.get_by_role('link', name='Checkout', exact=True).click()
+        expect(self.page.locator('#orderStatus')).to_have_text('Saving changes…')
+        self.assertEqual(len(held), 2)
+        held[1].continue_()
+        self.page.wait_for_url('**/checkout')
+        expect(self.page.locator('.checkout-items-table')).to_contain_text('Synthetic pending note')
+        self.assertEqual(len(held), 2)
+        self.page.screenshot(path=str(self._artifact_dir_for_capture() / 'coalesced-note-explicit-retry.png'))
+
     def test_item_note_failure_blocks_navigation_and_retry_preserves_text(self):
         self.add_first_catalog_item_to_cart()
         self.goto('/cart')
