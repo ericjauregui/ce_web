@@ -351,6 +351,45 @@ class UXE2ETests(BaseE2ETest):
         self.page.wait_for_url('**/checkout')
         expect(self.page.locator('.checkout-items-table')).not_to_contain_text('Synthetic note to preserve')
 
+    def test_note_typed_during_undo_survives_row_reconciliation(self):
+        for code in ('101SB', '102SB'):
+            self.context.request.post(f'{self.base_url}/api/cart/set', data={'code': code, 'qty': 1})
+        self.goto('/cart')
+        self.page.locator('.qty-remove[data-code="101SB"]').click()
+        undo = self.page.get_by_role('button', name='Undo removal of 101SB')
+        expect(undo).to_be_visible()
+        held = []
+        self.page.route('**/api/cart/undo', lambda route: held.append(route))
+        notes = []
+        self.page.route('**/api/cart/note', lambda route: notes.append(route))
+        undo.click()
+        self.page.wait_for_function("document.getElementById('orderStatus').textContent === 'Saving changes…'")
+        note = self.page.locator('.item-note-input[data-code="102SB"]')
+        note.fill('Draft typed while Undo is waiting')
+        self.page.wait_for_timeout(400)  # Let debounce enqueue behind Undo.
+        self.assertEqual(len(held), 1)
+        held[0].continue_()
+        expect(self.page.locator('.qty-remove[data-code="101SB"]')).to_be_visible()
+        expect(note).to_have_value('Draft typed while Undo is waiting')
+        expect(note).to_be_focused()
+        self.page.wait_for_timeout(100)
+        self.assertEqual(len(notes), 1)
+        # A later edit must not be overwritten by an earlier save's response.
+        note.fill('Newer draft after Undo')
+        notes[0].continue_()
+        self.page.wait_for_timeout(400)
+        self.assertEqual(len(notes), 2)
+        notes[1].fulfill(status=503, json={'ok': False})
+        expect(self.page.locator('#orderFeedback')).to_contain_text('couldn’t confirm')
+        expect(note).to_have_value('Newer draft after Undo')
+        self.page.unroute('**/api/cart/note')
+        self.page.get_by_role('link', name='Checkout', exact=True).click()
+        self.page.wait_for_url('**/checkout')
+        expect(self.page.locator('.checkout-items-table')).to_contain_text('Newer draft after Undo')
+        self.goto('/cart')
+        expect(self.page.locator('.item-note-input[data-code="102SB"]')).to_have_value('Newer draft after Undo')
+        self.page.screenshot(path=str(self._artifact_dir_for_capture() / 'undo-preserves-concurrent-note.png'))
+
     def test_clear_order_failure_and_undo(self):
         self.page.route(re.compile(r'/static/reels/[^?]+\.mp4(?:\?.*)?$', re.I), lambda r: r.fulfill(status=204, body=''))
         self.add_first_catalog_item_to_cart()

@@ -56,7 +56,7 @@ function initializeRows() {
     row.dataset.code = rowCode(row);
     const input = row.querySelector('.item-note-input');
     if (isDrawer) input.placeholder = 'Note (optional)';
-    input.dataset.savedNote = input.value.trim();
+    if (!('savedNote' in input.dataset)) input.dataset.savedNote = input.value.trim();
     syncCompactCartNoteInput(input);
     autoResizeNoteInput(input);
   }
@@ -188,10 +188,30 @@ async function restore(entry) {
   await CEOrder.run(async () => {
     const data = await CEOrder.post('/api/cart/undo', {token: entry.token});
     const fresh = new Map(serverRows(data.rows_html).map(row => [rowCode(row), row]));
-    for (const oldRow of [...cartBody.rows]) {
+    const serverCodes = new Set(fresh.keys());
+    let draftFocus;
+    // Prefer a live re-added item over a stale removed placeholder of its code.
+    const oldRows = [...cartBody.rows].sort((a, b) =>
+      Number(a.classList.contains('is-removed')) - Number(b.classList.contains('is-removed')));
+    for (const oldRow of oldRows) {
       const code = rowCode(oldRow);
-      if (fresh.has(code)) { oldRow.replaceWith(fresh.get(code)); fresh.delete(code); }
-      else if (oldRow.dataset.undoId === entry.id || !oldRow.classList.contains('is-removed')) oldRow.remove();
+      if (fresh.has(code)) {
+        const nextRow = fresh.get(code);
+        const note = oldRow.querySelector('.item-note-input');
+        const nextNote = nextRow.querySelector('.item-note-input');
+        if (!oldRow.classList.contains('is-removed') && note && nextNote &&
+            note.value.trim() !== note.dataset.savedNote) {
+          if (document.activeElement === note) {
+            draftFocus = {input: note, start: note.selectionStart, end: note.selectionEnd,
+              direction: note.selectionDirection};
+          }
+          // Retain the node referenced by debounce timers and queued note saves.
+          nextNote.replaceWith(note);
+        }
+        oldRow.replaceWith(nextRow);
+        fresh.delete(code);
+      }
+      else if (serverCodes.has(code) || oldRow.dataset.undoId === entry.id || !oldRow.classList.contains('is-removed')) oldRow.remove();
     }
     for (const row of fresh.values()) cartBody.append(row);
     forgetUndo(entry);
@@ -201,7 +221,12 @@ async function restore(entry) {
     initializeRows();
     updateTotals(data);
     const focusRow = [...cartBody.rows].find(row => rowCode(row) === restoredCode);
-    (entry.kind === 'clear' ? document.getElementById('clearOrderBtn') : focusRow?.querySelector('.qty-remove'))?.focus({preventScroll: true});
+    if (draftFocus?.input.isConnected) {
+      draftFocus.input.focus({preventScroll: true});
+      draftFocus.input.setSelectionRange(draftFocus.start, draftFocus.end, draftFocus.direction);
+    } else {
+      (entry.kind === 'clear' ? document.getElementById('clearOrderBtn') : focusRow?.querySelector('.qty-remove'))?.focus({preventScroll: true});
+    }
   }, error => { if (error.status === 410 || error.status === 403) forgetUndo(entry, true); }, 'Order restored.');
   entry.busy = false;
   tickUndo();
