@@ -380,6 +380,7 @@
     });
 
     input.addEventListener("keydown", function (event) {
+      if (event.isComposing) return;
       if (event.key === "ArrowDown") {
         event.preventDefault();
         if (!isOpen) openMenu();

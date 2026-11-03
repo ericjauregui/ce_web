@@ -8,6 +8,26 @@ from tests.e2e.common import BaseE2ETest
 class UXE2ETests(BaseE2ETest):
     viewport = {"width": 390, "height": 844}
 
+    def test_checkout_combobox_does_not_commit_composing_keystrokes(self):
+        self.context.request.post(f'{self.base_url}/api/cart/set', data={'code': '101SB', 'qty': 1})
+        self.goto('/checkout')
+        country = self.page.locator('#checkoutCountry')
+        country.fill('Can')
+        country.press('ArrowDown')
+        active = country.get_attribute('aria-activedescendant')
+        self.assertTrue(active)
+        # Synthetic composition events exercise the handler, not a native IME.
+        for key in ('Enter', 'ArrowDown', 'ArrowUp', 'Escape'):
+            country.dispatch_event('keydown', {'key': key, 'isComposing': True, 'bubbles': True, 'cancelable': True})
+            expect(country).to_have_value('Can')
+            expect(country).to_have_attribute('aria-expanded', 'true')
+            expect(country).to_have_attribute('aria-activedescendant', active)
+        country.press('Enter')
+        expect(country).to_have_value('Canada')
+        expect(country).to_have_attribute('aria-expanded', 'false')
+        expect(self.page.locator('#checkoutCountryKey')).to_have_value('ca')
+        self.page.screenshot(path=str(self._artifact_dir_for_capture() / 'checkout-composition-selection.png'))
+
     def test_order_controls_keep_touch_height_focus_and_pending_state(self):
         self.page.route(re.compile(r'/static/reels/[^?]+\.mp4(?:\?.*)?$', re.I), lambda r: r.fulfill(status=204, body=''))
         self.add_first_catalog_item_to_cart()
