@@ -1039,9 +1039,9 @@ footer {
 
 @media (max-width: 767.98px) {
   .footer-social .team-inline-icon {
-    width: 36px;
-    height: 36px;
-    min-width: 36px;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
   }
 
   .footer-social .team-inline-icon svg {

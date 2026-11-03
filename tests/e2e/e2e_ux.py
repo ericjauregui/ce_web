@@ -826,6 +826,39 @@ class UXE2ETests(BaseE2ETest):
         self.page.locator('#clearOrderBtn').click()
         expect(self.page.get_by_role('button', name='Undo clear order')).to_be_visible()
 
+    def test_footer_contact_targets_keep_mobile_size_and_wrap(self):
+        for path in ('/', '/product/101SB'):
+            self.goto(path)
+            footer = self.page.locator('footer')
+            links = footer.locator('.footer-social .team-inline-icon')
+            expect(links).to_have_count(6)
+            for width in (320, 390, 767, 768, 1280):
+                with self.subTest(path=path, width=width):
+                    self.page.set_viewport_size({'width': width, 'height': 900})
+                    footer.scroll_into_view_if_needed()
+                    mobile = width < 768
+                    for link in links.all():
+                        expect(link).to_be_visible()
+                        box = link.bounding_box()
+                        self.assertAlmostEqual(box['width'], 44 if mobile else 40, delta=1)
+                        self.assertAlmostEqual(box['height'], 44 if mobile else 40, delta=1)
+                        glyph = link.locator('svg').bounding_box()
+                        self.assertAlmostEqual(glyph['width'], 17 if mobile else 19, delta=1)
+                        self.assertAlmostEqual(glyph['height'], 17 if mobile else 19, delta=1)
+                    geometry = footer.locator('.footer-social').evaluate("""group => {
+                      const row = group.firstElementChild;
+                      const bounds = group.getBoundingClientRect();
+                      return {wrap: getComputedStyle(row).flexWrap,
+                        fits: [...row.children].every(link => {
+                          const box = link.getBoundingClientRect();
+                          return box.left >= bounds.left && box.right <= bounds.right;
+                        })};
+                    }""")
+                    self.assertEqual(geometry['wrap'], 'wrap')
+                    self.assertTrue(geometry['fits'])
+                    self.assertLessEqual(self.page.evaluate('document.documentElement.scrollWidth'), width)
+                    self.page.screenshot(path=str(self._artifact_dir_for_capture() / f'footer-targets-{path.strip("/").replace("/", "-") or "home"}-{width}.png'))
+
     def _artifact_dir_for_capture(self):
         path = self._artifact_dir()
         path.mkdir(parents=True, exist_ok=True)
