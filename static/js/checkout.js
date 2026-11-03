@@ -589,7 +589,6 @@
       setFieldError(stateInput, stateError, "Please enter a state");
       return false;
     }
-    stateInput.value = value;
     setFieldError(stateInput, stateError, "");
     return true;
   }

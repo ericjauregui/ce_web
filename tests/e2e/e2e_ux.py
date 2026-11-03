@@ -8,6 +8,25 @@ from tests.e2e.common import BaseE2ETest
 class UXE2ETests(BaseE2ETest):
     viewport = {"width": 390, "height": 844}
 
+    def test_checkout_state_preserves_spaces_while_typing(self):
+        self.context.request.post(f'{self.base_url}/api/cart/set', data={'code': '101SB', 'qty': 1})
+        self.goto('/checkout')
+        state = self.page.locator('#checkoutState')
+        state.fill('')
+        state.press_sequentially('New York')
+        expect(state).to_have_value('New York')
+        expect(state).to_have_attribute('aria-invalid', 'false')
+        state.press('Tab')
+        expect(state).to_have_value('New York')
+        state.fill('   ')
+        expect(state).to_have_attribute('aria-invalid', 'true')
+        expect(self.page.locator('#checkoutStateError')).to_have_text('Please enter a state')
+        state.fill('Calif')
+        self.page.locator('#checkoutStateListbox').get_by_role('option', name='California', exact=True).click()
+        expect(state).to_have_value('California')
+        expect(state).to_have_attribute('aria-invalid', 'false')
+        self.page.screenshot(path=str(self._artifact_dir_for_capture() / 'checkout-state-preserves-spaces.png'))
+
     def test_checkout_state_suggestions_follow_country_and_allow_free_text(self):
         self.context.request.post(f'{self.base_url}/api/cart/set', data={'code': '101SB', 'qty': 1})
         self.goto('/checkout')
