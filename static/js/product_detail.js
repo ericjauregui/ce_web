@@ -152,3 +152,90 @@ document.addEventListener("DOMContentLoaded", () => {
     qtyInput.blur();
   });
 });
+
+// The existing original image is reused only when opened; no second eager download.
+document.addEventListener('DOMContentLoaded', () => {
+  const trigger = document.querySelector('.product-image-open');
+  const dialog = document.getElementById('productImageDialog');
+  if (!trigger || !dialog || typeof dialog.showModal !== 'function') return;
+  const viewport = dialog.querySelector('.product-image-viewport');
+  const image = viewport.querySelector('img');
+  const zoomIn = dialog.querySelector('[data-image-zoom="in"]');
+  const zoomOut = dialog.querySelector('[data-image-zoom="out"]');
+  const fit = dialog.querySelector('[data-image-fit]');
+  const status = dialog.querySelector('[data-image-status]');
+  let scale = 1;
+  let drag = null;
+
+  function render(reset = false) {
+    if (!dialog.open || !image.naturalWidth) return;
+    const oldWidth = image.width || 1;
+    // A fitted image may be smaller than its viewport; preserve its center,
+    // not the whitespace around it, when crossing into scrollable zoom.
+    const centerX = oldWidth <= viewport.clientWidth ? .5 : (viewport.scrollLeft + viewport.clientWidth / 2) / oldWidth;
+    const centerY = image.height <= viewport.clientHeight ? .5 : (viewport.scrollTop + viewport.clientHeight / 2) / (image.height || 1);
+    const fitWidth = Math.min(viewport.clientWidth, viewport.clientHeight * image.naturalWidth / image.naturalHeight);
+    image.style.width = `${fitWidth * scale}px`;
+    image.style.height = `${fitWidth * scale * image.naturalHeight / image.naturalWidth}px`;
+    viewport.scrollLeft = reset ? 0 : centerX * image.width - viewport.clientWidth / 2;
+    viewport.scrollTop = reset ? 0 : centerY * image.height - viewport.clientHeight / 2;
+    zoomIn.disabled = scale >= 4;
+    zoomOut.disabled = scale <= 1;
+    fit.disabled = false;
+    viewport.classList.toggle('is-zoomed', scale > 1);
+    status.textContent = `${Math.round(scale * 100)}%`;
+  }
+  function zoom(delta) {
+    scale = Math.max(1, Math.min(4, scale + delta));
+    render(scale === 1);
+  }
+  trigger.addEventListener('click', (event) => {
+    event.preventDefault();
+    if (dialog.open) return;
+    scale = 1;
+    dialog.showModal();
+    if (!image.getAttribute('src') || (image.complete && !image.naturalWidth)) {
+      status.textContent = 'Loading image…';
+      image.src = trigger.href;
+    }
+    render(true);
+  });
+  image.addEventListener('load', () => render(true));
+  image.addEventListener('error', () => { status.textContent = 'Image unavailable. Close and try again.'; });
+  dialog.querySelector('[data-image-close]').addEventListener('click', () => dialog.close());
+  dialog.addEventListener('close', () => {
+    drag = null;
+    viewport.classList.remove('is-dragging');
+    trigger.focus({preventScroll: true});
+  });
+  dialog.addEventListener('click', (event) => {
+    if (event.target !== dialog) return;
+    const bounds = dialog.getBoundingClientRect();
+    if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) dialog.close();
+  });
+  zoomIn.addEventListener('click', () => zoom(.5));
+  zoomOut.addEventListener('click', () => zoom(-.5));
+  fit.addEventListener('click', () => { scale = 1; render(true); });
+  dialog.addEventListener('keydown', (event) => {
+    if (event.key === '+' || event.key === '=') { event.preventDefault(); zoom(.5); }
+    if (event.key === '-') { event.preventDefault(); zoom(-.5); }
+  });
+  viewport.addEventListener('dblclick', () => { scale = scale === 1 ? 2 : 1; render(scale === 1); });
+  viewport.addEventListener('pointerdown', (event) => {
+    if (event.pointerType !== 'mouse' || event.button !== 0 || scale <= 1) return;
+    drag = {id: event.pointerId, x: event.clientX, y: event.clientY, left: viewport.scrollLeft, top: viewport.scrollTop};
+    viewport.setPointerCapture(event.pointerId);
+    viewport.classList.add('is-dragging');
+    event.preventDefault();
+  });
+  viewport.addEventListener('pointermove', (event) => {
+    if (!drag || drag.id !== event.pointerId) return;
+    viewport.scrollLeft = drag.left - (event.clientX - drag.x);
+    viewport.scrollTop = drag.top - (event.clientY - drag.y);
+  });
+  function endDrag() { drag = null; viewport.classList.remove('is-dragging'); }
+  viewport.addEventListener('pointerup', endDrag);
+  viewport.addEventListener('pointercancel', endDrag);
+  viewport.addEventListener('lostpointercapture', endDrag);
+  window.addEventListener('resize', () => render());
+});

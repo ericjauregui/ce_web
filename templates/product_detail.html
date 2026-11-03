@@ -13,20 +13,12 @@
 <section class="container py-5 product-detail-page">
   {% set catalog_query = request.args.get('q', '') -%}
   {% set catalog_return_url = url_for('index', q=catalog_query, _anchor='section-search-results') if catalog_query.strip() else url_for('index', _anchor='section-' ~ product.collection) -%}
-  <div class="product-detail-top-actions mb-3">
-    <a class="btn btn-outline-gold product-detail-top-action product-detail-top-action--catalog" href="{{ catalog_return_url }}">← Catalog</a>
-    <button type="button" class="btn btn-gold add-to-cart-btn product-detail-top-action product-detail-top-add-btn product-detail-top-action--add" data-code="{{ product.code }}">
-      Add to Order
-    </button>
-    <a class="btn btn-outline-gold product-detail-top-action product-detail-top-action--contact" href="{{ url_for('contact') }}">Contact Us</a>
-    <button type="button" class="btn btn-outline-gold product-share-btn product-detail-top-action product-detail-top-action--share" data-share-url="{{ canonical_url }}"
-      data-share-title="{{ product.name }} | {{ site_name }}">Share</button>
-  </div>
+
 
   <div class="row g-3 align-items-start product-detail-content-row">
     <div class="col-12 col-lg-7">
       <article class="card bg-dark border-gold p-3 p-md-3 product-detail-image-card">
-        <div class="product-detail-image-wrap">
+        <a class="product-detail-image-wrap product-image-open" href="{{ asset_url('product_images/' ~ product.image) }}" aria-label="Enlarge image of {{ product.name }}" aria-haspopup="dialog" aria-controls="productImageDialog">
           <img
             src="{{ asset_url('product_images/' ~ product.image) }}"
             alt="{{ product.name }}"
@@ -35,7 +27,8 @@
             decoding="async"
             fetchpriority="high"
           >
-        </div>
+          <span class="product-image-open-hint">Tap or click to zoom</span>
+        </a>
       </article>
     </div>
 
@@ -67,9 +60,35 @@
       </article>
     </div>
   </div>
+
+  <div class="product-detail-top-actions mb-3">
+    <a class="btn btn-outline-gold product-detail-top-action product-detail-top-action--catalog" href="{{ catalog_return_url }}">← Catalog</a>
+    <button type="button" class="btn btn-gold add-to-cart-btn product-detail-top-action product-detail-top-add-btn product-detail-top-action--add" data-code="{{ product.code }}">
+      Add to Order
+    </button>
+    <a class="btn btn-outline-gold product-detail-top-action product-detail-top-action--contact" href="{{ url_for('contact') }}">Contact Us</a>
+    <button type="button" class="btn btn-outline-gold product-share-btn product-detail-top-action product-detail-top-action--share" data-share-url="{{ canonical_url }}"
+      data-share-title="{{ product.name }} | {{ site_name }}">Share</button>
+  </div>
 </section>
 {% endblock %}
 
 {% block body_end %}
+<dialog id="productImageDialog" class="product-image-dialog" aria-labelledby="productImageDialogTitle" aria-describedby="productImageHelp">
+  <div class="product-image-dialog-header">
+    <h2 id="productImageDialogTitle">{{ product.name }}</h2>
+    <button type="button" class="btn btn-outline-gold" data-image-close aria-label="Close image viewer" autofocus>Close</button>
+    <div class="product-image-toolbar" role="group" aria-label="Image zoom controls">
+      <button type="button" class="btn btn-outline-gold" data-image-zoom="out" aria-label="Zoom out" disabled>−</button>
+      <button type="button" class="btn btn-outline-gold" data-image-zoom="in" aria-label="Zoom in" disabled>+</button>
+      <button type="button" class="btn btn-outline-gold" data-image-fit disabled>Fit image</button>
+      <output data-image-status role="status" aria-live="polite">Loading image…</output>
+    </div>
+    <p id="productImageHelp">Use + or − to zoom. Scroll, swipe, or drag to explore. Press Escape to close.</p>
+  </div>
+  <div class="product-image-viewport" tabindex="0" role="region" aria-label="Zoomed product image">
+    <img alt="{{ product.name }}" decoding="async" draggable="false">
+  </div>
+</dialog>
 <script src="{{ asset_url('js/product_detail.js') }}"></script>
 {% endblock %}

@@ -919,6 +919,56 @@ body:has(.product-detail-page) {
   padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px));
 }
 
+@media (min-width: 992px) {
+  .product-detail-page .product-detail-top-actions {
+    position: static;
+    transform: none;
+    margin: 1.5rem auto 0;
+    border-radius: 18px;
+  }
+  body:has(.product-detail-page) { padding-bottom: 0; }
+}
+
+.product-image-open { position: relative; cursor: zoom-in; }
+.product-image-open:focus-visible { outline: 3px solid var(--gold); outline-offset: 4px; }
+.product-image-open-hint {
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: .35rem .7rem;
+  border-radius: .375rem;
+  background: #0d0d0de8;
+  color: var(--gold);
+  font-size: .875rem;
+  white-space: nowrap;
+}
+.product-image-dialog {
+  width: min(1100px, calc(100% - 1rem));
+  height: min(960px, 92dvh);
+  max-width: none;
+  max-height: 92dvh;
+  margin: auto;
+  padding: 1rem;
+  border: 1px solid var(--gold-outline);
+  border-radius: 14px;
+  background: #0d0d0d;
+  color: var(--gold);
+}
+.product-image-dialog[open] { display: grid; grid-template-rows: auto minmax(0, 1fr); gap: .75rem; }
+.product-image-dialog::backdrop { background: #000c; }
+body:has(.product-image-dialog[open]) { overflow: hidden; }
+.product-image-dialog-header { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .6rem; align-items: start; }
+.product-image-dialog-header h2 { font-size: 1.1rem; margin: 0; overflow-wrap: anywhere; }
+.product-image-dialog-header p { grid-column: 1 / -1; margin: 0; font-size: .875rem; }
+.product-image-toolbar { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
+.product-image-dialog .btn { min-width: 44px; min-height: 44px; }
+.product-image-viewport { overflow: auto; min-height: 0; background: #fff; border-radius: 8px; overscroll-behavior: contain; touch-action: pan-x pan-y pinch-zoom; }
+.product-image-viewport:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+.product-image-viewport img { display: block; max-width: none; margin: auto; user-select: none; }
+.product-image-viewport.is-zoomed { cursor: grab; }
+.product-image-viewport.is-dragging { cursor: grabbing; }
+
 .product-detail-content-row {
   --bs-gutter-x: .9rem;
 }

@@ -8,6 +8,59 @@ from tests.e2e.common import BaseE2ETest
 class UXE2ETests(BaseE2ETest):
     viewport = {"width": 390, "height": 844}
 
+    def test_product_desktop_actions_stay_before_footer(self):
+        self.goto('/product/101SB')
+        for width in (390, 991, 992, 1280, 1920):
+            with self.subTest(width=width):
+                self.page.set_viewport_size({'width': width, 'height': 1000})
+                actions = self.page.locator('.product-detail-top-actions')
+                self.page.locator('footer').scroll_into_view_if_needed()
+                self.assertEqual(actions.evaluate('e => getComputedStyle(e).position'), 'static' if width >= 992 else 'fixed')
+                if width >= 992:
+                    self.assertLessEqual(actions.bounding_box()['y'] + actions.bounding_box()['height'], self.page.locator('footer').bounding_box()['y'])
+                self.page.screenshot(path=str(self._artifact_dir_for_capture() / f'product-footer-actions-{width}.png'))
+
+    def test_product_image_viewer_zoom_close_and_reopen(self):
+        for width in (390, 1280):
+            with self.subTest(width=width):
+                self.page.set_viewport_size({'width': width, 'height': 900})
+                self.context.request.post(f'{self.base_url}/api/cart/set', data={'code': '101SB', 'qty': 0})
+                self.goto('/product/101SB')
+                trigger = self.page.locator('.product-image-open')
+                trigger.focus()
+                trigger.press('Enter')
+                dialog = self.page.locator('#productImageDialog')
+                expect(dialog).to_be_visible()
+                zoom_in = dialog.get_by_role('button', name='Zoom in', exact=True)
+                expect(zoom_in).to_be_enabled()
+                image = dialog.locator('img')
+                initial_width = image.bounding_box()['width']
+                zoom_in.click()
+                self.assertGreater(image.bounding_box()['width'], initial_width)
+                for _ in range(5):
+                    zoom_in.click()
+                expect(zoom_in).to_be_disabled()
+                viewport = dialog.locator('.product-image-viewport')
+                centered = viewport.evaluate('''e => {
+                  const image = e.querySelector('img');
+                  return image.width <= e.clientWidth || Math.abs(e.scrollLeft + e.clientWidth / 2 - image.width / 2) < 3;
+                }''')
+                self.assertTrue(centered)
+                dialog.get_by_role('button', name='Fit image', exact=True).click()
+                self.assertAlmostEqual(image.bounding_box()['width'], initial_width, delta=1)
+                dialog.press('Escape')
+                expect(dialog).not_to_be_visible()
+                expect(trigger).to_be_focused()
+                trigger.click()
+                expect(dialog).to_be_visible()
+                expect(dialog.get_by_role('button', name='Zoom out', exact=True)).to_be_disabled()
+                self.page.screenshot(path=str(self._artifact_dir_for_capture() / f'product-image-viewer-{width}.png'))
+                dialog.get_by_role('button', name='Close image viewer', exact=True).click()
+                expect(dialog).not_to_be_visible()
+                expect(trigger).to_be_focused()
+                self.page.locator('.product-detail-top-action--add').click()
+                expect(self.page.locator('.product-qty-input')).to_have_value('1')
+
     def test_contact_icons_fill_mobile_targets_without_changing_footer(self):
         self.goto('/contact')
         for width in (320, 390, 767, 768, 1280):
