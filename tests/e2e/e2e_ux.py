@@ -652,6 +652,27 @@ class UXE2ETests(BaseE2ETest):
         expect(self.page.locator('.item-note-input[data-code="101SB"]')).to_have_value('Synthetic search navigation note')
         self.page.screenshot(path=str(self._artifact_dir_for_capture() / 'search-preserves-item-note.png'))
 
+    def test_long_press_waits_for_order_and_cancel_drops_navigation(self):
+        self.goto('/?q=101SB')
+        card = self.page.locator('.product-card').first
+        card.click(position={'x': 15, 'y': 15})
+        expect(card).to_have_attribute('aria-expanded', 'true')
+        held = []
+        self.page.route('**/api/cart/add', lambda route: held.append(route))
+        card.locator('.add-to-cart-btn').click()
+        card.dispatch_event('pointerdown', {'pointerType': 'touch', 'pointerId': 1, 'clientX': 10, 'clientY': 10, 'bubbles': True})
+        self.page.wait_for_timeout(550)
+        self.assertEqual(urlsplit(self.page.url).path, '/')
+        card.dispatch_event('pointercancel', {'pointerType': 'touch', 'pointerId': 1, 'bubbles': True})
+        held[0].continue_()
+        expect(card.locator('.product-qty-input')).to_have_value('1')
+        self.assertEqual(urlsplit(self.page.url).path, '/')
+        # A fresh intentional press follows the normal guarded detail route.
+        card.dispatch_event('pointerdown', {'pointerType': 'touch', 'pointerId': 2, 'clientX': 10, 'clientY': 10, 'bubbles': True})
+        self.page.wait_for_url('**/product/101SB?q=101SB')
+        expect(self.page.locator('.product-qty-input')).to_have_value('1')
+        self.page.screenshot(path=str(self._artifact_dir_for_capture() / 'guarded-long-press-detail.png'))
+
     def test_clearing_search_waits_for_pending_cart_write(self):
         self.page.route(re.compile(r'/static/reels/[^?]+\.mp4(?:\?.*)?$', re.I), lambda r: r.fulfill(status=204, body=''))
         self.goto('/?q=101SB')

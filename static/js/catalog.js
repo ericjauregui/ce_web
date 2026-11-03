@@ -231,9 +231,13 @@ document.addEventListener("pointerdown", (event) => {
   longPressStartX = event.clientX;
   longPressStartY = event.clientY;
 
-  longPressTimerId = window.setTimeout(() => {
+  longPressTimerId = window.setTimeout(async () => {
     if (!longPressCard) return;
+    const pressTimerId = longPressTimerId;
     longPressCard.dataset.longPressFired = "true";
+    if (!await CEOrder.beforeNavigation()) return;
+    // A released/cancelled gesture or newer press must not navigate later.
+    if (longPressTimerId !== pressTimerId || longPressCard !== card) return;
     window.location.assign(detailUrl);
   }, LONG_PRESS_MS);
 });
