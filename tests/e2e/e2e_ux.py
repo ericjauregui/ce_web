@@ -390,6 +390,38 @@ class UXE2ETests(BaseE2ETest):
         expect(self.page.locator('.item-note-input[data-code="102SB"]')).to_have_value('Newer draft after Undo')
         self.page.screenshot(path=str(self._artifact_dir_for_capture() / 'undo-preserves-concurrent-note.png'))
 
+    def test_undo_timer_runs_only_while_undo_is_available(self):
+        self.page.add_init_script("""(() => {
+          const start = window.setInterval.bind(window);
+          const stop = window.clearInterval.bind(window);
+          window.undoTimerIds = new Set();
+          window.setInterval = (callback, delay, ...args) => {
+            const id = start(callback, delay, ...args);
+            if (callback.name === 'tickUndo') window.undoTimerIds.add(id);
+            return id;
+          };
+          window.clearInterval = id => {
+            window.undoTimerIds.delete(id);
+            return stop(id);
+          };
+        })();""")
+        self.context.request.post(f'{self.base_url}/api/cart/set', data={'code': '101SB', 'qty': 1})
+        self.goto('/cart')
+        self.assertEqual(self.page.evaluate('window.undoTimerIds.size'), 0)
+        self.page.locator('.qty-remove[data-code="101SB"]').click()
+        undo = self.page.get_by_role('button', name='Undo removal of 101SB')
+        expect(undo).to_be_visible()
+        self.assertEqual(self.page.evaluate('window.undoTimerIds.size'), 1)
+        undo.click()
+        expect(self.page.locator('.qty-remove[data-code="101SB"]')).to_be_visible()
+        self.assertEqual(self.page.evaluate('window.undoTimerIds.size'), 0)
+        self.page.locator('.qty-remove[data-code="101SB"]').click()
+        expect(undo).to_be_visible()
+        self.assertEqual(self.page.evaluate('window.undoTimerIds.size'), 1)
+        expect(undo).to_have_count(0, timeout=35000)
+        self.assertEqual(self.page.evaluate('window.undoTimerIds.size'), 0)
+        self.page.screenshot(path=str(self._artifact_dir_for_capture() / 'undo-timer-stopped-after-expiry.png'))
+
     def test_clear_order_failure_and_undo(self):
         self.page.route(re.compile(r'/static/reels/[^?]+\.mp4(?:\?.*)?$', re.I), lambda r: r.fulfill(status=204, body=''))
         self.add_first_catalog_item_to_cart()

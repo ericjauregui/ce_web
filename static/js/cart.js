@@ -45,6 +45,7 @@ function syncCompactCartNoteInput(input) {
 const undoStorageKey = 'ceCartUndoV1';
 const undoDurationMs = 30000;
 const undoEntries = new Map();
+let undoTimer = null;
 const noteTimers = new Map();
 const pendingNotes = new Map();
 const cartBody = document.getElementById('cartTableBody');
@@ -61,10 +62,18 @@ function initializeRows() {
     autoResizeNoteInput(input);
   }
 }
+function syncUndoTimer() {
+  if (undoEntries.size && undoTimer === null) undoTimer = setInterval(tickUndo, 250);
+  else if (!undoEntries.size && undoTimer !== null) {
+    clearInterval(undoTimer);
+    undoTimer = null;
+  }
+}
 function persistUndo() {
   try {
     sessionStorage.setItem(undoStorageKey, JSON.stringify([...undoEntries.values()].map(({id, token, expiresAt, kind}) => ({id, token, expiresAt, kind}))));
   } catch (_) { /* Undo still works on this page when storage is unavailable. */ }
+  syncUndoTimer();
 }
 function renderCartState() {
   const hasRows = cartBody.children.length > 0;
@@ -173,6 +182,7 @@ function tickUndo() {
       timer.querySelector('.cart-undo-ring-progress').setAttribute('stroke-dashoffset', String(100 * (1 - progress)));
     }
   }
+  syncUndoTimer();
 }
 // The HTML is rendered by the same escaped Jinja row partial as the cart page.
 function serverRows(html) {
@@ -280,7 +290,6 @@ async function hydrateUndo() {
   persistUndo();
 }
 if (!isDrawer) hydrateUndo();
-setInterval(tickUndo, 250);
 document.addEventListener('visibilitychange', tickUndo);
 document.addEventListener('click', async event => {
   if (!cartRoot.contains(event.target)) return;
@@ -372,6 +381,7 @@ window.CECart = {
       cartBody.replaceChildren(...serverRows(data.rows_html));
       document.getElementById('cartUndoClear').replaceChildren();
       undoEntries.clear();
+      syncUndoTimer();
       initializeRows();
       updateTotals(data);
     }, () => {}, 'Order loaded.');
