@@ -288,6 +288,23 @@
               if (restoreValue) resetInputValue();
             }
 
+              async function handleSearchSubmit(event) {
+                event.preventDefault();
+                if (!input || searchInFlight) return;
+                if (input.value.trim() === "") {
+                  handleClearedSearch();
+                  return;
+                }
+                searchInFlight = true;
+                try {
+                  setOpen(false, { restoreValue: false });
+                  if (await window.CEOrder?.beforeNavigation() === false) return;
+                  form.submit();
+                } finally {
+                  searchInFlight = false;
+                }
+              }
+
               function submitSearch() {
                 if (!form || !input) return;
                 setOpen(false, { restoreValue: false });
@@ -296,7 +313,7 @@
                   form.requestSubmit();
                   return;
                 }
-                form.submit();
+                handleSearchSubmit({ preventDefault() {} });
               }
 
               function maybeSubmitOrClearSearch() {
@@ -314,7 +331,7 @@
                 setOpen(open, { restoreValue: !open });
               });
 
-                let clearInFlight = false;
+                let searchInFlight = false;
 
               if (input) {
                 input.addEventListener("keydown", (e) => {
@@ -331,8 +348,8 @@
                 });
 
                 async function handleClearedSearch() {
-                  if (clearInFlight) return;
-                  clearInFlight = true;
+                  if (searchInFlight) return;
+                  searchInFlight = true;
 
                   try {
                     setOpen(false, { restoreValue: false });
@@ -347,7 +364,7 @@
                       if (hasSearchState) {
                         // Reload the document so media observers and order controls
                         // bind to the restored catalog. Preserve the replaced search history.
-                        await window.CEOrder?.whenIdle();
+                        if (await window.CEOrder?.beforeNavigation() === false) return;
                         window.location.replace(target.pathname);
                         return;
                       }
@@ -357,9 +374,10 @@
                       return;
                     }
 
+                    if (await window.CEOrder?.beforeNavigation() === false) return;
                     window.location.assign(target.pathname);
                   } finally {
-                    clearInFlight = false;
+                    searchInFlight = false;
                   }
                 }
 
@@ -374,15 +392,7 @@
               }
 
               if (form) {
-                form.addEventListener("submit", (e) => {
-                  if (!input) return;
-                  if (input.value.trim() === "") {
-                    e.preventDefault();
-                    handleClearedSearch();
-                    return;
-                  }
-                  setOpen(false, { restoreValue: false });
-                });
+                form.addEventListener("submit", handleSearchSubmit);
               }
 
               document.addEventListener("keydown", (e) => {
