@@ -201,7 +201,8 @@ class UXE2ETests(BaseE2ETest):
         self.page.unroute('**/api/cart/add')
         self.page.route('**/api/cart/add', lambda r: r.fulfill(status=503, content_type='text/html', body='Unavailable'))
         button.click()
-        expect(self.page.locator('#orderFeedback')).to_contain_text('try again')
+        expect(self.page.locator('#orderFeedback')).to_contain_text('couldn’t confirm')
+        expect(self.page.locator('#orderFeedback')).to_contain_text('Review your order before trying again')
         expect(self.page.locator('#orderStatus')).to_be_empty()
         expect(button).to_be_enabled()
         expect(button).to_have_text('Add to Order')
@@ -211,6 +212,36 @@ class UXE2ETests(BaseE2ETest):
         expect(self.page.locator('#orderStatus')).to_have_text('Order updated.')
         expect(self.page.locator('#orderFeedback')).to_be_hidden()
         self.assertEqual(self.page_errors, [])
+
+    def test_server_error_after_saved_add_requires_review_not_automatic_retry(self):
+        self.page.route(re.compile(r'/static/reels/[^?]+\.mp4(?:\?.*)?$', re.I), lambda r: r.fulfill(status=204, body=''))
+        self.goto('/')
+        button = self.page.locator('.add-to-cart-btn').first
+        code = button.get_attribute('data-code')
+        mutations = []
+
+        def saved_add_with_proxy_error(route):
+            mutations.append(route.request.post_data_json)
+            response = route.fetch()
+            self.assertEqual(response.status, 200)
+            self.assertEqual(response.json()['qty'], 1)
+            # Preserve the real synthetic session cookie, but simulate a proxy 503.
+            route.fulfill(response=response, status=503, content_type='text/html', body='Unavailable')
+
+        self.page.route('**/api/cart/add', saved_add_with_proxy_error)
+        button.click()
+        expect(self.page.locator('#orderFeedback')).to_contain_text('couldn’t confirm')
+        expect(self.page.locator('#orderFeedback')).to_contain_text('Review your order before trying again')
+        expect(self.page.locator('#orderStatus')).to_be_empty()
+        expect(button).to_be_enabled()
+        expect(button).to_have_text('Add to Order')
+        self.page.locator('#cartLink').click()
+        self.page.wait_for_url('**/cart')
+        row = self.page.locator(f'#cartTableBody .qty-control[data-code="{code}"]')
+        expect(row.locator('.product-qty-input')).to_have_value('1')
+        self.assertEqual(self.context.request.get(f'{self.base_url}/api/cart/count').json()['total_items'], 1)
+        self.assertEqual(len(mutations), 1)
+        self.page.screenshot(path=str(self._artifact_dir_for_capture() / 'server-error-review-saved-order.png'))
 
     def test_item_note_failure_blocks_navigation_and_retry_preserves_text(self):
         self.add_first_catalog_item_to_cart()

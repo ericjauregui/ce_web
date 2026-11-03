@@ -33,6 +33,8 @@
         ? 'The 30-second Undo window has ended.'
         : response.status === 429
         ? 'Please wait a moment, then try again. Your update was not saved.'
+        : response.status >= 500
+        ? 'We couldn’t confirm your update. Review your order before trying again.'
         : 'We couldn’t save your update. Please try again.');
       error.status = response.status;
       throw error;
