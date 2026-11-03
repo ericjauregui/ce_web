@@ -7,6 +7,76 @@ from tests.e2e.common import BaseE2ETest
 class UXE2ETests(BaseE2ETest):
     viewport = {"width": 390, "height": 844}
 
+    def test_order_controls_keep_touch_height_focus_and_pending_state(self):
+        self.page.route(re.compile(r'/static/reels/[^?]+\.mp4(?:\?.*)?$', re.I), lambda r: r.fulfill(status=204, body=''))
+        self.add_first_catalog_item_to_cart()
+        code = self.page.locator('.add-to-cart-btn').first.get_attribute('data-code')
+        for path, card_selector in (('/', '.product-card.is-in-cart'),
+                                    (f'/product/{code}', '.product-detail-meta-card'),
+                                    ('/cart', '#cartTableBody tr')):
+            self.goto(path)
+            card = self.page.locator(card_selector).first
+            for width in (320, 390, 767):
+                with self.subTest(path=path, width=width):
+                    self.page.set_viewport_size({'width': width, 'height': 900})
+                    card.scroll_into_view_if_needed()
+                    controls = card.locator('.qty-adjust-btn, .qty-clear-btn, .qty-remove, .product-qty-input')
+                    for control in controls.all():
+                        expect(control).to_be_visible()
+                        self.assertGreaterEqual(control.bounding_box()['height'], 44)
+                    self.assertLessEqual(self.page.evaluate('document.documentElement.scrollWidth'), width)
+                    if path == '/':
+                        self.assertGreaterEqual(card.locator('.add-to-cart-btn').bounding_box()['height'], 44)
+                        self.assertGreaterEqual(card.locator('.product-detail-link').bounding_box()['height'], 44)
+                        self.assertGreaterEqual(self.page.locator('.home-collections-toggle').bounding_box()['height'], 44)
+                        self.assertTrue(card.evaluate('''card => {
+                          const r = card.getBoundingClientRect();
+                          return [...card.querySelectorAll('.qty-adjust-btn, .qty-clear-btn, .product-qty-input')].every(e => {
+                            const b = e.getBoundingClientRect(); return b.left >= r.left && b.right <= r.right;
+                          });
+                        }'''))
+                    self.page.screenshot(path=str(self._artifact_dir_for_capture() / f'order-controls-{path.strip("/").replace("/", "-") or "catalog"}-{width}.png'))
+            increase = card.locator('.qty-adjust-btn').last
+            increase.focus()
+            self.assertTrue(increase.evaluate('''e => {
+              const s = getComputedStyle(e);
+              return s.outlineStyle === 'solid' && parseFloat(s.outlineWidth) >= 2;
+            }'''))
+            pending = []
+            self.page.route('**/api/cart/set', lambda route: pending.append(route))
+            self.page.keyboard.press('Enter')
+            expect(increase).to_be_disabled()
+            expect(card.locator('.product-qty-input')).to_have_attribute('readonly', '')
+            self.assertNotEqual(increase.evaluate('e => getComputedStyle(e).borderTopColor'), 'rgba(0, 0, 0, 0)')
+            self.assertEqual(len(pending), 1)
+            pending[0].fulfill(status=429, json={'ok': False, 'error': 'rate_limited'})
+            expect(increase).to_be_enabled()
+            expect(card.locator('.product-qty-input')).to_have_value('1')
+            self.page.unroute('**/api/cart/set')
+            increase.click()
+            expect(card.locator('.product-qty-input')).to_have_value('2')
+            card.locator('.qty-adjust-btn').first.click()
+            expect(card.locator('.product-qty-input')).to_have_value('1')
+
+    def test_catalog_controls_respect_reduced_motion_and_keep_navigation(self):
+        self.page.emulate_media(reduced_motion='reduce')
+        self.goto('/')
+        card = self.page.locator('.product-card').first
+        card.scroll_into_view_if_needed()
+        card.focus()
+        self.page.keyboard.press('Enter')
+        expect(card).to_have_attribute('aria-expanded', 'true')
+        self.assertEqual(card.evaluate('e => getComputedStyle(e).transform'), 'none')
+        self.assertEqual(card.evaluate('e => getComputedStyle(e).transitionDuration'), '0s')
+        self.assertEqual(card.locator('.product-drawer').evaluate('e => getComputedStyle(e).transitionDuration'), '0s')
+        detail = card.locator('.product-detail-link')
+        detail.focus()
+        self.assertEqual(detail.evaluate('e => getComputedStyle(e).outlineStyle'), 'solid')
+        self.page.screenshot(path=str(self._artifact_dir_for_capture() / 'catalog-reduced-motion-focus.png'))
+        detail.press('Enter')
+        self.page.wait_for_url('**/product/*')
+        expect(self.page.locator('.product-detail-title')).to_be_visible()
+
     def test_product_identity_has_room_at_intermediate_desktop_widths(self):
         # Local synthetic cart only; no checkout or email submission.
         self.goto('/product/101SB')

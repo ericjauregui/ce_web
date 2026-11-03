@@ -3734,7 +3734,8 @@
 @media (max-width: 767.98px) {
   .product-card .card-body { padding: .65rem; }
   .product-card .product-actions { grid-template-columns: minmax(0, 1fr); }
-  .product-card .add-to-cart-btn { min-height: 36px; font-size: .8rem; }
+  .product-card .add-to-cart-btn { min-height: 44px; font-size: .8rem; }
+  .product-card .product-detail-link.code-badge { min-height: 44px; }
   .product-card.is-in-cart .product-actions {
     grid-template-columns: minmax(0, 1fr) 24px;
     column-gap: 4px !important;
@@ -3760,8 +3761,8 @@
     min-width: 0;
     width: 32px;
     flex: 0 0 32px;
-    height: 32px;
-    min-height: 32px;
+    height: 44px;
+    min-height: 44px;
     padding: 0;
     font-size: .8rem;
   }
@@ -3770,7 +3771,7 @@
     grid-column: 2;
     grid-row: 1;
     width: 24px;
-    height: 36px;
+    height: 44px;
   }
   .product-detail-page .product-qty-control { padding-inline: 48px; }
 }
@@ -3860,7 +3861,7 @@
 .cart-page .cart-undo-clear.is-expiring { opacity: 0; transition: opacity 220ms ease; }
 @media (max-width: 767.98px) {
   .cart-page .cart-undo-control { gap: .4rem; }
-  .cart-page .cart-undo-btn { font-size: .8rem; min-height: 34px; padding: .3rem .55rem; }
+  .cart-page .cart-undo-btn { font-size: .8rem; min-height: 44px; padding: .3rem .55rem; }
   .cart-page .cart-removed-label { font-size: .75rem; }
   .cart-page .cart-undo-cell { padding-inline: .4rem !important; }
   .cart-page .cart-undo-clear { font-size: .875rem; }
@@ -3874,3 +3875,18 @@
 .product-grid-row > .search-empty-state { width: 100%; }
 .search-empty-state .card { overflow-wrap: anywhere; }
 .search-empty-state .btn { min-height: 40px; }
+
+/* Match mobile order-control heights without widening the compact cart table. */
+@media (max-width: 767.98px) {
+  .cart-page .minimal-items-table .cell-qty .qty-adjust-btn,
+  .cart-page .minimal-items-table .cell-qty .qty-input,
+  .cart-page .minimal-items-table .cell-remove .qty-remove,
+  .cart-page .minimal-items-table .cell-code .code-badge {
+    min-height: 44px;
+  }
+  .cart-page .minimal-items-table .cell-qty .qty-input,
+  .product-card .product-qty-input {
+    font-size: 1rem;
+    font-variant-numeric: tabular-nums;
+  }
+}

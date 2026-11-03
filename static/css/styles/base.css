@@ -1072,6 +1072,9 @@ body .dbc-button {
   --bs-btn-active-bg: rgba(215, 192, 122, 0.18);
   --bs-btn-active-border-color: var(--gold-outline-strong);
   --bs-btn-active-color: #fff;
+  --bs-btn-disabled-color: var(--gold);
+  --bs-btn-disabled-bg: transparent;
+  --bs-btn-disabled-border-color: var(--gold-outline);
 }
 
 /* Section titles */
@@ -1103,3 +1106,31 @@ body .dbc-button {
   font-weight: 700;
 }
 .btn-gold:focus-visible { outline: 2px solid #fff0c2; outline-offset: 3px; }
+
+/* A stable focus ring across browsing, quantity entry, and order actions.
+   Inset rings remain visible inside the compact controls' overflow clips. */
+.btn-outline-gold:focus-visible,
+.product-card:focus-visible,
+.product-card .product-detail-link.code-badge:focus-visible,
+.product-qty-input:focus-visible {
+  outline: 2px solid #fff0c2;
+  outline-offset: -3px;
+}
+
+.product-qty-input[readonly] {
+  opacity: .65;
+  cursor: progress;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .product-card,
+  .product-card .product-drawer,
+  .product-card .product-detail-link.code-badge {
+    transition: none;
+  }
+  .product-card:hover,
+  .product-card.is-open,
+  .product-card.is-in-cart {
+    transform: none;
+  }
+}

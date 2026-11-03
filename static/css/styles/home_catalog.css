@@ -92,3 +92,9 @@
   .home-collections .home-row-heading { gap: .3rem; }
   .home-collections .home-row-actions { gap: .3rem; }
 }
+
+/* Keep collection navigation as easy to tap as the nearby order actions. */
+@media (max-width: 767.98px) {
+  .home-row-button { min-height: 44px; height: 44px; }
+  .home-collections-toggle { flex-basis: 44px; width: 44px; }
+}
