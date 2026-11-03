@@ -500,9 +500,6 @@
       phoneCountryInput.value,
     );
     phoneCountryCodeInput.value = exactMatch ? exactMatch.key : "";
-    if (exactMatch) {
-      phoneCountryInput.value = exactMatch.value;
-    }
     return phoneCountryCodeInput.value;
   }
 
@@ -527,9 +524,6 @@
   function syncCountryKey() {
     const exactMatch = findExactOption(countryOptions, countryInput.value);
     countryKeyInput.value = exactMatch ? exactMatch.key : "";
-    if (exactMatch) {
-      countryInput.value = exactMatch.value;
-    }
     if (stateComboboxController) {
       stateComboboxController.refresh();
     }

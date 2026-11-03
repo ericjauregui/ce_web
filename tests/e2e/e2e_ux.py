@@ -8,6 +8,29 @@ from tests.e2e.common import BaseE2ETest
 class UXE2ETests(BaseE2ETest):
     viewport = {"width": 390, "height": 844}
 
+    def test_checkout_country_prefix_typing_commits_only_on_selection_or_blur(self):
+        self.context.request.post(f'{self.base_url}/api/cart/set', data={'code': '101SB', 'qty': 1})
+        self.goto('/checkout')
+        country = self.page.locator('#checkoutCountry')
+        country.fill('')
+        country.press_sequentially('United States Minor Outlying Islands')
+        expect(country).to_have_value('United States Minor Outlying Islands')
+        expect(self.page.locator('#checkoutCountryKey')).to_have_value('um')
+        country.press('Tab')
+        expect(country).to_have_value('United States Minor Outlying Islands')
+        phone = self.page.locator('#checkoutPhoneCountry')
+        phone.fill('')
+        phone.press_sequentially('United Kingdom')
+        expect(phone).to_have_value('United Kingdom')
+        expect(self.page.locator('#checkoutPhoneCountryCode')).to_have_value('gb')
+        phone.press('Tab')
+        expect(phone).to_have_value('United Kingdom (+44)')
+        country.fill('Unknown synthetic country')
+        country.press('Tab')
+        expect(self.page.locator('#checkoutCountryKey')).to_have_value('')
+        expect(country).to_have_attribute('aria-invalid', 'true')
+        self.page.screenshot(path=str(self._artifact_dir_for_capture() / 'checkout-country-prefix-typing.png'))
+
     def test_checkout_state_preserves_spaces_while_typing(self):
         self.context.request.post(f'{self.base_url}/api/cart/set', data={'code': '101SB', 'qty': 1})
         self.goto('/checkout')
