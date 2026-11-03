@@ -1,4 +1,5 @@
 <div class="col">
+  {% set detail_url = url_for('product_detail', product_code=p.code, q=request.args.get('q') if request.args.get('q', '').strip() else none) -%}
   {% set drawer_id = 'drawer-' ~ p.code|lower|replace(' ', '-')|replace('/', '-') %}
   {% set initial_qty = p.initial_qty|default(0, true)|int %}
   <article class="card product product-card shadow-sm bg-dark border-0{% if initial_qty > 0 %} is-in-cart{% endif %}"
@@ -6,7 +7,7 @@
       tabindex="0"
       data-qty="{{ initial_qty }}"
       data-analytics-target="component:product-card"
-      data-detail-url="{{ url_for('product_detail', product_code=p.code) }}"
+      data-detail-url="{{ detail_url }}"
        aria-expanded="false"
        aria-controls="{{ drawer_id }}">
     <div class="product-img-wrap">
@@ -21,7 +22,7 @@
         {{ image_attributes|xmlattr }} alt="{{ p.name }}" loading="lazy" decoding="async"></noscript>
     </div>
     <div class="card-body text-center d-flex flex-column">
-      <a class="small code-badge product-detail-link" href="{{ url_for('product_detail', product_code=p.code) }}"
+      <a class="small code-badge product-detail-link" href="{{ detail_url }}"
         aria-label="View details for {{ p.name }} {{ p.code }}">
         {{ p.code }}
       </a>

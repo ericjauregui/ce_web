@@ -11,8 +11,10 @@
 
 {% block content %}
 <section class="container py-5 product-detail-page">
+  {% set catalog_query = request.args.get('q', '') -%}
+  {% set catalog_return_url = url_for('index', q=catalog_query, _anchor='section-search-results') if catalog_query.strip() else url_for('index', _anchor='section-' ~ product.collection) -%}
   <div class="product-detail-top-actions mb-3">
-    <a class="btn btn-outline-gold product-detail-top-action product-detail-top-action--catalog" href="{{ url_for('index') }}#section-{{ product.collection }}">← Catalog</a>
+    <a class="btn btn-outline-gold product-detail-top-action product-detail-top-action--catalog" href="{{ catalog_return_url }}">← Catalog</a>
     <button type="button" class="btn btn-gold add-to-cart-btn product-detail-top-action product-detail-top-add-btn product-detail-top-action--add" data-code="{{ product.code }}">
       Add to Order
     </button>

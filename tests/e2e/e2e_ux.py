@@ -1,5 +1,6 @@
 """UX recovery and accessibility journeys; local synthetic carts only."""
 import re
+from urllib.parse import parse_qs, urlsplit
 from playwright.sync_api import expect
 from tests.e2e.common import BaseE2ETest
 
@@ -231,6 +232,39 @@ class UXE2ETests(BaseE2ETest):
         self.assertEqual(self.context.request.get(f'{self.base_url}/api/cart/count').json()['total_items'], 0)
         self.page.get_by_role('button', name='Undo clear order').click()
         expect(self.page.locator('#cartTableBody tr:not(.is-removed)')).to_have_count(1)
+
+    def test_product_catalog_return_preserves_search(self):
+        for width in (390, 1280):
+            with self.subTest(width=width):
+                self.page.set_viewport_size({'width': width, 'height': 900})
+                self.goto('/?q=101SB')
+                codes = self.page.locator('.product-detail-link').all_text_contents()
+                card = self.page.locator('.product-card').first
+                detail = card.locator('.product-detail-link')
+                destination = detail.get_attribute('href')
+                self.assertEqual(parse_qs(urlsplit(destination).query), {'q': ['101SB']})
+                self.assertEqual(card.get_attribute('data-detail-url'), destination)
+                detail.click()
+                self.page.wait_for_url('**/product/*')
+                expect(self.page.locator('.product-detail-title')).to_be_visible()
+                # Sharing remains a clean product URL, independent of browsing context.
+                share_url = self.page.locator('.product-share-btn').get_attribute('data-share-url')
+                self.assertEqual(urlsplit(share_url).query, '')
+                self.page.locator('.product-detail-top-action--catalog').click()
+                self.page.wait_for_url('**/?q=101SB#section-search-results')
+                expect(self.page.locator('.nav-search-input')).to_have_value('101SB')
+                expect(self.page.locator('#section-search-results')).to_be_visible()
+                self.assertEqual(self.page.locator('.product-detail-link').all_text_contents(), codes)
+                self.page.screenshot(path=str(self._artifact_dir_for_capture() / f'search-product-return-{width}.png'))
+
+        # Direct product visits still return to their collection, not stale search state.
+        self.goto('/product/101SB')
+        catalog_url = self.page.locator('.product-detail-top-action--catalog').get_attribute('href')
+        self.assertEqual(urlsplit(catalog_url).query, '')
+        self.assertTrue(urlsplit(catalog_url).fragment.startswith('section-'))
+        self.assertNotEqual(urlsplit(catalog_url).fragment, 'section-search-results')
+        self.page.locator('.product-detail-top-action--catalog').click()
+        expect(self.page.locator('#catalogCollectionPicker')).to_be_visible()
 
     def test_empty_search_has_query_and_recovery(self):
         self.goto('/?q=zzzxxyy-no-match')
