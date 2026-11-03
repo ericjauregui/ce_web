@@ -9,9 +9,11 @@
     if (element) { element.hidden = false; element.textContent = message; }
   }
   function lock() {
-    locked = [...document.querySelectorAll('.add-to-cart-btn, .qty-adjust-btn, .qty-clear-btn, .qty-remove, .cart-undo-btn, #clearOrderBtn, .product-qty-input')]
-      .filter(element => !element.closest('[inert]'))
-      .map(element => ({element, disabled: element.disabled, readOnly: element.readOnly}));
+    locked = locked.filter(({element}) => element.isConnected);
+    const known = new Set(locked.map(({element}) => element));
+    locked.push(...[...document.querySelectorAll('.add-to-cart-btn, .qty-adjust-btn, .qty-clear-btn, .qty-remove, .cart-undo-btn, #clearOrderBtn, .product-qty-input')]
+      .filter(element => !element.closest('[inert]') && !known.has(element))
+      .map(element => ({element, disabled: element.disabled, readOnly: element.readOnly})));
     locked.forEach(({element}) => {
       if (element.tagName === 'INPUT') element.readOnly = true;
       else element.disabled = true;
@@ -82,6 +84,9 @@
             if (element.tagName === 'INPUT') element.readOnly = readOnly;
           });
           locked = [];
+        } else {
+          // Reconciled rows must stay locked while the next queued write runs.
+          lock();
         }
       }
     });

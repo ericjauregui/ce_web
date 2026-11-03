@@ -485,6 +485,9 @@ class UXE2ETests(BaseE2ETest):
         expect(note).to_be_focused()
         self.page.wait_for_timeout(100)
         self.assertEqual(len(notes), 1)
+        expect(self.page.locator('.qty-remove[data-code="101SB"]')).to_be_disabled()
+        expect(self.page.locator('.qty-remove[data-code="102SB"]')).to_be_disabled()
+        expect(self.page.locator('.qty-control[data-code="102SB"] .qty-input')).to_have_attribute('readonly', '')
         # A later edit must not be overwritten by an earlier save's response.
         note.fill('Newer draft after Undo')
         notes[0].continue_()
@@ -493,6 +496,8 @@ class UXE2ETests(BaseE2ETest):
         notes[1].fulfill(status=503, json={'ok': False})
         expect(self.page.locator('#orderFeedback')).to_contain_text('couldn’t confirm')
         expect(note).to_have_value('Newer draft after Undo')
+        expect(self.page.locator('.qty-remove[data-code="102SB"]')).to_be_enabled()
+        expect(self.page.locator('.qty-control[data-code="102SB"] .qty-input')).not_to_have_attribute('readonly', '')
         self.page.unroute('**/api/cart/note')
         self.page.get_by_role('link', name='Checkout', exact=True).click()
         self.page.wait_for_url('**/checkout')
