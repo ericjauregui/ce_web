@@ -247,6 +247,32 @@ class UXE2ETests(BaseE2ETest):
         self.page.get_by_role('button', name='Undo clear order').click()
         expect(self.page.locator('#cartTableBody tr:not(.is-removed)')).to_have_count(1)
 
+    def test_owner_video_save_data_waits_for_explicit_play(self):
+        self.page.add_init_script("""
+          Object.defineProperty(navigator, 'connection', {
+            configurable: true, value: {saveData: true}
+          });
+        """)
+        media_pattern = re.compile(r'/static/assets/trade-shows/owner-welcome\.mp4(?:\?.*)?$')
+        requests = []
+        self.page.route(media_pattern, lambda route: (
+            requests.append(route.request.url), route.fulfill(status=204, body='')))
+        self.goto('/about')
+        video = self.page.locator('#ownerVideo')
+        expect(video).to_have_attribute('preload', 'none')
+        expect(video).to_have_attribute('controls', '')
+        self.assertTrue(video.get_attribute('poster'))
+        video.scroll_into_view_if_needed()
+        # Let the visibility observer run before checking for speculative requests.
+        self.page.evaluate('() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))')
+        self.assertEqual(requests, [])
+        self.assertTrue(video.evaluate('element => element.paused'))
+        with self.page.expect_request(media_pattern):
+            self.page.locator('.trade-show-video-frame .touch-video-sound').click()
+        # The synthetic empty response checks explicit loading, not decoded playback.
+        self.assertGreaterEqual(len(requests), 1)
+        self.page.screenshot(path=str(self._artifact_dir_for_capture() / 'owner-video-save-data-manual-play.png'))
+
     def test_product_catalog_return_preserves_search(self):
         for width in (390, 1280):
             with self.subTest(width=width):

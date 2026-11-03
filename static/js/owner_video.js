@@ -20,7 +20,7 @@
         automaticPause = true;
         video.pause();
       }
-    } else if (!pausedByViewer && !reducedMotion.matches) {
+    } else if (!pausedByViewer && !reducedMotion.matches && !navigator.connection?.saveData) {
       video.play().catch(() => {});
     }
   }
