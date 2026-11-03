@@ -3729,6 +3729,9 @@
   .page-title-back,
   .page-title-action { min-height: 44px; }
   .team-inline-icon { min-width: 44px; min-height: 44px; }
+  /* Keep contact glyphs proportional to their accessible tap targets. */
+  .contact-page .team-inline-icon svg { width: 24px; height: 24px; }
+  .contact-page .team-inline-emoji { font-size: 24px; }
 }
 
 @media (max-width: 767.98px) {

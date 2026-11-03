@@ -8,6 +8,46 @@ from tests.e2e.common import BaseE2ETest
 class UXE2ETests(BaseE2ETest):
     viewport = {"width": 390, "height": 844}
 
+    def test_contact_icons_fill_mobile_targets_without_changing_footer(self):
+        self.goto('/contact')
+        for width in (320, 390, 767, 768, 1280):
+            with self.subTest(width=width):
+                self.page.set_viewport_size({'width': width, 'height': 900})
+                icons = self.page.locator('.contact-page .team-inline-icon svg')
+                expect(icons).to_have_count(7)
+                for icon in icons.all():
+                    box = icon.bounding_box()
+                    self.assertAlmostEqual(box['width'], 24 if width < 768 else 16, delta=1)
+                    self.assertAlmostEqual(box['height'], 24 if width < 768 else 16, delta=1)
+                for target in self.page.locator('.contact-page .team-inline-icon').all():
+                    box = target.bounding_box()
+                    if width < 768:
+                        self.assertGreaterEqual(box['width'], 44)
+                        self.assertGreaterEqual(box['height'], 44)
+                footer_icon = self.page.locator('footer .team-inline-icon svg').first
+                self.assertAlmostEqual(footer_icon.bounding_box()['width'], 17 if width < 768 else 19, delta=1)
+                self.assertLessEqual(self.page.evaluate('document.documentElement.scrollWidth'), width)
+                self.page.screenshot(path=str(self._artifact_dir_for_capture() / f'contact-icon-scale-{width}.png'))
+
+    def test_product_detail_quantity_matches_action_shape(self):
+        self.context.request.post(f'{self.base_url}/api/cart/set', data={'code': '101SB', 'qty': 2})
+        self.goto('/product/101SB')
+        for width in (320, 390, 767, 768, 1280):
+            with self.subTest(width=width):
+                self.page.set_viewport_size({'width': width, 'height': 900})
+                controls = self.page.locator('.product-detail-page .product-qty-control')
+                radii = controls.locator('button, input').evaluate_all(
+                    'elements => elements.map(e => getComputedStyle(e).borderRadius)')
+                self.assertEqual(len(radii), 4)
+                self.assertEqual(len(set(radii)), 1)
+                quantity = controls.locator('.product-qty-input')
+                expect(quantity).to_have_value('2')
+                controls.locator('[data-delta="1"]').click()
+                expect(quantity).to_have_value('3')
+                controls.locator('[data-delta="-1"]').click()
+                expect(quantity).to_have_value('2')
+                self.page.screenshot(path=str(self._artifact_dir_for_capture() / f'product-quantity-shape-{width}.png'))
+
     def test_checkout_options_commit_on_activation_not_touch_start(self):
         self.context.request.post(f'{self.base_url}/api/cart/set', data={'code': '101SB', 'qty': 1})
         self.goto('/checkout')

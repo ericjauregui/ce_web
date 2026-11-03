@@ -768,7 +768,8 @@ main {
     -moz-appearance: textfield;
   }
 
-  .product-card .product-qty-input {
+  .product-card .product-qty-input,
+  .product-detail-page .product-qty-input {
     border-radius: var(--action-border-radius);
   }
 
