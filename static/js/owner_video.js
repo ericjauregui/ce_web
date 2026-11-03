@@ -1,7 +1,11 @@
 (() => {
   const video = document.getElementById("ownerVideo");
   if (!video) return;
-  window.initializeTouchVideoSound?.(video);
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const manualPlayback = reducedMotion.matches || Boolean(navigator.connection?.saveData);
+  video.parentElement.classList.toggle("is-manual-playback", manualPlayback);
+  window.initializeTouchVideoSound?.(video, manualPlayback
+    ? () => video.play().catch(() => {}) : null);
 
   let previousVolume = video.volume;
   video.addEventListener("volumechange", () => {
@@ -13,7 +17,6 @@
   let visible = false;
   let pausedByViewer = false;
   let automaticPause = false;
-  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   function syncPlayback() {
     if (!visible || document.hidden) {
       if (!video.paused) {

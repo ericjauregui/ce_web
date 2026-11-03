@@ -1,7 +1,7 @@
 (() => {
   // iOS hardware volume is separate from HTML media mute. Unmute directly
   // within an explicit tap so Safari can authorize playback with audio.
-  function initializeTouchVideoSound(video) {
+  function initializeTouchVideoSound(video, playOnRequest = null) {
     const host = video.parentElement;
     if (!host || host.querySelector('.touch-video-sound')) return;
     const button = document.createElement('button');
@@ -9,19 +9,24 @@
     button.className = 'touch-video-sound';
     const sync = () => {
       const silent = video.muted || video.volume === 0;
-      button.textContent = silent ? 'Sound on' : 'Mute';
-      button.setAttribute('aria-label', silent ? 'Turn video sound on' : 'Mute video');
+      const needsPlay = playOnRequest && (video.paused || video.ended);
+      button.textContent = needsPlay ? 'Play' : silent ? 'Sound on' : 'Mute';
+      button.setAttribute('aria-label', needsPlay ? 'Play video' : silent ? 'Turn video sound on' : 'Mute video');
     };
     button.addEventListener('keydown', (event) => event.stopPropagation());
     button.addEventListener('click', (event) => {
       event.stopPropagation();
+      if (playOnRequest && (video.paused || video.ended)) {
+        void playOnRequest();
+        return;
+      }
       const silent = video.muted || video.volume === 0;
       if (silent && video.volume === 0) video.volume = 1;
       video.muted = !silent;
       if (silent) video.play().catch(() => {});
       sync();
     });
-    video.addEventListener('volumechange', sync);
+    ['volumechange', 'play', 'pause', 'ended'].forEach(event => video.addEventListener(event, sync));
     host.append(button);
     sync();
   }
@@ -42,6 +47,10 @@
     if (!track) {
       return;
     }
+
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const manualPlayback = reducedMotion || Boolean(navigator.connection?.saveData);
+    track.classList.toggle("is-manual-playback", manualPlayback);
 
     const cards = Array.from(track.querySelectorAll(".inline-reel-card"));
     const videos = Array.from(track.querySelectorAll(".inline-reel-video"));
@@ -118,6 +127,7 @@
     }
 
     function resumeDeferredPlayback() {
+      if (manualPlayback) return;
       if (
         (!viewportPausedPlayback && !searchFocusPausedPlayback) ||
         !activeCard
@@ -351,7 +361,7 @@
     }
 
     function scrollCardIntoView(card, options = {}) {
-      const { alignment = "center", behavior = "smooth" } = options;
+      const { alignment = "center", behavior = reducedMotion ? "auto" : "smooth" } = options;
       if (!card) {
         return;
       }
@@ -743,6 +753,7 @@
     }
 
     async function playNextReel(currentCard) {
+      if (manualPlayback) return;
       if (isSearchInputFocused()) {
         pauseActiveCardPlaybackForSearchFocus();
         return;
@@ -824,7 +835,7 @@
           if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
             card.classList.add("is-loaded");
           }
-        } else {
+        } else if (!manualPlayback) {
           primeThumbnailFrame(video, card, true);
         }
       }
@@ -847,7 +858,7 @@
         poster.onerror = () => {
           if (video.dataset.requestedPoster === source) {
             delete video.dataset.requestedPoster;
-            if (!video.hasAttribute("src")) primeThumbnailFrame(video, card, true);
+            if (!manualPlayback && !video.hasAttribute("src")) primeThumbnailFrame(video, card, true);
           }
         };
         poster.src = source;
@@ -886,7 +897,8 @@
 
       // Native controls remain available, but looping is handled by advancing to the next card.
       video.loop = false;
-      initializeTouchVideoSound(video);
+      initializeTouchVideoSound(video, manualPlayback
+        ? () => activateCard(card, { scrollAlignment: "start" }) : null);
 
       // Register before autoplay or thumbnail observers can start loading media.
       // Poster completion is independent of whether a real video frame is ready.
@@ -905,6 +917,10 @@
         }
         if (pauseWhenOutOfView && !trackInViewport) {
           video.pause();
+          return;
+        }
+        if (manualPlayback) {
+          setControlsVisibility(video, true);
           return;
         }
         if (typeof window.triggerScrollCueAttention === "function") {
@@ -998,7 +1014,7 @@
 
       if (event.key === "Enter" || event.key === " ") {
         event.preventDefault();
-        if (card === activeCard) {
+        if (card === activeCard && !(manualPlayback && card.querySelector("video").paused)) {
           revealControlsForCard(card, { autoHide: false });
           return;
         }
@@ -1036,6 +1052,7 @@
     });
 
     track.addEventListener("ce:scroll-cue-activate-visible", (event) => {
+      if (manualPlayback) return;
       const direction =
         event instanceof CustomEvent &&
         event.detail &&
@@ -1095,7 +1112,7 @@
             return;
           }
 
-          void activateCard(card, { scrollIntoView: false });
+          if (!manualPlayback) void activateCard(card, { scrollIntoView: false });
         });
 
         card.addEventListener("mouseleave", () => {
@@ -1125,6 +1142,7 @@
         }
 
         nextCard.focus({ preventScroll: true });
+        if (manualPlayback) return;
         void activateCard(nextCard, { scrollAlignment: "start" });
       });
     }
@@ -1182,7 +1200,7 @@
     function startVisibleAutoplay() {
       // Observe current visibility after the hero is ready, rather than acting
       // on an earlier observation if the visitor has already scrolled away.
-      if (activeCard) return;
+      if (manualPlayback || activeCard) return;
       if (typeof IntersectionObserver === "function") {
         const startThreshold = pauseWhenOutOfView ? 0.2 : 0.01;
         const startObserver = new IntersectionObserver((entries) => {

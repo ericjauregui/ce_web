@@ -247,31 +247,102 @@ class UXE2ETests(BaseE2ETest):
         self.page.get_by_role('button', name='Undo clear order').click()
         expect(self.page.locator('#cartTableBody tr:not(.is-removed)')).to_have_count(1)
 
-    def test_owner_video_save_data_waits_for_explicit_play(self):
-        self.page.add_init_script("""
-          Object.defineProperty(navigator, 'connection', {
-            configurable: true, value: {saveData: true}
-          });
-        """)
+    def _assert_reels_wait_for_deliberate_play(self, save_data):
+        if save_data:
+            self.page.add_init_script("Object.defineProperty(navigator, 'connection', {value: {saveData: true}})")
+        else:
+            self.page.emulate_media(reduced_motion='reduce')
+        # Failed posters must not silently fall back to downloading MP4 thumbnails.
+        self.page.route(re.compile(r'/static/reels/[^?]+\.(?:jpg|webp)(?:\?.*)?$', re.I),
+                        lambda route: route.fulfill(status=404, body=''))
+        for path in ('/', '/reels'):
+            for width in (390, 1280):
+                with self.subTest(path=path, width=width, save_data=save_data):
+                    self.page.set_viewport_size({'width': width, 'height': 900})
+                    self.goto(path)
+                    track = self.page.locator('.inline-reel-track').first
+                    first = track.locator('.inline-reel-card').first
+                    video = first.locator('video')
+                    track.scroll_into_view_if_needed()
+                    expect(track).to_have_class(re.compile(r'is-manual-playback'))
+                    play = first.get_by_role('button', name='Play video', exact=True)
+                    expect(play).to_be_visible()
+                    self.assertEqual(first.locator('.inline-reel-placeholder').evaluate(
+                        "e => getComputedStyle(e, '::after').animationName"), 'none')
+                    first.hover()
+                    self.page.evaluate('() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))')
+                    expect(track.locator('video[src]')).to_have_count(0)
+                    play.click()
+                    expect(first).to_have_attribute('aria-expanded', 'true')
+                    self.assertEqual(video.get_attribute('src'), video.get_attribute('data-src'))
+                    self.page.wait_for_function('video => !video.paused && video.readyState >= 2', arg=video.element_handle())
+                    if path == '/':
+                        self.page.locator('footer').scroll_into_view_if_needed()
+                        self.page.wait_for_function('video => video.paused', arg=video.element_handle())
+                        first.scroll_into_view_if_needed()
+                        self.page.evaluate('() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))')
+                        self.assertTrue(video.evaluate('e => e.paused'))
+                        first.get_by_role('button', name='Play video', exact=True).click()
+                        self.page.wait_for_function('video => !video.paused', arg=video.element_handle())
+                    # Force end deterministically; the next reel must await a new choice.
+                    video.evaluate("e => { e.pause(); e.dispatchEvent(new Event('ended')); }")
+                    expect(track.locator('video[src]')).to_have_count(1)
+                    expect(first.get_by_role('button', name='Play video', exact=True)).to_be_visible()
+                    second = track.locator('.inline-reel-card').nth(1)
+                    second.focus()
+                    second.press('Enter')
+                    expect(second).to_have_attribute('aria-expanded', 'true')
+                    self.assertEqual(second.locator('video').get_attribute('src'), second.locator('video').get_attribute('data-src'))
+                    self.page.screenshot(path=str(self._artifact_dir_for_capture() / f'reels-manual-{save_data}-{path.strip("/") or "home"}-{width}.png'))
+
+    def test_reels_save_data_requires_deliberate_play(self):
+        self._assert_reels_wait_for_deliberate_play(save_data=True)
+
+    def test_reels_reduced_motion_requires_deliberate_play(self):
+        self._assert_reels_wait_for_deliberate_play(save_data=False)
+
+    def _assert_owner_waits_for_explicit_play(self, save_data):
+        if save_data:
+            self.page.add_init_script("""
+              Object.defineProperty(navigator, 'connection', {
+                configurable: true, value: {saveData: true}
+              });
+            """)
+        else:
+            self.page.emulate_media(reduced_motion='reduce')
         media_pattern = re.compile(r'/static/assets/trade-shows/owner-welcome\.mp4(?:\?.*)?$')
         requests = []
         self.page.route(media_pattern, lambda route: (
             requests.append(route.request.url), route.fulfill(status=204, body='')))
-        self.goto('/about')
-        video = self.page.locator('#ownerVideo')
-        expect(video).to_have_attribute('preload', 'none')
-        expect(video).to_have_attribute('controls', '')
-        self.assertTrue(video.get_attribute('poster'))
-        video.scroll_into_view_if_needed()
-        # Let the visibility observer run before checking for speculative requests.
-        self.page.evaluate('() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))')
-        self.assertEqual(requests, [])
-        self.assertTrue(video.evaluate('element => element.paused'))
-        with self.page.expect_request(media_pattern):
-            self.page.locator('.trade-show-video-frame .touch-video-sound').click()
-        # The synthetic empty response checks explicit loading, not decoded playback.
-        self.assertGreaterEqual(len(requests), 1)
-        self.page.screenshot(path=str(self._artifact_dir_for_capture() / 'owner-video-save-data-manual-play.png'))
+        for width in (390, 1280):
+            with self.subTest(width=width, save_data=save_data):
+                requests.clear()
+                self.page.set_viewport_size({'width': width, 'height': 900})
+                self.goto('/about')
+                video = self.page.locator('#ownerVideo')
+                expect(video).to_have_attribute('preload', 'none')
+                expect(video).to_have_attribute('controls', '')
+                self.assertTrue(video.get_attribute('poster'))
+                video.scroll_into_view_if_needed()
+                play = self.page.locator('.trade-show-video-frame').get_by_role('button', name='Play video', exact=True)
+                expect(play).to_be_visible()
+                expect(play).to_have_text('Play')
+                self.assertGreaterEqual(play.bounding_box()['height'], 44)
+                # Let the visibility observer run before checking speculative requests.
+                self.page.evaluate('() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))')
+                self.assertEqual(requests, [])
+                self.assertTrue(video.evaluate('element => element.paused'))
+                with self.page.expect_request(media_pattern):
+                    play.click()
+                # Empty media checks explicit loading, not decoded playback.
+                self.assertGreaterEqual(len(requests), 1)
+                self.page.screenshot(path=str(self._artifact_dir_for_capture() / f'owner-video-manual-{save_data}-{width}.png'))
+
+    def test_owner_video_save_data_waits_for_explicit_play(self):
+        self._assert_owner_waits_for_explicit_play(save_data=True)
+
+    def test_owner_video_reduced_motion_waits_for_explicit_play(self):
+        self._assert_owner_waits_for_explicit_play(save_data=False)
 
     def test_product_catalog_return_preserves_search(self):
         for width in (390, 1280):

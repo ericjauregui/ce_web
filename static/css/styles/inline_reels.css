@@ -142,25 +142,29 @@
     height: var(--inline-reel-mobile-height, clamp(140px, 40vw, 176px));
   }
 }
-.touch-video-sound { display: none; }
-@media (hover: none), (pointer: coarse) {
-  .touch-video-sound {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    position: absolute;
-    top: .6rem;
-    right: .6rem;
-    z-index: 3;
-    min-height: 44px;
-    padding: .4rem .75rem;
-    border: 1px solid var(--gold-outline);
-    border-radius: var(--action-border-radius);
-    background: rgba(7, 7, 7, .92);
-    color: var(--gold);
-    font: inherit;
-    cursor: pointer;
-  }
-  .inline-reel-card:not(.is-active) .touch-video-sound { display: none; }
-  .touch-video-sound:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+/* Reuse the sound control as an explicit play action when autoplay is disabled. */
+.touch-video-sound {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: .6rem;
+  right: .6rem;
+  z-index: 3;
+  min-height: 44px;
+  padding: .4rem .75rem;
+  border: 1px solid var(--gold-outline);
+  border-radius: var(--action-border-radius);
+  background: rgba(7, 7, 7, .92);
+  color: var(--gold);
+  font: inherit;
+  cursor: pointer;
 }
+.touch-video-sound:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+@media (hover: none), (pointer: coarse) {
+  .touch-video-sound { display: inline-flex; }
+  .inline-reel-card:not(.is-active) .touch-video-sound { display: none; }
+}
+.inline-reel-track.is-manual-playback .touch-video-sound,
+.trade-show-video-frame.is-manual-playback .touch-video-sound { display: inline-flex; }
+.inline-reel-track.is-manual-playback .inline-reel-placeholder::after { animation: none; }
