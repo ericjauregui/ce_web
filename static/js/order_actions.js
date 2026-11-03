@@ -67,6 +67,8 @@
         return true;
       } catch (error) {
         rollback(error);
+        const status = document.getElementById('orderStatus');
+        if (status) status.textContent = '';
         showError(error.message || 'We couldn’t save your update. Please try again.');
         return false;
       } finally {
