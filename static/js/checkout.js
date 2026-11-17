@@ -311,6 +311,7 @@
       const button = document.createElement("button");
       button.type = "button";
       button.className = "checkout-combobox__option";
+      button.tabIndex = -1;
       button.id = `${input.id}-option-${index}`;
       button.setAttribute("role", "option");
       button.dataset.index = String(index);
@@ -530,8 +531,9 @@
 
   function syncCountryKey() {
     const exactMatch = findExactOption(countryOptions, countryInput.value);
+    const previousKey = countryKeyInput.value;
     countryKeyInput.value = exactMatch ? exactMatch.key : "";
-    if (stateComboboxController) {
+    if (stateComboboxController && countryKeyInput.value !== previousKey) {
       stateComboboxController.refresh();
     }
     return countryKeyInput.value;

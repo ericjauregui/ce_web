@@ -266,9 +266,9 @@
       <summary class="analytics-section-heading">
         <div>
           <h2 id="request-status-title">Page response status</h2>
-          <p><strong>{{ '{:,}'.format(analytics.request_status.all_total) }}</strong> requests ({{ analytics.request_status.all_percent }}%) · <strong>{{ '{:,}'.format(analytics.request_status.all_success_count) }}</strong> successful ({{ analytics.request_status.all_success_percent }}%) · <strong>{{ '{:,}'.format(analytics.request_status.all_not_found_count) }}</strong> not found (404) ({{ analytics.request_status.all_not_found_percent }}%)</p>
-          <p><strong>{{ '{:,}'.format(analytics.request_status.probe_total) }}</strong> likely probes ({{ analytics.request_status.probe_percent }}%) · <strong>{{ '{:,}'.format(analytics.request_status.probe_groups[0].count) }}</strong> sensitive-file probes ({{ analytics.request_status.sensitive_probe_percent }}%)</p>
-          <p>Percentages of all requests · View request details</p>
+          <p><strong>{{ '{:,}'.format(analytics.request_status.total) }}</strong> requests ({{ '100' if analytics.request_status.total else '0' }}%) · <strong>{{ '{:,}'.format(analytics.request_status.success_count) }}</strong> successful ({{ analytics.request_status.success_percent }}%) · <strong>{{ '{:,}'.format(analytics.request_status.not_found_count) }}</strong> not found (404) ({{ analytics.request_status.not_found_percent }}%)</p>
+          <p><strong>{{ '{:,}'.format(analytics.request_status.probe_total) }}</strong> likely probes ({{ analytics.request_status.probe_percent }}%) · <strong>{{ '{:,}'.format(analytics.request_status.probe_groups[0].count) }}</strong> sensitive-file probes ({{ analytics.request_status.sensitive_probe_percent }}%) of all recorded requests</p>
+          <p>Response percentages exclude likely probes · View request details</p>
         </div>
       </summary>
       <p class="analytics-empty">HTML GET requests; likely scanner probes excluded from the percentages below.</p>

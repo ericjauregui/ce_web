@@ -221,14 +221,16 @@
 
     if (leftButton) {
       leftButton.addEventListener("click", () => {
-        track.scrollBy({ left: -getScrollStep(track), behavior: "smooth" });
+        const behavior = shell.classList.contains("scroll-cue-shell--collections") ? "instant" : "smooth";
+        track.scrollBy({ left: -getScrollStep(track), behavior });
         requestVisibleReelActivation(shell, track, "left");
       });
     }
 
     if (rightButton) {
       rightButton.addEventListener("click", () => {
-        track.scrollBy({ left: getScrollStep(track), behavior: "smooth" });
+        const behavior = shell.classList.contains("scroll-cue-shell--collections") ? "instant" : "smooth";
+        track.scrollBy({ left: getScrollStep(track), behavior });
         requestVisibleReelActivation(shell, track, "right");
       });
     }

@@ -48,7 +48,7 @@ class CatalogJourneyE2ETests(BaseE2ETest):
         first = self.page.locator("#section-search-results .product-card").first
         self.assertEqual(first.locator(".product-detail-link").inner_text().strip(), "1072LSB")
         first.locator(".product-detail-link").click()
-        self.page.wait_for_url("**/product/1072LSB")
+        self.page.wait_for_url("**/product/1072LSB?q=1072lsb")
         self.assertIn("Turtle", self.page.locator("h1.product-detail-title").inner_text())
 
         response = self.page.goto(

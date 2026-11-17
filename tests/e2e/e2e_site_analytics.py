@@ -287,7 +287,7 @@ class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
         for expected in ('5 requests (100%)', '4 successful (80%)', '1 not found (404) (20%)',
                          '0 likely probes (0%)', '0 sensitive-file probes (0%)'):
             self.assertIn(expected, request_summary)
-        self.assertIn('Percentages of all requests', request_summary)
+        self.assertIn('Response percentages exclude likely probes', request_summary)
         for key, expected_count, expected_percent in (
                 ('pages', '210', '65%'), ('clicks', '210', '65%'),
                 ('sources', '20', '80%'), ('connect', '210', '65%')):
@@ -368,9 +368,10 @@ class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
         card = self.page.locator('#request-status-card')
         self.assertEqual(card.evaluate('element => element.tagName'), 'DETAILS')
         self.assertIsNone(card.get_attribute('open'))
-        for total in ('66 requests', '7 successful', '59 not found (404)',
-                      '31 likely probes', '27 sensitive-file probes'):
+        for total in ('35 requests', '2 successful (6%)', '33 not found (404) (94%)',
+                      '31 likely probes'):
             self.assertIn(total, card.locator(':scope > summary').inner_text())
+        self.assertNotIn('59 not found', card.locator(':scope > summary').inner_text())
         self.assertFalse(self.page.locator('#request-status-summary').is_visible())
         card.locator(':scope > summary').click()
         self.assertTrue(self.page.locator('#request-status-summary').is_visible())
@@ -378,6 +379,8 @@ class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
         self.assertEqual(card.get_attribute('data-all-success'), '7')
         self.assertEqual(card.get_attribute('data-all-not-found'), '59')
         self.assertEqual(card.get_attribute('data-probe-requests'), '31')
+        self.assertIn('66', self.page.locator('#request-status-all').inner_text())
+        self.assertIn('59 not found', self.page.locator('#request-status-all').inner_text())
         summary = self.page.locator('#request-status-summary')
         self.assertEqual(summary.locator('tbody tr').nth(0).locator('td').nth(1).inner_text(), '2')
         self.assertEqual(summary.locator('tbody tr').nth(1).locator('td').nth(1).inner_text(), '33')

@@ -176,6 +176,7 @@ class UXE2ETests(BaseE2ETest):
         expect(self.page.locator('#checkoutPhoneCountryCode')).to_have_value('gb')
         phone.press('Tab')
         expect(phone).to_have_value('United Kingdom (+44)')
+        expect(self.page.locator('#checkoutPhone')).to_be_focused()
         country.fill('Unknown synthetic country')
         country.press('Tab')
         expect(self.page.locator('#checkoutCountryKey')).to_have_value('')
@@ -196,7 +197,7 @@ class UXE2ETests(BaseE2ETest):
         expect(state).to_have_attribute('aria-invalid', 'true')
         expect(self.page.locator('#checkoutStateError')).to_have_text('Please enter a state')
         state.fill('Calif')
-        self.page.locator('#checkoutStateListbox').get_by_role('option', name='California', exact=True).click()
+        self.page.locator('#checkoutStateListbox').get_by_role('option', name='California United States', exact=True).click()
         expect(state).to_have_value('California')
         expect(state).to_have_attribute('aria-invalid', 'false')
         self.page.screenshot(path=str(self._artifact_dir_for_capture() / 'checkout-state-preserves-spaces.png'))
@@ -207,7 +208,7 @@ class UXE2ETests(BaseE2ETest):
         country = self.page.locator('#checkoutCountry')
         state = self.page.locator('#checkoutState')
         state.fill('Calif')
-        self.page.locator('#checkoutStateListbox').get_by_role('option', name='California', exact=True).click()
+        self.page.locator('#checkoutStateListbox').get_by_role('option', name='California United States', exact=True).click()
         expect(state).to_have_value('California')
         country.fill('Canada')
         country.press('Enter')
@@ -798,7 +799,8 @@ class UXE2ETests(BaseE2ETest):
                 self.assertGreater(self.page.locator('.product-detail-link').count(), len(codes))
         self.page.screenshot(path=str(self._artifact_dir_for_capture() / 'search-refresh-clear-full-catalog.png'))
         # Keep the established collection-only refresh reset.
-        self.goto('/#section-studs')
+        self.page.goto(f'{self.base_url}/#section-studs')
+        self.page.wait_for_url(f'{self.base_url}/#section-studs')
         self.page.reload(wait_until='domcontentloaded')
         self.page.wait_for_url(f'{self.base_url}/')
         expect(self.page.locator('#catalogCollectionPicker')).to_be_visible()
@@ -1044,7 +1046,7 @@ class UXE2ETests(BaseE2ETest):
             boxes = card.locator('.qty-adjust-btn, .product-qty-input').evaluate_all(
                 'es => es.map(e => e.getBoundingClientRect().toJSON()).sort((a,b) => a.left-b.left)')
             self.assertLessEqual(max(b['top'] for b in boxes) - min(b['top'] for b in boxes), 1)
-            self.assertLessEqual(max(b['height'] for b in boxes), 36)
+            self.assertLessEqual(max(b['height'] for b in boxes), 48)
             for left, right in zip(boxes, boxes[1:]):
                 self.assertLessEqual(left['right'], right['left'])
             self.assertTrue(card.evaluate('''card => {

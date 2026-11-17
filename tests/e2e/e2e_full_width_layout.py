@@ -94,11 +94,16 @@ class FullWidthLayoutE2ETests(BaseE2ETest):
         self.assertTrue(track.evaluate('track => track.scrollWidth > track.clientWidth + 1'))
         next_button = navigation.get_by_role('button', name='Scroll collections right')
         expect(next_button).to_be_visible()
+        next_button.scroll_into_view_if_needed()
         for _ in range(8):
             if track.evaluate('track => track.scrollLeft >= track.scrollWidth - track.clientWidth - 2'):
                 break
+            previous_scroll = track.evaluate('track => track.scrollLeft')
             try:
-                next_button.click(timeout=2000)
+                expect(next_button).to_be_enabled(timeout=2000)
+                box = next_button.bounding_box()
+                self.assertIsNotNone(box)
+                self.page.mouse.click(box['x'] + box['width'] / 2, box['y'] + box['height'] / 2)
             except PlaywrightTimeoutError:
                 # A final smooth-scroll frame can reach the end after the
                 # check above, disabling the arrow while click retries.
@@ -108,6 +113,10 @@ class FullWidthLayoutE2ETests(BaseE2ETest):
                 ):
                     raise
                 break
+            self.page.wait_for_function(
+                '([track, previous]) => track.scrollLeft > previous',
+                arg=[track.element_handle(), previous_scroll], timeout=3000,
+            )
             # Wait for smooth scrolling to settle before checking/clicking again.
             # A fixed delay can race the arrow becoming disabled at the end.
             track.evaluate('''track => new Promise((resolve, reject) => {
@@ -131,6 +140,16 @@ class FullWidthLayoutE2ETests(BaseE2ETest):
             })''')
         self.assertTrue(track.evaluate('track => track.scrollLeft >= track.scrollWidth - track.clientWidth - 2'))
         expect(track.locator('.home-collection-option').last).to_be_in_viewport()
+        left_button = navigation.get_by_role('button', name='Scroll collections left')
+        expect(left_button).to_be_enabled()
+        end_scroll = track.evaluate('track => track.scrollLeft')
+        box = left_button.bounding_box()
+        self.assertIsNotNone(box)
+        self.page.mouse.click(box['x'] + box['width'] / 2, box['y'] + box['height'] / 2)
+        self.page.wait_for_function(
+            '([track, previous]) => track.scrollLeft < previous',
+            arg=[track.element_handle(), end_scroll], timeout=3000,
+        )
         self.assertLessEqual(self.page.evaluate('document.documentElement.scrollWidth'), 390)
         self.page.screenshot(path=str(self._artifact_dir() / 'collections-phone-end.png'))
 
