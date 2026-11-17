@@ -324,6 +324,12 @@ function initializeCatalogScrollTracking() {
 
   function finishCollapse() {
     if (toggle.getAttribute("aria-expanded") === "false") navigation.hidden = true;
+    // A delayed transition can finish after the fixed guard has expired.
+    // Its layout change may already have moved the scroll anchor before the
+    // scroll event is delivered; treat that position as the new baseline.
+    previousScrollY = Math.max(0, window.scrollY);
+    downwardTravel = 0;
+    upwardTravel = 0;
     scheduleUpdate();
   }
   panel.addEventListener("transitionend", (event) => {

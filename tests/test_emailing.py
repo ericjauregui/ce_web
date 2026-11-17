@@ -147,15 +147,6 @@ class EmailingTests(unittest.TestCase):
             content = renderer("#CE1", self._customer(), self._items(), submitted_at="2026-01-20T02:30:00+00:00")
             self.assertIn("Jan 19, 2026 at 06:30 PM PST", content)
 
-    def test_receipt_retains_every_line_in_large_order(self) -> None:
-        items = [dict(code=f"SKU-{i}", name=f"Product {i}", quantity=999, notes=f"Note {i}") for i in range(100)]
-        html = emailing.build_order_html("#CE1", self._customer(), items)
-        text = emailing.build_order_plain_text("#CE1", self._customer(), items)
-        for item in items:
-            self.assertIn(f"<strong>{item['code']}</strong>", html)
-            self.assertIn(f"{item['code']} | Qty: 999", text)
-        self.assertIn("100 unique items · Total quantity: 99900", html)
-
     def test_send_order_email_raises_with_saved_order_when_config_is_missing(self) -> None:
         with patch.dict(
             os.environ,

@@ -10,27 +10,38 @@ from tests.e2e.common import BaseE2ETest
 class NavLayoutE2ETests(BaseE2ETest):
     browser_name = "chromium"
 
-    def test_compact_navbar_and_offsets_across_site_pages(self) -> None:
+    def test_compact_navbar_catalog_and_team(self) -> None:
+        self._check_compact_navbar_and_offsets(0, 5)
+
+    def test_compact_navbar_information_pages(self) -> None:
+        self._check_compact_navbar_and_offsets(5, 10)
+
+    def test_compact_navbar_transaction_pages(self) -> None:
+        self._check_compact_navbar_and_offsets(10, 15)
+
+    def _check_compact_navbar_and_offsets(self, start: int, end: int) -> None:
         # Catch page overrides, clipped controls, stale sticky offsets, and
         # menu expansion moving the page beneath the fixed navigation row.
         self.page.route(
             re.compile(r"/static/reels/[^?]+\.mp4(?:\?.*)?$", re.I),
             lambda route: route.fulfill(status=204, body=""),
         )
-        self.goto("/team")
-        member_path = self.page.locator(".team-card-link").first.get_attribute("href")
+        member_path = None
+        if start == 0:
+            self.goto("/team")
+            member_path = self.page.locator(".team-card-link").first.get_attribute("href")
         paths = ("/", "/?q=stud", "/team", member_path, "/about", "/contact",
                  "/faqs", "/reels", "/trade-shows", "/connect", "/privacy",
                  f"/product/{self.valid_code}", "/cart", "/checkout", "/missing-page")
         records = []
         root = self._artifact_dir()
         root.mkdir(parents=True, exist_ok=True)
-        for width in (320, 390, 767, 768, 1280, 1692):
-            self.page.set_viewport_size({"width": width, "height": 900})
-            for index, path in enumerate(paths):
+        for index, path in enumerate(paths[start:end], start):
+            self.page.goto(f"{self.base_url}{path}", wait_until="load")
+            self.page.evaluate("document.fonts.ready")
+            for width in (320, 390, 767, 768, 1280, 1692):
                 with self.subTest(width=width, path=path):
-                    self.page.goto(f"{self.base_url}{path}", wait_until="load")
-                    self.page.evaluate("document.fonts.ready")
+                    self.page.set_viewport_size({"width": width, "height": 900})
                     self.page.wait_for_function("""() => Math.abs(
                         parseFloat(getComputedStyle(document.documentElement)
                             .getPropertyValue('--nav-actual-height')) -
@@ -204,7 +215,12 @@ class NavLayoutE2ETests(BaseE2ETest):
         self.assertGreater(self.page.locator(".home-collection-option").count(), 1)
         toggle.click()
         self.assertEqual(toggle.get_attribute("aria-expanded"), "false")
-        expect(navigation).to_be_hidden()
+        self.page.wait_for_function("""() => {
+          const nav = document.getElementById('homeCollectionNavigation');
+          const panel = document.querySelector('.home-collection-panel');
+          return nav.inert && panel.getBoundingClientRect().height < 1 &&
+            Number(getComputedStyle(panel).opacity) < 0.01;
+        }""")
         toggle.click()
         self.assertEqual(toggle.get_attribute("aria-expanded"), "true")
         self.assertTrue(navigation.is_visible())

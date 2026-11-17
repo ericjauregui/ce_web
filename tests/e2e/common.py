@@ -18,6 +18,7 @@ from werkzeug.serving import make_server
 os.environ.setdefault("SECRET_KEY", "test-secret-key")
 REQUIRE_E2E = os.environ.get("CE_REQUIRE_E2E") == "1"
 _ARTIFACT_ROOT_PREPARED = False
+_SHARED_RUNTIME = None
 
 import app as webapp
 from domains.location_options import (
@@ -72,13 +73,66 @@ def _prepare_artifact_root() -> None:
 class _LiveServerThread(threading.Thread):
 	def __init__(self, flask_app, host: str, port: int) -> None:
 		super().__init__(daemon=True)
-		self._server = make_server(host, port, flask_app)
+		# Video responses can otherwise block image and analytics requests behind
+		# a single streaming connection, especially under parallel browser load.
+		self._server = make_server(host, port, flask_app, threaded=True)
 
 	def run(self) -> None:
 		self._server.serve_forever()
 
 	def shutdown(self) -> None:
 		self._server.shutdown()
+
+
+def _shared_runtime(browser_name, sync_playwright):
+	global _SHARED_RUNTIME
+	if _SHARED_RUNTIME is None:
+		host = "127.0.0.1"
+		port = _find_free_port()
+		base_url = f"http://{host}:{port}"
+		server = _LiveServerThread(webapp.app, host, port)
+		server.start()
+		try:
+			_wait_for_server_ready(base_url)
+			playwright = sync_playwright().start()
+		except Exception:
+			server.shutdown()
+			server.join(timeout=2)
+			raise
+		_SHARED_RUNTIME = {"host": host, "port": port, "base_url": base_url,
+		                   "server": server, "playwright": playwright, "browsers": {}}
+	runtime = _SHARED_RUNTIME
+	if browser_name not in runtime["browsers"]:
+		browser_type = getattr(runtime["playwright"], browser_name, None)
+		if browser_type is None:
+			raise RuntimeError(f"Unknown Playwright browser '{browser_name}'. Use chromium, webkit, or firefox.")
+		options = {"headless": os.environ.get("CE_E2E_HEADLESS", "1") != "0"}
+		if browser_name == "chromium":
+			options["channel"] = "chromium"
+		try:
+			runtime["browsers"][browser_name] = browser_type.launch(**options)
+		except Exception as exc:
+			message = f"Playwright browser '{browser_name}' is not available. Run: python -m playwright install chromium webkit"
+			if REQUIRE_E2E:
+				raise RuntimeError(message) from exc
+			raise unittest.SkipTest(message) from exc
+	return runtime
+
+
+def close_shared_runtime():
+	global _SHARED_RUNTIME
+	runtime, _SHARED_RUNTIME = _SHARED_RUNTIME, None
+	if runtime is None:
+		return
+	try:
+		for browser in runtime["browsers"].values():
+			browser.close()
+	finally:
+		try:
+			runtime["playwright"].stop()
+		finally:
+			runtime["server"].shutdown()
+			runtime["server"].join(timeout=2)
 
 
 class BaseE2ETest(unittest.TestCase):
@@ -120,6 +174,15 @@ class BaseE2ETest(unittest.TestCase):
 			),
 			("", ""),
 		)
+		if os.environ.get("CE_E2E_SHARED_RUNTIME") == "1":
+			browser_name = os.environ.get("CE_E2E_BROWSER") or cls.browser_name
+			runtime = _shared_runtime(browser_name, sync_playwright)
+			cls._host, cls._port, cls.base_url = runtime["host"], runtime["port"], runtime["base_url"]
+			cls._server_thread = runtime["server"]
+			cls._playwright_context = runtime["playwright"]
+			cls._browser = runtime["browsers"][browser_name]
+			cls.browser_name = browser_name
+			return
 
 		cls._host = "127.0.0.1"
 		cls._port = _find_free_port()
@@ -166,6 +229,8 @@ class BaseE2ETest(unittest.TestCase):
 
 	@classmethod
 	def tearDownClass(cls) -> None:
+		if os.environ.get("CE_E2E_SHARED_RUNTIME") == "1":
+			return
 		browser = getattr(cls, "_browser", None)
 		playwright_context = getattr(cls, "_playwright_context", None)
 		server_thread = getattr(cls, "_server_thread", None)
@@ -302,7 +367,10 @@ class BaseE2ETest(unittest.TestCase):
 			try:
 				page.screenshot(path=str(artifact_dir / "page.png"), animations="disabled", timeout=15000)
 			except Exception as exc:
-				capture_errors.append(f"screenshot: {type(exc).__name__}: {exc}")
+				try:
+					page.screenshot(path=str(artifact_dir / "page.png"), timeout=30000)
+				except Exception as retry_exc:
+					capture_errors.append(f"screenshot: {type(exc).__name__}: {exc}; retry: {type(retry_exc).__name__}: {retry_exc}")
 			try:
 				(artifact_dir / "page.html").write_text(page.content(), encoding="utf-8")
 			except Exception as exc:

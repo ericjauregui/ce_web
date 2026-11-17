@@ -5,7 +5,7 @@ import hashlib
 import json
 from pathlib import Path
 
-from tests.run import ROOT, _source_fingerprint
+from tests.run import ROOT, _source_fingerprint, clean_project_caches
 
 
 def _sha256(path: Path) -> str:
@@ -60,6 +60,12 @@ def verify(root: Path, *, check_source: bool = False) -> list[str]:
                 problems.append(f"Artifact hash mismatch: {file_path.relative_to(root)}")
     if manifest.get("successful") and any(record["status"] != "passed" for record in evidence):
         problems.append("Successful manifest includes failed E2E evidence")
+    expected = manifest.get("expected_e2e")
+    if expected is not None:
+        if len(expected) != len(set(expected)):
+            problems.append("Manifest contains duplicate expected E2E tests")
+        if set(expected) - set(manifest.get("skipped", [])) != seen:
+            problems.append("Evidence does not match the expected E2E tests")
     return problems
 
 
@@ -78,4 +84,7 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    try:
+        raise SystemExit(main())
+    finally:
+        clean_project_caches()

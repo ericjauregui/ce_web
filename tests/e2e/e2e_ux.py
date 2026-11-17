@@ -895,6 +895,18 @@ class UXE2ETests(BaseE2ETest):
         expect(card.locator('.product-qty-input')).to_have_value('1')
         self.assertEqual(urlsplit(self.page.url).path, '/')
         # A fresh intentional press follows the normal guarded detail route.
+        # Reconciliation and scroll anchoring can outlast the quantity update;
+        # a scroll during a real press correctly cancels the gesture.
+        self.page.evaluate('window.CEOrder.whenIdle()')
+        self.page.wait_for_function("""() => new Promise(resolve => {
+          let last = scrollY, stable = 0;
+          function check() {
+            stable = Math.abs(scrollY - last) < 0.5 ? stable + 1 : 0;
+            last = scrollY;
+            if (stable >= 12) resolve(true); else requestAnimationFrame(check);
+          }
+          requestAnimationFrame(check);
+        })""")
         card.dispatch_event('pointerdown', {'pointerType': 'touch', 'pointerId': 2, 'clientX': 10, 'clientY': 10, 'bubbles': True})
         self.page.wait_for_url('**/product/101SB?q=101SB')
         expect(self.page.locator('.product-qty-input')).to_have_value('1')
@@ -1114,35 +1126,44 @@ class UXE2ETests(BaseE2ETest):
         expect(toggle).to_have_attribute('aria-expanded', 'false')
         # Chromium can report the child nav as visible even when its grid
         # panel clips it completely. Verify the rendered and interactive state.
-        self.page.wait_for_function("document.querySelector('.home-collection-panel').getBoundingClientRect().height <= 1")
-        self.assertTrue(navigation.evaluate('e => e.inert'))
+        def wait_collapsed():
+            self.page.wait_for_function("""() => {
+              const nav = document.querySelector('#homeCollectionNavigation');
+              const panel = document.querySelector('.home-collection-panel');
+              return document.querySelector('.home-collections-toggle').getAttribute('aria-expanded') === 'false'
+                && nav.inert && panel.getBoundingClientRect().height <= 1;
+            }""")
+
+        wait_collapsed()
         self.assertLess(self.page.locator('.home-collections').bounding_box()['height'], expanded_height - 50)
         self.page.wait_for_function("getComputedStyle(document.querySelector('.home-collections-toggle svg')).transform.startsWith('matrix(-1,')")
         self.page.screenshot(path=str(self._artifact_dir_for_capture() / 'collections-auto-collapsed.png'))
+        self.page.wait_for_timeout(600)
         toggle.click()
         expect(navigation).to_be_visible()
         expect(toggle).to_have_attribute('aria-label', 'Collapse catalog collections')
-        self.page.wait_for_function("document.querySelector('.home-collection-panel').getAnimations().every(a => a.playState === 'finished')")
-        self.page.wait_for_timeout(120)
+        self.page.wait_for_function("document.querySelector('.home-collection-panel').getBoundingClientRect().height > 50")
+        # The storefront ignores scroll anchoring for 500ms after toggling.
+        self.page.wait_for_timeout(600)
         expect(navigation).to_be_visible()
         self.page.mouse.wheel(0, 180)
-        expect(navigation).to_be_hidden()
-        self.page.wait_for_timeout(120)
+        wait_collapsed()
+        self.page.wait_for_timeout(600)
         self.page.mouse.wheel(0, -100)
         expect(navigation).to_be_visible()
         expect(toggle).to_have_attribute('aria-expanded', 'true')
         self.page.wait_for_function("['none', 'matrix(1, 0, 0, 1, 0, 0)'].includes(getComputedStyle(document.querySelector('.home-collections-toggle svg')).transform)")
         self.page.screenshot(path=str(self._artifact_dir_for_capture() / 'collections-scroll-up-expanded.png'))
-        self.page.wait_for_timeout(120)
+        self.page.wait_for_timeout(600)
         self.page.mouse.wheel(0, 180)
-        expect(navigation).to_be_hidden()
+        wait_collapsed()
         self.page.evaluate('window.scrollTo(0, 0)')
         expect(navigation).to_be_visible()
         self.page.set_viewport_size({'width': 1280, 'height': 900})
         self.page.locator('.home-collections').evaluate('e => window.scrollTo(0, e.getBoundingClientRect().top + scrollY + 160)')
         expect(navigation).to_be_visible()
         toggle.click()
-        expect(navigation).to_be_hidden()
+        wait_collapsed()
         toggle.click()
         expect(navigation).to_be_visible()
 

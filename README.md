@@ -203,11 +203,13 @@ Useful E2E options:
 uv run python -m tests.run e2e --browser webkit
 uv run python -m tests.run e2e --headed
 uv run python -m tests.run e2e --keep-artifacts
+uv run python -m tests.run e2e --workers 1
+uv run python -m tests.run e2e --test tests.e2e.e2e_reel_posters.ReelPosterRaceE2ETests.test_late_poster_cannot_replace_started_video --artifacts-dir /tmp/ce-focused-e2e
 uv run python -m tests.verify_e2e_artifacts --check-source
 ```
 
-Every E2E test writes a screenshot, rendered HTML, browser event log, and SHA-256 evidence record into `.test-artifacts/e2e/`. The runner writes a run manifest with the source fingerprint and evidence hashes. The E2E command fails if Playwright or browser binaries are missing.
-That directory is cleaned automatically at the start of each new E2E run unless you pass `--keep-artifacts`.
+Every E2E test writes a screenshot, rendered HTML, browser event log, and SHA-256 evidence record into `.test-artifacts/e2e/`. The runner uses four persistent isolated worker processes by default and schedules class-aware batches as workers become available; `--workers 1` runs serially, and `--workers N` changes concurrency. Repeat `--test` to select exact E2E test IDs; focused runs require a separate artifact directory so they cannot replace full-suite evidence. The run manifest records expected tests, source fingerprint, timings, and evidence hashes. Worker logs are retained on failure. The E2E command fails if Playwright or browser binaries are missing.
+The default E2E directory is replaced at the start of a run unless you pass `--keep-artifacts`. After a successful run and evidence verification, the runner removes worker logs and recognized E2E run directories older than seven days under `.test-artifacts/`, including direct browser runs with per-test evidence. Names containing `production` or `live` and directories with `.ce-e2e-preserve` are retained. It also removes Python, pytest, and Ruff caches after test runs. Other files and unrecognized artifact directories are left alone. Custom artifact directories must be empty or previously created by the runner. Test durations in the latest manifest help balance later parallel runs.
 
 The browser suite covers customer workflows, route behavior, and cross-browser layout/resilience. Focused isolated checks remain for failure modes a browser cannot reliably expose.
 

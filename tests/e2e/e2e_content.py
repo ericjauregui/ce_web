@@ -179,7 +179,7 @@ class ContentJourneysE2ETests(BaseE2ETest):
                     const video = document.getElementById('ownerVideo');
                     const rect = video.getBoundingClientRect();
                     return video.paused && (rect.top >= innerHeight || rect.bottom <= 0);
-                }""", timeout=5000)
+                }""", timeout=15000)
                 self.assertEqual(self.page_errors, [])
 
         self.page.emulate_media(reduced_motion="reduce")

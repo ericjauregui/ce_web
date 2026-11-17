@@ -136,9 +136,15 @@ class CommerceE2ETests(BaseE2ETest):
         form.locator('[name="city"]').fill("Los Angeles")
         form.locator('[name="notes"]').fill(order_notes)
 
-        self.page.locator("#checkoutPhoneCountry").fill("United States")
+        self.page.locator("#checkoutPhoneCountry").fill("uni")
+        self.assertIn("United States", self.page.locator("#checkoutPhoneCountryCombobox .checkout-combobox__option").first.inner_text())
         self.page.locator("#checkoutPhoneCountryCombobox .checkout-combobox__option").first.click()
-        self.page.locator("#checkoutCountry").fill("United States")
+        self.page.locator("#checkoutCountry").fill("uni")
+        options = self.page.locator("#checkoutCountryCombobox .checkout-combobox__option")
+        self.assertIn("United States", options.first.inner_text())
+        option_texts = options.all_inner_texts()
+        self.assertTrue(any("United Kingdom" in text for text in option_texts))
+        self.assertTrue(any("United Arab Emirates" in text for text in option_texts))
         self.page.locator("#checkoutCountryCombobox .checkout-combobox__option").first.click()
         self.page.locator("#checkoutState").fill("California")
         self.page.locator("#checkoutStateCombobox .checkout-combobox__option").first.click()
@@ -310,6 +316,9 @@ class CommerceE2ETests(BaseE2ETest):
         mime = message.as_bytes(policy=SMTP)
         html = message.get_body(preferencelist=("html",)).get_content()
         plain = message.get_body(preferencelist=("plain",)).get_content()
+        for index, product in enumerate(products):
+            quantity = 999 if index == 0 else 1
+            self.assertIn(f"{product['code']} | Qty: {quantity}", plain)
         self.assertIn(long_note, plain)
         csv_url = self.page.get_by_role("link", name="Download CSV").get_attribute("href")
         self.assertIn(long_note, self.context.request.get(f"{self.base_url}{csv_url}").text())

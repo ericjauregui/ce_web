@@ -44,6 +44,17 @@ class HeroRenderingE2ETests(BaseE2ETest):
         self.page.wait_for_function("document.querySelector('#latestVideosTrack .is-active video')?.readyState >= 2")
         self.page.locator('[data-target="section-hearts"]').first.click()
         target = self.page.locator("#section-hearts")
+        # Let the collection's smooth anchor scroll finish before asking
+        # Playwright to reveal its first image for native lazy loading.
+        self.page.wait_for_function("""() => new Promise(resolve => {
+          let last = scrollY, stable = 0;
+          function check() {
+            stable = Math.abs(scrollY - last) < 0.5 ? stable + 1 : 0;
+            last = scrollY;
+            if (stable >= 8) resolve(true); else requestAnimationFrame(check);
+          }
+          requestAnimationFrame(check);
+        })""")
         image = target.locator("img.product-img").first
         image.scroll_into_view_if_needed()
         self.page.wait_for_function("img => img.complete && img.naturalWidth > 0", arg=image.element_handle())

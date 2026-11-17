@@ -819,20 +819,11 @@ class SiteAnalyticsDashboardE2ETests(BaseE2ETest):
     def _watch_analytics(self, *, fallback: bool = False) -> list[dict]:
         events = []
         self._analytics_responses = []
-        self.page.expose_function("auditPayload", lambda payload: events.append({"payload": payload}))
-        self.page.add_init_script("""
-          const beacon = navigator.sendBeacon.bind(navigator);
-          navigator.sendBeacon = (url, body) => {
-            const sent = beacon(url, body);
-            if (sent && url === '/api/analytics/event') body.text().then(text => window.auditPayload(JSON.parse(text)));
-            return sent;
-          };
-          const nativeFetch = window.fetch;
-          window.fetch = (url, options) => {
-            if (url === '/api/analytics/event') window.auditPayload(JSON.parse(options.body));
-            return nativeFetch(url, options);
-          };
-        """)
+        def capture_request(request):
+            if request.url.endswith('/api/analytics/event'):
+                events.append({"payload": request.post_data_json})
+                self._save_tracking_evidence(events)
+        self.page.on("request", capture_request)
         if fallback:
             self.page.add_init_script("navigator.sendBeacon = () => false")
         def capture(response):
