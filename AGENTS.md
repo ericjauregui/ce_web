@@ -1,3 +1,7 @@
+# Worker model preference
+
+When delegating work to subagents, use the latest available Luna or Terra model with medium reasoning effort.
+
 # Repository testing rules
 
 - Never write unit tests after you write code.
